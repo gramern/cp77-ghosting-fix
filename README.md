@@ -1,5 +1,5 @@
 # FrameGen Ghosting 'Fix' mod for Cyberpunk 2077
-Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achives that by putting almost invisible HUD masks that block frame generation from presenting in certain parts of a screen.
+Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achieves that by putting almost invisible HUD masks that block frame generation from presenting in certain parts of a screen.
 
 # Requirements
 + Cyberpunk 2.12+
