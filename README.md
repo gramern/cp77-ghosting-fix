@@ -11,3 +11,6 @@ Given the way mod impacts the image shown on a screen, there must be at least 45
 
 # The mod's whiteboard on Miro (rough design notes)
 [https://miro.com/app/board/uXjVNrZBovU=/](https://miro.com/app/board/uXjVNrZBovU=/)
+
+# The mod releases
+I publish all the mod's releases on [this Nexus Mods page](https://www.nexusmods.com/cyberpunk2077/mods/13029).
