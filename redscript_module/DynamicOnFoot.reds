@@ -1,9 +1,12 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.1 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.11 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+
+// @addField(IronsightGameController) public let m_debugOnFootPrinted: Bool = false;
 
 @addField(IronsightGameController) public let m_masksOnFootEnabled: Bool;
 @addField(IronsightGameController) public let m_hasWeaponDrawn: Bool;
+@addField(IronsightGameController) public let m_isAmplifiedOnFoot: Bool = false;
 @addField(IronsightGameController) public let m_isDeactivatingPlusOnFoot: Bool = false;
 
 @addMethod(IronsightGameController)
@@ -18,6 +21,22 @@ protected final func OnFrameGenGhostingFixHasWeapon(hasWeapon: Bool) -> Void {
   }
 }
 
+//The main transformation function---------------------------------------------------------------------------------------
+@addMethod(IronsightGameController)
+protected cb func FrameGenGhostingFixFootSetTransformation(dumbo45footSetOpacity: Float) -> Bool {
+
+  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
+  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+
+  if dumbo4foot.GetOpacity() != dumbo45footSetOpacity {
+    dumbo4foot.SetOpacity(dumbo45footSetOpacity);
+  }
+  if dumbo5foot.GetOpacity() != dumbo45footSetOpacity {
+    dumbo5foot.SetOpacity(dumbo45footSetOpacity);
+  }
+}
+
 //Activate masks on foot---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected final func OnFrameGenGhostingFixOnFootToggleEvent(replacer: Bool) -> Void {
@@ -27,14 +46,6 @@ protected final func OnFrameGenGhostingFixOnFootToggleEvent(replacer: Bool) -> V
 @addMethod(IronsightGameController)
 protected final func OnFrameGenGhostingFixOnFootToggle(masksOnFoot: Bool) -> Void {
   this.m_masksOnFootEnabled = masksOnFoot;
-}
-
-
-@addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootActivationPlusPhaseTwoSetupEvent(delay: Float) -> Void {
-  let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOnMasksPhaseTwo: ref<FrameGenGhostingFixActivationFootPhaseTwoEvent> = new FrameGenGhostingFixActivationFootPhaseTwoEvent();
-  GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOnMasksPhaseTwo, delay, false);
 }
 
 @addMethod(IronsightGameController)
@@ -47,70 +58,74 @@ protected cb func OnFrameGenGhostingFixActivationFootEvent(evt: ref<FrameGenGhos
   let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
   let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
 
-  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) {
-    if dumbo4foot.GetOpacity() != 0.0500000007 {
-      dumbo4foot.SetOpacity(0.0299999993);
+  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) && Equals(this.m_isAmplifiedOnFoot,false) {
+    if dumbo4foot.GetOpacity() != 0.05 {
+      dumbo4foot.SetOpacity(0.03);
     }
-    if dumbo5foot.GetOpacity() != 0.0500000007 {
-      dumbo5foot.SetOpacity(0.0299999993);
+    if dumbo5foot.GetOpacity() != 0.05 {
+      dumbo5foot.SetOpacity(0.03);
     }
-    this.FrameGenGhostingFixOnFootActivationPlusPhaseTwoSetupEvent(0.2);
+    this.FrameGenGhostingFixOnFootActivationAmplifySetupEvent(0.2);
+  }
+  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) && Equals(this.m_isAmplifiedOnFoot,true) {
+    this.FrameGenGhostingFixOnFootActivationAmplifySetupEvent(0.0);
   }
 }
 
-//Activate masks plus on foot---------------------------------------------------------------------------------------
+//Amplify masks on foot---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixActivationFootPhaseTwoEvent(evt: ref<FrameGenGhostingFixActivationFootPhaseTwoEvent>) -> Bool {
+private final func FrameGenGhostingFixOnFootActivationAmplifySetupEvent(delay: Float) -> Void {
+  let player: ref<GameObject> = this.GetPlayerControlledObject();
+  let turnOnMasksPhaseTwo: ref<FrameGenGhostingFixActivationFootAmplifyEvent> = new FrameGenGhostingFixActivationFootAmplifyEvent();
+  GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOnMasksPhaseTwo, delay, false);
+}
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+@addMethod(IronsightGameController)
+protected cb func OnFrameGenGhostingFixActivationFootAmplifyEvent(evt: ref<FrameGenGhostingFixActivationFootAmplifyEvent>) -> Bool {
 
-  if dumbo4foot.GetOpacity() != 0.0500000007 {
-    dumbo4foot.SetOpacity(0.0500000007);
-  }
-  if dumbo5foot.GetOpacity() != 0.0500000007 {
-    dumbo5foot.SetOpacity(0.0500000007);
-  }
+  this.FrameGenGhostingFixFootSetTransformation(0.05);
+
+  this.m_isAmplifiedOnFoot = true;
+
   if Equals(this.m_isDeactivatingPlusOnFoot,false) {
     this.m_isDeactivatingPlusOnFoot = true;
-    this.FrameGenGhostingFixOnFootDeActivationPlusPhaseOneSetupEvent(3.0);
+    this.FrameGenGhostingFixOnFootDeActivationPhaseOneSetupEvent(3.0);
   }
 }
 
 //Setting deactivation for masks on foot---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootDeActivationPlusPhaseOneSetupEvent(delay: Float) -> Void {
+private final func FrameGenGhostingFixOnFootDeActivationPhaseOneSetupEvent(delay: Float) -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOffMasksPhaseOne: ref<FrameGenGhostingFixDeActivationFootPlusPhaseOneEvent> = new FrameGenGhostingFixDeActivationFootPlusPhaseOneEvent();
-  GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasksPhaseOne, delay, false);
+  let nextEvent: ref<FrameGenGhostingFixDeActivationFootPhaseOneEvent> = new FrameGenGhostingFixDeActivationFootPhaseOneEvent();
+  GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, nextEvent, delay, false);
 }
 
 @addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootDeActivationPlusPhaseTwoSetupEvent(delay: Float) -> Void {
+private final func FrameGenGhostingFixOnFootDeActivationPhaseTwoSetupEvent(delay: Float) -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOffMasksPhaseTwo: ref<FrameGenGhostingFixDeActivationFootPlusPhaseTwoEvent> = new FrameGenGhostingFixDeActivationFootPlusPhaseTwoEvent();
+  let turnOffMasksPhaseTwo: ref<FrameGenGhostingFixDeActivationFootPhaseTwoEvent> = new FrameGenGhostingFixDeActivationFootPhaseTwoEvent();
   GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasksPhaseTwo, delay, false);
 }
 
 @addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootDeActivationPlusPhaseThreeSetupEvent(delay: Float) -> Void {
+private final func FrameGenGhostingFixOnFootDeActivationPhaseThreeSetupEvent(delay: Float) -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOffMasksPhaseThree: ref<FrameGenGhostingFixDeActivationFootPlusPhaseThreeEvent> = new FrameGenGhostingFixDeActivationFootPlusPhaseThreeEvent();
+  let turnOffMasksPhaseThree: ref<FrameGenGhostingFixDeActivationFootPhaseThreeEvent> = new FrameGenGhostingFixDeActivationFootPhaseThreeEvent();
   GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasksPhaseThree, delay, false);
 }
 
 @addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootDeActivationPlusPhaseFourSetupEvent(delay: Float) -> Void {
+private final func FrameGenGhostingFixOnFootDeActivationPhaseFourSetupEvent(delay: Float) -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOffMasksPhaseFour: ref<FrameGenGhostingFixDeActivationFootPlusPhaseFourEvent> = new FrameGenGhostingFixDeActivationFootPlusPhaseFourEvent();
+  let turnOffMasksPhaseFour: ref<FrameGenGhostingFixDeActivationFootPhaseFourEvent> = new FrameGenGhostingFixDeActivationFootPhaseFourEvent();
   GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasksPhaseFour, delay, false);
 }
 
 @addMethod(IronsightGameController)
-private final func FrameGenGhostingFixOnFootDeActivationPlusPhaseFiveSetupEvent(delay: Float) -> Void {
+private final func FrameGenGhostingFixOnFootDeActivationPhaseFiveSetupEvent(delay: Float) -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
-  let turnOffMasksPhaseFive: ref<FrameGenGhostingFixDeActivationFootPlusPhaseFiveEvent> = new FrameGenGhostingFixDeActivationFootPlusPhaseFiveEvent();
+  let turnOffMasksPhaseFive: ref<FrameGenGhostingFixDeActivationFootPhaseFiveEvent> = new FrameGenGhostingFixDeActivationFootPhaseFiveEvent();
   GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasksPhaseFive, delay, false);
 }
 
@@ -121,88 +136,48 @@ private final func FrameGenGhostingFixOnFootDeActivationSetupEvent(delay: Float)
   GameInstance.GetDelaySystem(player.GetGame()).DelayEvent(player, turnOffMasks, delay, false);
 }
 
-//Deactivate masks plus on foot phase one---------------------------------------------------------------------------------------
+//Deactivate masks on foot phase one---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseOneFoot(evt: ref<FrameGenGhostingFixDeActivationFootPlusPhaseOneEvent>) -> Bool {
+protected cb func OnFrameGenGhostingFixDeActivationPhaseOneFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseOneEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.035);
 
-  if dumbo4foot.GetOpacity() != 0.0350000001 {
-    dumbo4foot.SetOpacity(0.0350000001);
-  }
-  if dumbo5foot.GetOpacity() != 0.0350000001 {
-    dumbo5foot.SetOpacity(0.0350000001);
-  }
-  this.FrameGenGhostingFixOnFootDeActivationPlusPhaseTwoSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseTwoSetupEvent(0.5);
 }
 
-//Deactivate masks plus on foot phase two---------------------------------------------------------------------------------------
+//Deactivate masks on foot phase two---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseTwoFoot(evt: ref<FrameGenGhostingFixDeActivationFootPlusPhaseTwoEvent>) -> Bool {
+protected cb func OnFrameGenGhostingFixDeActivationPhaseTwoFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseTwoEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.03);
 
-  if dumbo4foot.GetOpacity() != 0.0299999993 {
-    dumbo4foot.SetOpacity(0.0299999993);
-  }
-  if dumbo5foot.GetOpacity() != 0.0299999993 {
-    dumbo5foot.SetOpacity(0.0299999993);
-  }
-   this.FrameGenGhostingFixOnFootDeActivationPlusPhaseThreeSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseThreeSetupEvent(0.5);
 }
 
-//Deactivate masks plus on foot phase three---------------------------------------------------------------------------------------
+//Deactivate masks on foot phase three---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseThreeFoot(evt: ref<FrameGenGhostingFixDeActivationFootPlusPhaseThreeEvent>) -> Bool {
+protected cb func OnFrameGenGhostingFixDeActivationPhaseThreeFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseThreeEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.02);
 
-  if dumbo4foot.GetOpacity() != 0.0199999996 {
-    dumbo4foot.SetOpacity(0.0199999996);
-  }
-  if dumbo5foot.GetOpacity() != 0.0199999996 {
-    dumbo5foot.SetOpacity(0.0199999996);
-  }
-   this.FrameGenGhostingFixOnFootDeActivationPlusPhaseFourSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseFourSetupEvent(0.5);
 }
 
-//Deactivate masks plus on foot phase four---------------------------------------------------------------------------------------
+//Deactivate masks on foot phase four---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseFourFoot(evt: ref<FrameGenGhostingFixDeActivationFootPlusPhaseFourEvent>) -> Bool {
+protected cb func OnFrameGenGhostingFixDeActivationPhaseFourFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseFourEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.015);
 
-  if dumbo4foot.GetOpacity() != 0.0149999997 {
-    dumbo4foot.SetOpacity(0.0149999997);
-  }
-  if dumbo5foot.GetOpacity() != 0.0149999997 {
-    dumbo5foot.SetOpacity(0.0149999997);
-  }
-  this.FrameGenGhostingFixOnFootDeActivationPlusPhaseFiveSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseFiveSetupEvent(0.5);
 }
 
-//Deactivate masks plus on foot phase four---------------------------------------------------------------------------------------
+//Deactivate masks on foot phase four---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseFiveFoot(evt: ref<FrameGenGhostingFixDeActivationFootPlusPhaseFiveEvent>) -> Bool {
+protected cb func OnFrameGenGhostingFixDeActivationPhaseFiveFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseFiveEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.01);
 
-  if dumbo4foot.GetOpacity() != 0.00999999978 {
-    dumbo4foot.SetOpacity(0.00999999978);
-  }
-  if dumbo5foot.GetOpacity() != 0.00999999978 {
-    dumbo5foot.SetOpacity(0.00999999978);
-  }
   this.FrameGenGhostingFixOnFootDeActivationSetupEvent(0.5);
 }
 
@@ -210,15 +185,8 @@ protected cb func OnFrameGenGhostingFixDeActivationPlusPhaseFiveFoot(evt: ref<Fr
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationFoot(evt: ref<FrameGenGhostingFixDeActivationFootEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
+  this.FrameGenGhostingFixFootSetTransformation(0.0);
 
-  if dumbo4foot.GetOpacity() != 0.0 {
-    dumbo4foot.SetOpacity(0.0);
-  }
-  if dumbo5foot.GetOpacity() != 0.0 {
-    dumbo5foot.SetOpacity(0.0);
-  }
+  this.m_isAmplifiedOnFoot = false;
   this.m_isDeactivatingPlusOnFoot = false;
 }

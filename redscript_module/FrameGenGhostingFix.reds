@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.1 for FSR3 Mods, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 2.11 for FSR3 Mods, 2024 gramern (scz_g)
 
 //Global toggle---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixToggleEvent extends Event {}
@@ -39,12 +39,14 @@ public class FrameGenGhostingFixDumboActivationFootEvent extends Event {}
 public class FrameGenGhostingFixDumboDeActivationFootEvent extends Event {}
 public class FrameGenGhostingFixActivationFootEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootEvent extends Event {}
-public class FrameGenGhostingFixActivationFootPhaseTwoEvent extends Event {}
-public class FrameGenGhostingFixDeActivationFootPlusPhaseOneEvent extends Event {}
-public class FrameGenGhostingFixDeActivationFootPlusPhaseTwoEvent extends Event {}
-public class FrameGenGhostingFixDeActivationFootPlusPhaseThreeEvent extends Event {}
-public class FrameGenGhostingFixDeActivationFootPlusPhaseFourEvent extends Event {}
-public class FrameGenGhostingFixDeActivationFootPlusPhaseFiveEvent extends Event {}
+public class FrameGenGhostingFixActivationFootAmplifyEvent extends Event {}
+public class FrameGenGhostingFixDeActivationFootPhaseOneEvent extends Event {}
+public class FrameGenGhostingFixDeActivationFootPhaseTwoEvent extends Event {}
+public class FrameGenGhostingFixDeActivationFootPhaseThreeEvent extends Event {}
+public class FrameGenGhostingFixDeActivationFootPhaseFourEvent extends Event {}
+public class FrameGenGhostingFixDeActivationFootPhaseFiveEvent extends Event {}
+
+public class FrameGenGhostingFixDumboCameraTPPCarMixEvent extends Event {}
 
 //Setting an input listener for a player's inputs---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixInputListener {

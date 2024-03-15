@@ -1,6 +1,8 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.1 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.11 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+
+// @addField(IronsightGameController) public let m_debugPrinted: Bool = false;
 
 @addField(DriveEvents) public let m_carCameraContext: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContext: vehicleCameraPerspective;
@@ -9,9 +11,9 @@
 @addField(DriveEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
 
 
-//Setting masks when changing cameras in a car---------------------------------------------------------------------------------------
+//The main transformation function---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarEvent>) -> Bool {
+private cb func OnFrameGenGhostingFixVehicleSetTransformation(dumbo1setOpacity: Float, dumbo2setOpacity: Float, dumbo3setOpacity: Float, dumbo45setOpacity: Float, dynamic_dumbo1setOpacity: Float, dynamic_dumbo2setOpacity: Float, dynamic_dumbo3setOpacity: Float, dumbo1setSize: Vector2, dumbo2setSize: Vector2, dumbo3setSize: Vector2) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
@@ -23,446 +25,141 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGho
   let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
   let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
 
-  if dumbo1.GetOpacity() != 0.0299999993 {
-    dumbo1.SetOpacity(0.0299999993);
-  }
-  if dumbo2.GetOpacity() != 0.0500000007 {
-    dumbo2.SetOpacity(0.0500000007);
-  }
-  if dumbo3.GetOpacity() != 0.0299999993 {
-    dumbo3.SetOpacity(0.0299999993);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0299999993 {
-    dynamic_dumbo1.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
+  let dumbo1size = dumbo1.GetSize();
+  if dumbo1size.Y != dumbo1setSize.Y {
+    dumbo1.SetSize(dumbo1size.X, dumbo1setSize.Y);
     dumbo1.Reparent(root);
   }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3600.0 {
-    dumbo2.SetSize(3600.0, dumbo2Size.Y);
+  let dumbo2size = dumbo2.GetSize();
+  if dumbo2size.X != dumbo2setSize.X {
+    dumbo2.SetSize(dumbo2setSize.X, dumbo2size.Y);
     dumbo2.Reparent(root);
   }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 850.0 {
-    dumbo2.SetSize(dumbo2Size.X, 850.0);
+  let dumbo2size = dumbo2.GetSize();
+  if dumbo2size.Y != dumbo2setSize.Y {
+    dumbo2.SetSize(dumbo2size.X, dumbo2setSize.Y);
     dumbo2.Reparent(root);
   }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 2000.0 {
-    dumbo3.SetSize(2000.0, dumbo3Size.Y);
+  let dumbo3size = dumbo3.GetSize();
+  if dumbo3size.X != dumbo3setSize.X {
+    dumbo3.SetSize(dumbo3setSize.X, dumbo3size.Y);
     dumbo3.Reparent(root);
   }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 900.0 {
-    dumbo3.SetSize(dumbo3Size.X, 900.0);
+  let dumbo3size = dumbo3.GetSize();
+    if dumbo3size.Y != dumbo3setSize.Y {
+    dumbo3.SetSize(dumbo3size.X, dumbo3setSize.Y);
     dumbo3.Reparent(root);
   }
+
+  if dumbo1.GetOpacity() != dumbo1setOpacity {
+    dumbo1.SetOpacity(dumbo1setOpacity);
+  }
+  if dumbo2.GetOpacity() != dumbo2setOpacity {
+    dumbo2.SetOpacity(dumbo2setOpacity);
+  }
+  if dumbo3.GetOpacity() != dumbo3setOpacity {
+    dumbo3.SetOpacity(dumbo3setOpacity);
+  }
+  if dumbo4.GetOpacity() != dumbo45setOpacity {
+    dumbo4.SetOpacity(dumbo45setOpacity);
+  }
+  if dumbo5.GetOpacity() != dumbo45setOpacity {
+    dumbo5.SetOpacity(dumbo45setOpacity);
+  }
+  if dynamic_dumbo1.GetOpacity() != dynamic_dumbo1setOpacity {
+    dynamic_dumbo1.SetOpacity(dynamic_dumbo1setOpacity);
+  }
+  if dynamic_dumbo2.GetOpacity() != dynamic_dumbo2setOpacity {
+    dynamic_dumbo2.SetOpacity(dynamic_dumbo2setOpacity);
+  }
+  if dynamic_dumbo3.GetOpacity() != dynamic_dumbo3setOpacity {
+    dynamic_dumbo3.SetOpacity(dynamic_dumbo3setOpacity);
+  }
+
+  // if Equals(this.m_debugPrinted, false) {
+  //   LogChannel(n"DEBUG", s"Received and applied opacities for dumbos: \(dumbo1setOpacity), \(dumbo2setOpacity), \(dumbo3setOpacity), \(dumbo45setOpacity), \(dynamic_dumbo1setOpacity), \(dynamic_dumbo2setOpacity), \(dynamic_dumbo3setOpacity)");
+  //   LogChannel(n"DEBUG", s"Received sizes for dumbos: \(dumbo1setSize), \(dumbo2setSize), \(dumbo3setSize)");
+  //   this.m_debugPrinted = true;
+  // }
+}
+
+//Setting masks when changing cameras in a car---------------------------------------------------------------------------------------
+@addMethod(IronsightGameController)
+private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarEvent>) -> Bool {
+  
+  // this.m_debugPrinted = false;
+
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
+  let dumbo3setSize: Vector2 = new Vector2(2000.0, 900.0);
+
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.05, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarFasterEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  // this.m_debugPrinted = false;
 
-  if dumbo1.GetOpacity() != 0.0250000004 {
-    dumbo1.SetOpacity(0.0250000004);
-  }
-  if dumbo2.GetOpacity() != 0.0299999993 {
-    dumbo2.SetOpacity(0.0299999993);
-  }
-  if dumbo3.GetOpacity() != 0.0250000004 {
-    dumbo3.SetOpacity(0.0250000004);
-  }
-  if dumbo4.GetOpacity() != 0.0250000004 {
-    dumbo4.SetOpacity(0.0250000004);
-  }
-  if dumbo5.GetOpacity() != 0.0250000004 {
-    dumbo5.SetOpacity(0.0250000004);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0199999996 {
-    dynamic_dumbo1.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
+  let dumbo3setSize: Vector2 = new Vector2(2000.0, 900.0);
 
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3600.0 {
-    dumbo2.SetSize(3600.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 850.0 {
-    dumbo2.SetSize(dumbo2Size.X, 850.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 2000.0 {
-    dumbo3.SetSize(2000.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 900.0 {
-    dumbo3.SetSize(dumbo3Size.X, 900.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.025, 0.03, 0.025, 0.025, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarSlowEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  // this.m_debugPrinted = false;
 
-  if dumbo1.GetOpacity() != 0.0199999996 {
-    dumbo1.SetOpacity(0.0199999996);
-  }
-  if dumbo2.GetOpacity() != 0.0199999996 {
-    dumbo2.SetOpacity(0.0199999996);
-  }
-  if dumbo3.GetOpacity() != 0.0199999996{
-    dumbo3.SetOpacity(0.0199999996);
-  }
-  if dumbo4.GetOpacity() != 0.0199999996 {
-    dumbo4.SetOpacity(0.0199999996);
-  }
-  if dumbo5.GetOpacity() != 0.0199999996 {
-    dumbo5.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978{
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3400.0 {
-    dumbo2.SetSize(3400.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.02, 0.02, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarCrawlEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  // this.m_debugPrinted = false;
 
-  if dumbo1.GetOpacity() != 0.00999999978 {
-    dumbo1.SetOpacity(0.00999999978);
-  }
-  if dumbo2.GetOpacity() != 0.00999999978 {
-    dumbo2.SetOpacity(0.00999999978);
-  }
-  if dumbo3.GetOpacity() != 0.00999999978{
-    dumbo3.SetOpacity(0.00999999978);
-  }
-  if dumbo4.GetOpacity() != 0.00999999978 {
-    dumbo4.SetOpacity(0.00999999978);
-  }
-  if dumbo5.GetOpacity() != 0.00999999978 {
-    dumbo5.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3400.0 {
-    dumbo2.SetSize(3400.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarCarEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 800.0);
+  let dumbo2setSize: Vector2 = new Vector2(2000.0, 1150.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 700.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.0299999993 {
-    dumbo2.SetOpacity(0.0299999993);
-  }
-  if dumbo3.GetOpacity() != 0.0299999993 {
-    dumbo3.SetOpacity(0.0299999993);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0299999993 {
-    dynamic_dumbo1.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 800.0 {
-    dumbo1.SetSize(dumbo1Size.X, 800.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2000.0 {
-    dumbo2.SetSize(2000.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 1150.0 {
-    dumbo2.SetSize(dumbo2Size.X, 1150.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 700.0 {
-    dumbo3.SetSize(dumbo3Size.X, 700.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.03, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarCarSlowEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-   dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.0199999996 {
-  dumbo2.SetOpacity(0.0199999996);
-  }
-  if dumbo3.GetOpacity() != 0.0199999996 {
-  dumbo3.SetOpacity(0.0199999996);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-  dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-  dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0299999993 {
-  dynamic_dumbo1.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-  dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-  dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2600.0 {
-    dumbo2.SetSize(2600.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 800.0 {
-    dumbo2.SetSize(dumbo2Size.X, 800.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.02, 0.02, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-   dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.00999999978 {
-  dumbo2.SetOpacity(0.00999999978);
-  }
-  if dumbo3.GetOpacity() != 0.0199999996 {
-  dumbo3.SetOpacity(0.0199999996);
-  }
-  if dumbo4.GetOpacity() != 0.00999999978 {
-  dumbo4.SetOpacity(0.00999999978);
-  }
-  if dumbo5.GetOpacity() != 0.00999999978 {
-  dumbo5.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-  dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-  dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-  dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2600.0 {
-    dumbo2.SetSize(2600.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 800.0 {
-    dumbo2.SetSize(dumbo2Size.X, 800.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.01, 0.02, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
@@ -480,35 +177,35 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPCarEvent(fppCarSideMirrorOpac
   let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
   let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.00100000005 {
-    dumbo2.SetOpacity(0.00100000005);
-  }
-  if dumbo3.GetOpacity() != 0.00100000005 {
-    dumbo3.SetOpacity(0.00100000005);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo1.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo2.GetOpacity() != fppCarSideMirrorOpacity {
-    dynamic_dumbo2.SetOpacity(fppCarSideMirrorOpacity);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
   let dynamic_dumbo2Size = dynamic_dumbo2.GetSize();
   if dynamic_dumbo2Size.X != 2100.0 && dynamic_dumbo2Size.Y != 1800.0 {
     dynamic_dumbo2.SetSize(fppCarSideMirrorSize);
     dynamic_dumbo2.Reparent(root);
+  }
+
+  if dumbo1.GetOpacity() != 0.001 {
+    dumbo1.SetOpacity(0.001);
+  }
+  if dumbo2.GetOpacity() != 0.001 {
+    dumbo2.SetOpacity(0.001);
+  }
+  if dumbo3.GetOpacity() != 0.001 {
+    dumbo3.SetOpacity(0.001);
+  }
+  if dumbo4.GetOpacity() != 0.03 {
+    dumbo4.SetOpacity(0.03);
+  }
+  if dumbo5.GetOpacity() != 0.03 {
+    dumbo5.SetOpacity(0.03);
+  }
+  if dynamic_dumbo1.GetOpacity() != 0.001 {
+    dynamic_dumbo1.SetOpacity(0.001);
+  }
+  if dynamic_dumbo2.GetOpacity() != fppCarSideMirrorOpacity {
+    dynamic_dumbo2.SetOpacity(fppCarSideMirrorOpacity);
+  }
+  if dynamic_dumbo3.GetOpacity() != 0.001 {
+    dynamic_dumbo3.SetOpacity(0.001);
   }
 }
 
@@ -521,505 +218,82 @@ private cb func OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent(evt: ref<FrameG
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPCarSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPCarSlowEvent>) -> Bool {
 
-  let fppCarSideMirrorSize: Vector2 = new Vector2(2100.0, 1800.0);
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
-
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.00100000005 {
-    dumbo2.SetOpacity(0.00100000005);
-  }
-  if dumbo3.GetOpacity() != 0.00100000005 {
-    dumbo3.SetOpacity(0.00100000005);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo1.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dynamic_dumbo2Size = dynamic_dumbo2.GetSize();
-  if dynamic_dumbo2Size.X != 2100.0 && dynamic_dumbo2Size.Y != 1800.0 {
-    dynamic_dumbo2.SetSize(fppCarSideMirrorSize);
-    dynamic_dumbo2.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.001, 0.001, 0.03, 0.001, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 //Setting masks when changing cameras on a bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPBikeEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3200.0, 1050.0);
+  let dumbo3setSize: Vector2 = new Vector2(1400.0, 1400.0);
 
-  if dumbo1.GetOpacity() != 0.0299999993 {
-    dumbo1.SetOpacity(0.0299999993);
-  }
-  if dumbo2.GetOpacity() != 0.0399999991 {
-    dumbo2.SetOpacity(0.0399999991);
-  }
-  if dumbo3.GetOpacity() != 0.0299999993{
-    dumbo3.SetOpacity(0.0299999993);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0299999993 {
-    dynamic_dumbo1.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3200.0 {
-    dumbo2.SetSize(3200.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 1050.0 {
-    dumbo2.SetSize(dumbo2Size.X, 1050.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1400.0 {
-    dumbo3.SetSize(1400.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 1400.0 {
-    dumbo3.SetSize(dumbo3Size.X, 1400.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.04, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
-//Setting masks when changing cameras on a bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPBikeFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPBikeFasterEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3200.0, 1050.0);
+  let dumbo3setSize: Vector2 = new Vector2(1400.0, 1400.0);
 
-  if dumbo1.GetOpacity() != 0.0250000004 {
-    dumbo1.SetOpacity(0.0250000004);
-  }
-  if dumbo2.GetOpacity() != 0.0250000004 {
-    dumbo2.SetOpacity(0.0250000004);
-  }
-  if dumbo3.GetOpacity() != 0.0250000004{
-    dumbo3.SetOpacity(0.0250000004);
-  }
-  if dumbo4.GetOpacity() != 0.0250000004 {
-    dumbo4.SetOpacity(0.0250000004);
-  }
-  if dumbo5.GetOpacity() != 0.0250000004 {
-    dumbo5.SetOpacity(0.0250000004);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0199999996 {
-    dynamic_dumbo1.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3200.0 {
-    dumbo2.SetSize(3200.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 1050.0 {
-    dumbo2.SetSize(dumbo2Size.X, 1050.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1400.0 {
-    dumbo3.SetSize(1400.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 1400.0 {
-    dumbo3.SetSize(dumbo3Size.X, 1400.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.025, 0.025, 0.025, 0.025, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPBikeSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPBikeSlowEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(2400.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.0199999996 {
-    dumbo1.SetOpacity(0.0199999996);
-  }
-  if dumbo2.GetOpacity() != 0.0199999996 {
-    dumbo2.SetOpacity(0.0199999996);
-  }
-  if dumbo3.GetOpacity() != 0.0199999996{
-    dumbo3.SetOpacity(0.0199999996);
-  }
-  if dumbo4.GetOpacity() != 0.0199999996 {
-    dumbo4.SetOpacity(0.0199999996);
-  }
-  if dumbo5.GetOpacity() != 0.0199999996 {
-    dumbo5.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2400.0 {
-    dumbo2.SetSize(2400.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.02, 0.02, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPBikeCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(2400.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00999999978 {
-    dumbo1.SetOpacity(0.00999999978);
-  }
-  if dumbo2.GetOpacity() != 0.00999999978 {
-    dumbo2.SetOpacity(0.00999999978);
-  }
-  if dumbo3.GetOpacity() != 0.00999999978{
-    dumbo3.SetOpacity(0.00999999978);
-  }
-  if dumbo4.GetOpacity() != 0.00999999978 {
-    dumbo4.SetOpacity(0.00999999978);
-  }
-  if dumbo5.GetOpacity() != 0.00999999978 {
-    dumbo5.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2400.0 {
-    dumbo2.SetSize(2400.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarBikeEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 800.0);
+  let dumbo2setSize: Vector2 = new Vector2(2000.0, 1050.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.0299999993 {
-    dumbo2.SetOpacity(0.0299999993);
-  }
-  if dumbo3.GetOpacity() != 0.0299999993 {
-    dumbo3.SetOpacity(0.0299999993);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0299999993 {
-    dynamic_dumbo1.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 800.0 {
-    dumbo1.SetSize(dumbo1Size.X, 800.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2000.0 {
-    dumbo2.SetSize(2000.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 1050.0 {
-    dumbo2.SetSize(dumbo2Size.X, 1050.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.03, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 800.0);
+  let dumbo2setSize: Vector2 = new Vector2(2000.0, 900.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.0199999996 {
-    dumbo2.SetOpacity(0.0199999996);
-  }
-  if dumbo3.GetOpacity() != 0.0199999996 {
-    dumbo3.SetOpacity(0.0199999996);
-  }
-  if dumbo4.GetOpacity() != 0.0199999996 {
-    dumbo4.SetOpacity(0.0199999996);
-  }
-  if dumbo5.GetOpacity() != 0.0199999996 {
-    dumbo5.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0199999996 {
-    dynamic_dumbo1.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2000.0 {
-    dumbo2.SetSize(2000.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.02, 0.02, 0.02, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 800.0);
+  let dumbo2setSize: Vector2 = new Vector2(2000.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00100000005 {
-    dumbo1.SetOpacity(0.00100000005);
-  }
-  if dumbo2.GetOpacity() != 0.00999999978 {
-    dumbo2.SetOpacity(0.00999999978);
-  }
-  if dumbo3.GetOpacity() != 0.00999999978 {
-    dumbo3.SetOpacity(0.00999999978);
-  }
-  if dumbo4.GetOpacity() != 0.00999999978 {
-    dumbo4.SetOpacity(0.00999999978);
-  }
-  if dumbo5.GetOpacity() != 0.00999999978 {
-    dumbo5.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 2000.0 {
-    dumbo2.SetSize(2000.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 700.0 {
-    dumbo2.SetSize(dumbo2Size.X, 700.0);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
@@ -1034,31 +308,6 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(fppBikeELGDumbo1Siz
   let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
   let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
   let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
-
-  if dumbo1.GetOpacity() != fppBikeELGDumbo1Opacity {
-    dumbo1.SetOpacity(fppBikeELGDumbo1Opacity);
-  }
-  if dumbo2.GetOpacity() != fppBikeELGDumbo2Opacity {
-    dumbo2.SetOpacity(fppBikeELGDumbo2Opacity);
-  }
-  if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
-    dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
-  }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
-  }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo1.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005{
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
 
   let dumbo1Size = dumbo1.GetSize();
   if dumbo1Size.Y != fppBikeELGDumbo1SizeY {
@@ -1085,6 +334,31 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(fppBikeELGDumbo1Siz
     dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
     dumbo3.Reparent(root);
   }
+
+  if dumbo1.GetOpacity() != fppBikeELGDumbo1Opacity {
+    dumbo1.SetOpacity(fppBikeELGDumbo1Opacity);
+  }
+  if dumbo2.GetOpacity() != fppBikeELGDumbo2Opacity {
+    dumbo2.SetOpacity(fppBikeELGDumbo2Opacity);
+  }
+  if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
+    dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
+  }
+  if dumbo4.GetOpacity() != 0.0299999993 {
+    dumbo4.SetOpacity(0.0299999993);
+  }
+  if dumbo5.GetOpacity() != 0.0299999993 {
+    dumbo5.SetOpacity(0.0299999993);
+  }
+  if dynamic_dumbo1.GetOpacity() != 0.00100000005 {
+    dynamic_dumbo1.SetOpacity(0.00100000005);
+  }
+  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
+    dynamic_dumbo2.SetOpacity(0.00100000005);
+  }
+  if dynamic_dumbo3.GetOpacity() != 0.00100000005{
+    dynamic_dumbo3.SetOpacity(0.00100000005);
+  }
 }
 
 @addMethod(IronsightGameController)
@@ -1102,111 +376,21 @@ private cb func OnFrameGenGhostingFixFPPBikeELGSettingsEvent(evt: ref<FrameGenGh
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeSlowEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.0199999996 {
-    dumbo1.SetOpacity(0.0199999996);
-  }
-  if dumbo2.GetOpacity() != 0.0199999996 {
-    dumbo2.SetOpacity(0.0199999996);
-  }
-  if dumbo3.GetOpacity() != 0.00100000005 {
-    dumbo3.SetOpacity(0.00100000005);
-  }
-  if dumbo4.GetOpacity() != 0.0199999996 {
-    dumbo4.SetOpacity(0.0199999996);
-  }
-  if dumbo5.GetOpacity() != 0.0199999996 {
-    dumbo5.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0199999996 {
-    dynamic_dumbo1.SetOpacity(0.0199999996);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005{
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.001, 0.02, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent>) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
+  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  if dumbo1.GetOpacity() != 0.00999999978 {
-    dumbo1.SetOpacity(0.00999999978);
-  }
-  if dumbo2.GetOpacity() != 0.00999999978 {
-    dumbo2.SetOpacity(0.00999999978);
-  }
-  if dumbo3.GetOpacity() != 0.00100000005 {
-    dumbo3.SetOpacity(0.00100000005);
-  }
-  if dumbo4.GetOpacity() != 0.00999999978 {
-    dumbo4.SetOpacity(0.00999999978);
-  }
-  if dumbo5.GetOpacity() != 0.00999999978 {
-    dumbo5.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.00999999978 {
-    dynamic_dumbo1.SetOpacity(0.00999999978);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005{
-    dynamic_dumbo3.SetOpacity(0.00100000005);
-  }
-
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != 950.0 {
-    dumbo1.SetSize(dumbo1Size.X, 950.0);
-    dumbo1.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != 1800.0 {
-    dumbo3.SetSize(1800.0, dumbo3Size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != 800.0 {
-    dumbo3.SetSize(dumbo3Size.X, 800.0);
-    dumbo3.Reparent(root);
-  }
+  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.001, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
@@ -1244,22 +428,13 @@ private cb func OnFrameGenGhostingFixDumboDeActivationVehicleToggleEvent(evt: re
 //Setting masks for vehicles when a weapon is drawn
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixWeaponCarEvent(evt: ref<FrameGenGhostingFixWeaponCarEvent>) -> Bool {
+	
+  if Equals(this.m_hasWeaponDrawn,true) {
+    let dumbo1setSize: Vector2 = new Vector2(7680.0, 900.0);
+    let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
+    let dumbo3setSize: Vector2 = new Vector2(1800.0, 900.0);
 
-	let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-	let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-	let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-
-	if Equals(this.m_hasWeaponDrawn,true) {
-		if dumbo1.GetOpacity() != 0.0299999993 {
-			dumbo1.SetOpacity(0.0299999993);
-		}
-		if dumbo2.GetOpacity() != 0.0299999993 {
-			dumbo2.SetOpacity(0.0299999993);
-		}
-		if dynamic_dumbo1.GetOpacity() != 0.0399999991 {
-			dynamic_dumbo1.SetOpacity(0.0399999991);
-		}
+    this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.03, 0.001, 0.01, 0.04, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
 	}
 }
 
