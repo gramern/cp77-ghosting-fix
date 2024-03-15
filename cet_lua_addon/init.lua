@@ -1,5 +1,5 @@
 local framegen_ghosting_fix= {
-__VERSION     = 'FrameGen Ghosting Fix 2.1',
+__VERSION     = 'FrameGen Ghosting Fix 2.11',
 __DESCRIPTION = 'Limits ghosting when using FSR3 frame generation mods in Cyberpunk 2077',
 __LICENSE     = [[
 	MIT License
@@ -91,12 +91,11 @@ function SetELGDefault()
 	HandlebarsY()
 end
 
-function HasWeaponDrawn()
-	local hasWeapon = Game.GetTransactionSystem()
-	if hasWeapon:GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight")) then
-		-- print("A weapon equipped!")
-	end
-end
+-- function HasWeaponDrawn()
+-- 	local hasWeapon = Game.GetTransactionSystem()
+-- 	if not hasWeapon:GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight")) then return end
+-- 	print("A weapon equipped!")
+-- end
 
 --load/save user settigns
 function LoadUserSettings()
@@ -147,43 +146,39 @@ function SaveUserSettings()
 	end
 end
 
+function ApplyFPPCarSideMirror()
+	if not enabledFPPCarSideMirror then return end
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent', function(self)
+		self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.0500000007, 2400.0, 1800.0)
+	end)
+end
+
+function ApplyELGSettings()
+	if not enabledELGSettings then return end
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
+		self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0299999993, 0.00100000005, 0.0250000004)
+	end)
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent', function(self)
+		self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0399999991, 0.00100000005, 0.0399999991)
+	end)
+end
+
+function TurnOffLiveViewELGEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
+		self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0, 0.0)
+	end)
+end
+
 function ApplyUserSettings()
 	Override('IronsightGameController', 'OnFrameGenGhostingFixOnFootToggleEvent', function(self, masksOnFoot, wrappedMethod)
 		local orginalFunc = wrappedMethod(masksOnFoot)
 
-		if enabledFPPOnFoot then
-			self:OnFrameGenGhostingFixOnFootToggle(true)
-		else
-			return orginalFunc
-		end
+		if not enabledFPPOnFoot then return orginalFunc end
+		self:OnFrameGenGhostingFixOnFootToggle(true)
 	end)
-	if enabledFPPCarSideMirror then
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.0500000007, 2400.0, 1800.0)
-		end)
-	else
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.00100000005, 2100.0, 1800.0)
-		end)
-	end
-	if enabledELGSettings then
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0299999993, 0.00100000005, 0.0250000004)
-		end)
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0399999991, 0.00100000005, 0.0399999991)
-		end)
-	else
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(originalHandlebarsHeightPx, originalWindshieldWidthPx, originalWindshieldHeightPx, 0.0299999993, 0.0299999993, 0.00100000005)
-		end)
-		Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent', function(self)
-			self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(originalHandlebarsHeightPx, originalWindshieldWidthPx, originalWindshieldHeightPx, 0.0399999991, 0.0299999993, 0.00100000005)
-		end)
-	end
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-		self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.00100000005, 0.00100000005)
-	end)
+	ApplyFPPCarSideMirror()
+	ApplyELGSettings()
+	TurnOffLiveViewELGEditor()
 end
 
 
