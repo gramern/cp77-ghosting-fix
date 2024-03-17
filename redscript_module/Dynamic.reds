@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.11 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.12 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
 
 // @addField(IronsightGameController) public let m_debugPrinted: Bool = false;
 
@@ -11,9 +11,9 @@
 @addField(DriveEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
 
 
-//The main transformation function---------------------------------------------------------------------------------------
+//The main Transition function---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixVehicleSetTransformation(dumbo1setOpacity: Float, dumbo2setOpacity: Float, dumbo3setOpacity: Float, dumbo45setOpacity: Float, dynamic_dumbo1setOpacity: Float, dynamic_dumbo2setOpacity: Float, dynamic_dumbo3setOpacity: Float, dumbo1setSize: Vector2, dumbo2setSize: Vector2, dumbo3setSize: Vector2) -> Bool {
+private cb func OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize: Vector2, dumbo2setSize: Vector2, dumbo3setSize: Vector2, dumbo1setOpacity: Float, dumbo2setOpacity: Float, dumbo3setOpacity: Float, dumbo45setOpacity: Float, dynamic_dumbo1setOpacity: Float, dynamic_dumbo2setOpacity: Float, dynamic_dumbo3setOpacity: Float) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
@@ -84,6 +84,7 @@ private cb func OnFrameGenGhostingFixVehicleSetTransformation(dumbo1setOpacity: 
 }
 
 //Setting masks when changing cameras in a car---------------------------------------------------------------------------------------
+//TPP Car---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarEvent>) -> Bool {
   
@@ -93,7 +94,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGho
   let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
   let dumbo3setSize: Vector2 = new Vector2(2000.0, 900.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.05, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.03, 0.05, 0.03, 0.03, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -105,7 +106,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarFasterEvent(evt: ref<Frame
   let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
   let dumbo3setSize: Vector2 = new Vector2(2000.0, 900.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.025, 0.03, 0.025, 0.025, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.025, 0.03, 0.025, 0.025, 0.02, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -117,7 +118,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarSlowEvent(evt: ref<FrameGe
   let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.02, 0.02, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.02, 0.02, 0.02, 0.02, 0.01, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -129,9 +130,10 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarCrawlEvent(evt: ref<FrameG
   let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0);
 }
 
+//TPP Far Car---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarCarEvent>) -> Bool {
 
@@ -139,7 +141,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarEvent(evt: ref<FrameGen
   let dumbo2setSize: Vector2 = new Vector2(2000.0, 1150.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 700.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.03, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.03, 0.03, 0.03, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -149,7 +151,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarSlowEvent(evt: ref<Fram
   let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.02, 0.02, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.02, 0.02, 0.03, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -159,9 +161,10 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent(evt: ref<Fra
   let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.01, 0.02, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.01, 0.02, 0.01, 0.01, 0.0, 0.0);
 }
 
+//FPP Car---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPCarEvent(fppCarSideMirrorOpacity: Float, fppCarSideMirrorSizeX: Float, fppCarSideMirrorSizeY: Float) -> Bool {
 
@@ -183,14 +186,14 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPCarEvent(fppCarSideMirrorOpac
     dynamic_dumbo2.Reparent(root);
   }
 
-  if dumbo1.GetOpacity() != 0.001 {
-    dumbo1.SetOpacity(0.001);
+  if dumbo1.GetOpacity() != 0.0 {
+    dumbo1.SetOpacity(0.0);
   }
-  if dumbo2.GetOpacity() != 0.001 {
-    dumbo2.SetOpacity(0.001);
+  if dumbo2.GetOpacity() != 0.0 {
+    dumbo2.SetOpacity(0.0);
   }
-  if dumbo3.GetOpacity() != 0.001 {
-    dumbo3.SetOpacity(0.001);
+  if dumbo3.GetOpacity() != 0.0 {
+    dumbo3.SetOpacity(0.0);
   }
   if dumbo4.GetOpacity() != 0.03 {
     dumbo4.SetOpacity(0.03);
@@ -198,21 +201,21 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPCarEvent(fppCarSideMirrorOpac
   if dumbo5.GetOpacity() != 0.03 {
     dumbo5.SetOpacity(0.03);
   }
-  if dynamic_dumbo1.GetOpacity() != 0.001 {
-    dynamic_dumbo1.SetOpacity(0.001);
+  if dynamic_dumbo1.GetOpacity() != 0.0 {
+    dynamic_dumbo1.SetOpacity(0.0);
   }
   if dynamic_dumbo2.GetOpacity() != fppCarSideMirrorOpacity {
     dynamic_dumbo2.SetOpacity(fppCarSideMirrorOpacity);
   }
-  if dynamic_dumbo3.GetOpacity() != 0.001 {
-    dynamic_dumbo3.SetOpacity(0.001);
+  if dynamic_dumbo3.GetOpacity() != 0.0 {
+    dynamic_dumbo3.SetOpacity(0.0);
   }
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent(evt: ref<FrameGenGhostingFixFPPCarSideMirrorToggleEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.00100000005, 2100.0, 1800.0);
+  this.OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.0, 2100.0, 1800.0);
 }
 
 @addMethod(IronsightGameController)
@@ -222,10 +225,11 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPCarSlowEvent(evt: ref<FrameGe
   let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.001, 0.001, 0.03, 0.001, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.0, 0.0, 0.03, 0.0, 0.0, 0.0);
 }
 
 //Setting masks when changing cameras on a bike---------------------------------------------------------------------------------------
+//TPP Bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPBikeEvent>) -> Bool {
 
@@ -233,7 +237,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPBikeEvent(evt: ref<FrameGenGh
   let dumbo2setSize: Vector2 = new Vector2(3200.0, 1050.0);
   let dumbo3setSize: Vector2 = new Vector2(1400.0, 1400.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.04, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.03, 0.04, 0.03, 0.03, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -243,7 +247,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPBikeFasterEvent(evt: ref<Fram
   let dumbo2setSize: Vector2 = new Vector2(3200.0, 1050.0);
   let dumbo3setSize: Vector2 = new Vector2(1400.0, 1400.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.025, 0.025, 0.025, 0.025, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.025, 0.025, 0.025, 0.025, 0.02, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -253,7 +257,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPBikeSlowEvent(evt: ref<FrameG
   let dumbo2setSize: Vector2 = new Vector2(2400.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.02, 0.02, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.02, 0.02, 0.02, 0.02, 0.01, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -263,9 +267,10 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPBikeCrawlEvent(evt: ref<Frame
   let dumbo2setSize: Vector2 = new Vector2(2400.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0);
 }
 
+//TPP Far Bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPFarBikeEvent>) -> Bool {
 
@@ -273,7 +278,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeEvent(evt: ref<FrameGe
   let dumbo2setSize: Vector2 = new Vector2(2000.0, 1050.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.03, 0.03, 0.03, 0.03, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.03, 0.03, 0.03, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -283,7 +288,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent(evt: ref<Fra
   let dumbo2setSize: Vector2 = new Vector2(2000.0, 900.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.02, 0.02, 0.02, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.02, 0.02, 0.02, 0.02, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -293,11 +298,12 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent(evt: ref<Fr
   let dumbo2setSize: Vector2 = new Vector2(2000.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.001, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0);
 }
 
+//FPP Bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(fppBikeELGDumbo1SizeY: Float, fppBikeELGDumbo3SizeX: Float, fppBikeELGDumbo3SizeY: Float, fppBikeELGDumbo1Opacity: Float, fppBikeELGDumbo2Opacity: Float, fppBikeELGDumbo3Opacity: Float) -> Bool {
+private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY: Float, fppBikeELGDumbo3SizeX: Float, fppBikeELGDumbo3SizeY: Float, fppBikeELGDumbo1Opacity: Float, fppBikeELGDumbo2Opacity: Float, fppBikeELGDumbo3Opacity: Float) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
@@ -344,43 +350,43 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(fppBikeELGDumbo1Siz
   if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
     dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
   }
-  if dumbo4.GetOpacity() != 0.0299999993 {
-    dumbo4.SetOpacity(0.0299999993);
+  if dumbo4.GetOpacity() != 0.03 {
+    dumbo4.SetOpacity(0.03);
   }
-  if dumbo5.GetOpacity() != 0.0299999993 {
-    dumbo5.SetOpacity(0.0299999993);
+  if dumbo5.GetOpacity() != 0.03{
+    dumbo5.SetOpacity(0.03);
   }
-  if dynamic_dumbo1.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo1.SetOpacity(0.00100000005);
+  if dynamic_dumbo1.GetOpacity() != 0.0 {
+    dynamic_dumbo1.SetOpacity(0.0);
   }
-  if dynamic_dumbo2.GetOpacity() != 0.00100000005 {
-    dynamic_dumbo2.SetOpacity(0.00100000005);
+  if dynamic_dumbo2.GetOpacity() != 0.0 {
+    dynamic_dumbo2.SetOpacity(0.0);
   }
-  if dynamic_dumbo3.GetOpacity() != 0.00100000005{
-    dynamic_dumbo3.SetOpacity(0.00100000005);
+  if dynamic_dumbo3.GetOpacity() != 0.0 {
+    dynamic_dumbo3.SetOpacity(0.0);
   }
 }
 
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent(evt: ref<FrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent>) -> Void {
+private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixDumboCameraFPPBikeEvent(950.0, 1800.0, 800.0, 0.0399999991, 0.0299999993, 0.00100000005);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(1100.0, 1800.0, 800.0, 0.04, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixFPPBikeELGSettingsEvent(evt: ref<FrameGenGhostingFixFPPBikeELGSettingsEvent>) -> Void {
+private cb func OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeFasterEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixDumboCameraFPPBikeEvent(950.0, 1800.0, 800.0, 0.0299999993, 0.0299999993, 0.00100000005);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(1050.0, 1800.0, 800.0, 0.03, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeSlowEvent>) -> Bool {
 
-  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
+  let dumbo1setSize: Vector2 = new Vector2(7680.0, 1000.0);
   let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.02, 0.02, 0.001, 0.02, 0.02, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.02, 0.0, 0.0, 0.02, 0.0, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -390,7 +396,7 @@ private cb func OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent(evt: ref<Frame
   let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransformation(0.01, 0.01, 0.001, 0.01, 0.01, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.01, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0);
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
@@ -412,12 +418,12 @@ protected cb func OnFrameGenGhostingFixDumboDeActivationVehicleEvent(evt: ref<Fr
   let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
   let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
 
-  dumbo1.SetOpacity(0.00100000005);
-  dumbo2.SetOpacity(0.00100000005);
-  dumbo3.SetOpacity(0.00100000005);
-  dumbo4.SetOpacity(0.00100000005);
-  dumbo5.SetOpacity(0.00100000005);
-  dynamic_dumbo2.SetOpacity(0.00100000005);
+  dumbo1.SetOpacity(0.0);
+  dumbo2.SetOpacity(0.0);
+  dumbo3.SetOpacity(0.0);
+  dumbo4.SetOpacity(0.0);
+  dumbo5.SetOpacity(0.0);
+  dynamic_dumbo2.SetOpacity(0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -434,7 +440,7 @@ private cb func OnFrameGenGhostingFixWeaponCarEvent(evt: ref<FrameGenGhostingFix
     let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
     let dumbo3setSize: Vector2 = new Vector2(1800.0, 900.0);
 
-    this.OnFrameGenGhostingFixVehicleSetTransformation(0.03, 0.03, 0.001, 0.01, 0.04, 0.001, 0.001, dumbo1setSize, dumbo2setSize, dumbo3setSize);
+    this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.03, 0.03, 0.0, 0.01, 0.04, 0.0, 0.0);
 	}
 }
 
@@ -472,7 +478,7 @@ private cb func OnFrameGenGhostingFixFPPBikeELGEditor(fppBikeELGEDumbo1SizeY: Fl
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixFPPBikeELGEEvent(evt: ref<FrameGenGhostingFixFPPBikeELGEEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixFPPBikeELGEditor(950.0, 1800.0, 800.0, 0.00100000005, 0.00100000005);
+  this.OnFrameGenGhostingFixFPPBikeELGEditor(950.0, 1800.0, 800.0, 0.0, 0.0);
 }
 
 //Setting context for vehicles masks start here---------------------------------------------------------------------------------------
@@ -522,29 +528,29 @@ protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<Sta
 @addMethod(DriveEvents)
 public final func CarCameraChangeCrawl(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
-  let cameraTPPSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPCarCrawlEvent>;
-  let cameraTPPFarSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent>;
-  let cameraFPPSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPCarSlowEvent>;
+  let cameraFPPCrawlEvent: ref<FrameGenGhostingFixDumboCameraFPPCarSlowEvent>;
+  let cameraTPPCrawlEvent: ref<FrameGenGhostingFixDumboCameraTPPCarCrawlEvent>;
+  let cameraTPPFarCrawlEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
-      cameraFPPSlowEvent = new FrameGenGhostingFixDumboCameraFPPCarSlowEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraFPPSlowEvent);
+      cameraFPPCrawlEvent = new FrameGenGhostingFixDumboCameraFPPCarSlowEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraFPPCrawlEvent);
       // LogChannel(n"DEBUG", "Car camera is in FPP mode.");
       break;
     case vehicleCameraPerspective.TPPClose:
-      cameraTPPSlowEvent = new FrameGenGhostingFixDumboCameraTPPCarCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPSlowEvent);
+      cameraTPPCrawlEvent = new FrameGenGhostingFixDumboCameraTPPCarCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPCrawlEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPClose mode.");
       break;
     case vehicleCameraPerspective.TPPMedium:
-      cameraTPPSlowEvent = new FrameGenGhostingFixDumboCameraTPPCarCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPSlowEvent);
+      cameraTPPCrawlEvent = new FrameGenGhostingFixDumboCameraTPPCarCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPCrawlEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
     break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarSlowEvent = new FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarSlowEvent);
+      cameraTPPFarCrawlEvent = new FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFarCrawlEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
     break;
     default:
@@ -555,9 +561,9 @@ public final func CarCameraChangeCrawl(scriptInterface: ref<StateGameScriptInter
 @addMethod(DriveEvents)
 public final func CarCameraChangeSlow(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
+  let cameraFPPSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPCarSlowEvent>;
   let cameraTPPSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPCarSlowEvent>;
   let cameraTPPFarSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarSlowEvent>;
-  let cameraFPPSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPCarSlowEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -587,30 +593,31 @@ public final func CarCameraChangeSlow(scriptInterface: ref<StateGameScriptInterf
 
 @addMethod(DriveEvents)
 public final func CarCameraChangeFaster(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
+ 
+  let cameraFPPFasterEvent: ref<FrameGenGhostingFixFPPCarSideMirrorToggleEvent>;
+  let cameraTPPFasterEvent: ref<FrameGenGhostingFixDumboCameraTPPCarFasterEvent>;
+  let cameraTPPFarFasterEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarEvent>;
 
-  let cameraTPPEvent: ref<FrameGenGhostingFixDumboCameraTPPCarFasterEvent>;
-  let cameraTPPFarEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarEvent>;
-  let cameraFPPEvent: ref<FrameGenGhostingFixFPPCarSideMirrorToggleEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
-      cameraFPPEvent = new FrameGenGhostingFixFPPCarSideMirrorToggleEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraFPPEvent);
+      cameraFPPFasterEvent = new FrameGenGhostingFixFPPCarSideMirrorToggleEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraFPPFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in FPP mode.");
       break;
     case vehicleCameraPerspective.TPPClose:
-      cameraTPPEvent = new FrameGenGhostingFixDumboCameraTPPCarFasterEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPEvent);
+      cameraTPPFasterEvent = new FrameGenGhostingFixDumboCameraTPPCarFasterEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPClose mode.");
       break;
     case vehicleCameraPerspective.TPPMedium:
-      cameraTPPEvent = new FrameGenGhostingFixDumboCameraTPPCarFasterEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPEvent);
+      cameraTPPFasterEvent = new FrameGenGhostingFixDumboCameraTPPCarFasterEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
     break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarEvent = new FrameGenGhostingFixDumboCameraTPPFarCarEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarEvent);
+      cameraTPPFarFasterEvent = new FrameGenGhostingFixDumboCameraTPPFarCarEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFarFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
     break;
     default:
@@ -621,9 +628,9 @@ public final func CarCameraChangeFaster(scriptInterface: ref<StateGameScriptInte
 @addMethod(DriveEvents)
 public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
+  let cameraFPPEvent: ref<FrameGenGhostingFixFPPCarSideMirrorToggleEvent>;
   let cameraTPPEvent: ref<FrameGenGhostingFixDumboCameraTPPCarEvent>;
   let cameraTPPFarEvent: ref<FrameGenGhostingFixDumboCameraTPPFarCarEvent>;
-  let cameraFPPEvent: ref<FrameGenGhostingFixFPPCarSideMirrorToggleEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -655,29 +662,29 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
 @addMethod(DriveEvents)
 public final func BikeCameraChangeCrawl(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
-  let cameraTPPBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent>;
-  let cameraTPPFarBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent>;
-  let cameraFPPBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent>;
+  let cameraFPPBikeCrawlEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent>;
+  let cameraTPPBikeCrawlEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent>;
+  let cameraTPPFarBikeCrawlEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
-      cameraFPPBikeSlowEvent = new FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraFPPBikeSlowEvent);
+      cameraFPPBikeCrawlEvent = new FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraFPPBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in FPP mode.");
       break;
     case vehicleCameraPerspective.TPPClose:
-      cameraTPPBikeSlowEvent = new FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeSlowEvent);
+      cameraTPPBikeCrawlEvent = new FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPClose mode.");
       break;
     case vehicleCameraPerspective.TPPMedium:
-      cameraTPPBikeSlowEvent = new FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeSlowEvent);
+      cameraTPPBikeCrawlEvent = new FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
     break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarBikeSlowEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeSlowEvent);
+      cameraTPPFarBikeCrawlEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
     break;
     default:
@@ -688,9 +695,9 @@ public final func BikeCameraChangeCrawl(scriptInterface: ref<StateGameScriptInte
 @addMethod(DriveEvents)
 public final func BikeCameraChangeSlow(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
+  let cameraFPPBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeSlowEvent>;
   let cameraTPPBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeSlowEvent>;
   let cameraTPPFarBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent>;
-  let cameraFPPBikeSlowEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeSlowEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -721,29 +728,29 @@ public final func BikeCameraChangeSlow(scriptInterface: ref<StateGameScriptInter
 @addMethod(DriveEvents)
 public final func BikeCameraChangeFaster(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
-  let cameraTPPBikeEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeFasterEvent>;
-  let cameraTPPFarBikeEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeEvent>;
-  let cameraFPPBikeEvent: ref<FrameGenGhostingFixFPPBikeELGSettingsEvent>;
+  let cameraFPPBikeFasterEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeFasterEvent>;
+  let cameraTPPBikeFasterEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeFasterEvent>;
+  let cameraTPPFarBikeFasterEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
-      cameraFPPBikeEvent = new FrameGenGhostingFixFPPBikeELGSettingsEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraFPPBikeEvent);
+      cameraFPPBikeFasterEvent = new FrameGenGhostingFixDumboCameraFPPBikeFasterEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraFPPBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in FPP mode.");
       break;
     case vehicleCameraPerspective.TPPClose:
-      cameraTPPBikeEvent = new FrameGenGhostingFixDumboCameraTPPBikeFasterEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeEvent);
+      cameraTPPBikeFasterEvent = new FrameGenGhostingFixDumboCameraTPPBikeFasterEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPClose mode.");
       break;
     case vehicleCameraPerspective.TPPMedium:
-      cameraTPPBikeEvent = new FrameGenGhostingFixDumboCameraTPPBikeFasterEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeEvent);
+      cameraTPPBikeFasterEvent = new FrameGenGhostingFixDumboCameraTPPBikeFasterEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
     break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarBikeEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeEvent);
+      cameraTPPFarBikeFasterEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
     break;
     default:
@@ -754,13 +761,13 @@ public final func BikeCameraChangeFaster(scriptInterface: ref<StateGameScriptInt
 @addMethod(DriveEvents)
 public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
+  let cameraFPPBikeEvent: ref<FrameGenGhostingFixDumboCameraFPPBikeEvent>;
   let cameraTPPBikeEvent: ref<FrameGenGhostingFixDumboCameraTPPBikeEvent>;
   let cameraTPPFarBikeEvent: ref<FrameGenGhostingFixDumboCameraTPPFarBikeEvent>;
-  let cameraFPPBikeEvent: ref<FrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
-      cameraFPPBikeEvent = new FrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent();
+      cameraFPPBikeEvent = new FrameGenGhostingFixDumboCameraFPPBikeEvent();
       scriptInterface.executionOwner.QueueEvent(cameraFPPBikeEvent);
       // LogChannel(n"DEBUG", "Bike camera is in FPP mode.");
       break;

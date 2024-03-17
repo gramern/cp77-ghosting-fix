@@ -1,13 +1,14 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.11 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.12 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
 
 // @addField(IronsightGameController) public let m_debugOnFootPrinted: Bool = false;
 
 @addField(IronsightGameController) public let m_masksOnFootEnabled: Bool;
+@addField(IronsightGameController) public let m_vignetteOnFootEnabled: Bool;
 @addField(IronsightGameController) public let m_hasWeaponDrawn: Bool;
 @addField(IronsightGameController) public let m_isAmplifiedOnFoot: Bool = false;
-@addField(IronsightGameController) public let m_isDeactivatingPlusOnFoot: Bool = false;
+@addField(IronsightGameController) public let m_isDeactivatingOnFoot: Bool = false;
 
 @addMethod(IronsightGameController)
 protected final func OnFrameGenGhostingFixHasWeapon(hasWeapon: Bool) -> Void {
@@ -21,9 +22,9 @@ protected final func OnFrameGenGhostingFixHasWeapon(hasWeapon: Bool) -> Void {
   }
 }
 
-//The main transformation function---------------------------------------------------------------------------------------
+//The main Transition functions---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-protected cb func FrameGenGhostingFixFootSetTransformation(dumbo45footSetOpacity: Float) -> Bool {
+protected cb func FrameGenGhostingFixFootSetTransition(dumbo45footSetOpacity: Float) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
@@ -51,24 +52,16 @@ protected final func OnFrameGenGhostingFixOnFootToggle(masksOnFoot: Bool) -> Voi
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixActivationFootEvent(evt: ref<FrameGenGhostingFixActivationFootEvent>) -> Bool {
 
-  this.OnFrameGenGhostingFixOnFootToggleEvent(true);
   this.OnFrameGenGhostingFixHasWeapon(true);
+  this.OnFrameGenGhostingFixOnFootToggleEvent(true);
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4foot") as inkWidget;
-  let dumbo5foot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5foot") as inkWidget;
-
-  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) && Equals(this.m_isAmplifiedOnFoot,false) {
-    if dumbo4foot.GetOpacity() != 0.05 {
-      dumbo4foot.SetOpacity(0.03);
-    }
-    if dumbo5foot.GetOpacity() != 0.05 {
-      dumbo5foot.SetOpacity(0.03);
-    }
+  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) {
+    if NotEquals(this.m_isAmplifiedOnFoot,true) {
+    this.FrameGenGhostingFixFootSetTransition(0.03);
     this.FrameGenGhostingFixOnFootActivationAmplifySetupEvent(0.2);
-  }
-  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) && Equals(this.m_isAmplifiedOnFoot,true) {
+    } else {
     this.FrameGenGhostingFixOnFootActivationAmplifySetupEvent(0.0);
+    }
   }
 }
 
@@ -82,14 +75,14 @@ private final func FrameGenGhostingFixOnFootActivationAmplifySetupEvent(delay: F
 
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixActivationFootAmplifyEvent(evt: ref<FrameGenGhostingFixActivationFootAmplifyEvent>) -> Bool {
-
-  this.FrameGenGhostingFixFootSetTransformation(0.05);
-
-  this.m_isAmplifiedOnFoot = true;
-
-  if Equals(this.m_isDeactivatingPlusOnFoot,false) {
-    this.m_isDeactivatingPlusOnFoot = true;
+ 
+  if Equals(this.m_hasWeaponDrawn,true) && Equals(this.m_masksOnFootEnabled,true) {
+    this.FrameGenGhostingFixFootSetTransition(0.05);
+    this.m_isAmplifiedOnFoot = true;
+  }
+  if Equals(this.m_isDeactivatingOnFoot,false) {
     this.FrameGenGhostingFixOnFootDeActivationPhaseOneSetupEvent(3.0);
+    this.m_isDeactivatingOnFoot = true;
   }
 }
 
@@ -140,53 +133,60 @@ private final func FrameGenGhostingFixOnFootDeActivationSetupEvent(delay: Float)
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationPhaseOneFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseOneEvent>) -> Bool {
 
-  this.FrameGenGhostingFixFootSetTransformation(0.035);
+  this.FrameGenGhostingFixFootSetTransition(0.035);
 
-  this.FrameGenGhostingFixOnFootDeActivationPhaseTwoSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseTwoSetupEvent(0.1);
 }
 
 //Deactivate masks on foot phase two---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationPhaseTwoFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseTwoEvent>) -> Bool {
 
-  this.FrameGenGhostingFixFootSetTransformation(0.03);
+  this.FrameGenGhostingFixFootSetTransition(0.03);
 
-  this.FrameGenGhostingFixOnFootDeActivationPhaseThreeSetupEvent(0.5);
+  this.FrameGenGhostingFixOnFootDeActivationPhaseThreeSetupEvent(0.1);
+
+  this.m_isAmplifiedOnFoot = false;
 }
 
 //Deactivate masks on foot phase three---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationPhaseThreeFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseThreeEvent>) -> Bool {
+  
+  if Equals(this.m_isAmplifiedOnFoot,false) {
+    this.FrameGenGhostingFixFootSetTransition(0.02);
 
-  this.FrameGenGhostingFixFootSetTransformation(0.02);
-
-  this.FrameGenGhostingFixOnFootDeActivationPhaseFourSetupEvent(0.5);
+    this.FrameGenGhostingFixOnFootDeActivationPhaseFourSetupEvent(0.1);
+  }
 }
 
 //Deactivate masks on foot phase four---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationPhaseFourFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseFourEvent>) -> Bool {
 
-  this.FrameGenGhostingFixFootSetTransformation(0.015);
+  if Equals(this.m_isAmplifiedOnFoot,false) {
+    this.FrameGenGhostingFixFootSetTransition(0.015);
 
-  this.FrameGenGhostingFixOnFootDeActivationPhaseFiveSetupEvent(0.5);
+    this.FrameGenGhostingFixOnFootDeActivationPhaseFiveSetupEvent(0.1);
+  }
 }
 
 //Deactivate masks on foot phase four---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationPhaseFiveFoot(evt: ref<FrameGenGhostingFixDeActivationFootPhaseFiveEvent>) -> Bool {
 
-  this.FrameGenGhostingFixFootSetTransformation(0.01);
+  if Equals(this.m_isAmplifiedOnFoot,false) {
+    this.FrameGenGhostingFixFootSetTransition(0.010);
 
-  this.FrameGenGhostingFixOnFootDeActivationSetupEvent(0.5);
+    this.FrameGenGhostingFixOnFootDeActivationSetupEvent(0.1);
+  }
 }
 
 //Deactivate masks on foot---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func OnFrameGenGhostingFixDeActivationFoot(evt: ref<FrameGenGhostingFixDeActivationFootEvent>) -> Bool {
 
-  this.FrameGenGhostingFixFootSetTransformation(0.0);
+  this.FrameGenGhostingFixFootSetTransition(0.0);
 
-  this.m_isAmplifiedOnFoot = false;
-  this.m_isDeactivatingPlusOnFoot = false;
+  this.m_isDeactivatingOnFoot = false;
 }

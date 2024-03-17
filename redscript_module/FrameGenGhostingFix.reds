@@ -25,8 +25,8 @@ public class FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraTPPFarBikeEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent extends Event {}
-public class FrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent extends Event {}
-public class FrameGenGhostingFixFPPBikeELGSettingsEvent extends Event {}
+public class FrameGenGhostingFixDumboCameraFPPBikeEvent extends Event {}
+public class FrameGenGhostingFixDumboCameraFPPBikeFasterEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraFPPBikeSlowEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent extends Event {}
 //Vehicles with weapon---------------------------------------------------------------------------------------
@@ -45,9 +45,6 @@ public class FrameGenGhostingFixDeActivationFootPhaseTwoEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseThreeEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseFourEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseFiveEvent extends Event {}
-
-public class FrameGenGhostingFixDumboCameraTPPCarMixEvent extends Event {}
-
 //Setting an input listener for a player's inputs---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixInputListener {
 
