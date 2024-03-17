@@ -1,5 +1,5 @@
 local framegen_ghosting_fix= {
-__VERSION     = 'FrameGen Ghosting Fix 2.11',
+__VERSION     = 'FrameGen Ghosting Fix 2.12',
 __DESCRIPTION = 'Limits ghosting when using FSR3 frame generation mods in Cyberpunk 2077',
 __LICENSE     = [[
 	MIT License
@@ -131,7 +131,7 @@ function SaveUserSettings()
 			enabledSideMirror = enabledFPPCarSideMirror
 		},
 		FPPOnFoot = {
-			enabledOnFoot = enabledFPPOnFoot
+			enabledOnFoot = enabledFPPOnFoot,
 		}
 	}
 
@@ -146,20 +146,50 @@ function SaveUserSettings()
 	end
 end
 
+--apply user settings
+function ApplyMasksOnFoot()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixOnFootToggleEvent', function(self, masksOnFoot, wrappedMethod)
+		local originalFunc = wrappedMethod(masksOnFoot)
+
+		if not enabledFPPOnFoot then return originalFunc end
+		self:OnFrameGenGhostingFixOnFootToggle(true)
+	end)
+end
+
 function ApplyFPPCarSideMirror()
-	if not enabledFPPCarSideMirror then return end
 	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent', function(self)
-		self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.0500000007, 2400.0, 1800.0)
+		if not enabledFPPCarSideMirror then return end
+		self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.05, 2400.0, 1800.0)
 	end)
 end
 
 function ApplyELGSettings()
-	if not enabledELGSettings then return end
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-		self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0299999993, 0.00100000005, 0.0250000004)
+	if enabledELGSettings then
+		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeEvent', function(self)
+			self:OnFrameGenGhostingFixFPPBikeSetTransition(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.04, 0.0, 0.04)
+		end)
+		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent', function(self)
+			self:OnFrameGenGhostingFixFPPBikeSetTransition(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.03, 0.0, 0.025)
+		end)
+	else
+		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeEvent', function(self)
+			self:OnFrameGenGhostingFixFPPBikeSetTransition((originalHandlebarsHeightPx*1.25), originalWindshieldWidthPx, originalWindshieldHeightPx, 0.04, 0.0, 0.0)
+		end)
+		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent', function(self)
+			self:OnFrameGenGhostingFixFPPBikeSetTransition((originalHandlebarsHeightPx*1.12), originalWindshieldWidthPx, originalWindshieldHeightPx, 0.03, 0.0, 0.0)
+		end)
+	end
+end
+
+function TurnOnLiveViewELGEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
+		self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.7, 0.7)
 	end)
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsAmplifyEvent', function(self)
-		self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.0399999991, 0.00100000005, 0.0399999991)
+end
+
+function DefaultLiveViewELGEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
+		self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.4, 0.4)
 	end)
 end
 
@@ -170,12 +200,7 @@ function TurnOffLiveViewELGEditor()
 end
 
 function ApplyUserSettings()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixOnFootToggleEvent', function(self, masksOnFoot, wrappedMethod)
-		local orginalFunc = wrappedMethod(masksOnFoot)
-
-		if not enabledFPPOnFoot then return orginalFunc end
-		self:OnFrameGenGhostingFixOnFootToggle(true)
-	end)
+	ApplyMasksOnFoot()
 	ApplyFPPCarSideMirror()
 	ApplyELGSettings()
 	TurnOffLiveViewELGEditor()
@@ -235,7 +260,7 @@ registerForEvent("onDraw", function()
 			if fppOnFootEnabled then
 				SaveUserSettings()
 			end
-			ImGui.Text("NOTE: This option needs the 'Input Loader' mod to work")
+			ImGui.Text("NOTE: These options needs the 'Input Loader' mod to work")
 			ImGui.Text("")
 			ImGui.Text("Vehicles FPP options:")
 			enabledFPPCarSideMirror, fppCarSideMirrorEnabled = ImGui.Checkbox("Enable left-side mirror AG mask for FPP in cars", enabledFPPCarSideMirror)
@@ -265,12 +290,7 @@ registerForEvent("onDraw", function()
 					if handlebarsYChanged then
 						HandlebarsY()
 						saved = false
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-							self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.2, 0.00100000005, 0.2)
-						end)
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-							self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.7, 0.7)
-						end)
+						TurnOnLiveViewELGEditor()
 					end
 				ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 				ImGui.Text("Windshield AG mask width (ELG default 120%):")
@@ -279,12 +299,7 @@ registerForEvent("onDraw", function()
 					if windshieldXChanged then
 						WindshieldX()
 						saved = false
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-							self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.2, 0.00100000005, 0.2)
-						end)
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-							self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.7, 0.7)
-						end)
+						TurnOnLiveViewELGEditor()
 					end
 				ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 				ImGui.Text("Windshield AG mask height (ELG default 300%):")
@@ -293,12 +308,7 @@ registerForEvent("onDraw", function()
 					if windshieldYChanged then
 						WindshieldY()
 						saved = false
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-							self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.2, 0.00100000005, 0.2)
-						end)
-						Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-							self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.7, 0.7)
-						end)
+						TurnOnLiveViewELGEditor()
 					end
 				ImGui.Text("")
 				ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
@@ -309,12 +319,7 @@ registerForEvent("onDraw", function()
 				if ImGui.Button("Set ELG to default", 218, 40) then
 					saved = false
 					SetELGDefault()
-					Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGSettingsEvent', function(self)
-						self:OnFrameGenGhostingFixDumboCameraFPPBikeEvent(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.2, 0.00100000005, 0.2)
-					end)
-					Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-						self:OnFrameGenGhostingFixFPPBikeELGEditor(newHandlebarsHeightPx, newWindshieldWidthPx, newWindshieldHeightPx, 0.4, 0.4)
-					end)
+					DefaultLiveViewELGEditor()
 				end
 				ImGui.SameLine()
 				if ImGui.Button("Save ELG settings", 218, 40) then
