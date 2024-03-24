@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.12 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.13.0-alpha for FSR3 FG Mods, 2024 gramern (scz_g) 2024
 
 // @addField(IronsightGameController) public let m_debugPrinted: Bool = false;
 
@@ -9,7 +9,6 @@
 @addField(DriveEvents) public let m_vehicleCurrentType: gamedataVehicleType;
 @addField(DriveEvents) public let m_vehicleCurrentSpeed: Float;
 @addField(DriveEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
-
 
 //The main Transition function---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
@@ -75,12 +74,6 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize: Vector2
   if dynamic_dumbo3.GetOpacity() != dynamic_dumbo3setOpacity {
     dynamic_dumbo3.SetOpacity(dynamic_dumbo3setOpacity);
   }
-
-  // if Equals(this.m_debugPrinted, false) {
-  //   LogChannel(n"DEBUG", s"Received and applied opacities for dumbos: \(dumbo1setOpacity), \(dumbo2setOpacity), \(dumbo3setOpacity), \(dumbo45setOpacity), \(dynamic_dumbo1setOpacity), \(dynamic_dumbo2setOpacity), \(dynamic_dumbo3setOpacity)");
-  //   LogChannel(n"DEBUG", s"Received sizes for dumbos: \(dumbo1setSize), \(dumbo2setSize), \(dumbo3setSize)");
-  //   this.m_debugPrinted = true;
-  // }
 }
 
 //Setting masks when changing cameras in a car---------------------------------------------------------------------------------------
@@ -303,7 +296,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent(evt: ref<Fr
 
 //FPP Bike---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY: Float, fppBikeELGDumbo3SizeX: Float, fppBikeELGDumbo3SizeY: Float, fppBikeELGDumbo1Opacity: Float, fppBikeELGDumbo2Opacity: Float, fppBikeELGDumbo3Opacity: Float) -> Bool {
+private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY: Float, fppBikeELGDumbo3SizeX: Float, fppBikeELGDumbo3SizeY: Float, fppBikeELGDumbo1Opacity: Float, fppBikeELGDumbo2Opacity: Float, fppBikeELGDumbo3Opacity: Float, fppBikeELGDumbo45Opacity: Float) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
@@ -320,23 +313,23 @@ private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY:
     dumbo1.SetSize(dumbo1Size.X, fppBikeELGDumbo1SizeY);
     dumbo1.Reparent(root);
   }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.X != 3000.0 {
-    dumbo2.SetSize(3000.0, dumbo2Size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2Size = dumbo2.GetSize();
-  if dumbo2Size.Y != 1000.0 {
-    dumbo2.SetSize(dumbo2Size.X, 1000.0);
-    dumbo2.Reparent(root);
-  }
+  // let dumbo2Size = dumbo2.GetSize();
+  // if dumbo2Size.X != 3000.0 {
+  //   dumbo2.SetSize(3000.0, dumbo2Size.Y);
+  //   dumbo2.Reparent(root);
+  // }
+  // let dumbo2Size = dumbo2.GetSize();
+  // if dumbo2Size.Y != 1000.0 {
+  //   dumbo2.SetSize(dumbo2Size.X, 1000.0);
+  //   dumbo2.Reparent(root);
+  // }
   let dumbo3Size = dumbo3.GetSize();
   if dumbo3Size.X != fppBikeELGDumbo3SizeX {
     dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
     dumbo3.Reparent(root);
   }
   let dumbo3Size = dumbo3.GetSize();
-    if dumbo3Size.Y != fppBikeELGDumbo3SizeY {
+  if dumbo3Size.Y != fppBikeELGDumbo3SizeY {
     dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
     dumbo3.Reparent(root);
   }
@@ -350,11 +343,11 @@ private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY:
   if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
     dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
   }
-  if dumbo4.GetOpacity() != 0.03 {
-    dumbo4.SetOpacity(0.03);
+  if dumbo4.GetOpacity() != fppBikeELGDumbo45Opacity {
+    dumbo4.SetOpacity(fppBikeELGDumbo45Opacity);
   }
-  if dumbo5.GetOpacity() != 0.03{
-    dumbo5.SetOpacity(0.03);
+  if dumbo5.GetOpacity() != fppBikeELGDumbo45Opacity{
+    dumbo5.SetOpacity(fppBikeELGDumbo45Opacity);
   }
   if dynamic_dumbo1.GetOpacity() != 0.0 {
     dynamic_dumbo1.SetOpacity(0.0);
@@ -370,33 +363,25 @@ private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY:
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixFPPBikeSetTransition(1100.0, 1800.0, 800.0, 0.04, 0.0, 0.0);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(1100.0, 1800.0, 800.0, 0.04, 0.0, 0.0, 0.03);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeFasterEvent>) -> Void {
 
-  this.OnFrameGenGhostingFixFPPBikeSetTransition(1050.0, 1800.0, 800.0, 0.03, 0.0, 0.0);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(1050.0, 1800.0, 800.0, 0.03, 0.0, 0.0, 0.03);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeSlowEvent>) -> Bool {
 
-  let dumbo1setSize: Vector2 = new Vector2(7680.0, 1000.0);
-  let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
-  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
-
-  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.02, 0.0, 0.0, 0.02, 0.0, 0.0, 0.0);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(1000.0, 1800.0, 800.0, 0.02, 0.0, 0.0, 0.02);
 }
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent>) -> Bool {
 
-  let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
-  let dumbo2setSize: Vector2 = new Vector2(3000.0, 700.0);
-  let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
-
-  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.01, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0);
+  this.OnFrameGenGhostingFixFPPBikeSetTransition(950.0, 1800.0, 800.0, 0.01, 0.0, 0.0, 0.01);
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
@@ -820,7 +805,7 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
     case gamedataVehicleType.Car:
       if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
         if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-          this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
+            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
         } else {
           this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
           if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {

@@ -1,13 +1,11 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.11 for FSR3 Mods, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 2.13.0-alpha for FSR3 Mods, 2024 gramern (scz_g)
 
-//Global toggle---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixToggleEvent extends Event {}
 //CET add-on customization---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixFPPCarSideMirrorToggleEvent extends Event {}
 public class FrameGenGhostingFixFPPBikeELGEEvent extends Event {}
-public class FrameGenGhostingFixFPPBikeELGEOFFEvent extends Event {}
+public class FrameGenGhostingFixVignetteOnFootEditorEvent extends Event {}
 //Car camera change---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixDumboCameraTPPCarEvent extends Event {}
 public class FrameGenGhostingFixDumboCameraTPPFarCarEvent extends Event {}
@@ -45,6 +43,7 @@ public class FrameGenGhostingFixDeActivationFootPhaseTwoEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseThreeEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseFourEvent extends Event {}
 public class FrameGenGhostingFixDeActivationFootPhaseFiveEvent extends Event {}
+
 //Setting an input listener for a player's inputs---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixInputListener {
 
@@ -56,9 +55,6 @@ public class FrameGenGhostingFixInputListener {
     }
 
     protected cb func OnAction(action: ListenerAction, consumer: ListenerActionConsumer) -> Bool {
-      if ListenerAction.IsAction(action, n"FrameGenGhostingFixToggle") && Equals(ListenerAction.GetType(action), gameinputActionType.BUTTON_RELEASED) {
-        this.m_uiSystem.QueueEvent(new FrameGenGhostingFixToggleEvent());
-      };
       if ListenerAction.IsAction(action, n"FrameGenGhostingFixOnFootCameraMoveR") && Equals(ListenerAction.GetType(action), gameinputActionType.RELATIVE_CHANGE) {
         this.m_uiSystem.QueueEvent(new FrameGenGhostingFixActivationFootEvent());
         this.m_uiSystem.QueueEvent(new FrameGenGhostingFixWeaponCarEvent());
@@ -89,9 +85,3 @@ protected cb func OnDetach() -> Bool {
     this.UnregisterInputListener(this.m_frameGenGhostingFixInputListener);
     this.m_frameGenGhostingFixInputListener = null;
 }
-
-// @wrapMethod(EquipmentSystemPlayerData)
-// func OnRestored() -> Void {
-//     wrappedMethod();
-//     LogChannel(n"DEBUG", "FrameGenGhostingFix Redscript Module loaded!");
-// }
