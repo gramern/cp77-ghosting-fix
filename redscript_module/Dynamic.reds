@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 2.13.0-alpha for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 2.18.0-alpha for FSR3 FG Mods, 2024 gramern (scz_g) 2024
 
 // @addField(IronsightGameController) public let m_debugPrinted: Bool = false;
 
