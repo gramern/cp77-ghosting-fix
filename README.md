@@ -7,7 +7,6 @@ This repo's goal is to serve as a small, literal repository for some modules of 
 + Cyberpunk 2.12+
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.31.0+
-+ [Input Loader](https://github.com/jackhumbert/cyberpunk2077-input-loader) 0.2.2+
 
 # Intended results
 Given the way mod impacts the image shown on the screen, there must be at least 45 base fps before turning FSR 3 frame generation on to achieve acceptable perceived smoothness.
