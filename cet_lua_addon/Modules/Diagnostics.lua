@@ -1,11 +1,9 @@
---FrameGen Ghosting Fix 2.18.0-alpha
+--FrameGen Ghosting Fix 3.1.0
 
 local Diagnostics = {
 	modscompatibility = true,
 	modfiles = {}
 }
-
-local defaultLogTitle = "[FrameGen Ghosting 'Fix']"
 
 --check for compatibility with other mods
 function Diagnostics.CheckModsCompatibility()
@@ -25,6 +23,10 @@ function Diagnostics.CheckModsCompatibility()
 	if ModArchiveExists('#Project-E3_HUD-Lite.archive') and not ModArchiveExists('###framegenghostingfix_ProjectE3Lite.archive') then
 		Diagnostics.modscompatibility = false
 		table.insert(Diagnostics.modfiles, 4, "Project E3 - HUD (Lite)")
+	end
+	if ModArchiveExists('dxstreamlined.archive') and not ModArchiveExists('###framegenghostingfix_StreamlinedHUD.archive') then
+		Diagnostics.modscompatibility = false
+		table.insert(Diagnostics.modfiles, 5, "Streamlined HUD")
 	end
 
 end
