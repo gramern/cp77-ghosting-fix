@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 3.0.0
+--FrameGen Ghosting Fix 3.1.2
 
 local Calculate = {
     ScreenDetection = {
@@ -42,8 +42,8 @@ local Calculate = {
         newVignetteFootMarginTopPx = nil,
         newVignetteFootSizeXPx = nil,
         newVignetteFootSizeYPx = nil,
-		vignetteAimFootSizeXPx = 3840,
-        vignetteAimFootSizeYPx = 2440
+		aimFootSizeXPx = 3840,
+        aimFootSizeYPx = 2440
     }
 }
 
@@ -64,6 +64,7 @@ function Calculate.GetAspectRatio()
 		Calculate.ScreenDetection.FGGFscreentype = "32:9"
 	end
 	-- print("Aspect ratio:",Calculate.ScreenDetection.FGGFaspectratio)
+	-- print("Screen type:",Calculate.ScreenDetection.FGGFscreentype)
 end
 
 function Calculate.SetMasksOrgSizes()
@@ -106,21 +107,21 @@ function Calculate.SetVignetteOrgSize()
 	-- print("Vignette position and size:",Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx,Calculate.FPPOnFoot.originalVignetteFootMarginTopPx,Calculate.FPPOnFoot.originalVignetteFootSizeXPx,Calculate.FPPOnFoot.originalVignetteFootSizeYPx)
 end
 
-function Calculate.SetVignetteAimSize()
+function Calculate.SetMaskingAimSize()
 	if Calculate.ScreenDetection.FGGFscreentype == "4:3" then
-		Calculate.FPPOnFoot.vignetteAimFootSizeXPx = 3840
-		Calculate.FPPOnFoot.vignetteAimFootSizeYPx = 3072
+		Calculate.FPPOnFoot.aimFootSizeXPx = 3840
+		Calculate.FPPOnFoot.aimFootSizeYPx = 3072
 	elseif Calculate.ScreenDetection.FGGFscreentype == "16:10" then
-		Calculate.FPPOnFoot.vignetteAimFootSizeXPx = 3840
-		Calculate.FPPOnFoot.vignetteAimFootSizeYPx = 2640
+		Calculate.FPPOnFoot.aimFootSizeXPx = 3840
+		Calculate.FPPOnFoot.aimFootSizeYPx = 2640
 	elseif Calculate.ScreenDetection.FGGFscreentype == "21:9" then
-		Calculate.FPPOnFoot.vignetteAimFootSizeXPx = 5140
-		Calculate.FPPOnFoot.vignetteAimFootSizeYPx = 2440
+		Calculate.FPPOnFoot.aimFootSizeXPx = 5140
+		Calculate.FPPOnFoot.aimFootSizeYPx = 2440
 	elseif Calculate.ScreenDetection.FGGFscreentype == "32:9" then
-		Calculate.FPPOnFoot.vignetteAimFootSizeXPx = 7770
-		Calculate.FPPOnFoot.vignetteAimFootSizeYPx = 2440
+		Calculate.FPPOnFoot.aimFootSizeXPx = 7770
+		Calculate.FPPOnFoot.aimFootSizeYPx = 2440
 	end
-	-- print("Aim vignette size:",Calculate.FPPOnFoot.vignetteAimFootSizeXPx,Calculate.FPPOnFoot.vignetteAimFootSizeYPx)
+	-- print("Aim size:",Calculate.FPPOnFoot.aimFootSizeXPx,Calculate.FPPOnFoot.aimFootSizeYPx)
 end
 
 --calc dimensions of ELG masks
@@ -212,7 +213,7 @@ end
 
 function Calculate.SetVignetteDefault()
 	Calculate.FPPOnFoot.vignetteFootMarginLeft = 100
-	Calculate.FPPOnFoot.vignetteFootMarginTop = 80
+	Calculate.FPPOnFoot.vignetteFootMarginTop = 75
 	Calculate.FPPOnFoot.vignetteFootSizeX = 120
 	Calculate.FPPOnFoot.vignetteFootSizeY = 120
 	Calculate.VignettePosX()
