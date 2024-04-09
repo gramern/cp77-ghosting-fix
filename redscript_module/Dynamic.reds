@@ -1,6 +1,8 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 3.0.0 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 3.1.2 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+
+@addField(IronsightGameController) public let m_isMaskingInVehiclesEnabled: Bool = true;
 
 @addField(DriveEvents) public let m_carCameraContext: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContext: vehicleCameraPerspective;
@@ -8,69 +10,87 @@
 @addField(DriveEvents) public let m_vehicleCurrentSpeed: Float;
 @addField(DriveEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
 
-//The main Transition function---------------------------------------------------------------------------------------
+//Global toggle for transtions, called in On Foot loop---------------------------------------------------------------------------------------
+@addMethod(IronsightGameController)
+protected final func FrameGenFrameGenGhostingFixVehicleToggleEvent() -> Void {
+  this.FrameGenGhostingFixVehicleToggle(true);
+}
+
+@addMethod(IronsightGameController)
+protected final func FrameGenGhostingFixVehicleToggle(maskingInVehicles: Bool) -> Void {
+  this.m_isMaskingInVehiclesEnabled = maskingInVehicles;
+}
+
+//The main transition function---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize: Vector2, dumbo2setSize: Vector2, dumbo3setSize: Vector2, dumbo1setOpacity: Float, dumbo2setOpacity: Float, dumbo3setOpacity: Float, dumbo45setOpacity: Float, dynamic_dumbo1setOpacity: Float, dynamic_dumbo2setOpacity: Float, dynamic_dumbo3setOpacity: Float) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  if NotEquals(this.m_isMaskingInVehiclesEnabled,false) {
+    let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+    let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
+    let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
+    let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
+    let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
+    let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
+    let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
+    let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
+    let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
 
-  let dumbo1size = dumbo1.GetSize();
-  if dumbo1size.Y != dumbo1setSize.Y {
-    dumbo1.SetSize(dumbo1size.X, dumbo1setSize.Y);
-    dumbo1.Reparent(root);
-  }
-  let dumbo2size = dumbo2.GetSize();
-  if dumbo2size.X != dumbo2setSize.X {
-    dumbo2.SetSize(dumbo2setSize.X, dumbo2size.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo2size = dumbo2.GetSize();
-  if dumbo2size.Y != dumbo2setSize.Y {
-    dumbo2.SetSize(dumbo2size.X, dumbo2setSize.Y);
-    dumbo2.Reparent(root);
-  }
-  let dumbo3size = dumbo3.GetSize();
-  if dumbo3size.X != dumbo3setSize.X {
-    dumbo3.SetSize(dumbo3setSize.X, dumbo3size.Y);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3size = dumbo3.GetSize();
-    if dumbo3size.Y != dumbo3setSize.Y {
-    dumbo3.SetSize(dumbo3size.X, dumbo3setSize.Y);
-    dumbo3.Reparent(root);
-  }
+    let dumbo1size = dumbo1.GetSize();
+    if dumbo1size.X != dumbo1setSize.X {
+      dumbo1.SetSize(dumbo1setSize.X, dumbo1size.Y);
+      dumbo1.Reparent(root);
+    }
+    let dumbo1size = dumbo1.GetSize();
+    if dumbo1size.Y != dumbo1setSize.Y {
+      dumbo1.SetSize(dumbo1size.X, dumbo1setSize.Y);
+      dumbo1.Reparent(root);
+    }
+    let dumbo2size = dumbo2.GetSize();
+    if dumbo2size.X != dumbo2setSize.X {
+      dumbo2.SetSize(dumbo2setSize.X, dumbo2size.Y);
+      dumbo2.Reparent(root);
+    }
+    let dumbo2size = dumbo2.GetSize();
+    if dumbo2size.Y != dumbo2setSize.Y {
+      dumbo2.SetSize(dumbo2size.X, dumbo2setSize.Y);
+      dumbo2.Reparent(root);
+    }
+    let dumbo3size = dumbo3.GetSize();
+    if dumbo3size.X != dumbo3setSize.X {
+      dumbo3.SetSize(dumbo3setSize.X, dumbo3size.Y);
+      dumbo3.Reparent(root);
+    }
+    let dumbo3size = dumbo3.GetSize();
+      if dumbo3size.Y != dumbo3setSize.Y {
+      dumbo3.SetSize(dumbo3size.X, dumbo3setSize.Y);
+      dumbo3.Reparent(root);
+    }
 
-  if dumbo1.GetOpacity() != dumbo1setOpacity {
-    dumbo1.SetOpacity(dumbo1setOpacity);
-  }
-  if dumbo2.GetOpacity() != dumbo2setOpacity {
-    dumbo2.SetOpacity(dumbo2setOpacity);
-  }
-  if dumbo3.GetOpacity() != dumbo3setOpacity {
-    dumbo3.SetOpacity(dumbo3setOpacity);
-  }
-  if dumbo4.GetOpacity() != dumbo45setOpacity {
-    dumbo4.SetOpacity(dumbo45setOpacity);
-  }
-  if dumbo5.GetOpacity() != dumbo45setOpacity {
-    dumbo5.SetOpacity(dumbo45setOpacity);
-  }
-  if dynamic_dumbo1.GetOpacity() != dynamic_dumbo1setOpacity {
-    dynamic_dumbo1.SetOpacity(dynamic_dumbo1setOpacity);
-  }
-  if dynamic_dumbo2.GetOpacity() != dynamic_dumbo2setOpacity {
-    dynamic_dumbo2.SetOpacity(dynamic_dumbo2setOpacity);
-  }
-  if dynamic_dumbo3.GetOpacity() != dynamic_dumbo3setOpacity {
-    dynamic_dumbo3.SetOpacity(dynamic_dumbo3setOpacity);
+    if dumbo1.GetOpacity() != dumbo1setOpacity {
+      dumbo1.SetOpacity(dumbo1setOpacity);
+    }
+    if dumbo2.GetOpacity() != dumbo2setOpacity {
+      dumbo2.SetOpacity(dumbo2setOpacity);
+    }
+    if dumbo3.GetOpacity() != dumbo3setOpacity {
+      dumbo3.SetOpacity(dumbo3setOpacity);
+    }
+    if dumbo4.GetOpacity() != dumbo45setOpacity {
+      dumbo4.SetOpacity(dumbo45setOpacity);
+    }
+    if dumbo5.GetOpacity() != dumbo45setOpacity {
+      dumbo5.SetOpacity(dumbo45setOpacity);
+    }
+    if dynamic_dumbo1.GetOpacity() != dynamic_dumbo1setOpacity {
+      dynamic_dumbo1.SetOpacity(dynamic_dumbo1setOpacity);
+    }
+    if dynamic_dumbo2.GetOpacity() != dynamic_dumbo2setOpacity {
+      dynamic_dumbo2.SetOpacity(dynamic_dumbo2setOpacity);
+    }
+    if dynamic_dumbo3.GetOpacity() != dynamic_dumbo3setOpacity {
+      dynamic_dumbo3.SetOpacity(dynamic_dumbo3setOpacity);
+    }
   }
 }
 
@@ -78,8 +98,6 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize: Vector2
 //TPP Car---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarEvent>) -> Bool {
-  
-  // this.m_debugPrinted = false;
 
   let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
   let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
@@ -91,8 +109,6 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarEvent(evt: ref<FrameGenGho
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarFasterEvent>) -> Bool {
 
-  // this.m_debugPrinted = false;
-
   let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
   let dumbo2setSize: Vector2 = new Vector2(3600.0, 850.0);
   let dumbo3setSize: Vector2 = new Vector2(2000.0, 900.0);
@@ -103,8 +119,6 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarFasterEvent(evt: ref<Frame
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarSlowEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarSlowEvent>) -> Bool {
 
-  // this.m_debugPrinted = false;
-
   let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
   let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
@@ -114,8 +128,6 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPCarSlowEvent(evt: ref<FrameGe
 
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraTPPCarCrawlEvent(evt: ref<FrameGenGhostingFixDumboCameraTPPCarCrawlEvent>) -> Bool {
-
-  // this.m_debugPrinted = false;
 
   let dumbo1setSize: Vector2 = new Vector2(7680.0, 950.0);
   let dumbo2setSize: Vector2 = new Vector2(3400.0, 700.0);
@@ -142,7 +154,7 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarSlowEvent(evt: ref<Fram
   let dumbo2setSize: Vector2 = new Vector2(2600.0, 800.0);
   let dumbo3setSize: Vector2 = new Vector2(1800.0, 800.0);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.02, 0.02, 0.03, 0.03, 0.0, 0.0);
+  this.OnFrameGenGhostingFixVehicleSetTransition(dumbo1setSize, dumbo2setSize, dumbo3setSize, 0.0, 0.02, 0.02, 0.02, 0.02, 0.0, 0.0);
 }
 
 @addMethod(IronsightGameController)
@@ -159,47 +171,49 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent(evt: ref<Fra
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixDumboCameraFPPCarEvent(fppCarSideMirrorOpacity: Float, fppCarSideMirrorSizeX: Float, fppCarSideMirrorSizeY: Float) -> Bool {
 
-  let fppCarSideMirrorSize: Vector2 = new Vector2(fppCarSideMirrorSizeX, fppCarSideMirrorSizeY);
+  if NotEquals(this.m_isMaskingInVehiclesEnabled,false) {
+    let fppCarSideMirrorSize: Vector2 = new Vector2(fppCarSideMirrorSizeX, fppCarSideMirrorSizeY);
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+    let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+    let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
+    let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
+    let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
+    let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
+    let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
+    let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
+    let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
+    let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
 
-  let dynamic_dumbo2Size = dynamic_dumbo2.GetSize();
-  if dynamic_dumbo2Size.X != 2100.0 && dynamic_dumbo2Size.Y != 1800.0 {
-    dynamic_dumbo2.SetSize(fppCarSideMirrorSize);
-    dynamic_dumbo2.Reparent(root);
-  }
+    let dynamic_dumbo2Size = dynamic_dumbo2.GetSize();
+    if dynamic_dumbo2Size.X != 2100.0 && dynamic_dumbo2Size.Y != 1800.0 {
+      dynamic_dumbo2.SetSize(fppCarSideMirrorSize);
+      dynamic_dumbo2.Reparent(root);
+    }
 
-  if dumbo1.GetOpacity() != 0.0 {
-    dumbo1.SetOpacity(0.0);
-  }
-  if dumbo2.GetOpacity() != 0.0 {
-    dumbo2.SetOpacity(0.0);
-  }
-  if dumbo3.GetOpacity() != 0.0 {
-    dumbo3.SetOpacity(0.0);
-  }
-  if dumbo4.GetOpacity() != 0.03 {
-    dumbo4.SetOpacity(0.03);
-  }
-  if dumbo5.GetOpacity() != 0.03 {
-    dumbo5.SetOpacity(0.03);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0 {
-    dynamic_dumbo1.SetOpacity(0.0);
-  }
-  if dynamic_dumbo2.GetOpacity() != fppCarSideMirrorOpacity {
-    dynamic_dumbo2.SetOpacity(fppCarSideMirrorOpacity);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.0 {
-    dynamic_dumbo3.SetOpacity(0.0);
+    if dumbo1.GetOpacity() != 0.0 {
+      dumbo1.SetOpacity(0.0);
+    }
+    if dumbo2.GetOpacity() != 0.0 {
+      dumbo2.SetOpacity(0.0);
+    }
+    if dumbo3.GetOpacity() != 0.0 {
+      dumbo3.SetOpacity(0.0);
+    }
+    if dumbo4.GetOpacity() != 0.03 {
+      dumbo4.SetOpacity(0.03);
+    }
+    if dumbo5.GetOpacity() != 0.03 {
+      dumbo5.SetOpacity(0.03);
+    }
+    if dynamic_dumbo1.GetOpacity() != 0.0 {
+      dynamic_dumbo1.SetOpacity(0.0);
+    }
+    if dynamic_dumbo2.GetOpacity() != fppCarSideMirrorOpacity {
+      dynamic_dumbo2.SetOpacity(fppCarSideMirrorOpacity);
+    }
+    if dynamic_dumbo3.GetOpacity() != 0.0 {
+      dynamic_dumbo3.SetOpacity(0.0);
+    }
   }
 }
 
@@ -296,76 +310,73 @@ private cb func OnFrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent(evt: ref<Fr
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixFPPBikeSetTransition(fppBikeELGDumbo1SizeY: Float, fppBikeELGDumbo3SizeX: Float, fppBikeELGDumbo3SizeY: Float, fppBikeELGDumbo1Opacity: Float, fppBikeELGDumbo2Opacity: Float, fppBikeELGDumbo3Opacity: Float, fppBikeELGDumbo45Opacity: Float) -> Bool {
 
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
-  let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
-  let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
-  let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
-  let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
-  let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
-  let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
-  let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
+  if NotEquals(this.m_isMaskingInVehiclesEnabled,false) {
+    let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+    let dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo1") as inkWidget;
+    let dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo2") as inkWidget;
+    let dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo3") as inkWidget;
+    let dumbo4: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4") as inkWidget;
+    let dumbo5: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5") as inkWidget;
+    let dynamic_dumbo1: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo1") as inkWidget;
+    let dynamic_dumbo2: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo2") as inkWidget;
+    let dynamic_dumbo3: ref<inkWidget> = root.GetWidgetByPathName(n"dynamic_dumbo3") as inkWidget;
 
-  let dumbo1Size = dumbo1.GetSize();
-  if dumbo1Size.Y != fppBikeELGDumbo1SizeY {
-    dumbo1.SetSize(dumbo1Size.X, fppBikeELGDumbo1SizeY);
-    dumbo1.Reparent(root);
-  }
-  // let dumbo2Size = dumbo2.GetSize();
-  // if dumbo2Size.X != 3000.0 {
-  //   dumbo2.SetSize(3000.0, dumbo2Size.Y);
-  //   dumbo2.Reparent(root);
-  // }
-  // let dumbo2Size = dumbo2.GetSize();
-  // if dumbo2Size.Y != 1000.0 {
-  //   dumbo2.SetSize(dumbo2Size.X, 1000.0);
-  //   dumbo2.Reparent(root);
-  // }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.X != fppBikeELGDumbo3SizeX {
-    dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
-    dumbo3.Reparent(root);
-  }
-  let dumbo3Size = dumbo3.GetSize();
-  if dumbo3Size.Y != fppBikeELGDumbo3SizeY {
-    dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
-    dumbo3.Reparent(root);
-  }
+    let dumbo1Size = dumbo1.GetSize();
+    if dumbo1Size.X != 7680.0 {
+      dumbo1.SetSize(7680.0, dumbo1Size.Y);
+      dumbo1.Reparent(root);
+    }
+    let dumbo1Size = dumbo1.GetSize();
+    if dumbo1Size.Y != fppBikeELGDumbo1SizeY {
+      dumbo1.SetSize(dumbo1Size.X, fppBikeELGDumbo1SizeY);
+      dumbo1.Reparent(root);
+    }
+    let dumbo3Size = dumbo3.GetSize();
+    if dumbo3Size.X != fppBikeELGDumbo3SizeX {
+      dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
+      dumbo3.Reparent(root);
+    }
+    let dumbo3Size = dumbo3.GetSize();
+    if dumbo3Size.Y != fppBikeELGDumbo3SizeY {
+      dumbo3.SetSize(fppBikeELGDumbo3SizeX, fppBikeELGDumbo3SizeY);
+      dumbo3.Reparent(root);
+    }
 
-  if dumbo1.GetOpacity() != fppBikeELGDumbo1Opacity {
-    dumbo1.SetOpacity(fppBikeELGDumbo1Opacity);
-  }
-  if dumbo2.GetOpacity() != fppBikeELGDumbo2Opacity {
-    dumbo2.SetOpacity(fppBikeELGDumbo2Opacity);
-  }
-  if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
-    dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
-  }
-  if dumbo4.GetOpacity() != fppBikeELGDumbo45Opacity {
-    dumbo4.SetOpacity(fppBikeELGDumbo45Opacity);
-  }
-  if dumbo5.GetOpacity() != fppBikeELGDumbo45Opacity{
-    dumbo5.SetOpacity(fppBikeELGDumbo45Opacity);
-  }
-  if dynamic_dumbo1.GetOpacity() != 0.0 {
-    dynamic_dumbo1.SetOpacity(0.0);
-  }
-  if dynamic_dumbo2.GetOpacity() != 0.0 {
-    dynamic_dumbo2.SetOpacity(0.0);
-  }
-  if dynamic_dumbo3.GetOpacity() != 0.0 {
-    dynamic_dumbo3.SetOpacity(0.0);
+    if dumbo1.GetOpacity() != fppBikeELGDumbo1Opacity {
+      dumbo1.SetOpacity(fppBikeELGDumbo1Opacity);
+    }
+    if dumbo2.GetOpacity() != fppBikeELGDumbo2Opacity {
+      dumbo2.SetOpacity(fppBikeELGDumbo2Opacity);
+    }
+    if dumbo3.GetOpacity() != fppBikeELGDumbo3Opacity {
+      dumbo3.SetOpacity(fppBikeELGDumbo3Opacity);
+    }
+    if dumbo4.GetOpacity() != fppBikeELGDumbo45Opacity {
+      dumbo4.SetOpacity(fppBikeELGDumbo45Opacity);
+    }
+    if dumbo5.GetOpacity() != fppBikeELGDumbo45Opacity{
+      dumbo5.SetOpacity(fppBikeELGDumbo45Opacity);
+    }
+    if dynamic_dumbo1.GetOpacity() != 0.0 {
+      dynamic_dumbo1.SetOpacity(0.0);
+    }
+    if dynamic_dumbo2.GetOpacity() != 0.0 {
+      dynamic_dumbo2.SetOpacity(0.0);
+    }
+    if dynamic_dumbo3.GetOpacity() != 0.0 {
+      dynamic_dumbo3.SetOpacity(0.0);
+    }
   }
 }
 
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeEvent>) -> Void {
+private cb func OnFrameGenGhostingFixDumboCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeEvent>) -> Bool {
 
   this.OnFrameGenGhostingFixFPPBikeSetTransition(1100.0, 1800.0, 800.0, 0.04, 0.0, 0.0, 0.03);
 }
 
 @addMethod(IronsightGameController)
-private cb func OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeFasterEvent>) -> Void {
+private cb func OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent(evt: ref<FrameGenGhostingFixDumboCameraFPPBikeFasterEvent>) -> Bool {
 
   this.OnFrameGenGhostingFixFPPBikeSetTransition(1050.0, 1800.0, 800.0, 0.03, 0.0, 0.0, 0.03);
 }
@@ -565,12 +576,12 @@ public final func CarCameraChangeSlow(scriptInterface: ref<StateGameScriptInterf
       cameraTPPSlowEvent = new FrameGenGhostingFixDumboCameraTPPCarSlowEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPSlowEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarSlowEvent = new FrameGenGhostingFixDumboCameraTPPFarCarSlowEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarSlowEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
-    break;
+     break;
     default:
       break;
   }
@@ -599,12 +610,12 @@ public final func CarCameraChangeFaster(scriptInterface: ref<StateGameScriptInte
       cameraTPPFasterEvent = new FrameGenGhostingFixDumboCameraTPPCarFasterEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
-    break;
+     break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarFasterEvent = new FrameGenGhostingFixDumboCameraTPPFarCarEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarFasterEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -632,12 +643,12 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
       cameraTPPEvent = new FrameGenGhostingFixDumboCameraTPPCarEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarEvent = new FrameGenGhostingFixDumboCameraTPPFarCarEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -666,12 +677,12 @@ public final func BikeCameraChangeCrawl(scriptInterface: ref<StateGameScriptInte
       cameraTPPBikeCrawlEvent = new FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarBikeCrawlEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeCrawlEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -699,12 +710,12 @@ public final func BikeCameraChangeSlow(scriptInterface: ref<StateGameScriptInter
       cameraTPPBikeSlowEvent = new FrameGenGhostingFixDumboCameraTPPBikeSlowEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPBikeSlowEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarBikeSlowEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeSlowEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -732,12 +743,12 @@ public final func BikeCameraChangeFaster(scriptInterface: ref<StateGameScriptInt
       cameraTPPBikeFasterEvent = new FrameGenGhostingFixDumboCameraTPPBikeFasterEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarBikeFasterEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeFasterEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -765,12 +776,12 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
       cameraTPPBikeEvent = new FrameGenGhostingFixDumboCameraTPPBikeEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPBikeEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
-    break;
+      break;
     case vehicleCameraPerspective.TPPFar:
       cameraTPPFarBikeEvent = new FrameGenGhostingFixDumboCameraTPPFarBikeEvent();
       scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
-    break;
+      break;
     default:
       break;
   }
@@ -782,7 +793,6 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   let vehicleTypeRecord: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
   this.m_vehicleCurrentType = vehicleTypeRecord.Type();
-  // this.m_ironsightController.m_vehicleCurrentType = this.m_vehicleCurrentType;
 
   switch(this.m_vehicleCurrentType) {
     case gamedataVehicleType.Bike:
@@ -805,14 +815,24 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
       break;
     case gamedataVehicleType.Car:
       if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
-        if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
-        } else {
+        if RoundTo(this.m_vehicleCurrentSpeed,1)<-2.0 {
           this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
-          if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
+          if RoundTo(this.m_vehicleCurrentSpeed,1)<-4.0 {
             this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
+            if RoundTo(this.m_vehicleCurrentSpeed,1)<-7.0 {
               this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+            }
+          }
+        } else {
+          if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
+              this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
+          } else {
+            this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
+            if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
+              this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
+              if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
+                this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+              }
             }
           }
         }
