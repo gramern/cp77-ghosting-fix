@@ -2,15 +2,15 @@
 
 FrameGen Ghosting 'Fix' uses predefined .inkwidget files to store masks (widgets) that are used to locally block certain parts of an interpolated frame from occurring on the screen. For version 3.1.x, masks for vehicles are stored and defined in the `fgfixcars.inkwidget` file. Those masks' visibility and size, while predefined, are dynamically changed to improve frame generation anti-ghosting and improve a player's experience.
 
-This manual will briefly explain how to create your own anti-ghosting presets that may be used to better fit your preferences, customize anti-ghosting for your average framerate, or just for fun and learning purposes - this manual is for anyone who likes to tinker and learn new stuff.
+This manual will briefly explain how to create your anti-ghosting presets that may be used to better fit your preferences, customize anti-ghosting for your average framerate, or just for fun and learning purposes - this manual is for anyone who likes to tinker and learn new stuff.
 
 **Some knowledge of how Lua's tables are built and skills on how to follow a presented pattern without breaking it are required.**
 
 ## Creating your anti-ghosting preset
 
-1. Open `Presets` folder you can find in Cyberpunk's `.../bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix` path after installing the mod in version 3.1.x. You will see a few `*.lua` files there.
+1. Open `Presets` folder you can find in Cyberpunk's `.../bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix` path after installing the mod in version 3.1.x. You will see a few `*.lua` preset files there.
 
-2. Copy and paste in the same `Presets` folder a file of your choice.
+2. Copy and paste in the same `Presets` folder one `*.lua` preset of your choice.
 
 3. Give the file a new, preferred name, like `MyPreset.lua`. It will be best if you don't use spaces.
 
