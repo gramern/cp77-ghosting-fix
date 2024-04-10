@@ -8,9 +8,9 @@ This manual will briefly explain how to create your anti-ghosting presets that m
 
 ## Creating your anti-ghosting preset
 
-1. Open `Presets` folder you can find in Cyberpunk's `.../bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix` path after installing the mod in version 3.1.x. You will see a few `*.lua` preset files there.
+1. Open the `Presets` folder which you can find in Cyberpunk's `.../bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix` path after installing the mod in version 3.1.x. You will see a few `*.lua` preset files there.
 
-2. Copy and paste in the same `Presets` folder one `*.lua` preset of your choice.
+2. Copy and paste in the same `Presets` folder one `*.lua` preset file of your choice.
 
 3. Give the file a new, preferred name, like `MyPreset.lua`. It will be best if you don't use spaces.
 
@@ -20,7 +20,7 @@ This manual will briefly explain how to create your anti-ghosting presets that m
 
 6. Open [`Presets.lua`](https://github.com/gramern/cp77-ghosting-fix/blob/main/cet_lua_addon/Modules/Presets.lua) here and for your convenience, copy lines with a predefined 'Default' preset: lines [39 to 71](https://github.com/gramern/cp77-ghosting-fix/blob/6ad3d9cc76adda9611e71ab21bc8a0d125479b9f/cet_lua_addon/Modules/Presets.lua#L39-L71) for most screens' aspect ratios or [75 to 107](https://github.com/gramern/cp77-ghosting-fix/blob/6ad3d9cc76adda9611e71ab21bc8a0d125479b9f/cet_lua_addon/Modules/Presets.lua#L75-L107) for 4:3.
 
-7. Paste one of those in place of lines [4 to 35](https://github.com/gramern/cp77-ghosting-fix/blob/6ad3d9cc76adda9611e71ab21bc8a0d125479b9f/cet_lua_addon/Presets/LessMasking_60FPS.lua#L4-L35) in your new, opened in a text editor, preset's file.
+7. Paste one of those in place of lines [4 to 35](https://github.com/gramern/cp77-ghosting-fix/blob/6ad3d9cc76adda9611e71ab21bc8a0d125479b9f/cet_lua_addon/Presets/LessMasking_60FPS.lua#L4-L35) in your new preset file, opened in the text editor.
 
 8. Now look at the image below:
 ![dumbo_map](https://github.com/gramern/cp77-ghosting-fix/assets/159150855/8374dc8c-775b-4a54-9716-b03c9ba98f6e)
