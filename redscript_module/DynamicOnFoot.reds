@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 3.1.2 for FSR3 FG Mods, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.0.1, 2024 gramern (scz_g) 2024
 
 @addField(IronsightGameController) public let m_masksOnFootEnabled: Bool = false;
 @addField(IronsightGameController) public let m_vignetteOnFootEnabled: Bool = false;
@@ -42,21 +42,43 @@
 
 @addField(IronsightGameController) public let m_isVehicleMounted: Bool = false;
 
-//Standard masks (dumbos) transition functions---------------------------------------------------------------------------------------
+//Corner masks transition functions---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let dumbo4OnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo4OnFoot") as inkWidget;
-  let dumbo5OnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"dumbo5OnFoot") as inkWidget;
+  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownLeftOnFoot") as inkWidget;
+  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownRightOnFoot") as inkWidget;
 
   this.m_masksOnFootCurrentOpacity = this.m_masksOnFootCurrentOpacity + this.m_masksOnFootChangeOpacityBy;
-  dumbo4OnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
-  dumbo5OnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
+  cornerDownLeftOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
+  cornerDownRightOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
 
   // LogChannel(n"DEBUG", s"this.m_masksOnFootCurrentOpacity = \(this.m_masksOnFootCurrentOpacity)");
-  // LogChannel(n"DEBUG", s"masksOnFoot.GetOpacity() = \(dumbo4OnFoot.GetOpacity())");
-  // LogChannel(n"DEBUG", s"masksOnFoot.GetOpacity() = \(dumbo5OnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"masksOnFoot.GetOpacity() = \(cornerDownLeftOnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"masksOnFoot.GetOpacity() = \(cornerDownRightOnFoot.GetOpacity())");
+}
+
+@addMethod(IronsightGameController)
+protected cb func FrameGenGhostingFixMasksOnFootSetMargins(cornerDownLeftMargin: Float, cornerDownRightMargin: Float, cornerDownMarginTop: Float) -> Bool {
+
+  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownLeftOnFoot") as inkWidget;
+  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownRightOnFoot") as inkWidget;
+
+  let cornerDownLeftOnFootMargin = cornerDownLeftOnFoot.GetMargin();
+  cornerDownLeftOnFoot.SetMargin(cornerDownLeftMargin, cornerDownMarginTop, cornerDownLeftOnFootMargin.right, cornerDownLeftOnFootMargin.bottom);
+
+  let cornerDownRightOnFootMargin = cornerDownRightOnFoot.GetMargin();
+  cornerDownRightOnFoot.SetMargin(cornerDownRightMargin, cornerDownMarginTop, cornerDownRightOnFootMargin.right, cornerDownRightOnFootMargin.bottom);
+
+  // LogChannel(n"DEBUG", s"Margins for corner masks set: \(cornerDownLeftMargin), \(cornerDownRightMargin), \(cornerDownMarginTop)");
+}
+
+@addMethod(IronsightGameController)
+private cb func FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent() -> Void {
+
+  this.FrameGenGhostingFixMasksOnFootSetMargins(0.0, 3840.0, 2160.0);
 }
 
 //Vignette dimensions transition functions---------------------------------------------------------------------------------------
@@ -361,106 +383,4 @@ private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> B
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) -> Bool {
   this.m_isVehicleMounted = false;
-}
-
-//On foot loop - callback---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
-public func FrameGenGhostingFixOnFootLoop() {
-  let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
-  let onFootCallback = new FrameGenGhostingFixOnFootCallback();
-  onFootCallback.ironsightController = this;
-  this.m_onFootLoopID = GameInstance.GetDelaySystem(playerPuppet.GetGame()).DelayCallback(onFootCallback, 0.1);
-}
-
-public class FrameGenGhostingFixOnFootCallback extends DelayCallback {
-
-  public let ironsightController: wref<IronsightGameController>;
-
-  public func Call() -> Void {
-
-    this.ironsightController.FrameGenGhostingFixHasWeapon();
-
-    if Equals(this.ironsightController.m_isWeaponDrawn,true) {
-      if Equals(this.ironsightController.m_isMaskingOnFootActivated,false) {
-        this.ironsightController.m_isMaskingOnFootActivated = true;
-        this.ironsightController.FrameGenGhostingFixOnFootActivationEvent();
-      }
-      if Equals(this.ironsightController.m_masksOnFootActivated,true) && this.ironsightController.m_masksOnFootCurrentOpacity < this.ironsightController.m_masksOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixMasksOnFootSetTransition();
-      }
-      if Equals(this.ironsightController.m_vignetteOnFootActivated,true) && this.ironsightController.m_vignetteOnFootCurrentOpacity < this.ironsightController.m_vignetteOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixVignetteOnFootSetTransition();
-      }
-
-      this.ironsightController.FrameGenGhostingFixBlockerAimOnFootToggleEvent();
-      this.ironsightController.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
-
-      if Equals(this.ironsightController.m_upperBodyState,IntEnum<gamePSMUpperBodyStates>(6)) {
-        if Equals(this.ironsightController.m_blockerAimOnFootEnabled,true) && NotEquals(this.ironsightController.m_blockerAimOnFootActivated,true) {
-          this.ironsightController.FrameGenGhostingFixBlockerAimOnFootActivationEvent();
-        }
-        if Equals(this.ironsightController.m_vignetteAimOnFootEnabled,true) && NotEquals(this.ironsightController.m_vignetteAimOnFootActivated,true) {
-          this.ironsightController.FrameGenGhostingFixVignetteAimOnFootActivationEvent();
-        }
-      }
-      
-      if NotEquals(this.ironsightController.m_upperBodyState,IntEnum<gamePSMUpperBodyStates>(6)) {
-        if Equals(this.ironsightController.m_blockerAimOnFootEnabled,true) && Equals(this.ironsightController.m_blockerAimOnFootActivated,true) {
-          this.ironsightController.FrameGenGhostingFixBlockerAimOnFootDeActivationEvent();
-        }
-        if Equals(this.ironsightController.m_vignetteAimOnFootEnabled,true) && Equals(this.ironsightController.m_vignetteAimOnFootActivated,true) {
-          this.ironsightController.FrameGenGhostingFixVignetteAimOnFootDeActivationEvent();
-        }
-      }
-
-      if Equals(this.ironsightController.m_blockerAimOnFootActivated,true) && this.ironsightController.m_blockerAimOnFootCurrentOpacity < this.ironsightController.m_blockerAimOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixBlockerAimOnFootSetTransition();
-      }
-      if Equals(this.ironsightController.m_blockerAimOnFootActivated,false) && this.ironsightController.m_blockerAimOnFootCurrentOpacity > this.ironsightController.m_blockerAimOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixBlockerAimOnFootSetTransition();
-      }
-
-      if Equals(this.ironsightController.m_vignetteAimOnFootActivated,true) && this.ironsightController.m_vignetteAimOnFootCurrentOpacity < this.ironsightController.m_vignetteAimOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixVignetteAimOnFootSetTransition();
-      }
-      if Equals(this.ironsightController.m_vignetteAimOnFootActivated,false) && this.ironsightController.m_vignetteAimOnFootCurrentOpacity > this.ironsightController.m_vignetteAimOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixVignetteAimOnFootSetTransition();
-      }
-
-      if Equals(this.ironsightController.m_isVehicleMounted,true) {
-        this.ironsightController.FrameGenGhostingFixVehicleWeaponEvent();
-      }
-    } else {
-      if Equals(this.ironsightController.m_isMaskingOnFootActivated,true) {
-        this.ironsightController.m_isMaskingOnFootActivated = false;
-        this.ironsightController.FrameGenGhostingFixOnFootDeActivationEvent();
-      }
-      if Equals(this.ironsightController.m_masksOnFootActivated,false) && this.ironsightController.m_masksOnFootCurrentOpacity > this.ironsightController.m_masksOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixMasksOnFootSetTransition();
-      }
-      if Equals(this.ironsightController.m_vignetteOnFootActivated,false) && this.ironsightController.m_vignetteOnFootCurrentOpacity > this.ironsightController.m_vignetteOnFootFinalOpacity {
-        this.ironsightController.FrameGenGhostingFixVignetteOnFootSetTransition();
-      }
-    }
-  
-    if NotEquals(this.ironsightController.m_isVehicleMounted,true) {
-      this.ironsightController.FrameGenGhostingFixVignetteOnFootEditorToggle();
-      if Equals(this.ironsightController.m_vignetteOnFootEditor,true) {
-        this.ironsightController.FrameGenGhostingFixVignetteOnFootEditor();
-      }
-    }  
-
-    this.ironsightController.FrameGenGhostingFixOnFootLoop();
-  }
-}
-
-@wrapMethod(IronsightGameController)
-protected cb func OnPlayerAttach(playerPuppet: ref<GameObject>) -> Bool {
-  wrappedMethod(playerPuppet);
-
-  this.FrameGenGhostingFixOnFootLoop();
-  this.FrameGenGhostingFixVignetteOnFootSetDimensions();
-  this.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
-  this.FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent();
-  this.FrameGenGhostingFixAimOnFootSetDimensions();
 }
