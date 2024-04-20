@@ -1,16 +1,17 @@
---FrameGen Ghosting Fix 3.1.2
+--FrameGen Ghosting Fix 4.0.1
 
 local UIText = {
     General = {
         modname = "FrameGen Ghosting 'Fix'",
         modname_log = "[FrameGen Ghosting 'Fix']",
         title_general = "General Settings:",
-        title_fps90 = "90+ FPS FG ON Recommended Settings:",
-        title_fps100 = "100+ FPS FG ON Recommended Settings:",
-        title_fps120 = "120+ FPS FG ON Recommended Settings:",
+        title_fps90 = "90+ FPS FG ON Settings:",
+        title_fps100 = "100+ FPS FG ON Settings:",
+        title_fps120 = "120+ FPS FG ON Settings:",
         settings_loaded = "User settings loaded.",
         settings_loaded_preset = "Preset loaded",
         settings_apply = "  Apply  ",
+        settings_applied_veh = "[ ! ] Selected preset applied.",
         settings_save = "Save settings",
         settings_saved = "[ ! ] Your settings are saved.",
         settings_saved_onfoot = "[ ! ] Redraw your weapon to accept changes.",
@@ -28,24 +29,18 @@ local UIText = {
     Vehicles = {
         tabname = "Vehicles",
         MaskingPresets = {
-            name = "Use anti-ghosting masking preset:",
-            tooltip = "Choose a preset of anti-ghosting for vehicles."
+            name = "Use this preset for vehicles:",
+            tooltip = "Choose a preset of anti-ghosting for vehicles.",
         },
-        SideMirror = {
-            name = "Enable left-side mirror anti-ghosting for FPP in cars",
-            tooltip = "Enables position-fixed anti-ghosting mask to stop frame generation\nfrom occuring locally around a left-side mirror and reduce ghosting\nwhen driving a car in FPP."
-        },
-        ELG = {
-            name = "Enable 'Even Less Ghosting' anti-ghosting for FPP on bikes",
-            tooltip = "Enables customizable, dynamic anti-ghosting masks to stop frame generation\nfrom occuring locally around a windshield and further reduce ghosting\nwhen riding a motorcycle.",
-            textfield_1 = "For a live view, change the values below when in FPP on a\nmotorcycle during gameplay (not in the game's menu).",
-            textfield_2 = "Sliders below let you customize ELG settings. The default ELG\nsettings are optimized for 45+ base fps (90+ fps with FG ON).\nYou need much more base fps for a good experience when\nsetting high values below. Potential Side Effects: sunscreen\nand banding.",
-            setting_1 = "Handlebars AG mask height (ELG default 170%):",
-            setting_2 = "Windshield AG mask width (ELG default 120%):",
-            setting_3 = "Windshield AG mask height (ELG default 300%):",
-            comment_1 = "Extreme",
-            comment_2 = "Oooffff",
-            comment_3 = "Bonkers"
+        Windshield = {
+            name = "Customize motorcycle windshield mask",
+            tooltip = "Enables customization of the anti-ghosting mask to stop frame generation\nfrom occuring locally around a windshield when riding a motorcycle.",
+            textfield_1 = "The sliders below let you customize the size of the motorcycle\nwindshield mask. Usually not necessary, may turn out handy for\nsome motorcycles like Apollo.",
+            setting_1 = "Windshield anti-ghosting mask width:",
+            setting_2 = "Windshield anti-ghosting mask height:",
+            comment_1 = "Scale width",
+            comment_2 = "Scale height",
+            warning = "V needs to be sitting on a stationary motorcycle while in\nFirst Person Perspective to edit this option."
         }
     },
     OnFoot = {
@@ -62,7 +57,7 @@ local UIText = {
         Vignette = {
             name = "Enable customizable anti-ghosting vignette",
             tooltip = "Enables customizable anti-ghosting vignette to stop frame generation\nfrom occuring locally around edges of your screen and reduce ghosting\nwhen V is holding a weapon.",
-            textfield_1 = "Sliders below let you customize the vignette's dimensions\nto cover ghosting on your screen edges. For framerates lower\nthan recommended, these settings come at a noticeable cost\nof perceived smoothness in outermost areas of your field\nof view.",
+            textfield_1 = "The sliders below let you customize the vignette's dimensions\nto cover ghosting on your screen edges. For framerates lower\nthan recommended, these settings come at a noticeable cost\nof perceived smoothness in outermost areas of your field\nof view.",
             setting_1 = "Vignette's width:",
             setting_2 = "Vignette's height:",
             setting_3 = "Vignette's horizontal position:",
@@ -74,7 +69,7 @@ local UIText = {
         },
         BlockerAim = {
             name = "Enable frame gen blocker for aiming/blocking",
-            tooltip = "[EXPERIMENTAL] Enables contextual blocking of frame generation\nfor a whole screen when V is aiming/blocking with a weapon. This\nmay turn out to be helpful in higher framerates as crosshairs/\nsights tend to ghost heavily with frame generation turned on."
+            tooltip = "Enables contextual blocking of frame generation\nfor a whole screen when V is aiming/blocking with a weapon. This\nmay turn out to be helpful in higher framerates as crosshairs/\nsights tend to ghost heavily with frame generation turned on."
         }
     }
 }

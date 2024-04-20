@@ -1,5 +1,5 @@
 local framegen_ghosting_fix = {
-__VERSION     = "FrameGen Ghosting 'Fix' 3.1.2",
+__VERSION     = "FrameGen Ghosting 'Fix' 4.0.1",
 __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
 __LICENSE     = [[
 	MIT License
@@ -27,41 +27,39 @@ __LICENSE     = [[
 }
 
 local Calculate = require("Modules/Calculate")
+local Config = require("Modules/Config")
 local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
 local UIText = require("Modules/UIText")
+local Vectors = require("Modules/Vectors")
 
 local saved = false
-local applied_onfoot = false
+local appliedVeh = false
+local appliedOnFoot = false
+local enabledGFixWindow = false
 
 --default settings
-local enabledFPPCarSideMirror = false
-local enabledELGSettings = false
+local enabledWindshieldSettings = false
 local enabledFPPOnFoot = false
-local enabledFPPBlockerAimOnFoot = false
+local enabledFPPBlockerAimOnFoot = true
 local enabledFPPVignetteAimOnFoot = false
 local enabledFPPVignetteOnFoot = false
 local enabledFPPVignettePermamentOnFoot = false
 
 --set default preset
 function SetDefaultPreset()
-	if Calculate.ScreenDetection.FGGFscreentype == "4:3" then
-		table.insert(Presets.presetsList, 1, Presets.Default43.PresetInfo.name)
-		table.insert(Presets.presetsDesc, 1, Presets.Default43.PresetInfo.description)
-		table.insert(Presets.presetsAuth, 1, Presets.Default43.PresetInfo.author)
-	else
-		table.insert(Presets.presetsList, 1, Presets.Default.PresetInfo.name)
-		table.insert(Presets.presetsDesc, 1, Presets.Default.PresetInfo.description)
-		table.insert(Presets.presetsAuth, 1, Presets.Default.PresetInfo.author)
-	end
-	-- print(UIText.General.modname_log,"Set default preset:",Presets.presetsList[1])
+	table.insert(Presets.presetsList, 1, Config.Default.PresetInfo.name)
+	table.insert(Presets.presetsDesc, 1, Config.Default.PresetInfo.description)
+	table.insert(Presets.presetsAuth, 1, Config.Default.PresetInfo.author)
 end
 
 function SetDefaultPresetFile()
-	if Calculate.ScreenDetection.FGGFscreentype == "4:3" then
-		table.insert(Presets.presetsFile, 1, Presets.Default43.PresetInfo.file)
-	else
-		table.insert(Presets.presetsFile, 1, Presets.Default.PresetInfo.file)
+	table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
+end
+
+function SetDefaultIf43()
+	if Calculate.ScreenDetection.screenType == 5 then
+		Presets.selectedPreset = "Stronger"
 	end
 end
 
@@ -75,19 +73,19 @@ function LoadUserSettings()
 		if userSettings then
 			print(UIText.General.modname_log,UIText.General.settings_loaded)
 		end
-		enabledFPPCarSideMirror = userSettings.FPPCar.enabledSideMirror
-		enabledELGSettings = userSettings.FPPBikeELG.enabledELG
-		Calculate.FPPBikeELG.windshieldWidth = userSettings.FPPBikeELG.windshieldWidth
-		Calculate.FPPBikeELG.windshieldHeight = userSettings.FPPBikeELG.windshieldHeight
-		Calculate.FPPBikeELG.handlebarsHeight = userSettings.FPPBikeELG.handlebarsHeight
-		enabledFPPOnFoot = userSettings.FPPOnFoot.enabledOnFoot
+		if userSettings.FPPBikeWindshield.enabledWindshield then
+			enabledWindshieldSettings = userSettings.FPPBikeWindshield.enabledWindshield
+			Vectors.VehMasks.Mask1.Scale.x = userSettings.FPPBikeWindshield.width
+			Vectors.VehMasks.Mask1.Scale.y = userSettings.FPPBikeWindshield.height
+		end
+		if userSettings.FPPOnFoot.enabledOnFoot then
+			enabledFPPOnFoot = userSettings.FPPOnFoot.enabledOnFoot
+		end
 		if userSettings.FPPOnFoot.enabledBlockerAimOnFoot then
 			enabledFPPBlockerAimOnFoot = userSettings.FPPOnFoot.enabledBlockerAimOnFoot
 		end
-		if userSettings.FPPOnFoot.enabledVignetteAimOnFoot then
-			enabledFPPVignetteAimOnFoot = userSettings.FPPOnFoot.enabledVignetteAimOnFoot
-		end
 		if userSettings.FPPOnFoot.enabledVignetteOnFoot then
+			enabledFPPVignetteAimOnFoot = userSettings.FPPOnFoot.enabledVignetteAimOnFoot
 			enabledFPPVignetteOnFoot = userSettings.FPPOnFoot.enabledVignetteOnFoot
 			enabledFPPVignettePermamentOnFoot = userSettings.FPPOnFoot.enabledVignettePermamentOnFoot
 			Calculate.FPPOnFoot.vignetteFootMarginLeft = userSettings.FPPOnFoot.vignetteFootMarginLeft
@@ -95,11 +93,12 @@ function LoadUserSettings()
 			Calculate.FPPOnFoot.vignetteFootSizeX = userSettings.FPPOnFoot.vignetteFootSizeX
 			Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot.vignetteFootSizeY
 		end
-		if userSettings.TPPVehicles.selectedPreset then
-			Presets.selectedPreset = userSettings.TPPVehicles.selectedPreset
+		if userSettings.Vehicles.selectedPreset then
+			Presets.selectedPreset = userSettings.Vehicles.selectedPreset
 		end
 	else
-		Calculate.SetELGDefault()
+		SetDefaultIf43()
+		Vectors.SetWindshieldDefault()
 		Calculate.SetVignetteDefault()
 		print(UIText.General.modname_log,UIText.General.settings_notfound)
 	end
@@ -108,17 +107,13 @@ end
 --save user settigns
 function SaveUserSettings()
 	local userSettings = {
-		TPPVehicles = {
+		Vehicles = {
 			selectedPreset = Presets.selectedPreset,
 		},
-		FPPBikeELG = {
-			enabledELG = enabledELGSettings,
-			windshieldWidth = Calculate.FPPBikeELG.windshieldWidth,
-			windshieldHeight = Calculate.FPPBikeELG.windshieldHeight,
-			handlebarsHeight = Calculate.FPPBikeELG.handlebarsHeight
-		},
-		FPPCar = {
-			enabledSideMirror = enabledFPPCarSideMirror
+		FPPBikeWindshield = {
+			enabledWindshield = enabledWindshieldSettings,
+			width = Vectors.VehMasks.Mask1.CachedScale.x,
+			height = Vectors.VehMasks.Mask1.CachedScale.y,
 		},
 		FPPOnFoot = {
 			enabledOnFoot = enabledFPPOnFoot,
@@ -146,86 +141,35 @@ end
 
 function SaveUserSettingsOnFootLog()
 	print(UIText.General.modname_log,UIText.General.settings_saved_onfoot)
-	applied_onfoot = true
+	appliedOnFoot = true
 end
 
 --apply user settings
 function ApplyMaskingInVehiclesGlobal()
+	Vectors.VehMasks.enabled = Config.MaskingInVehiclesGlobal.enabled
 	Override('IronsightGameController', 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
 		local originalFunction = wrappedMethod()
 
-		if Presets.MaskingInVehiclesGlobal.enabled then return originalFunction end
+		if Config.MaskingInVehiclesGlobal.enabled then return originalFunction end
 		self:FrameGenGhostingFixVehicleToggle(false)
 	end)
 end
 
-function ApplyFPPCarSideMirror()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPCarSideMirrorToggleEvent', function(self)
-		if not enabledFPPCarSideMirror then return end
-		self:OnFrameGenGhostingFixDumboCameraFPPCarEvent(0.05, 2400.0, 1800.0)
+function TurnOnLiveViewWindshieldEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.8, false, false, true)
 	end)
 end
 
-function ApplyELGSettings()
-	if enabledELGSettings then
-		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeEvent', function(self)
-			self:OnFrameGenGhostingFixFPPBikeSetTransition(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.04, 0.0, 0.04, 0.03)
-		end)
-		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent', function(self)
-			self:OnFrameGenGhostingFixFPPBikeSetTransition(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.03, 0.0, 0.03, 0.03)
-		end)
-		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent', function(self)
-			self:OnFrameGenGhostingFixFPPBikeSetTransition(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.02, 0.0, 0.02, 0.02)
-		end)
-		Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent', function(self)
-			self:OnFrameGenGhostingFixFPPBikeSetTransition(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.01, 0.0, 0.02, 0.01)
-		end)
-	else
-		if Presets.FPPBike.enabled == false then
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-			end)
-		else
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition((Calculate.FPPBikeELG.originalHandlebarsHeightPx*1.2), Calculate.FPPBikeELG.originalWindshieldWidthPx, Calculate.FPPBikeELG.originalWindshieldHeightPx, 0.04, 0.0, 0.0, 0.03)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeFasterEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition((Calculate.FPPBikeELG.originalHandlebarsHeightPx*1.15), Calculate.FPPBikeELG.originalWindshieldWidthPx, Calculate.FPPBikeELG.originalWindshieldHeightPx, 0.03, 0.0, 0.0, 0.03)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeSlowEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition((Calculate.FPPBikeELG.originalHandlebarsHeightPx*1.1), Calculate.FPPBikeELG.originalWindshieldWidthPx, Calculate.FPPBikeELG.originalWindshieldHeightPx, 0.02, 0.0, 0.0, 0.02)
-			end)
-			Override('IronsightGameController', 'OnFrameGenGhostingFixDumboCameraFPPBikeCrawlEvent', function(self)
-				self:OnFrameGenGhostingFixFPPBikeSetTransition((Calculate.FPPBikeELG.originalHandlebarsHeightPx), Calculate.FPPBikeELG.originalWindshieldWidthPx, Calculate.FPPBikeELG.originalWindshieldHeightPx, 0.01, 0.0, 0.0, 0.01)
-			end)
-		end
-	end
-end
-
-function TurnOnLiveViewELGEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-		self:OnFrameGenGhostingFixFPPBikeELGEditor(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.7, 0.7)
+function DefaultLiveViewWindshieldEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.6, false, false, true)
 	end)
 end
 
-function DefaultLiveViewELGEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-		self:OnFrameGenGhostingFixFPPBikeELGEditor(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.4, 0.4)
-	end)
-end
-
-function TurnOffLiveViewELGEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeELGEEvent', function(self)
-		self:OnFrameGenGhostingFixFPPBikeELGEditor(Calculate.FPPBikeELG.newHandlebarsHeightPx, Calculate.FPPBikeELG.newWindshieldWidthPx, Calculate.FPPBikeELG.newWindshieldHeightPx, 0.0, 0.0)
+function TurnOffLiveViewWindshieldEditor()
+	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.0, false, false, true)
 	end)
 end
 
@@ -235,6 +179,9 @@ function ApplyMasksOnFoot()
 
 		if not enabledFPPOnFoot then return originalOnFoot end
 		self:FrameGenGhostingFixOnFootToggle(true)
+	end)
+	Override('IronsightGameController', 'FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent', function(self)
+		self:FrameGenGhostingFixMasksOnFootSetMargins(Calculate.FPPOnFoot.cornerDownLeftMargin, Calculate.FPPOnFoot.cornerDownRightMargin, Calculate.FPPOnFoot.cornerDownMarginTop)
 	end)
 end
 
@@ -303,12 +250,9 @@ function ApplyUserSettings()
 	ApplyBlockerAimOnFoot()
 	ApplyVignetteAimOnFoot()
 	ApplyVignetteOnFoot()
-	TurnOffLiveViewELGEditor()
+	TurnOffLiveViewWindshieldEditor()
 	TurnOffLiveViewVignetteOnFootEditor()
 	ApplyMaskingInVehiclesGlobal()
-	if not Presets.MaskingInVehiclesGlobal.enabled then return end
-	ApplyFPPCarSideMirror()
-	ApplyELGSettings()
 end
 
 --initialize all stuff etc
@@ -324,17 +268,16 @@ registerForEvent("onInit", function()
 		Presets.GetPresetInfo()
 		Presets.LoadPreset()
 		Presets.ApplyPreset()
-		Calculate.SetMasksOrgSizes()
+		Calculate.SetCornersMargins()
 		Calculate.SetVignetteOrgMinMax()
 		Calculate.SetVignetteOrgSize()
 		Calculate.SetMaskingAimSize()
-		Calculate.HandlebarsY()
-		Calculate.WindshieldX()
-		Calculate.WindshieldY()
 		Calculate.VignettePosX()
 		Calculate.VignettePosY()
 		Calculate.VignetteX()
 		Calculate.VignetteY()
+		Vectors.SetWindshieldDefault()
+		Calculate.SetHEDSize()
 		ApplyUserSettings()
 	end
 end)
@@ -344,9 +287,27 @@ registerForEvent("onOverlayOpen", function()
 end)
 
 registerForEvent("onOverlayClose", function()
-	CyberEngineOpen = false
-	applied_onfoot = false
+	if not enabledGFixWindow then
+		CyberEngineOpen = false
+	end
+	appliedOnFoot = false
+	Calculate.CalcAspectRatio()
+	Calculate.GetAspectRatio()
+	Calculate.SetCornersMargins()
+	Calculate.SetVignetteOrgMinMax()
+	Calculate.SetVignetteOrgSize()
+	Calculate.SetMaskingAimSize()
+	Calculate.VignettePosX()
+	Calculate.VignettePosY()
+	Calculate.VignetteX()
+	Calculate.VignetteY()
+	Calculate.SetHEDSize()
 	ApplyUserSettings()
+end)
+
+registerForEvent("onUpdate", function(delta)
+		Vectors.IsMounted()
+		Vectors.ProjectMasks()
 end)
 
 -- draw a ImGui window
@@ -355,30 +316,30 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
 		ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
 
-		ImGui.PushStyleColor(ImGuiCol.Button, 1, 0.82, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1, 0.85, 0.325, 1)
+		ImGui.PushStyleColor(ImGuiCol.Button, 1, 0.78, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1, 0.85, 0.31, 1)
 		ImGui.PushStyleColor(ImGuiCol.ButtonActive, 0.73, 0.56, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.CheckMark, 0, 0, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.FrameBg, 1, 0.82, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, 1, 0.85, 0.325, 1)
+		ImGui.PushStyleColor(ImGuiCol.FrameBg, 1, 0.78, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, 1, 0.85, 0.31, 1)
 		ImGui.PushStyleColor(ImGuiCol.FrameBgActive, 0.74, 0.58, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.Header, 1, 0.82, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1, 0.85, 0.325, 1)
-		ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1, 0.82, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.Header, 1, 0.78, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1, 0.85, 0.31, 1)
+		ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1, 0.78, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.PopupBg, 0.73, 0.56, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.ResizeGrip, 0.73, 0.56, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, 1, 0.85, 0.325, 1)
+		ImGui.PushStyleColor(ImGuiCol.ResizeGrip, 0.78, 0.612, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, 1, 0.85, 0.31, 1)
         ImGui.PushStyleColor(ImGuiCol.ResizeGripActive, 0.73, 0.56, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.SliderGrab, 0.73, 0.56, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, 1, 0.85, 0.325, 1)
+		ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, 1, 0.85, 0.31, 1)
 		ImGui.PushStyleColor(ImGuiCol.Tab, 0.73, 0.56, 0, 1)
-		ImGui.PushStyleColor(ImGuiCol.TabHovered, 1, 0.85, 0.325, 1)
-		ImGui.PushStyleColor(ImGuiCol.TabActive, 1, 0.82, 0, 1)
+		ImGui.PushStyleColor(ImGuiCol.TabHovered, 1, 0.85, 0.31, 1)
+		ImGui.PushStyleColor(ImGuiCol.TabActive, 1, 0.78, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.TabUnfocused, 0.73, 0.56, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.TabUnfocusedActive, 0.73, 0.56, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.Text, 0, 0, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.TitleBg, 0.73, 0.56, 0, 1)
-        ImGui.PushStyleColor(ImGuiCol.TitleBgActive, 1, 0.82, 0, 1)
+        ImGui.PushStyleColor(ImGuiCol.TitleBgActive, 1, 0.78, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, 0.73, 0.56, 0, 1)
 		ImGui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0.75)
 
@@ -419,6 +380,7 @@ registerForEvent("onDraw", function()
 								end
 								if preset_selected then
 									ImGui.SetItemDefaultFocus()
+									appliedVeh = false
 								end
 							end
 							ImGui.EndCombo()
@@ -433,6 +395,7 @@ registerForEvent("onDraw", function()
 							SaveUserSettings()
 							Presets.LoadPreset()
 							Presets.ApplyPreset()
+							appliedVeh = true
 						end
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 						if Presets.selectedPresetPosition then
@@ -446,88 +409,88 @@ registerForEvent("onDraw", function()
 								ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
 							end
 						end
-						if Presets.MaskingInVehiclesGlobal.enabled then
+						if appliedVeh then
+							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 							ImGui.Text("")
+							ImGui.Text(UIText.General.settings_applied_veh)
+							ImGui.PopStyleColor()
+						end
+						ImGui.PopStyleColor()
+						if Config.MaskingInVehiclesGlobal.enabled then
+							ImGui.Text("")
+							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 							ImGui.Text(UIText.General.title_fps90)
 							ImGui.Separator()
-							enabledFPPCarSideMirror, fppCarSideMirrorEnabled = ImGui.Checkbox(UIText.Vehicles.SideMirror.name, enabledFPPCarSideMirror)
-							if fppCarSideMirrorEnabled then
+							enabledWindshieldSettings, WindshieldSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.Windshield.name, enabledWindshieldSettings)
+							if WindshieldSettingsEnabled then
+								Vectors.ReadCache()
 								SaveUserSettings()
 							end
 							ImGui.PopStyleColor()
 							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.Vehicles.SideMirror.tooltip)
+								ImGui.SetTooltip(UIText.Vehicles.Windshield.tooltip)
 							else
 								ImGui.SetTooltip(nil)
 							end
 							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							enabledELGSettings, elgSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.ELG.name, enabledELGSettings)
-							if elgSettingsEnabled then
-								SaveUserSettings()
-							end
-							ImGui.PopStyleColor()
-							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.Vehicles.ELG.tooltip)
+							if enabledWindshieldSettings then
+								if Vectors.Vehicle.currentSpeed ~= nil and Vectors.Vehicle.currentSpeed < 1 and Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") and Vectors.Vehicle.activePerspective == vehicleCameraPerspective.FPP then
+									ImGui.Text("")
+									ImGui.Text(UIText.Vehicles.Windshield.textfield_1)
+									ImGui.Text("")
+									ImGui.PopStyleColor()
+									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+									ImGui.Text(UIText.Vehicles.Windshield.setting_1)
+									ImGui.PopStyleColor()
+									Vectors.VehMasks.Mask1.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask1.Scale.x, 100, 150, "%.0f")
+										if windshieldXChanged then
+											Vectors.ResizeBikeWindshieldMask()
+											saved = false
+											TurnOnLiveViewWindshieldEditor()
+										end
+									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+									ImGui.Text(UIText.Vehicles.Windshield.setting_2)
+									ImGui.PopStyleColor()
+									Vectors.VehMasks.Mask1.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask1.Scale.y, 100, 300, "%.0f")
+										if windshieldYChanged then
+											Vectors.ResizeBikeWindshieldMask()
+											saved = false
+											TurnOnLiveViewWindshieldEditor()
+										end
+									ImGui.Text("")
+									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+									if saved == true then
+										ImGui.Text(UIText.General.settings_saved)
+									end
+									ImGui.PopStyleColor()
+									if ImGui.Button(UIText.General.settings_default, 240, 40) then
+										saved = false
+										Vectors.SetWindshieldDefault()
+										DefaultLiveViewWindshieldEditor()
+									end
+									ImGui.SameLine()
+									if ImGui.Button(UIText.General.settings_save, 240, 40) then
+										saved = true
+										Vectors.SaveCache()
+										SaveUserSettings()
+									end
+								else
+									ImGui.Text("")
+									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+									ImGui.Text(UIText.Vehicles.Windshield.warning)
+									ImGui.Text("")
+									ImGui.PopStyleColor()
+								end
 							else
-								ImGui.SetTooltip(nil)
-							end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							if enabledELGSettings then
-								ImGui.Text("")
-								ImGui.Text(UIText.Vehicles.ELG.textfield_1)
-								ImGui.Text("")
-								ImGui.Text(UIText.Vehicles.ELG.textfield_2)
-								ImGui.Text("")
-								ImGui.Text(UIText.Vehicles.ELG.setting_1)
-							ImGui.PopStyleColor()
-							Calculate.FPPBikeELG.handlebarsHeight, handlebarsYChanged = ImGui.SliderFloat(UIText.Vehicles.ELG.comment_1,Calculate.FPPBikeELG.handlebarsHeight, 70, 350, "%.0f")
-									if handlebarsYChanged then
-										Calculate.HandlebarsY()
-										saved = false
-										TurnOnLiveViewELGEditor()
-									end
-								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-								ImGui.Text(UIText.Vehicles.ELG.setting_2)
-								ImGui.PopStyleColor()
-								Calculate.FPPBikeELG.windshieldWidth, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.ELG.comment_2,Calculate.FPPBikeELG.windshieldWidth, 70, 250, "%.0f")
-									if windshieldXChanged then
-										Calculate.WindshieldX()
-										saved = false
-										TurnOnLiveViewELGEditor()
-									end
-								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-								ImGui.Text(UIText.Vehicles.ELG.setting_3)
-								ImGui.PopStyleColor()
-								Calculate.FPPBikeELG.windshieldHeight, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.ELG.comment_3,Calculate.FPPBikeELG.windshieldHeight, 80, 400, "%.0f")
-									if windshieldYChanged then
-										Calculate.WindshieldY()
-										saved = false
-										TurnOnLiveViewELGEditor()
-									end
-								ImGui.Text("")
-								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-								if saved == true then
-									ImGui.Text(UIText.General.settings_saved)
-								end
-								ImGui.PopStyleColor()
-								if ImGui.Button(UIText.General.settings_default, 240, 40) then
-									saved = false
-									Calculate.SetELGDefault()
-									DefaultLiveViewELGEditor()
-								end
-								ImGui.SameLine()
-								if ImGui.Button(UIText.General.settings_save, 240, 40) then
-									saved = true
-									SaveUserSettings()
-								end
+								Vectors.SetWindshieldDefault()
 							end
 						end
-					ImGui.PopStyleColor()
+						ImGui.PopStyleColor()
 					ImGui.EndTabItem()
 					end
 					if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						ImGui.Text(UIText.General.title_fps90)
+						ImGui.Text(UIText.General.title_general)
 						ImGui.Separator()
 						enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
 						if fppOnFootEnabled then
@@ -679,12 +642,13 @@ registerForEvent("onDraw", function()
 						else
 							enabledFPPVignettePermamentOnFoot = false
 						end
-						if applied_onfoot then
+						if appliedOnFoot then
 							ImGui.Separator()
 							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 							ImGui.Text(UIText.General.settings_saved_onfoot)
 							ImGui.PopStyleColor()
 						end
+						ImGui.PopStyleColor()
 					ImGui.EndTabItem()
 					end
 				ImGui.EndTabBar()

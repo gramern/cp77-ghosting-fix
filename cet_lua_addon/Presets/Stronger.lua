@@ -1,42 +1,42 @@
 local Preset = {
     TPPCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.07},
+        faster = {0.02, 0.05, 0.05},
+        slow = {0.01, 0.035, 0.035},
+        crawl = {0.005, 0.02, 0.02}
     },
     TPPFarCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.07},
+        faster = {0.02, 0.05, 0.05},
+        slow = {0.01, 0.035, 0.035},
+        crawl = {0.005, 0.02, 0.02}
     },
     FPPCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.04},
+        faster = {0.02, 0.05, 0.03},
+        slow = {0.01, 0.035, 0.02},
+        crawl = {0.005, 0.02, 0.02}
     },
     TPPBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.07},
+        faster = {0.02, 0.05, 0.05},
+        slow = {0.01, 0.035, 0.035},
+        crawl = {0.005, 0.02, 0.02}
     },
     TPPFarBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.07},
+        faster = {0.02, 0.05, 0.05},
+        slow = {0.01, 0.035, 0.035},
+        crawl = {0.005, 0.02, 0.02}
     },
     FPPBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {0.03, 0.07, 0.07},
+        faster = {0.02, 0.05, 0.05},
+        slow = {0.01, 0.035, 0.035},
+        crawl = {0.005, 0.02, 0.02},
     },
     MaskingInVehiclesGlobal = {
-        enabled = false
+        enabled = true
     },
     Vectors = {
         VehElements = {
@@ -44,7 +44,8 @@ local Preset = {
                 MultiplyBy = {FPP = 1},
                 Offset = {x=0.0, y=0.48, z=0.85},
                 Size = {
-                    Increment = {x = 32, y = 32},
+                    Increment = {x = 48, y = 64},
+                    Max = {x = 11540, y = 5000},
                     Min = {x = 7680, y = 1600},
                 },
             },
@@ -53,8 +54,8 @@ local Preset = {
                 Offset = {x=0, y=0.6, z=0.5},
                 Size = {
                     Increment = {x = 3, y = 4},
-                    Max = {x = 1600, y = 1400},
-                    Min = {x = 1300, y = 1200},
+                    Max = {x = 1600, y = 1500},
+                    Min = {x = 1300, y = 1300},
                 },
             },
             BikeWheelRear = {
@@ -78,9 +79,9 @@ local Preset = {
                 MultiplyBy = {TPPClose = 2.5, TPPMedium = 1.7, TPPFar = 1},
                 Offset = {x=0, y=0.2, z=-1.8},
                 Size = {
-                    Increment = {x = 3, y = 8},
-                    Max = {x = 1500, y = 1300},
-                    Min = {x = 1200, y = 900},
+                    Increment = {x = 3, y = 4},
+                    Max = {x = 1600, y = 1600},
+                    Min = {x = 1300, y = 1400},
                 },
             },
             CarFrontBumper = {
@@ -88,8 +89,8 @@ local Preset = {
                 Offset = {x=0, y=0.2, z=2.0},
                 Size = {
                     Increment = {x = 3, y = 16},
-                    Max = {x = 1600, y = 1700},
-                    Min = {x = 1300, y = 900},
+                    Max = {x = 1800, y = 1700},
+                    Min = {x = 1500, y = 900},
                 },
             },
             CarSideMirrors= {
@@ -98,7 +99,7 @@ local Preset = {
                     Offset = {x=-0.95, y=0.65, z=0.45},
                     Size = {
                         Increment = {x = 3, y = 8},
-                        Min = {x = 1400, y = 1200},
+                        Min = {x = 1400, y = 1300},
                     },
                 },
                 Right = {
@@ -115,14 +116,14 @@ local Preset = {
             AnchorPoint = {x = 0.5, y = 0.25, yMin = 0.25, yMax = 0.3, yIncrement = 0.001},
             HorizontalEdgeDown = {
                 Size = {
-                    Base = {x = 4240, y = 1480} -- min size x = 3888
+                    Base = {x = 4000, y = 1680} -- min size x = 3888
                 }
             }
-        }
+        },
     },
 	PresetInfo = {
-        name = "Turn off anti-ghosting masking",
-		description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+        name = "Stronger",
+		description = "Increases size of anti-ghosting masks for vehicles by ~8%.\nWorks with all types of screens supported by Ghosting 'Fix'.\nRecommended as default for 4:3.",
         author = nil
 	}
 }
