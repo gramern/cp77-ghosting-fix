@@ -1,32 +1,36 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 3.1.0 for FSR3 FG Mods, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 4.0.0, 2024 gramern (scz_g)
 
 //CET add-on customization---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixFPPCarSideMirrorToggleEvent extends Event {}
-public class FrameGenGhostingFixFPPBikeELGEEvent extends Event {}
+public class FrameGenGhostingFixFPPBikeWindshieldEditorEvent extends Event {}
 public class FrameGenGhostingFixVignetteOnFootEditorEvent extends Event {}
 //Car camera change---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixDumboCameraTPPCarEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarCarEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPCarFasterEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPCarSlowEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarCarSlowEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPCarCrawlEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarCarCrawlEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraFPPCarSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPCarEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarCarEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPCarFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarCarFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPCarSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarCarSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPCarCrawlEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarCarCrawlEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPCarEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPCarFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPCarSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPCarCrawlEvent extends Event {}
 //Bike camera change---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixDumboCameraTPPBikeEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPBikeFasterEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPBikeSlowEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPBikeCrawlEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarBikeEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarBikeSlowEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraTPPFarBikeCrawlEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraFPPBikeEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraFPPBikeFasterEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraFPPBikeSlowEvent extends Event {}
-public class FrameGenGhostingFixDumboCameraFPPBikeCrawlEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPBikeEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPBikeFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPBikeSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarBikeFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPBikeCrawlEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarBikeEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarBikeSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraTPPFarBikeCrawlEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPBikeEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPBikeFasterEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPBikeSlowEvent extends Event {}
+public class FrameGenGhostingFixCameraFPPBikeCrawlEvent extends Event {}
 //Vehicles masks deacitvation---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixDumboDeActivationVehicleEvent extends Event {}
-public class FrameGenGhostingFixDumboDeActivationVehicleToggleEvent extends Event {}
+public class FrameGenGhostingFixDeActivationVehicleEvent extends Event {}
+public class FrameGenGhostingFixDeActivationVehicleToggleEvent extends Event {}
