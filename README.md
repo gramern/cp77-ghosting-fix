@@ -9,7 +9,7 @@ This repo's goal is to serve as a small, literal repository for some modules of 
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.31.0+
 
 # Intended results
-Since 4.0.0-alpha, thanks to the major change in how masks are projected (uses the game's world space-to-screen space method, vehicle's position and camera data to project and transform masks in real-time), the mod is usable with FSR4 FG ON in lower framerates (30+ fps interpolated 60+ fps e.g.).
+Since 4.0.0-alpha, thanks to the major change in how masks are projected (uses the game's world space-to-screen space method, vehicle's position and camera data to project and transform masks in real-time), the mod is usable with FSR3 FG ON in lower framerates (30+ fps interpolated 60+ fps e.g.).
 
 # The mod's whiteboard on Miro (rough design notes)
 [https://miro.com/app/board/uXjVNrZBovU=/](https://miro.com/app/board/uXjVNrZBovU=/)
