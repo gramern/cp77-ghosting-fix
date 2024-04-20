@@ -1,42 +1,42 @@
 local Preset = {
     TPPCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     TPPFarCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     FPPCar = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     TPPBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     TPPFarBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     FPPBike = {
-        full = {0.0, 0.0, 0.0},
-        faster = {0.0, 0.0, 0.0},
-        slow = {0.0, 0.0, 0.0},
-        crawl = {0.0, 0.0, 0.0}
+        full = {1.0, 1.0, 1.0},
+        faster = {1.0, 1.0, 1.0},
+        slow = {1.0, 1.0, 1.0},
+        crawl = {1.0, 1.0, 1.0}
     },
     MaskingInVehiclesGlobal = {
-        enabled = false
+        enabled = true
     },
     Vectors = {
         VehElements = {
@@ -44,7 +44,8 @@ local Preset = {
                 MultiplyBy = {FPP = 1},
                 Offset = {x=0.0, y=0.48, z=0.85},
                 Size = {
-                    Increment = {x = 32, y = 32},
+                    Increment = {x = 32, y = 48},
+                    Max = {x = 10540, y = 4000},
                     Min = {x = 7680, y = 1600},
                 },
             },
@@ -118,11 +119,11 @@ local Preset = {
                     Base = {x = 4240, y = 1480} -- min size x = 3888
                 }
             }
-        }
+        },
     },
 	PresetInfo = {
-        name = "Turn off anti-ghosting masking",
-		description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+        name = "Testing",
+		description = "Testing preset, all masks visible.",
         author = nil
 	}
 }
