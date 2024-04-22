@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<bindings>
+    <context name="FrameGenGhostingFix" >
+        <action name="FrameGenGhostingFixOnFootCameraMoveR" map="FrameGenGhostingFixOnFootCameraMove_Relative" />
+        <action name="FrameGenGhostingFixOnFootCameraMoveA" map="FrameGenGhostingFixOnFootCameraMove_Axis" />
+    </context>
+
+    <context name="UIToggles" append="true">
+        <include name="FrameGenGhostingFix" />
+    </context>
+
+    <mapping name="FrameGenGhostingFixOnFootCameraMove_Relative" type="Relative" >
+        <button id="IK_MouseY" />
+        <button id="IK_Pad_Fake_RelativeRightAxis" />
+    </mapping>
+    <mapping name="FrameGenGhostingFixOnFootCameraMove_Axis" type="Axis" >
+        <button id="IK_Pad_RightAxisX" />
+    </mapping>
+</bindings>
