@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.0.1
+--FrameGen Ghosting Fix 4.0.2
 
 local Presets = {
     selectedPreset = nil,

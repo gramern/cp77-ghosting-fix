@@ -1,5 +1,5 @@
 local framegen_ghosting_fix = {
-__VERSION     = "FrameGen Ghosting 'Fix' 4.0.1",
+__VERSION     = "FrameGen Ghosting 'Fix' 4.0.2",
 __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
 __LICENSE     = [[
 	MIT License

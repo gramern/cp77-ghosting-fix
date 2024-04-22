@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.0.1
+--FrameGen Ghosting Fix 4.0.2
 
 local Vectors = {
 	Camera = {
@@ -171,23 +171,23 @@ function Vectors.IsMounted()
 	end
 end
 
-function Vectors.IsDriver()
-	local isDriver = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
-	if isDriver then
-		Vectors.Vehicle.isDriver = isDriver
-	else
-		Vectors.Vehicle.isDriver = false
-	end
-end
+-- function Vectors.IsDriver()
+-- 	local isDriver = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+-- 	if isDriver then
+-- 		Vectors.Vehicle.isDriver = isDriver
+-- 	else
+-- 		Vectors.Vehicle.isDriver = false
+-- 	end
+-- end
 
-function Vectors.HasWeapon()
-	local hasWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
-	if hasWeapon then
-		Vectors.Vehicle.hasWeapon = true
-	else
-		Vectors.Vehicle.hasWeapon = false
-	end
-end
+-- function Vectors.HasWeapon()
+-- 	local hasWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
+-- 	if hasWeapon then
+-- 		Vectors.Vehicle.hasWeapon = true
+-- 	else
+-- 		Vectors.Vehicle.hasWeapon = false
+-- 	end
+-- end
 
 function Vectors.GetVehicleData()
 	if Vectors.Vehicle.isMounted then
@@ -197,8 +197,8 @@ function Vectors.GetVehicleData()
 		Vectors.Vehicle.Up = Game.GetMountedVehicle(Game.GetPlayer()):GetWorldUp()
 		Vectors.Vehicle.vehicleType = Game.GetMountedVehicle(Game.GetPlayer())
 		Vectors.Vehicle.currentSpeed = Game.GetMountedVehicle(Game.GetPlayer()):GetCurrentSpeed()
-		Vectors.IsDriver()
-		Vectors.HasWeapon()
+		-- Vectors.IsDriver()
+		-- Vectors.HasWeapon()
 	end
 end
 
@@ -330,7 +330,7 @@ function Vectors.ResizeVehMasks()
 	Vectors.Camera.forwardXDiffAbs = math.abs(forwardXDiff)
 
 	if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
-		if Vectors.Camera.convergenceRound > 0 or Vectors.Camera.convergenceRound < 0 then
+		if convergenceAbs > 0 then
 			Vectors.VehMasks.Mask2.Size.x = (Vectors.VehMasks.Mask2.Def.Size.Min.x * Vectors.VehMasks.Mask2.multiplyFactor) + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask2.Def.Size.Increment.x * Vectors.VehMasks.Mask2.multiplyFactor))
 			Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.Min.x + ((100 - convergenceAbs) * Vectors.VehMasks.Mask1.Def.Size.Increment.x)
 			if Vectors.Camera.convergenceRound < 0 then
@@ -338,51 +338,53 @@ function Vectors.ResizeVehMasks()
 			end
 			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
 		else
-			Vectors.VehMasks.Mask2.Size.x = (Vectors.VehMasks.Mask2.Def.Size.Max.x * Vectors.VehMasks.Mask2.multiplyFactor)
-			Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.Max.x
+			Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask2.Def.Size.Min.x + ((100 - convergenceAbs) * Vectors.VehMasks.Mask1.Def.Size.Increment.x)
+			Vectors.VehMasks.Mask1.Size.x = (Vectors.VehMasks.Mask1.Def.Size.Min.x * Vectors.VehMasks.Mask1.multiplyFactor) + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask1.Def.Size.Increment.x * Vectors.VehMasks.Mask1.multiplyFactor))
 			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
 		end
 
-		if forwardZ <= -50 then
-			Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Max.y - ((100 - forwardZAbs) * Vectors.VehMasks.Mask2.Def.Size.Increment.y)
-			if Vectors.VehMasks.Mask1.multiplyFactor == 1 then
-				Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.Min.y + ((forwardZAbs - 50) * Vectors.VehMasks.Mask1.Def.Size.Increment.y)
-			else
-				Vectors.VehMasks.Mask1.Size.y = (Vectors.VehMasks.Mask1.Def.Size.Min.y * Vectors.VehMasks.Mask1.multiplyFactor * 0.76) + ((forwardZAbs - 50) * Vectors.VehMasks.Mask1.Def.Size.Increment.y)
+		if forwardZ > 0 then
+			Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y + (forwardZAbs * Vectors.VehMasks.Mask2.Def.Size.Increment.y)
+			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin + (forwardZAbs * Vectors.VehMasks.AnchorPoint.yIncrement * 3)
+			Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top - 60
+			Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1.1)
+			Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 0.95, true)
+			if forwardZ > 10 then
+				Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top - 120
+				Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1.2)
+				Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 0.9, true)
 			end
-			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin + ((forwardZAbs - 50) * Vectors.VehMasks.AnchorPoint.yIncrement * 3)
 		else
-			Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y
-			if Vectors.VehMasks.Mask1.multiplyFactor == 1 then
-				Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.Min.y
-			else
-				Vectors.VehMasks.Mask1.Size.y = (Vectors.VehMasks.Mask1.Def.Size.Min.y * Vectors.VehMasks.Mask1.multiplyFactor * 0.76)
-			end
-			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
-		end
-
-		if forwardZ > -20 then
-			if forwardZ > 0 or convergence <80 then
-				Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top - 60
-				Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1.1)
-				Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 0.95, true)
-				if forwardZ > 0 then
-					Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y + (forwardZAbs * Vectors.VehMasks.Mask2.Def.Size.Increment.y)
-					Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin + (forwardZAbs * Vectors.VehMasks.AnchorPoint.yIncrement * 3)
-					if forwardZ > 10 then
-						Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top - 120
-						Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1.2)
-						Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 0.9, true)
+			if forwardZ <= -50 then
+				Vectors.VehMasks.Mask2.Size.x = (Vectors.VehMasks.Mask2.Def.Size.Min.x * Vectors.VehMasks.Mask2.multiplyFactor)
+				if Vectors.Camera.convergenceRound <= -10 then
+					if Vectors.Camera.convergenceRound <= -20 then
+						Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.Min.x + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask2.Def.Size.Increment.x * Vectors.VehMasks.Mask2.multiplyFactor))
+					else
+						Vectors.VehMasks.Mask2.Size.x = (Vectors.VehMasks.Mask2.Def.Size.Min.x * Vectors.VehMasks.Mask2.multiplyFactor) + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask2.Def.Size.Increment.x * Vectors.VehMasks.Mask2.multiplyFactor))
 					end
+					Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y + ((forwardZAbs - 50) * Vectors.VehMasks.Mask2.Def.Size.Increment.y * 7)
 				else
-					Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y
-					Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
+					Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.Min.y + ((forwardZAbs - 50) * Vectors.VehMasks.Mask2.Def.Size.Increment.y)
 				end
+				if Vectors.VehMasks.Mask1.multiplyFactor == 1 then
+					Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.Min.y + ((forwardZAbs - 50) * Vectors.VehMasks.Mask1.Def.Size.Increment.y)
+				else
+					Vectors.VehMasks.Mask1.Size.y = (Vectors.VehMasks.Mask1.Def.Size.Min.y * Vectors.VehMasks.Mask1.multiplyFactor * 0.76) + ((forwardZAbs - 50) * Vectors.VehMasks.Mask1.Def.Size.Increment.y)
+				end
+				Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin + ((forwardZAbs - 50) * Vectors.VehMasks.AnchorPoint.yIncrement * 3)
 			else
-				Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top
-				Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1)
-				Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 1, true)
+				Vectors.VehMasks.Mask2.Size.x = (Vectors.VehMasks.Mask2.Def.Size.Min.x * Vectors.VehMasks.Mask2.multiplyFactor) + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask2.Def.Size.Increment.x * Vectors.VehMasks.Mask2.multiplyFactor))
+				if Vectors.VehMasks.Mask1.multiplyFactor == 1 then
+					Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.Min.y
+				else
+					Vectors.VehMasks.Mask1.Size.y = (Vectors.VehMasks.Mask1.Def.Size.Min.y * Vectors.VehMasks.Mask1.multiplyFactor * 0.76)
+				end
+				Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
 			end
+			Vectors.VehMasks.HorizontalEdgeDown.Margin.top = Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top
+			Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1)
+			Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 1, true)
 		end
 
 		if convergence < 0 then
