@@ -1,6 +1,6 @@
 // Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.0.1, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.0.2, 2024 gramern (scz_g) 2024
 
 @addField(IronsightGameController) public let m_isMaskingInVehiclesEnabled: Bool = true;
 
@@ -39,26 +39,15 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2,
     let mask2: ref<inkWidget> = root.GetWidgetByPathName(n"mask2") as inkWidget;
     let mask1: ref<inkWidget> = root.GetWidgetByPathName(n"mask1") as inkWidget;
 
-    let hedSize = hedCorners.GetSize();
-    if hedSize.X != hedSetSize.X {
-      let hedMargin = hedCorners.GetMargin();
-      hedCorners.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
-      hedCorners.SetSize(hedSetSize.X, hedSetSize.Y);
-      hedCorners.Reparent(root);
-      hedFill.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
-      hedFill.SetSize(hedSetSize.X, hedSetSize.Y);
-      hedFill.Reparent(root);
-    }
-
-    if hedSize.Y != hedSetSize.Y {
-      let hedMargin = hedCorners.GetMargin();
-      hedCorners.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
-      hedCorners.SetSize(hedSetSize.X, hedSetSize.Y);
-      hedCorners.Reparent(root);
-      hedFill.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
-      hedFill.SetSize(hedSetSize.X, hedSetSize.Y);
-      hedFill.Reparent(root);
-    }
+    let hedMargin = hedCorners.GetMargin();
+    hedCorners.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
+    hedCorners.SetSize(hedSetSize.X, hedSetSize.Y);
+    hedCorners.Reparent(root);
+    hedFill.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
+    hedFill.SetSize(hedSetSize.X, hedSetSize.Y);
+    hedFill.Reparent(root);
+    // let hedSize = hedCorners.GetSize();
+    // LogChannel(n"DEBUG", s"hedSize: \(hedSize.X) \(hedSize.Y)");
 
     if hedCorners.GetOpacity() != hedSetOpacity {
       hedCorners.SetOpacity(hedSetOpacity);

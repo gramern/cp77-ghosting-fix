@@ -1,4 +1,4 @@
-//FrameGen Ghosting 'Fix' 4.0.1, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.0.2, 2024 gramern (scz_g) 2024
 
 //The main loop---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
