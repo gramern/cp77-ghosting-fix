@@ -1,4 +1,5 @@
---FrameGen Ghosting Fix 4.1.0
+
+--FrameGen Ghosting Fix 4.1.0xl
 
 local Vectors = {
 	Camera = {

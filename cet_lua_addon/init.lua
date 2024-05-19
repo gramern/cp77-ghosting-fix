@@ -1,5 +1,5 @@
 local framegen_ghosting_fix = {
-__VERSION     = "FrameGen Ghosting 'Fix' 4.1.0",
+__VERSION     = "FrameGen Ghosting 'Fix' 4.1.0xl",
 __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
 __LICENSE     = [[
 	MIT License
@@ -28,7 +28,6 @@ __LICENSE     = [[
 
 local Calculate = require("Modules/Calculate")
 local Config = require("Modules/Config")
-local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
 local UIText = require("Modules/UIText")
 local Vectors = require("Modules/Vectors")
@@ -147,7 +146,7 @@ end
 --apply user settings
 function ApplyMaskingInVehiclesGlobal()
 	Vectors.VehMasks.enabled = Config.MaskingInVehiclesGlobal.enabled
-	Override('IronsightGameController', 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
 		local originalFunction = wrappedMethod()
 
 		if Config.MaskingInVehiclesGlobal.enabled then return originalFunction end
@@ -156,73 +155,73 @@ function ApplyMaskingInVehiclesGlobal()
 end
 
 function TurnOnLiveViewWindshieldEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
 		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.8, false, false, true)
 	end)
 end
 
 function DefaultLiveViewWindshieldEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
 		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.6, false, false, true)
 	end)
 end
 
 function TurnOffLiveViewWindshieldEditor()
-	Override('IronsightGameController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
 		self:OnFrameGenGhostingFixVehicleSetTransition(Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Margin.left, Y = Vectors.VehMasks.HorizontalEdgeDown.Margin.top}), Vector2.new({X = Vectors.VehMasks.HorizontalEdgeDown.Size.x, Y = Vectors.VehMasks.HorizontalEdgeDown.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask2.ScreenSpace.x, Y = Vectors.VehMasks.Mask2.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask2.Size.x, Y = Vectors.VehMasks.Mask2.Size.y}), Vector2.new({X = Vectors.VehMasks.Mask1.ScreenSpace.x, Y = Vectors.VehMasks.Mask1.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.Mask1.Size.x, Y = Vectors.VehMasks.Mask1.Size.y}), Vector2.new({X = Vectors.VehMasks.AnchorPoint.x, Y = Vectors.VehMasks.AnchorPoint.y}), 0.0, 0.0, 0.0, false, false, true)
 	end)
 end
 
 function ApplyMasksOnFoot()
-	Override('IronsightGameController', 'FrameGenGhostingFixOnFootToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixOnFootToggleEvent', function(self, wrappedMethod)
 		local originalOnFoot = wrappedMethod()
 
 		if not enabledFPPOnFoot then return originalOnFoot end
 		self:FrameGenGhostingFixOnFootToggle(true)
 	end)
-	Override('IronsightGameController', 'FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent', function(self)
 		self:FrameGenGhostingFixMasksOnFootSetMargins(Calculate.FPPOnFoot.cornerDownLeftMargin, Calculate.FPPOnFoot.cornerDownRightMargin, Calculate.FPPOnFoot.cornerDownMarginTop)
 	end)
 end
 
 function ApplyBlockerAimOnFoot()
-	Override('IronsightGameController', 'FrameGenGhostingFixBlockerAimOnFootToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixBlockerAimOnFootToggleEvent', function(self, wrappedMethod)
 		local originalBlockerAim = wrappedMethod()
 
 		if not enabledFPPBlockerAimOnFoot then return originalBlockerAim end
 		self:FrameGenGhostingFixBlockerAimOnFootToggle(true)
 	end)
-	Override('IronsightGameController', 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
 		self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(Calculate.FPPOnFoot.aimFootSizeXPx, Calculate.FPPOnFoot.aimFootSizeYPx)
 	end)
 end
 
 function ApplyVignetteAimOnFoot()
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteAimOnFootToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteAimOnFootToggleEvent', function(self, wrappedMethod)
 		local originalVignetteAim = wrappedMethod()
 
 		if not enabledFPPVignetteAimOnFoot then return originalVignetteAim end
 		self:FrameGenGhostingFixVignetteAimOnFootToggle(true)
 	end)
-	Override('IronsightGameController', 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
 		self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(Calculate.FPPOnFoot.aimFootSizeXPx, Calculate.FPPOnFoot.aimFootSizeYPx)
 	end)
 end
 
 function ApplyVignetteOnFoot()
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteOnFootToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteOnFootToggleEvent', function(self, wrappedMethod)
 		local originalVignette = wrappedMethod()
 
 		if not enabledFPPVignetteOnFoot then return originalVignette end
 		self:FrameGenGhostingFixVignetteOnFootToggle(true)
 	end)
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent', function(self, wrappedMethod)
 		local originalVignetteDimensions = wrappedMethod()
 
 		if not enabledFPPVignetteOnFoot then return originalVignetteDimensions end
 		self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(Calculate.FPPOnFoot.newVignetteFootMarginLeftPx, Calculate.FPPOnFoot.newVignetteFootMarginTopPx, Calculate.FPPOnFoot.newVignetteFootSizeXPx, Calculate.FPPOnFoot.newVignetteFootSizeYPx)
 	end)
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent', function(self, wrappedMethod)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent', function(self, wrappedMethod)
 		local originalFunction = wrappedMethod()
 
 		if not enabledFPPVignettePermamentOnFoot then return originalFunction end
@@ -231,14 +230,14 @@ function ApplyVignetteOnFoot()
 end
 
 function TurnOnLiveViewVignetteOnFootEditor()
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
 		self:FrameGenGhostingFixVignetteOnFootEditorContext(true)
 		self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(Calculate.FPPOnFoot.newVignetteFootMarginLeftPx, Calculate.FPPOnFoot.newVignetteFootMarginTopPx, Calculate.FPPOnFoot.newVignetteFootSizeXPx, Calculate.FPPOnFoot.newVignetteFootSizeYPx)
 	end)
 end
 
 function TurnOffLiveViewVignetteOnFootEditor()
-	Override('IronsightGameController', 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
+	Override('gameuiCrosshairContainerController', 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
 		self:FrameGenGhostingFixVignetteOnFootEditorContext(false)
 		self:FrameGenGhostingFixVignetteOnFootEditorTurnOff()
 		self:FrameGenGhostingFixVignetteOnFootSetDimensions()
@@ -257,29 +256,26 @@ end
 
 --initialize all stuff etc
 registerForEvent("onInit", function()
-	Diagnostics.CheckModsCompatibility()
-	if Diagnostics.modscompatibility then
-		Calculate.CalcAspectRatio()
-		Calculate.GetAspectRatio()
-		SetDefaultPreset()
-		Presets.ListPresets()
-		SetDefaultPresetFile()
-		LoadUserSettings()
-		Presets.GetPresetInfo()
-		Presets.LoadPreset()
-		Presets.ApplyPreset()
-		Calculate.SetCornersMargins()
-		Calculate.SetVignetteOrgMinMax()
-		Calculate.SetVignetteOrgSize()
-		Calculate.SetMaskingAimSize()
-		Calculate.VignettePosX()
-		Calculate.VignettePosY()
-		Calculate.VignetteX()
-		Calculate.VignetteY()
-		Vectors.SetWindshieldDefault()
-		Calculate.SetHEDSize()
-		ApplyUserSettings()
-	end
+	Calculate.CalcAspectRatio()
+	Calculate.GetAspectRatio()
+	SetDefaultPreset()
+	Presets.ListPresets()
+	SetDefaultPresetFile()
+	LoadUserSettings()
+	Presets.GetPresetInfo()
+	Presets.LoadPreset()
+	Presets.ApplyPreset()
+	Calculate.SetCornersMargins()
+	Calculate.SetVignetteOrgMinMax()
+	Calculate.SetVignetteOrgSize()
+	Calculate.SetMaskingAimSize()
+	Calculate.VignettePosX()
+	Calculate.VignettePosY()
+	Calculate.VignetteX()
+	Calculate.VignetteY()
+	Vectors.SetWindshieldDefault()
+	Calculate.SetHEDSize()
+	ApplyUserSettings()
 end)
 
 registerForEvent("onOverlayOpen", function()
@@ -345,314 +341,296 @@ registerForEvent("onDraw", function()
 
 		if ImGui.Begin(UIText.General.modname, ImGuiWindowFlags.AlwaysAutoResize) then
 			if ImGui.BeginTabBar('Tabs') then
-				if not Diagnostics.modscompatibility then
-					if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
-						ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
-						ImGui.Text(UIText.Diagnostics.title)
-						ImGui.PopStyleColor()
-						ImGui.Text("")
-						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						ImGui.Text(UIText.Diagnostics.textfield_1)
-						ImGui.Text("")
-						ImGui.Text(UIText.Diagnostics.textfield_2)
-						for modfile,mod in pairs(Diagnostics.modfiles) do
-							ImGui.Text(mod)
-						end
-						ImGui.PopStyleColor()
-					ImGui.EndTabItem()
+				if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					ImGui.Text(UIText.General.title_general)
+					ImGui.Separator()
+					ImGui.Text(UIText.Vehicles.MaskingPresets.name)
+					ImGui.PopStyleColor()
+					if Presets.selectedPresetPosition == nil then
+						Presets.GetPresetInfo()
 					end
-				else
-					if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
-						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						ImGui.Text(UIText.General.title_general)
-						ImGui.Separator()
-						ImGui.Text(UIText.Vehicles.MaskingPresets.name)
-						ImGui.PopStyleColor()
-						if Presets.selectedPresetPosition == nil then
-							Presets.GetPresetInfo()
-						end
-						if ImGui.BeginCombo("##", Presets.selectedPreset) then
-							for _, preset in ipairs(Presets.presetsList) do
-							local preset_selected = (Presets.selectedPreset == preset)
-								if ImGui.Selectable(preset, preset_selected) then
-									Presets.selectedPreset = preset
-									Presets.GetPresetInfo()
-								end
-								if preset_selected then
-									ImGui.SetItemDefaultFocus()
-									appliedVeh = false
-								end
+					if ImGui.BeginCombo("##", Presets.selectedPreset) then
+						for _, preset in ipairs(Presets.presetsList) do
+						local preset_selected = (Presets.selectedPreset == preset)
+							if ImGui.Selectable(preset, preset_selected) then
+								Presets.selectedPreset = preset
+								Presets.GetPresetInfo()
 							end
-							ImGui.EndCombo()
-						end
-						if ImGui.IsItemHovered() then
-							ImGui.SetTooltip(UIText.Vehicles.MaskingPresets.tooltip)
-						else
-							ImGui.SetTooltip(nil)
-						end
-						ImGui.SameLine()
-						if ImGui.Button(UIText.General.settings_apply) then
-							SaveUserSettings()
-							Presets.LoadPreset()
-							Presets.ApplyPreset()
-							appliedVeh = true
-						end
-						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						if Presets.selectedPresetPosition then
-							if Presets.presetsDesc[Presets.selectedPresetPosition] then
-								ImGui.Text("Preset's info:")
-								ImGui.Text(Presets.presetsDesc[Presets.selectedPresetPosition])
-							end
-							if Presets.presetsAuth[Presets.selectedPresetPosition] then
-								ImGui.Text("Preset's author:")
-								ImGui.SameLine()
-								ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
+							if preset_selected then
+								ImGui.SetItemDefaultFocus()
+								appliedVeh = false
 							end
 						end
-						if appliedVeh then
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text("")
-							ImGui.Text(UIText.General.settings_applied_veh)
-							ImGui.PopStyleColor()
-						end
-						ImGui.PopStyleColor()
-						if Config.MaskingInVehiclesGlobal.enabled then
-							ImGui.Text("")
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.General.title_fps90)
-							ImGui.Separator()
-							enabledWindshieldSettings, WindshieldSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.Windshield.name, enabledWindshieldSettings)
-							if WindshieldSettingsEnabled then
-								Vectors.ReadCache()
-								SaveUserSettings()
-							end
-							ImGui.PopStyleColor()
-							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.Vehicles.Windshield.tooltip)
-							else
-								ImGui.SetTooltip(nil)
-							end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							if enabledWindshieldSettings then
-								if Vectors.Vehicle.currentSpeed ~= nil and Vectors.Vehicle.currentSpeed < 1 and Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") and Vectors.Vehicle.activePerspective == vehicleCameraPerspective.FPP then
-									ImGui.Text("")
-									ImGui.Text(UIText.Vehicles.Windshield.textfield_1)
-									ImGui.Text("")
-									ImGui.PopStyleColor()
-									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-									ImGui.Text(UIText.Vehicles.Windshield.setting_1)
-									ImGui.PopStyleColor()
-									Vectors.VehMasks.Mask1.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask1.Scale.x, 100, 150, "%.0f")
-										if windshieldXChanged then
-											Vectors.ResizeBikeWindshieldMask()
-											saved = false
-											TurnOnLiveViewWindshieldEditor()
-										end
-									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-									ImGui.Text(UIText.Vehicles.Windshield.setting_2)
-									ImGui.PopStyleColor()
-									Vectors.VehMasks.Mask1.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask1.Scale.y, 100, 300, "%.0f")
-										if windshieldYChanged then
-											Vectors.ResizeBikeWindshieldMask()
-											saved = false
-											TurnOnLiveViewWindshieldEditor()
-										end
-									ImGui.Text("")
-									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-									if saved == true then
-										ImGui.Text(UIText.General.settings_saved)
-									end
-									ImGui.PopStyleColor()
-									if ImGui.Button(UIText.General.settings_default, 240, 40) then
-										saved = false
-										Vectors.SetWindshieldDefault()
-										DefaultLiveViewWindshieldEditor()
-									end
-									ImGui.SameLine()
-									if ImGui.Button(UIText.General.settings_save, 240, 40) then
-										saved = true
-										Vectors.SaveCache()
-										SaveUserSettings()
-									end
-								else
-									ImGui.Text("")
-									ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-									ImGui.Text(UIText.Vehicles.Windshield.warning)
-									ImGui.Text("")
-									ImGui.PopStyleColor()
-								end
-							else
-								Vectors.SetWindshieldDefault()
-							end
-						end
-						ImGui.PopStyleColor()
-					ImGui.EndTabItem()
+						ImGui.EndCombo()
 					end
-					if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
+					if ImGui.IsItemHovered() then
+						ImGui.SetTooltip(UIText.Vehicles.MaskingPresets.tooltip)
+					else
+						ImGui.SetTooltip(nil)
+					end
+					ImGui.SameLine()
+					if ImGui.Button(UIText.General.settings_apply) then
+						SaveUserSettings()
+						Presets.LoadPreset()
+						Presets.ApplyPreset()
+						appliedVeh = true
+					end
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					if Presets.selectedPresetPosition then
+						if Presets.presetsDesc[Presets.selectedPresetPosition] then
+							ImGui.Text("Preset's info:")
+							ImGui.Text(Presets.presetsDesc[Presets.selectedPresetPosition])
+						end
+						if Presets.presetsAuth[Presets.selectedPresetPosition] then
+							ImGui.Text("Preset's author:")
+							ImGui.SameLine()
+							ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
+						end
+					end
+					if appliedVeh then
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						ImGui.Text(UIText.General.title_general)
-						ImGui.Separator()
-						enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
-						if fppOnFootEnabled then
-							SaveUserSettings()
-							SaveUserSettingsOnFootLog()
-						end
+						ImGui.Text("")
+						ImGui.Text(UIText.General.settings_applied_veh)
 						ImGui.PopStyleColor()
-						if ImGui.IsItemHovered() then
-							ImGui.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
-						else
-							ImGui.SetTooltip(nil)
-						end
-						if not enabledFPPVignetteAimOnFoot then
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							enabledFPPBlockerAimOnFoot, fppBlockerAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BlockerAim.name, enabledFPPBlockerAimOnFoot)
-							if fppBlockerAimOnFootEnabled then
-								enabledFPPVignetteAimOnFoot = false
-								SaveUserSettings()
-								SaveUserSettingsOnFootLog()
-							end
-							ImGui.PopStyleColor()
-							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
-							else
-								ImGui.SetTooltip(nil)
-							end
-						else
-							ImGui.Separator()
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.General.info_aim_onfoot)
-							ImGui.PopStyleColor()
-							ImGui.Separator()
-						end
+					end
+					ImGui.PopStyleColor()
+					if Config.MaskingInVehiclesGlobal.enabled then
 						ImGui.Text("")
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						ImGui.Text(UIText.General.title_fps120)
+						ImGui.Text(UIText.General.title_fps90)
 						ImGui.Separator()
-						ImGui.PopStyleColor()
-						if not enabledFPPBlockerAimOnFoot then
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							enabledFPPVignetteAimOnFoot, fppVignetteAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignetteAim.name, enabledFPPVignetteAimOnFoot)
-							if fppVignetteAimOnFootEnabled then
-								enabledFPPBlockerAimOnFoot = false
-								SaveUserSettings()
-								SaveUserSettingsOnFootLog()
-							end
-							ImGui.PopStyleColor()
-							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
-							else
-								ImGui.SetTooltip(nil)
-							end
-						else
-							ImGui.Separator()
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.General.info_aim_onfoot)
-							ImGui.PopStyleColor()
-							ImGui.Separator()
-						end
-						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						enabledFPPVignetteOnFoot, fppVignetteOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.Vignette.name, enabledFPPVignetteOnFoot)
-						if fppVignetteOnFootEnabled then
+						enabledWindshieldSettings, WindshieldSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.Windshield.name, enabledWindshieldSettings)
+						if WindshieldSettingsEnabled then
+							Vectors.ReadCache()
 							SaveUserSettings()
-							SaveUserSettingsOnFootLog()
 						end
 						ImGui.PopStyleColor()
 						if ImGui.IsItemHovered() then
-							ImGui.SetTooltip(UIText.OnFoot.Vignette.tooltip)
+							ImGui.SetTooltip(UIText.Vehicles.Windshield.tooltip)
 						else
 							ImGui.SetTooltip(nil)
 						end
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-						if enabledFPPVignetteOnFoot then
-							enabledFPPVignettePermamentOnFoot, fppVignettePermamentOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignettePermament.name, enabledFPPVignettePermamentOnFoot)
-							if fppVignettePermamentOnFootEnabled then
-								SaveUserSettings()
-								SaveUserSettingsOnFootLog()
-							end
-							ImGui.PopStyleColor()
-							if ImGui.IsItemHovered() then
-								ImGui.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
-							else
-								ImGui.SetTooltip(nil)
-							end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							if enabledFPPVignetteAimOnFoot and enabledFPPVignetteOnFoot then
+						if enabledWindshieldSettings then
+							if Vectors.Vehicle.currentSpeed ~= nil and Vectors.Vehicle.currentSpeed < 1 and Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") and Vectors.Vehicle.activePerspective == vehicleCameraPerspective.FPP then
 								ImGui.Text("")
-								ImGui.Text(UIText.OnFoot.VignetteAim.textfield_1)
+								ImGui.Text(UIText.Vehicles.Windshield.textfield_1)
+								ImGui.Text("")
+								ImGui.PopStyleColor()
+								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+								ImGui.Text(UIText.Vehicles.Windshield.setting_1)
+								ImGui.PopStyleColor()
+								Vectors.VehMasks.Mask1.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask1.Scale.x, 100, 150, "%.0f")
+									if windshieldXChanged then
+										Vectors.ResizeBikeWindshieldMask()
+										saved = false
+										TurnOnLiveViewWindshieldEditor()
+									end
+								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+								ImGui.Text(UIText.Vehicles.Windshield.setting_2)
+								ImGui.PopStyleColor()
+								Vectors.VehMasks.Mask1.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask1.Scale.y, 100, 300, "%.0f")
+									if windshieldYChanged then
+										Vectors.ResizeBikeWindshieldMask()
+										saved = false
+										TurnOnLiveViewWindshieldEditor()
+									end
+								ImGui.Text("")
+								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+								if saved == true then
+									ImGui.Text(UIText.General.settings_saved)
+								end
+								ImGui.PopStyleColor()
+								if ImGui.Button(UIText.General.settings_default, 240, 40) then
+									saved = false
+									Vectors.SetWindshieldDefault()
+									DefaultLiveViewWindshieldEditor()
+								end
+								ImGui.SameLine()
+								if ImGui.Button(UIText.General.settings_save, 240, 40) then
+									saved = true
+									Vectors.SaveCache()
+									SaveUserSettings()
+								end
+							else
+								ImGui.Text("")
+								ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+								ImGui.Text(UIText.Vehicles.Windshield.warning)
+								ImGui.Text("")
+								ImGui.PopStyleColor()
 							end
+						else
+							Vectors.SetWindshieldDefault()
+						end
+					end
+					ImGui.PopStyleColor()
+				ImGui.EndTabItem()
+				end
+				if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					ImGui.Text(UIText.General.title_general)
+					ImGui.Separator()
+					enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
+					if fppOnFootEnabled then
+						SaveUserSettings()
+						SaveUserSettingsOnFootLog()
+					end
+					ImGui.PopStyleColor()
+					if ImGui.IsItemHovered() then
+						ImGui.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
+					else
+						ImGui.SetTooltip(nil)
+					end
+					if not enabledFPPVignetteAimOnFoot then
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						enabledFPPBlockerAimOnFoot, fppBlockerAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BlockerAim.name, enabledFPPBlockerAimOnFoot)
+						if fppBlockerAimOnFootEnabled then
+							enabledFPPVignetteAimOnFoot = false
+							SaveUserSettings()
+							SaveUserSettingsOnFootLog()
+						end
+						ImGui.PopStyleColor()
+						if ImGui.IsItemHovered() then
+							ImGui.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
+						else
+							ImGui.SetTooltip(nil)
+						end
+					else
+						ImGui.Separator()
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.General.info_aim_onfoot)
+						ImGui.PopStyleColor()
+						ImGui.Separator()
+					end
+					ImGui.Text("")
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					ImGui.Text(UIText.General.title_fps120)
+					ImGui.Separator()
+					ImGui.PopStyleColor()
+					if not enabledFPPBlockerAimOnFoot then
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						enabledFPPVignetteAimOnFoot, fppVignetteAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignetteAim.name, enabledFPPVignetteAimOnFoot)
+						if fppVignetteAimOnFootEnabled then
+							enabledFPPBlockerAimOnFoot = false
+							SaveUserSettings()
+							SaveUserSettingsOnFootLog()
+						end
+						ImGui.PopStyleColor()
+						if ImGui.IsItemHovered() then
+							ImGui.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
+						else
+							ImGui.SetTooltip(nil)
+						end
+					else
+						ImGui.Separator()
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.General.info_aim_onfoot)
+						ImGui.PopStyleColor()
+						ImGui.Separator()
+					end
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					enabledFPPVignetteOnFoot, fppVignetteOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.Vignette.name, enabledFPPVignetteOnFoot)
+					if fppVignetteOnFootEnabled then
+						SaveUserSettings()
+						SaveUserSettingsOnFootLog()
+					end
+					ImGui.PopStyleColor()
+					if ImGui.IsItemHovered() then
+						ImGui.SetTooltip(UIText.OnFoot.Vignette.tooltip)
+					else
+						ImGui.SetTooltip(nil)
+					end
+					ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+					if enabledFPPVignetteOnFoot then
+						enabledFPPVignettePermamentOnFoot, fppVignettePermamentOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignettePermament.name, enabledFPPVignettePermamentOnFoot)
+						if fppVignettePermamentOnFootEnabled then
+							SaveUserSettings()
+							SaveUserSettingsOnFootLog()
+						end
+						ImGui.PopStyleColor()
+						if ImGui.IsItemHovered() then
+							ImGui.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
+						else
+							ImGui.SetTooltip(nil)
+						end
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						if enabledFPPVignetteAimOnFoot and enabledFPPVignetteOnFoot then
 							ImGui.Text("")
-							ImGui.Text(UIText.OnFoot.Vignette.textfield_1)
-							ImGui.Text("")
-							ImGui.Text(UIText.OnFoot.Vignette.setting_1)
-							ImGui.PopStyleColor()
-							Calculate.FPPOnFoot.vignetteFootSizeX, vignetteFootSizeXChanged = ImGui.SliderFloat("X size",Calculate.FPPOnFoot.vignetteFootSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeX, "%.0f")
-								if vignetteFootSizeXChanged then
-									Calculate.VignetteCalcMarginX()
-									Calculate.VignetteX()
-									saved = false
-									TurnOnLiveViewVignetteOnFootEditor()
-								end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.OnFoot.Vignette.setting_2)
-							ImGui.PopStyleColor()
-							Calculate.FPPOnFoot.vignetteFootSizeY, vignetteFootSizeYChanged = ImGui.SliderFloat("Y size",Calculate.FPPOnFoot.vignetteFootSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeY, "%.0f")
-								if vignetteFootSizeYChanged then
-									Calculate.VignetteCalcMarginY()
-									Calculate.VignetteY()
-									saved = false
-									TurnOnLiveViewVignetteOnFootEditor()
-								end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.OnFoot.Vignette.setting_3)
-							ImGui.PopStyleColor()
-							Calculate.FPPOnFoot.vignetteFootMarginLeft, vignetteFootMarginLeftChanged = ImGui.SliderFloat("X pos.",Calculate.FPPOnFoot.vignetteFootMarginLeft, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginX, "%.0f")
-								if vignetteFootMarginLeftChanged then
-									Calculate.VignetteCalcMarginX()
-									Calculate.VignettePosX()
-									saved = false
-									TurnOnLiveViewVignetteOnFootEditor()
-								end
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.OnFoot.Vignette.setting_4)
-							ImGui.PopStyleColor()
-							Calculate.FPPOnFoot.vignetteFootMarginTop, vignetteFootMarginTopChanged = ImGui.SliderFloat("Y pos.",Calculate.FPPOnFoot.vignetteFootMarginTop, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginY, "%.0f")
-								if vignetteFootMarginTopChanged then
-									Calculate.VignetteCalcMarginY()
-									Calculate.VignettePosY()
-									saved = false
-									TurnOnLiveViewVignetteOnFootEditor()
-								end
-							ImGui.Text("")
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							if saved == true then
-								ImGui.Text(UIText.General.settings_saved)
-							end
-							ImGui.PopStyleColor()
-							if ImGui.Button(UIText.General.settings_default, 240, 40) then
+							ImGui.Text(UIText.OnFoot.VignetteAim.textfield_1)
+						end
+						ImGui.Text("")
+						ImGui.Text(UIText.OnFoot.Vignette.textfield_1)
+						ImGui.Text("")
+						ImGui.Text(UIText.OnFoot.Vignette.setting_1)
+						ImGui.PopStyleColor()
+						Calculate.FPPOnFoot.vignetteFootSizeX, vignetteFootSizeXChanged = ImGui.SliderFloat("X size",Calculate.FPPOnFoot.vignetteFootSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeX, "%.0f")
+							if vignetteFootSizeXChanged then
+								Calculate.VignetteCalcMarginX()
+								Calculate.VignetteX()
 								saved = false
-								Calculate.SetVignetteDefault()
 								TurnOnLiveViewVignetteOnFootEditor()
 							end
-							ImGui.SameLine()
-							if ImGui.Button(UIText.General.settings_save, 240, 40) then
-								saved = true
-								SaveUserSettings()
-								SaveUserSettingsOnFootLog()
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.OnFoot.Vignette.setting_2)
+						ImGui.PopStyleColor()
+						Calculate.FPPOnFoot.vignetteFootSizeY, vignetteFootSizeYChanged = ImGui.SliderFloat("Y size",Calculate.FPPOnFoot.vignetteFootSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeY, "%.0f")
+							if vignetteFootSizeYChanged then
+								Calculate.VignetteCalcMarginY()
+								Calculate.VignetteY()
+								saved = false
+								TurnOnLiveViewVignetteOnFootEditor()
 							end
-						else
-							enabledFPPVignettePermamentOnFoot = false
-						end
-						if appliedOnFoot then
-							ImGui.Separator()
-							ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-							ImGui.Text(UIText.General.settings_saved_onfoot)
-							ImGui.PopStyleColor()
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.OnFoot.Vignette.setting_3)
+						ImGui.PopStyleColor()
+						Calculate.FPPOnFoot.vignetteFootMarginLeft, vignetteFootMarginLeftChanged = ImGui.SliderFloat("X pos.",Calculate.FPPOnFoot.vignetteFootMarginLeft, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginX, "%.0f")
+							if vignetteFootMarginLeftChanged then
+								Calculate.VignetteCalcMarginX()
+								Calculate.VignettePosX()
+								saved = false
+								TurnOnLiveViewVignetteOnFootEditor()
+							end
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.OnFoot.Vignette.setting_4)
+						ImGui.PopStyleColor()
+						Calculate.FPPOnFoot.vignetteFootMarginTop, vignetteFootMarginTopChanged = ImGui.SliderFloat("Y pos.",Calculate.FPPOnFoot.vignetteFootMarginTop, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginY, "%.0f")
+							if vignetteFootMarginTopChanged then
+								Calculate.VignetteCalcMarginY()
+								Calculate.VignettePosY()
+								saved = false
+								TurnOnLiveViewVignetteOnFootEditor()
+							end
+						ImGui.Text("")
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						if saved == true then
+							ImGui.Text(UIText.General.settings_saved)
 						end
 						ImGui.PopStyleColor()
-					ImGui.EndTabItem()
+						if ImGui.Button(UIText.General.settings_default, 240, 40) then
+							saved = false
+							Calculate.SetVignetteDefault()
+							TurnOnLiveViewVignetteOnFootEditor()
+						end
+						ImGui.SameLine()
+						if ImGui.Button(UIText.General.settings_save, 240, 40) then
+							saved = true
+							SaveUserSettings()
+							SaveUserSettingsOnFootLog()
+						end
+					else
+						enabledFPPVignettePermamentOnFoot = false
 					end
-				ImGui.EndTabBar()
+					if appliedOnFoot then
+						ImGui.Separator()
+						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+						ImGui.Text(UIText.General.settings_saved_onfoot)
+						ImGui.PopStyleColor()
+					end
+					ImGui.PopStyleColor()
+				ImGui.EndTabItem()
 				end
+			ImGui.EndTabBar()
 			end
         end
 		ImGui.End()
