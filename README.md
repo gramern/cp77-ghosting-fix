@@ -8,6 +8,8 @@ This repo's goal is to serve as a small, literal repository for some modules of 
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.31.0+
 
+The ['Preem Compatibility Edition - ArchiveXL'](https://github.com/gramern/cp77-ghosting-fix/tree/main-xl) version additionaly requires [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
+
 # Intended results
 Since 4.0.0-alpha, thanks to the major change in how masks are projected (uses the game's world space-to-screen space method, vehicle's position and camera data to project and transform masks in real-time), the mod is usable with FSR3 FG ON in lower framerates (30+ fps interpolated 60+ fps e.g.).
 
