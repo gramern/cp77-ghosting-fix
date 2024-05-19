@@ -1,6 +1,6 @@
-// Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.0.2, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 4.1.0, 2024 gramern (scz_g)
 
 //CET add-on customization---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixFPPBikeWindshieldEditorEvent extends Event {}
@@ -33,4 +33,3 @@ public class FrameGenGhostingFixCameraFPPBikeSlowEvent extends Event {}
 public class FrameGenGhostingFixCameraFPPBikeCrawlEvent extends Event {}
 //Vehicles masks deacitvation---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixDeActivationVehicleEvent extends Event {}
-public class FrameGenGhostingFixDeActivationVehicleToggleEvent extends Event {}

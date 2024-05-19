@@ -1,21 +1,32 @@
-// Thanks to djkovrik for redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.0.2, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.1.0, 2024 gramern (scz_g) 2024
 
-@addField(IronsightGameController) public let m_isMaskingInVehiclesEnabled: Bool = true;
+@addField(IronsightGameController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
+@addField(IronsightGameController) public let m_isVehicleMountedFGGF: Bool = false;
 
-@addField(DriveEvents) public let m_carCameraContext: vehicleCameraPerspective;
-@addField(DriveEvents) public let m_bikeCameraContext: vehicleCameraPerspective;
-@addField(DriveEvents) public let m_vehicleCurrentType: gamedataVehicleType;
-@addField(DriveEvents) public let m_vehicleCurrentSpeed: Float;
-@addField(DriveEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
+@addField(DriveEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
+@addField(DriveEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
+@addField(DriveEvents) public let m_vehicleCurrentTypeFGGF: gamedataVehicleType;
+@addField(DriveEvents) public let m_vehicleCurrentSpeedFGGF: Float;
+@addField(DriveEvents) public let m_vehicleCurrentSpeedCallbackFGGF: ref<CallbackHandle>;
 
-@addField(DriverCombatEvents) public let m_carCameraContext: vehicleCameraPerspective;
-@addField(DriverCombatEvents) public let m_bikeCameraContext: vehicleCameraPerspective;
-@addField(DriverCombatEvents) public let m_vehicleCurrentType: gamedataVehicleType;
-@addField(DriverCombatEvents) public let m_vehicleCurrentSpeed: Float;
-@addField(DriverCombatEvents) public let m_vehicleCurrentSpeedCallback: ref<CallbackHandle>;
+@addField(DriverCombatEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
+@addField(DriverCombatEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
+@addField(DriverCombatEvents) public let m_vehicleCurrentTypeFGGF: gamedataVehicleType;
+@addField(DriverCombatEvents) public let m_vehicleCurrentSpeedFGGF: Float;
+@addField(DriverCombatEvents) public let m_vehicleCurrentSpeedCallbackFGGF: ref<CallbackHandle>;
 
+//Mounting/unmounting events---------------------------------------------------------------------------------------
+@addMethod(IronsightGameController)
+private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> Bool {
+  this.m_isVehicleMountedFGGF = true;
+}
+
+@addMethod(IronsightGameController)
+private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) -> Bool {
+  this.m_isVehicleMountedFGGF = false;
+}
 
 //Global toggle for transtions, called in On Foot loop---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
@@ -25,14 +36,14 @@ protected final func FrameGenFrameGenGhostingFixVehicleToggleEvent() -> Void {
 
 @addMethod(IronsightGameController)
 protected final func FrameGenGhostingFixVehicleToggle(maskingInVehicles: Bool) -> Void {
-  this.m_isMaskingInVehiclesEnabled = maskingInVehicles;
+  this.m_isMaskingInVehiclesEnabledFGGF = maskingInVehicles;
 }
 
 //The main transition function---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2, hedSetSize: Vector2, mask2SetMargin: Vector2, mask2SetSize: Vector2, mask1SetMargin: Vector2, mask1SetSize: Vector2, setAnchorPoint: Vector2, hedSetOpacity: Float, mask2SetOpacity: Float, mask1SetOpacity: Float, hedFillVisible: Bool, mask2Visible: Bool, mask1Visible: Bool) -> Bool {
 
-  if NotEquals(this.m_isMaskingInVehiclesEnabled,false) {
+  if NotEquals(this.m_isMaskingInVehiclesEnabledFGGF,false) {
     let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
     let hedCorners: ref<inkWidget> = root.GetWidgetByPathName(n"horizontaledgedowncorners") as inkWidget;
     let hedFill: ref<inkWidget> = root.GetWidgetByPathName(n"horizontaledgedownfill") as inkWidget;
@@ -42,12 +53,8 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2,
     let hedMargin = hedCorners.GetMargin();
     hedCorners.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
     hedCorners.SetSize(hedSetSize.X, hedSetSize.Y);
-    hedCorners.Reparent(root);
     hedFill.SetMargin(hedSetMargin.X, hedSetMargin.Y, hedMargin.right, hedMargin.bottom);
     hedFill.SetSize(hedSetSize.X, hedSetSize.Y);
-    hedFill.Reparent(root);
-    // let hedSize = hedCorners.GetSize();
-    // LogChannel(n"DEBUG", s"hedSize: \(hedSize.X) \(hedSize.Y)");
 
     if hedCorners.GetOpacity() != hedSetOpacity {
       hedCorners.SetOpacity(hedSetOpacity);
@@ -72,7 +79,6 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2,
     } else {
       mask2.SetOpacity(0.0);
     }
-    mask2.Reparent(root);
 
     let mask1Margin = mask1.GetMargin();
     mask1.SetMargin(mask1SetMargin.X, mask1SetMargin.Y, mask1Margin.right, mask1Margin.bottom);
@@ -89,7 +95,6 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2,
     } else {
       mask1.SetOpacity(0.0);
     }
-    mask1.Reparent(root);
   }
 }
 
@@ -98,12 +103,12 @@ private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2,
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhostingFixCameraTPPCarEvent>) -> Bool {
   
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
@@ -112,12 +117,12 @@ private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhosting
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPCarFasterEvent(evt: ref<FrameGenGhostingFixCameraTPPCarFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
@@ -126,12 +131,12 @@ private cb func OnFrameGenGhostingFixCameraTPPCarFasterEvent(evt: ref<FrameGenGh
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPCarSlowEvent(evt: ref<FrameGenGhostingFixCameraTPPCarSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
@@ -140,12 +145,12 @@ private cb func OnFrameGenGhostingFixCameraTPPCarSlowEvent(evt: ref<FrameGenGhos
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPCarCrawlEvent(evt: ref<FrameGenGhostingFixCameraTPPCarCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
@@ -155,12 +160,12 @@ private cb func OnFrameGenGhostingFixCameraTPPCarCrawlEvent(evt: ref<FrameGenGho
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarEvent>) -> Bool {
   
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
@@ -169,12 +174,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhost
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarCarFasterEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
@@ -183,12 +188,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarFasterEvent(evt: ref<FrameGe
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarCarSlowEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
@@ -197,12 +202,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarSlowEvent(evt: ref<FrameGenG
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarCarCrawlEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
@@ -212,12 +217,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarCrawlEvent(evt: ref<FrameGen
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhostingFixCameraFPPCarEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -226,12 +231,12 @@ private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhosting
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPCarFasterEvent(evt: ref<FrameGenGhostingFixCameraFPPCarFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -240,12 +245,12 @@ private cb func OnFrameGenGhostingFixCameraFPPCarFasterEvent(evt: ref<FrameGenGh
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPCarSlowEvent(evt: ref<FrameGenGhostingFixCameraFPPCarSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -254,12 +259,12 @@ private cb func OnFrameGenGhostingFixCameraFPPCarSlowEvent(evt: ref<FrameGenGhos
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPCarCrawlEvent(evt: ref<FrameGenGhostingFixCameraFPPCarCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -270,12 +275,12 @@ private cb func OnFrameGenGhostingFixCameraFPPCarCrawlEvent(evt: ref<FrameGenGho
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
@@ -284,12 +289,12 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostin
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeFasterEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
@@ -298,12 +303,12 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeFasterEvent(evt: ref<FrameGenG
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeSlowEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
@@ -312,12 +317,12 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeSlowEvent(evt: ref<FrameGenGho
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeCrawlEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
@@ -327,12 +332,12 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeCrawlEvent(evt: ref<FrameGenGh
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
@@ -341,12 +346,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhos
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarBikeFasterEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
@@ -355,12 +360,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeFasterEvent(evt: ref<FrameG
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarBikeSlowEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
@@ -369,12 +374,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeSlowEvent(evt: ref<FrameGen
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraTPPFarBikeCrawlEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
@@ -384,12 +389,12 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeCrawlEvent(evt: ref<FrameGe
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -398,12 +403,12 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPBikeFasterEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeFasterEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -412,12 +417,12 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeFasterEvent(evt: ref<FrameGenG
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPBikeSlowEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeSlowEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -426,12 +431,12 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeSlowEvent(evt: ref<FrameGenGho
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixCameraFPPBikeCrawlEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeCrawlEvent>) -> Bool {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
@@ -457,12 +462,12 @@ protected cb func OnFrameGenGhostingFixDeActivationVehicleEvent(evt: ref<FrameGe
 @addMethod(IronsightGameController)
 private cb func OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent(evt: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>) -> Void {
 
-  let hedSetMargin: Vector2 = new Vector2(1920.0, 2320.0);
-  let hedSetSize: Vector2 = new Vector2(4320.0, 1440.0);
+  let hedSetMargin: Vector2 = new Vector2(1920.0, 2280.0);
+  let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask2SetSize: Vector2 = new Vector2(3000.0, 900.0);
-  let mask1Margin: Vector2 = new Vector2(1920, 1550.0);
-  let mask1SetSize: Vector2 = new Vector2(1800.0, 900.0);
+  let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
+  let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
   this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.03, false, false, true);
@@ -470,12 +475,12 @@ private cb func OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent(evt: ref<Frame
 
 //Setting context for vehicles masks start here---------------------------------------------------------------------------------------
 @addMethod(DriveEvents)
-protected final func OnVehicleSpeedChange(speed: Float) -> Void {
-  this.m_vehicleCurrentSpeed = speed;
+protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Void {
+  this.m_vehicleCurrentSpeedFGGF = speed;
 }
 
 @addMethod(DriveEvents)
-public final func VehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let vehicleDeactivation: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
 
   vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
@@ -484,7 +489,7 @@ public final func VehicleStationaryDeactivation(scriptInterface: ref<StateGameSc
 }
 
 @addMethod(DriveEvents)
-public final func BikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let windshieldEditorContext: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>;
 
   windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
@@ -493,21 +498,21 @@ public final func BikeStationaryWindshieldEditorContext(scriptInterface: ref<Sta
 }
 
 @addMethod(DriveEvents)
-protected final func MaskChange(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+protected final func FrameGenGhostingFixMaskChange(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let vehicleBlackboard: wref<IBlackboard>;
 
-  if !IsDefined(this.m_vehicleCurrentSpeedCallback) {
+  if !IsDefined(this.m_vehicleCurrentSpeedCallbackFGGF) {
     vehicleBlackboard = (scriptInterface.owner as VehicleObject).GetBlackboard();
-    this.m_vehicleCurrentSpeedCallback = vehicleBlackboard.RegisterListenerFloat(GetAllBlackboardDefs().Vehicle.SpeedValue, this, n"OnVehicleSpeedChange");
+    this.m_vehicleCurrentSpeedCallbackFGGF = vehicleBlackboard.RegisterListenerFloat(GetAllBlackboardDefs().Vehicle.SpeedValue, this, n"OnFrameGenGhostingFixVehicleSpeedChange");
   }
 
   let vehicleType_Record: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
-  this.m_vehicleCurrentType = vehicleType_Record.Type();
+  this.m_vehicleCurrentTypeFGGF = vehicleType_Record.Type();
 }
 
 @wrapMethod(DriveEvents)
 protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-    this.MaskChange(scriptInterface);
+    this.FrameGenGhostingFixMaskChange(scriptInterface);
   wrappedMethod(stateContext,scriptInterface);
 }
 
@@ -783,52 +788,62 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
   wrappedMethod(timeDelta,stateContext,scriptInterface);
 
   let vehicleTypeRecord: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
-  this.m_vehicleCurrentType = vehicleTypeRecord.Type();
+  this.m_vehicleCurrentTypeFGGF = vehicleTypeRecord.Type();
 
-  switch(this.m_vehicleCurrentType) {
+  switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
-        if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-          this.BikeCameraChangeCrawl(scriptInterface, this.m_bikeCameraContext);
-        } else {
-          this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContext);
-          if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
-            this.BikeCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
-              this.BikeCameraChange(scriptInterface, this.m_carCameraContext);
-            }
-          }
-        }
-      } else {
-        this.VehicleStationaryDeactivation(scriptInterface);
-        this.BikeStationaryWindshieldEditorContext(scriptInterface);
-      }
-      break;
-    case gamedataVehicleType.Car:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
-        if RoundTo(this.m_vehicleCurrentSpeed,1)<-2.0 {
-          this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
-          if RoundTo(this.m_vehicleCurrentSpeed,1)<-4.0 {
-            this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)<-7.0 {
-              this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-2.0 {
+          this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContextFGGF);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-4.0 {
+            this.BikeCameraChangeFaster(scriptInterface, this.m_bikeCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-7.0 {
+              this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
             }
           }
         } else {
-          if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<2.0 {
+            this.BikeCameraChangeCrawl(scriptInterface, this.m_bikeCameraContextFGGF);
           } else {
-            this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
-              this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-              if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
-                this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+            this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>4.0 {
+              this.BikeCameraChangeFaster(scriptInterface, this.m_bikeCameraContextFGGF);
+              if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>7.0 {
+                this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
               }
             }
           }
         }
       } else {
-        this.VehicleStationaryDeactivation(scriptInterface);
+        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
+        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+      }
+      break;
+    case gamedataVehicleType.Car:
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-2.0 {
+          this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContextFGGF);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-4.0 {
+            this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-7.0 {
+              this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+            }
+          }
+        } else {
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<2.0 {
+            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContextFGGF);
+          } else {
+            this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>4.0 {
+              this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContextFGGF);
+              if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>7.0 {
+                this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+              }
+            }
+          }
+        }
+      } else {
+        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
       }
       break;
     default:
@@ -838,12 +853,12 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
 //Setting context for vehicles masks while in combat starts here---------------------------------------------------------------------------------------
 @addMethod(DriverCombatEvents)
-protected final func OnVehicleSpeedChange(speed: Float) -> Void {
-  this.m_vehicleCurrentSpeed = speed;
+protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Void {
+  this.m_vehicleCurrentSpeedFGGF = speed;
 }
 
 @addMethod(DriverCombatEvents)
-public final func VehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let vehicleDeactivation: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
 
   vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
@@ -852,7 +867,7 @@ public final func VehicleStationaryDeactivation(scriptInterface: ref<StateGameSc
 }
 
 @addMethod(DriverCombatEvents)
-public final func BikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let windshieldEditorContext: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>;
 
   windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
@@ -861,21 +876,21 @@ public final func BikeStationaryWindshieldEditorContext(scriptInterface: ref<Sta
 }
 
 @addMethod(DriverCombatEvents)
-protected final func MaskChange(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+protected final func FrameGenGhostingFixMaskChange(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let vehicleBlackboard: wref<IBlackboard>;
 
-  if !IsDefined(this.m_vehicleCurrentSpeedCallback) {
+  if !IsDefined(this.m_vehicleCurrentSpeedCallbackFGGF) {
     vehicleBlackboard = (scriptInterface.owner as VehicleObject).GetBlackboard();
-    this.m_vehicleCurrentSpeedCallback = vehicleBlackboard.RegisterListenerFloat(GetAllBlackboardDefs().Vehicle.SpeedValue, this, n"OnVehicleSpeedChange");
+    this.m_vehicleCurrentSpeedCallbackFGGF = vehicleBlackboard.RegisterListenerFloat(GetAllBlackboardDefs().Vehicle.SpeedValue, this, n"OnFrameGenGhostingFixVehicleSpeedChange");
   }
 
   let vehicleType_Record: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
-  this.m_vehicleCurrentType = vehicleType_Record.Type();
+  this.m_vehicleCurrentTypeFGGF = vehicleType_Record.Type();
 }
 
 @wrapMethod(DriverCombatEvents)
 protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-    this.MaskChange(scriptInterface);
+    this.FrameGenGhostingFixMaskChange(scriptInterface);
   wrappedMethod(stateContext,scriptInterface);
 }
 
@@ -1151,52 +1166,62 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
   wrappedMethod(timeDelta,stateContext,scriptInterface);
 
   let vehicleTypeRecord: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
-  this.m_vehicleCurrentType = vehicleTypeRecord.Type();
+  this.m_vehicleCurrentTypeFGGF = vehicleTypeRecord.Type();
 
-  switch(this.m_vehicleCurrentType) {
+  switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
-        if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-          this.BikeCameraChangeCrawl(scriptInterface, this.m_bikeCameraContext);
-        } else {
-          this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContext);
-          if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
-            this.BikeCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
-              this.BikeCameraChange(scriptInterface, this.m_carCameraContext);
-            }
-          }
-        }
-      } else {
-        this.VehicleStationaryDeactivation(scriptInterface);
-        this.BikeStationaryWindshieldEditorContext(scriptInterface);
-      }
-      break;
-    case gamedataVehicleType.Car:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeed,1),0.0) {
-        if RoundTo(this.m_vehicleCurrentSpeed,1)<-2.0 {
-          this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
-          if RoundTo(this.m_vehicleCurrentSpeed,1)<-4.0 {
-            this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)<-7.0 {
-              this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-2.0 {
+          this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContextFGGF);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-4.0 {
+            this.BikeCameraChangeFaster(scriptInterface, this.m_bikeCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-7.0 {
+              this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
             }
           }
         } else {
-          if RoundTo(this.m_vehicleCurrentSpeed,1)<2.0 {
-            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContext);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<2.0 {
+            this.BikeCameraChangeCrawl(scriptInterface, this.m_bikeCameraContextFGGF);
           } else {
-            this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContext);
-            if RoundTo(this.m_vehicleCurrentSpeed,1)>4.0 {
-              this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContext);
-              if RoundTo(this.m_vehicleCurrentSpeed,1)>7.0 {
-                this.CarCameraChange(scriptInterface, this.m_carCameraContext);
+            this.BikeCameraChangeSlow(scriptInterface, this.m_bikeCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>4.0 {
+              this.BikeCameraChangeFaster(scriptInterface, this.m_bikeCameraContextFGGF);
+              if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>7.0 {
+                this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
               }
             }
           }
         }
       } else {
-        this.VehicleStationaryDeactivation(scriptInterface);
+        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
+        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+      }
+      break;
+    case gamedataVehicleType.Car:
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-2.0 {
+          this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContextFGGF);
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-4.0 {
+            this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<-7.0 {
+              this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+            }
+          }
+        } else {
+          if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)<2.0 {
+            this.CarCameraChangeCrawl(scriptInterface, this.m_carCameraContextFGGF);
+          } else {
+            this.CarCameraChangeSlow(scriptInterface, this.m_carCameraContextFGGF);
+            if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>4.0 {
+              this.CarCameraChangeFaster(scriptInterface, this.m_carCameraContextFGGF);
+              if RoundTo(this.m_vehicleCurrentSpeedFGGF,1)>7.0 {
+                this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+              }
+            }
+          }
+        }
+      } else {
+        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
       }
       break;
     default:

@@ -1,4 +1,6 @@
-//FrameGen Ghosting 'Fix' 4.0.2, 2024 gramern (scz_g) 2024
+//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+
+//FrameGen Ghosting 'Fix' 4.1.0, 2024 gramern (scz_g) 2024
 
 //The main loop---------------------------------------------------------------------------------------
 @addMethod(IronsightGameController)
@@ -77,7 +79,7 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
       }
     }
   
-    if NotEquals(this.ironsightController.m_isVehicleMounted,true) {
+    if NotEquals(this.ironsightController.m_isVehicleMountedFGGF,true) {
       this.ironsightController.FrameGenGhostingFixVignetteOnFootEditorToggle();
       if Equals(this.ironsightController.m_vignetteOnFootEditor,true) {
         this.ironsightController.FrameGenGhostingFixVignetteOnFootEditor();
@@ -99,4 +101,13 @@ protected cb func OnPlayerAttach(playerPuppet: ref<GameObject>) -> Bool {
   this.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
   this.FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent();
   this.FrameGenGhostingFixAimOnFootSetDimensions();
+
+  // LogChannel(n"DEBUG", s"On Foot Loop initialized...");
+}
+
+@wrapMethod(IronsightGameController)
+protected cb func OnPlayerDetach(playerPuppet: ref<GameObject>) -> Bool {
+  wrappedMethod(playerPuppet);
+
+  GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_onFootLoopID);
 }
