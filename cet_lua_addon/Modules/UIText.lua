@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.0.2
+--FrameGen Ghosting Fix 4.1.0
 
 local UIText = {
     General = {
@@ -23,8 +23,8 @@ local UIText = {
 	Diagnostics = {
         tabname = "Diagnostics",
         title = "CONFLICTS WITH OTHER MODS DETECTED",
-        textfield_1 = "To resolve conflicts with these mods:",
-        textfield_2 = "and ensure FG anti-ghosting will work, please visit\nGhosting 'Fix's Nexus page for compatibility tweaks\nand instructions."
+        textfield_1 = "Seems like you have a conflicting mod installed.\nTo ensure that anti-ghosting for frame generation\nwill work without problems, please, visit FrameGen\nGhosting 'Fix's Nexus page to download and install\nthe 'Preem Compatibility Edition - Archive XL'\nversion of the mod instead.",
+        textfield_2 = "Conflicting mods:"
     },
     Vehicles = {
         tabname = "Vehicles",

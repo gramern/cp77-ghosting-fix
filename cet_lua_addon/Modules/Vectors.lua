@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.0.2
+--FrameGen Ghosting Fix 4.1.0
 
 local Vectors = {
 	Camera = {
@@ -338,7 +338,7 @@ function Vectors.ResizeVehMasks()
 			end
 			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
 		else
-			Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask2.Def.Size.Min.x + ((100 - convergenceAbs) * Vectors.VehMasks.Mask1.Def.Size.Increment.x)
+			Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.Min.x + ((100 - convergenceAbs) * Vectors.VehMasks.Mask1.Def.Size.Increment.x)
 			Vectors.VehMasks.Mask1.Size.x = (Vectors.VehMasks.Mask1.Def.Size.Min.x * Vectors.VehMasks.Mask1.multiplyFactor) + ((100 - convergenceAbs) * (Vectors.VehMasks.Mask1.Def.Size.Increment.x * Vectors.VehMasks.Mask1.multiplyFactor))
 			Vectors.VehMasks.AnchorPoint.y = Vectors.VehMasks.AnchorPoint.yMin
 		end

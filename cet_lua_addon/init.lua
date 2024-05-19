@@ -1,5 +1,5 @@
 local framegen_ghosting_fix = {
-__VERSION     = "FrameGen Ghosting 'Fix' 4.0.2",
+__VERSION     = "FrameGen Ghosting 'Fix' 4.1.0",
 __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
 __LICENSE     = [[
 	MIT License
@@ -350,14 +350,14 @@ registerForEvent("onDraw", function()
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
 						ImGui.Text(UIText.Diagnostics.title)
 						ImGui.PopStyleColor()
+						ImGui.Text("")
 						ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 						ImGui.Text(UIText.Diagnostics.textfield_1)
 						ImGui.Text("")
+						ImGui.Text(UIText.Diagnostics.textfield_2)
 						for modfile,mod in pairs(Diagnostics.modfiles) do
 							ImGui.Text(mod)
 						end
-						ImGui.Text("")
-						ImGui.Text(UIText.Diagnostics.textfield_2)
 						ImGui.PopStyleColor()
 					ImGui.EndTabItem()
 					end
