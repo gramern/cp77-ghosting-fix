@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.1.0xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.1.2xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_onFootLoopID: DelayID;
 
@@ -12,9 +12,11 @@
 //The main loop---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 public func FrameGenGhostingFixLoop() {
+
   let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
   let onFootCallback = new FrameGenGhostingFixLoopCallback();
   onFootCallback.masksController = this;
+  
   this.m_onFootLoopID = GameInstance.GetDelaySystem(playerPuppet.GetGame()).DelayCallback(onFootCallback, 0.1);
 }
 
@@ -25,7 +27,7 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
   public func Call() -> Void {
 
     this.masksController.FrameGenGhostingFixHasWeapon();
-		// LogChannel(n"DEBUG", s"\(this.masksController.m_upperBodyState)");
+    // LogChannel(n"DEBUG", s"\(this.masksController.m_upperBodyState)");
 
     if Equals(this.masksController.m_isWeaponDrawn,true) {
       if Equals(this.masksController.m_isMaskingOnFootActivated,false) {
@@ -101,11 +103,11 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
 //Add upper body state func---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func OnUpperBodyChanged(state: Int32) -> Bool {
-	let isAiming: Bool = state == 6;
-	this.m_upperBodyState = IntEnum<gamePSMUpperBodyStates>(state);
-	if IsDefined(this.m_ADSAnimator) {
-		this.m_ADSAnimator.OnAim(isAiming);
-	};
+  let isAiming: Bool = state == 6;
+  this.m_upperBodyState = IntEnum<gamePSMUpperBodyStates>(state);
+  if IsDefined(this.m_ADSAnimator) {
+    this.m_ADSAnimator.OnAim(isAiming);
+  };
 }
 
 //Spawn widgets---------------------------------------------------------------------------------------
@@ -128,7 +130,7 @@ protected cb func OnInitialize() -> Bool {
   if IsDefined(this.GetChildWidgetByPath(n"fgfixcars/windshieldeditor")) {
     return false;
   }
-	if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownLeftOnFoot")) {
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownLeftOnFoot")) {
     return false;
   }
   if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownRightOnFoot")) {
@@ -147,12 +149,11 @@ protected cb func OnInitialize() -> Bool {
     return false;
   }
 
-
   let root = this.GetRootCompoundWidget();
   let fgfixcars = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfixcars\\fgfixcars.inkwidget", n"Root") as inkCompoundWidget;
   fgfixcars.SetName(n"fgfixcars");
 
-	let fgfix = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root") as inkCompoundWidget;
+  let fgfix = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root") as inkCompoundWidget;
   fgfix.SetName(n"fgfix");
 
   let deactivationEvent: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
@@ -163,8 +164,8 @@ protected cb func OnInitialize() -> Bool {
 protected cb func OnUninitialize() -> Bool {
   wrappedMethod();
 
-	let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
-	GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_onFootLoopID);
+  let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
+  GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_onFootLoopID);
 }
 
 //The kick off---------------------------------------------------------------------------------------
@@ -172,12 +173,12 @@ protected cb func OnUninitialize() -> Bool {
 protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   wrappedMethod(playerGameObject);
 
-	this.m_playerStateMachineBB = this.GetBlackboardSystem().GetLocalInstanced(playerGameObject.GetEntityID(), GetAllBlackboardDefs().PlayerStateMachine);
-	if IsDefined(this.m_playerStateMachineBB) {
-		this.m_playerStateMachineUpperBodyBBID = this.m_playerStateMachineBB.RegisterDelayedListenerInt(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this, n"OnUpperBodyChanged");
-	};
+  this.m_playerStateMachineBB = this.GetBlackboardSystem().GetLocalInstanced(playerGameObject.GetEntityID(), GetAllBlackboardDefs().PlayerStateMachine);
+  if IsDefined(this.m_playerStateMachineBB) {
+    this.m_playerStateMachineUpperBodyBBID = this.m_playerStateMachineBB.RegisterDelayedListenerInt(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this, n"OnUpperBodyChanged");
+  };
 
-	this.FrameGenGhostingFixLoop();
+  this.FrameGenGhostingFixLoop();
   this.FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent();
   this.FrameGenGhostingFixVignetteOnFootSetDimensions();
   this.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
@@ -191,7 +192,7 @@ protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
 protected cb func OnPlayerDetach(playerGameObject: ref<GameObject>) -> Bool {
   wrappedMethod(playerGameObject);
 
-	if IsDefined(this.m_playerStateMachineBB) {
-		this.m_playerStateMachineBB.UnregisterDelayedListener(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this.m_playerStateMachineUpperBodyBBID);
-	};
+  if IsDefined(this.m_playerStateMachineBB) {
+    this.m_playerStateMachineBB.UnregisterDelayedListener(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this.m_playerStateMachineUpperBodyBBID);
+  };
 }

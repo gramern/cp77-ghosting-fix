@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.1.0xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.1.2xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -25,6 +25,7 @@ private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> B
 
 @addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) -> Bool {
+  
   this.m_isVehicleMountedFGGF = false;
 
   let deactivationEvent: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
