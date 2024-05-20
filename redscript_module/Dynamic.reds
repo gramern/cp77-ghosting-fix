@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.1.0, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.1.2, 2024 gramern (scz_g) 2024
 
 @addField(IronsightGameController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(IronsightGameController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -485,7 +485,7 @@ public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterfa
 
   vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
 
-    scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
+  scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
 }
 
 @addMethod(DriveEvents)
@@ -494,7 +494,7 @@ public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scrip
 
   windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
 
-    scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
+  scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
 }
 
 @addMethod(DriveEvents)
@@ -863,7 +863,7 @@ public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterfa
 
   vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
 
-    scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
+  scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
 }
 
 @addMethod(DriverCombatEvents)
@@ -872,7 +872,7 @@ public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scrip
 
   windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
 
-    scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
+  scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
 }
 
 @addMethod(DriverCombatEvents)
