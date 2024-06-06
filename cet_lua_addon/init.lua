@@ -1,5 +1,5 @@
-local framegen_ghosting_fix = {
-__VERSION     = "FrameGen Ghosting 'Fix' 4.1.2",
+local FrameGenGhostingFix = {
+__VERSION     = "FrameGen Ghosting 'Fix' 4.1.4",
 __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
 __LICENSE     = [[
   MIT License
@@ -66,42 +66,30 @@ end
 --load user settigns
 function LoadUserSettings()
   local file = io.open("user_settings.json", "r")
-
   if file then
     local userSettingsContents = file:read("*a")
-    file:close();
+    file:close()
     local userSettings = json.decode(userSettingsContents)
 
+    enabledWindshieldSettings = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.enabledWindshield or false
+    Vectors.VehMasks.Mask1.Scale.x = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.width or Vectors.VehMasks.Mask1.Scale.x
+    Vectors.VehMasks.Mask1.Scale.y = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.height or Vectors.VehMasks.Mask1.Scale.y
+  
+
+    enabledFPPOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledOnFoot or false
+    enabledFPPBlockerAimOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledBlockerAimOnFoot or false
+    enabledFPPVignetteAimOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledVignetteOnFoot or false
+    enabledFPPVignetteOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledVignetteOnFoot or false
+    enabledFPPVignettePermamentOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledVignettePermamentOnFoot or false
+    Calculate.FPPOnFoot.vignetteFootMarginLeft = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootMarginLeft or Calculate.FPPOnFoot.vignetteFootMarginLeft
+    Calculate.FPPOnFoot.vignetteFootMarginTop = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootMarginTop or Calculate.FPPOnFoot.vignetteFootMarginTop
+    Calculate.FPPOnFoot.vignetteFootSizeX = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
+    Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
+
+    Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
+
     if userSettings then
-      print(UIText.General.modname_log,UIText.General.settings_loaded)
-    end
-
-    if userSettings.FPPBikeWindshield.enabledWindshield then
-      enabledWindshieldSettings = userSettings.FPPBikeWindshield.enabledWindshield
-      Vectors.VehMasks.Mask1.Scale.x = userSettings.FPPBikeWindshield.width
-      Vectors.VehMasks.Mask1.Scale.y = userSettings.FPPBikeWindshield.height
-    end
-
-    if userSettings.FPPOnFoot.enabledOnFoot then
-      enabledFPPOnFoot = userSettings.FPPOnFoot.enabledOnFoot
-    end
-
-    if userSettings.FPPOnFoot.enabledBlockerAimOnFoot then
-      enabledFPPBlockerAimOnFoot = userSettings.FPPOnFoot.enabledBlockerAimOnFoot
-    end
-
-    if userSettings.FPPOnFoot.enabledVignetteOnFoot then
-      enabledFPPVignetteAimOnFoot = userSettings.FPPOnFoot.enabledVignetteAimOnFoot
-      enabledFPPVignetteOnFoot = userSettings.FPPOnFoot.enabledVignetteOnFoot
-      enabledFPPVignettePermamentOnFoot = userSettings.FPPOnFoot.enabledVignettePermamentOnFoot
-      Calculate.FPPOnFoot.vignetteFootMarginLeft = userSettings.FPPOnFoot.vignetteFootMarginLeft
-      Calculate.FPPOnFoot.vignetteFootMarginTop = userSettings.FPPOnFoot.vignetteFootMarginTop
-      Calculate.FPPOnFoot.vignetteFootSizeX = userSettings.FPPOnFoot.vignetteFootSizeX
-      Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot.vignetteFootSizeY
-    end
-
-    if userSettings.Vehicles.selectedPreset then
-      Presets.selectedPreset = userSettings.Vehicles.selectedPreset
+        print(UIText.General.modname_log, UIText.General.settings_loaded)
     end
   else
     SetDefaultIf43()
@@ -384,11 +372,11 @@ registerForEvent("onDraw", function()
           end
         end
         if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.1
           ImGui.Text(UIText.General.title_general)
           ImGui.Separator()
           ImGui.Text(UIText.Vehicles.MaskingPresets.name)
-          ImGui.PopStyleColor()
+          ImGui.PopStyleColor() --PSC.1
           if Presets.selectedPresetPosition == nil then
             Presets.GetPresetInfo()
           end
@@ -418,7 +406,7 @@ registerForEvent("onDraw", function()
             Presets.ApplyPreset()
             appliedVeh = true
           end
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
           if Presets.selectedPresetPosition then
             if Presets.presetsDesc[Presets.selectedPresetPosition] then
               ImGui.Text("Preset's info:")
@@ -430,64 +418,62 @@ registerForEvent("onDraw", function()
               ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
             end
           end
+          ImGui.PopStyleColor() --PSC.2
           if appliedVeh then
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.3
             ImGui.Text("")
             ImGui.Text(UIText.General.settings_applied_veh)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.3
           end
-          ImGui.PopStyleColor()
           if Config.MaskingInVehiclesGlobal.enabled then
             ImGui.Text("")
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
             ImGui.Text(UIText.General.title_fps90)
             ImGui.Separator()
-            enabledWindshieldSettings, WindshieldSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.Windshield.name, enabledWindshieldSettings)
-            if WindshieldSettingsEnabled then
+            enabledWindshieldSettings, windshieldSettingsEnabled = ImGui.Checkbox(UIText.Vehicles.Windshield.name, enabledWindshieldSettings)
+            if windshieldSettingsEnabled then
               Vectors.ReadCache()
               SaveUserSettings()
             end
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.4
             if ImGui.IsItemHovered() then
               ImGui.SetTooltip(UIText.Vehicles.Windshield.tooltip)
             else
               ImGui.SetTooltip(nil)
             end
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
             if enabledWindshieldSettings then
               if Vectors.Vehicle.currentSpeed ~= nil and Vectors.Vehicle.currentSpeed < 1 and Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") and Vectors.Vehicle.activePerspective == vehicleCameraPerspective.FPP then
                 ImGui.Text("")
+                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.5
                 ImGui.Text(UIText.Vehicles.Windshield.textfield_1)
                 ImGui.Text("")
-                ImGui.PopStyleColor()
-                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
                 ImGui.Text(UIText.Vehicles.Windshield.setting_1)
-                ImGui.PopStyleColor()
+                ImGui.PopStyleColor() --PSC.5
                 Vectors.VehMasks.Mask1.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask1.Scale.x, 100, 150, "%.0f")
                   if windshieldXChanged then
                     Vectors.ResizeBikeWindshieldMask()
                     saved = false
-                    TurnOnLiveViewWindshieldEditor()
+                    SettingsCtrl.TurnOnLiveViewWindshieldEditor()
                   end
-                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
                 ImGui.Text(UIText.Vehicles.Windshield.setting_2)
-                ImGui.PopStyleColor()
+                ImGui.PopStyleColor() --PSC.6
                 Vectors.VehMasks.Mask1.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask1.Scale.y, 100, 300, "%.0f")
                   if windshieldYChanged then
                     Vectors.ResizeBikeWindshieldMask()
                     saved = false
-                    TurnOnLiveViewWindshieldEditor()
+                    SettingsCtrl.TurnOnLiveViewWindshieldEditor()
                   end
                 ImGui.Text("")
-                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.7
                 if saved == true then
                   ImGui.Text(UIText.General.settings_saved)
                 end
-                ImGui.PopStyleColor()
+                ImGui.PopStyleColor() --PSC.7
                 if ImGui.Button(UIText.General.settings_default, 240, 40) then
                   saved = false
                   Vectors.SetWindshieldDefault()
-                  DefaultLiveViewWindshieldEditor()
+                  SettingsCtrl.DefaultLiveViewWindshieldEditor()
                 end
                 ImGui.SameLine()
                 if ImGui.Button(UIText.General.settings_save, 240, 40) then
@@ -497,20 +483,19 @@ registerForEvent("onDraw", function()
                 end
               else
                 ImGui.Text("")
-                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+                ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.8
                 ImGui.Text(UIText.Vehicles.Windshield.warning)
                 ImGui.Text("")
-                ImGui.PopStyleColor()
+                ImGui.PopStyleColor() --PSC.8
               end
             else
               Vectors.SetWindshieldDefault()
             end
           end
-          ImGui.PopStyleColor()
-        ImGui.EndTabItem()
+          ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.9
           ImGui.Text(UIText.General.title_general)
           ImGui.Separator()
           enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
@@ -518,21 +503,21 @@ registerForEvent("onDraw", function()
             SaveUserSettings()
             SaveUserSettingsOnFootLog()
           end
-          ImGui.PopStyleColor()
+          ImGui.PopStyleColor()--PSC.9
           if ImGui.IsItemHovered() then
             ImGui.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
           else
             ImGui.SetTooltip(nil)
           end
           if not enabledFPPVignetteAimOnFoot then
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.10
             enabledFPPBlockerAimOnFoot, fppBlockerAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BlockerAim.name, enabledFPPBlockerAimOnFoot)
             if fppBlockerAimOnFootEnabled then
               enabledFPPVignetteAimOnFoot = false
               SaveUserSettings()
               SaveUserSettingsOnFootLog()
             end
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.10
             if ImGui.IsItemHovered() then
               ImGui.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
             else
@@ -540,25 +525,25 @@ registerForEvent("onDraw", function()
             end
           else
             ImGui.Separator()
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.11
             ImGui.Text(UIText.General.info_aim_onfoot)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.11
             ImGui.Separator()
           end
           ImGui.Text("")
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.12
           ImGui.Text(UIText.General.title_fps120)
           ImGui.Separator()
-          ImGui.PopStyleColor()
+          ImGui.PopStyleColor() --PSC.12
           if not enabledFPPBlockerAimOnFoot then
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.13
             enabledFPPVignetteAimOnFoot, fppVignetteAimOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignetteAim.name, enabledFPPVignetteAimOnFoot)
             if fppVignetteAimOnFootEnabled then
               enabledFPPBlockerAimOnFoot = false
               SaveUserSettings()
               SaveUserSettingsOnFootLog()
             end
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.13
             if ImGui.IsItemHovered() then
               ImGui.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
             else
@@ -566,37 +551,37 @@ registerForEvent("onDraw", function()
             end
           else
             ImGui.Separator()
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.14
             ImGui.Text(UIText.General.info_aim_onfoot)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.14
             ImGui.Separator()
           end
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.15
           enabledFPPVignetteOnFoot, fppVignetteOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.Vignette.name, enabledFPPVignetteOnFoot)
           if fppVignetteOnFootEnabled then
             SaveUserSettings()
             SaveUserSettingsOnFootLog()
           end
-          ImGui.PopStyleColor()
+          ImGui.PopStyleColor() --PSC.15
           if ImGui.IsItemHovered() then
             ImGui.SetTooltip(UIText.OnFoot.Vignette.tooltip)
           else
             ImGui.SetTooltip(nil)
           end
-          ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
           if enabledFPPVignetteOnFoot then
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.16
             enabledFPPVignettePermamentOnFoot, fppVignettePermamentOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignettePermament.name, enabledFPPVignettePermamentOnFoot)
             if fppVignettePermamentOnFootEnabled then
               SaveUserSettings()
               SaveUserSettingsOnFootLog()
             end
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.16
             if ImGui.IsItemHovered() then
               ImGui.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
             else
               ImGui.SetTooltip(nil)
             end
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.17
             if enabledFPPVignetteAimOnFoot and enabledFPPVignetteOnFoot then
               ImGui.Text("")
               ImGui.Text(UIText.OnFoot.VignetteAim.textfield_1)
@@ -605,54 +590,54 @@ registerForEvent("onDraw", function()
             ImGui.Text(UIText.OnFoot.Vignette.textfield_1)
             ImGui.Text("")
             ImGui.Text(UIText.OnFoot.Vignette.setting_1)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.17
             Calculate.FPPOnFoot.vignetteFootSizeX, vignetteFootSizeXChanged = ImGui.SliderFloat("X size",Calculate.FPPOnFoot.vignetteFootSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeX, "%.0f")
               if vignetteFootSizeXChanged then
                 Calculate.VignetteCalcMarginX()
                 Calculate.VignetteX()
                 saved = false
-                TurnOnLiveViewVignetteOnFootEditor()
+                SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
               end
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.18
             ImGui.Text(UIText.OnFoot.Vignette.setting_2)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.18
             Calculate.FPPOnFoot.vignetteFootSizeY, vignetteFootSizeYChanged = ImGui.SliderFloat("Y size",Calculate.FPPOnFoot.vignetteFootSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxSizeY, "%.0f")
               if vignetteFootSizeYChanged then
                 Calculate.VignetteCalcMarginY()
                 Calculate.VignetteY()
                 saved = false
-                TurnOnLiveViewVignetteOnFootEditor()
+                SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
               end
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.19
             ImGui.Text(UIText.OnFoot.Vignette.setting_3)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.19
             Calculate.FPPOnFoot.vignetteFootMarginLeft, vignetteFootMarginLeftChanged = ImGui.SliderFloat("X pos.",Calculate.FPPOnFoot.vignetteFootMarginLeft, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginX, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginX, "%.0f")
               if vignetteFootMarginLeftChanged then
                 Calculate.VignetteCalcMarginX()
                 Calculate.VignettePosX()
                 saved = false
-                TurnOnLiveViewVignetteOnFootEditor()
+                SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
               end
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.20
             ImGui.Text(UIText.OnFoot.Vignette.setting_4)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.20
             Calculate.FPPOnFoot.vignetteFootMarginTop, vignetteFootMarginTopChanged = ImGui.SliderFloat("Y pos.",Calculate.FPPOnFoot.vignetteFootMarginTop, Calculate.FPPOnFoot.VignetteEditor.vignetteMinMarginY, Calculate.FPPOnFoot.VignetteEditor.vignetteMaxMarginY, "%.0f")
               if vignetteFootMarginTopChanged then
                 Calculate.VignetteCalcMarginY()
                 Calculate.VignettePosY()
                 saved = false
-                TurnOnLiveViewVignetteOnFootEditor()
+                SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
               end
             ImGui.Text("")
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.21
             if saved == true then
               ImGui.Text(UIText.General.settings_saved)
             end
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.21
             if ImGui.Button(UIText.General.settings_default, 240, 40) then
               saved = false
               Calculate.SetVignetteDefault()
-              TurnOnLiveViewVignetteOnFootEditor()
+              SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
             end
             ImGui.SameLine()
             if ImGui.Button(UIText.General.settings_save, 240, 40) then
@@ -665,17 +650,19 @@ registerForEvent("onDraw", function()
           end
           if appliedOnFoot then
             ImGui.Separator()
-            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.22
             ImGui.Text(UIText.General.settings_saved_onfoot)
-            ImGui.PopStyleColor()
+            ImGui.PopStyleColor() --PSC.22
           end
-          ImGui.PopStyleColor()
-        ImGui.EndTabItem()
+          ImGui.EndTabItem()
         end
       ImGui.EndTabBar()
       end
     end
     ImGui.End()
+    ImGui.PopStyleColor(26)
     ImGui.PopStyleVar(1)
   end
 end)
+
+return FrameGenGhostingFix
