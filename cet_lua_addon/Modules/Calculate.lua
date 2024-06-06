@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.1.2xl
+--FrameGen Ghosting Fix 4.1.4xl
 
 local Calculate = {
   ScreenDetection = {

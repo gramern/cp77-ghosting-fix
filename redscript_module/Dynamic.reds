@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.1.2xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.1.4xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -45,7 +45,7 @@ protected final func FrameGenGhostingFixVehicleToggle(maskingInVehicles: Bool) -
 
 //The main transition function---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2, hedSetSize: Vector2, mask2SetMargin: Vector2, mask2SetSize: Vector2, mask1SetMargin: Vector2, mask1SetSize: Vector2, setAnchorPoint: Vector2, hedSetOpacity: Float, mask2SetOpacity: Float, mask1SetOpacity: Float, hedFillVisible: Bool, mask2Visible: Bool, mask1Visible: Bool) -> Bool {
+private cb func OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin: Vector2, hedSetSize: Vector2, mask2SetMargin: Vector2, mask2SetSize: Vector2, mask2SetRotation: Float, mask1SetMargin: Vector2, mask1SetSize: Vector2, mask1SetRotation: Float, setAnchorPoint: Vector2, hedSetOpacity: Float, mask2SetOpacity: Float, mask1SetOpacity: Float, hedFillVisible: Bool, mask2Visible: Bool, mask1Visible: Bool) -> Bool {
 
   if NotEquals(this.m_isMaskingInVehiclesEnabledFGGF,false) {
     let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
@@ -111,11 +111,13 @@ private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhosting
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -125,11 +127,13 @@ private cb func OnFrameGenGhostingFixCameraTPPCarFasterEvent(evt: ref<FrameGenGh
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -139,11 +143,13 @@ private cb func OnFrameGenGhostingFixCameraTPPCarSlowEvent(evt: ref<FrameGenGhos
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -153,11 +159,13 @@ private cb func OnFrameGenGhostingFixCameraTPPCarCrawlEvent(evt: ref<FrameGenGho
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
 }
 
 //TPP Far Car---------------------------------------------------------------------------------------
@@ -168,11 +176,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhost
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -182,11 +192,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarFasterEvent(evt: ref<FrameGe
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -196,11 +208,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarSlowEvent(evt: ref<FrameGenG
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -210,11 +224,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarCrawlEvent(evt: ref<FrameGen
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
 }
 
 //FPP Car---------------------------------------------------------------------------------------
@@ -225,11 +241,13 @@ private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhosting
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -239,11 +257,13 @@ private cb func OnFrameGenGhostingFixCameraFPPCarFasterEvent(evt: ref<FrameGenGh
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -253,11 +273,13 @@ private cb func OnFrameGenGhostingFixCameraFPPCarSlowEvent(evt: ref<FrameGenGhos
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -267,11 +289,13 @@ private cb func OnFrameGenGhostingFixCameraFPPCarCrawlEvent(evt: ref<FrameGenGho
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 //Setting masks when changing cameras on a bike---------------------------------------------------------------------------------------
@@ -283,11 +307,13 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostin
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -297,11 +323,13 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeFasterEvent(evt: ref<FrameGenG
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -311,11 +339,13 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeSlowEvent(evt: ref<FrameGenGho
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -325,11 +355,13 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeCrawlEvent(evt: ref<FrameGenGh
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
 }
 
 //TPP Far Bike---------------------------------------------------------------------------------------
@@ -340,11 +372,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhos
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.03, 0.07, 0.07, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -354,11 +388,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeFasterEvent(evt: ref<FrameG
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.02, 0.05, 0.05, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -368,11 +404,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeSlowEvent(evt: ref<FrameGen
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.035, 0.035, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -382,11 +420,13 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeCrawlEvent(evt: ref<FrameGe
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.01, 0.02, 0.02, true, true, true);
 }
 
 //FPP Bike---------------------------------------------------------------------------------------
@@ -397,11 +437,13 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -411,11 +453,13 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeFasterEvent(evt: ref<FrameGenG
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -425,11 +469,13 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeSlowEvent(evt: ref<FrameGenGho
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -439,11 +485,13 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeCrawlEvent(evt: ref<FrameGenGh
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.0, true, true, true);
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
@@ -470,11 +518,13 @@ private cb func OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent(evt: ref<Frame
   let hedSetSize: Vector2 = new Vector2(4240.0, 1440.0);
   let mask2SetMargin: Vector2 = new Vector2(1920.0, 1700.0);
   let mask2SetSize: Vector2 = new Vector2(7680.0, 1200.0);
+  let mask2SetRotation: Float = 0.0;
   let mask1Margin: Vector2 = new Vector2(1920, 1300.0);
   let mask1SetSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let mask1SetRotation: Float = 0.0;
   let setAnchorPoint: Vector2 = new Vector2(0.5, 0.25);
 
-  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask1Margin, mask1SetSize, setAnchorPoint, 0.0, 0.0, 0.03, false, false, true);
+  this.OnFrameGenGhostingFixVehicleSetTransition(hedSetMargin, hedSetSize, mask2SetMargin, mask2SetSize, mask2SetRotation, mask1Margin, mask1SetSize, mask1SetRotation, setAnchorPoint, 0.0, 0.0, 0.03, false, false, true);
 }
 
 //Setting context for vehicles masks start here---------------------------------------------------------------------------------------

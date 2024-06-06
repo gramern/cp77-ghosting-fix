@@ -1,4 +1,4 @@
---FrameGen Ghosting Fix 4.1.2xl
+--FrameGen Ghosting Fix 4.1.4xl
 
 local Vectors = {
   Camera = {
@@ -130,6 +130,7 @@ local Vectors = {
       },
       multiplyFactor = 1,
       Position = nil,
+      rotation = 0,
       Scale = {x = 100, y = 100},
       CachedScale = {x = 100, y = 100},
       Size = {x = nil, y = nil},
@@ -148,6 +149,7 @@ local Vectors = {
       },
       multiplyFactor = 1,
       Position = nil,
+      rotation = 0,
       Scale = {x = 100, y = 100},
       CachedScale = {x = 100, y = 100},
       Size = {x = nil, y = nil},
