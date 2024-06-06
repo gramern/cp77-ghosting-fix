@@ -1,15 +1,21 @@
-# FrameGen Ghosting 'Fix' mod for Cyberpunk 2077
+# FrameGen Ghosting 'Fix' Preem Compatibility Edition - ArchiveXL mod for Cyberpunk 2077
 Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achieves that by putting almost invisible HUD masks that block frame generation from presenting in certain parts of a screen.
 
-This repo's goal is to serve as a small, literal repository for some modules of the mod only that will be updated with time. I'll keep publishing all files and releases on Nexus for now.
+**Improved compatibility with other mods compared to the 'classic' version.**
+
+Since 4.8.0xl-alpha2, the 'xl' edition becomes the base for the `develop` branch.
 
 # Requirements
 + Cyberpunk 2.12+
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.31.0+
++ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
 
 # Intended results
-Given the way mod impacts the image shown on the screen, there must be at least 45 base fps before turning FSR 3 frame generation on to achieve acceptable perceived smoothness.
+Since 4.0.0-alpha, thanks to the major change in how masks are projected (uses the game's world space-to-screen space method, vehicle's position and camera data to project and transform masks in real-time), the mod is usable with FSR3 FG ON in lower framerates (30+ fps interpolated 60+ fps e.g.). The new masks projection algorythm in 4.8.0xl-alpha2 brings further improvements in smootheness in lower framerates.
+
+# Using the repo from within the mod's WolvenKit project folder
+The repo is configured to be placed 'as is' in the `source` folder of the mod's WolvenKit project. To avoid `*.reds` files being indexed twice by Redscript extensions for VSCode, open the `source` folder in the IDE directly.
 
 # The mod's whiteboard on Miro (rough design notes)
 [https://miro.com/app/board/uXjVNrZBovU=/](https://miro.com/app/board/uXjVNrZBovU=/)
