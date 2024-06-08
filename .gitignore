@@ -1,6 +1,6 @@
-/archive
 /customSounds
 /raw
+*.inkhud
 *.cpmodproj
 *.log
 *.sql
