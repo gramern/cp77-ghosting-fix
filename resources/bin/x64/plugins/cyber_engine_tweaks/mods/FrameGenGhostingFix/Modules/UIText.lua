@@ -1,6 +1,7 @@
 --FrameGen Ghosting Fix 4.8.0xl-alpha2
 
 local UIText = {
+  __VERSION_NUMBER = 480,
   General = {
     modname_log = "[FrameGen Ghosting 'Fix']",
     title_general = "General Settings:",
@@ -24,7 +25,8 @@ local UIText = {
     settings_default = "Set to default",
     info_aim_onfoot = "[ ! ] You can enable one aiming/blocking feature at once.",
     info_version = "Mod version:",
-    info_diagnostics = "Potential conflicts with other mods detected. Starting the diagnostics module..."
+    info_diagnostics = "Potential conflicts with other mods detected.",
+    info_config = "Can't find the 'Config' module. The mod won't work..."
   },
   Info = {
     tabname = "Info",
@@ -84,12 +86,13 @@ local UIText = {
     enabledWindow = "Keep this window open",
     tooltipWindow = "Keeps this window opened after closing CET's overlay.",
     Benchmark = {
-      currentFps = "Current FPS w/o FG:",
-      currentFrametime = "Current Frame-Time w/o FG (ms):",
-      averageFps = "Average FPS w/o FG:",
-      benchmark = "Benchmark running:",
+      currentFps = "Current FPS without Frame Gen:",
+      currentFrametime = "Current Frame-Time without Frame Gen (ms):",
+      averageFps = "Average FPS without Frame Gen:",
+      benchmark = "Benchmark enabled:",
       benchmarkTime = "Benchmark remaining time (s):",
       benchmarkPause = "[ ! ] Benchmark is paused. Unpause the game to continue.",
+      benchmarkRestart = "[ ! ] Benchmark restarting in:",
       benchmarkRun = "Run benchmark",
       benchmarkSaveSettings = "Save suggested settings",
       benchmarkRevertSettings = "Revert to my settings",

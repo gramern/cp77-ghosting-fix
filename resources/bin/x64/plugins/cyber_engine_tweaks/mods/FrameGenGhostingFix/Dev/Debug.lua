@@ -1,15 +1,32 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha
-
 local Debug = {
+  __VERSION_NUMBER = 480,
   currentFps = 0,
+  isGamePaused = true,
+  masksController = nil,
+  masksControllerReady = false,
 }
 
 local Calculate = require("Modules/Calculate")
+local Diagnostics = require("Modules/Diagnostics")
+local Presets = require("Modules/Presets")
+local Settings = require("Modules/Settings")
 local Vectors = require("Modules/Vectors")
+
+local ImGui = ImGui
+local ImGuiCol = ImGuiCol
 
 function Debug.DebugUI()
   if ImGui.BeginTabItem("General Data") then
     ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.1
+    ImGui.Text("Diagnostics:")
+    if Diagnostics then
+      ImGui.Text("Mods Compatibility:")
+      ImGui.SameLine()
+      ImGui.Text(tostring(Diagnostics.modscompatibility))
+    else
+      ImGui.Text("Diagnostics module not present")
+    end
+    ImGui.Separator()
     ImGui.Text("Screen Resolution:")
     ImGui.SameLine()
     ImGui.Text(tostring(Vectors.Screen.Real.width))
@@ -23,9 +40,33 @@ function Debug.DebugUI()
     ImGui.SameLine()
     ImGui.Text(tostring(Debug.currentFps))
     ImGui.Separator()
+    ImGui.Text("Masks Controller:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Debug.masksController))
+    ImGui.Text("For Presets Module")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Presets.masksController))
+    ImGui.Text("For Settings Module")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Settings.masksController))
+    ImGui.Separator()
+    ImGui.Text("Is Masks Controller Ready:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Debug.masksControllerReady))
+    ImGui.Text("For Settings Module")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Settings.masksControllerReady))
+    ImGui.Text("For Vectors Module")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.VehMasks.masksControllerReady))
+    ImGui.Separator()
     ImGui.Text("Masking enabled:")
     ImGui.SameLine()
     ImGui.Text(tostring(Vectors.VehMasks.enabled))
+    ImGui.Separator()
+    ImGui.Text("Is Game Paused:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Debug.isGamePaused))
     ImGui.Separator()
     ImGui.Text("Vehicles HED Mask Size:")
     if Vectors.VehMasks.HorizontalEdgeDown.Size.x then

@@ -1,9 +1,10 @@
 local FrameGenGhostingFix = {
-  __NAME        = "FrameGen Ghosting 'Fix'",
-  __EDITION     = "IV",
-  __VERSION     = "4.8.0xl-alpha2",
+  __NAME= "FrameGen Ghosting 'Fix'",
+  __VERSION = "4.8.0",
+  __VERSION_NUMBER = 480,
+  __VERSION_STATUS = "alpha3",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
-  __LICENSE     = [[
+  __LICENSE = [[
     MIT License
 
     Copyright (c) 2024 gramern (scz_g)
@@ -28,42 +29,65 @@ local FrameGenGhostingFix = {
   ]],
 }
 
+--modules
 local Calculate = require("Modules/Calculate")
 local Config = require("Modules/Config")
 local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
-local SettingsCtrl = require("Modules/SettingsCtrl")
+local Settings = require("Modules/Settings")
 local UIText = require("Modules/UIText")
 local Vectors = require("Modules/Vectors")
 
+--scopes
 local floor = math.floor
+local io = io
+local json = json
+local ImGui = ImGui
+local ImGuiCol = ImGuiCol
+local ImGuiCond = ImGuiCond
+local ImGuiStyleVar = ImGuiStyleVar
+local ImGuiWindowFlags = ImGuiWindowFlags
 
-local windowTitle = FrameGenGhostingFix.__NAME .. " " .. FrameGenGhostingFix.__EDITION
+--ui window title
+local windowTitle = Config and FrameGenGhostingFix.__NAME .. " " .. Config.__EDITION or FrameGenGhostingFix.__NAME
 
-local masksController = "gameuiCrosshairContainerController"
+--masks controller
+local masksController = nil
 local masksControllerReady = false
+
+--run diagnostics?
 local modsCompatibility = true
-local addOptions = true
-local firstRun = true
-local newInstall = true
-local userSettingsCache = {}
-local saved = false
-local appliedVeh = false
-local appliedOnFoot = false
-local isGamePaused = false
+
+--is it a first run?
+local firstRun = nil
+local newInstall = nil
+
+--speaks for itself
+local isGamePaused = nil
+local isPreGame = nil
+
+--benchmark related
 local gameDeltaTime = 0
 local currentFps = 0
 local currentFpsInt = 0
 local currentFrametime = 0
-local skipBenchmark = true
 local benchmark = false
 local benchmarkDuration = 30
 local benchmarkRemainingTime = benchmarkDuration
-local benchmarkSettings = true
+local benchmarkRestart = false
+local benchmarkRestartDuration = 4
+local benchmarkRestartTime = 0
+local benchmarkRestartRemaining = benchmarkRestartDuration
 local benchmarkTime = 0
 local averageFps = 0
 local countFps = 0
+
+--user settings related
+local userSettingsCache = {}
+local saved = false
+local appliedVeh = false
+local appliedOnFoot = false
 
 --default settings
 local enabledDebug = false
@@ -75,30 +99,127 @@ local enabledFPPVignetteAimOnFoot = false
 local enabledFPPVignetteOnFoot = false
 local enabledFPPVignettePermamentOnFoot = false
 
+--ui settings names
+local windshieldSettingsEnabled
+local windshieldXChanged
+local windshieldYChanged
+local fppOnFootEnabled
+local fppBlockerAimOnFootEnabled
+local fppVignetteAimOnFootEnabled
+local fppVignetteOnFootEnabled
+local fppVignettePermamentOnFootEnabled
+local vignetteFootSizeXChanged
+local vignetteFootSizeYChanged
+local vignetteFootMarginLeftChanged
+local vignetteFootMarginTopChanged
+
+
+function CheckVersion()
+  if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
+
+  if Config.MaskingGlobal.masksController ~= "IronsightGameController" then
+    FrameGenGhostingFix.__VERSION_SUFFIX = "xl"
+  else
+    FrameGenGhostingFix.__VERSION_SUFFIX = ""
+  end
+
+  FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
+end
+
 --set for available modules
-function CheckModules()
+function LoadModules()
   if Debug then
     enabledDebug = true
     enabledWindow = true
   return end
 
   if Diagnostics then
+    Diagnostics.CheckModsCompatibility()
+
     modsCompatibility = Diagnostics.modsCompatibility
 
-    if not Diagnostics.modsCompatibility then
+    if not modsCompatibility then
       print(UIText.General.modname_log,UIText.General.info_diagnostics)
     end
   end
 end
 
-function ModStarter()
-  Observe(masksController, 'OnPlayerAttach', function()
-    masksControllerReady = true
-  end)
+function LoadMasksController()
+  if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
+
+  masksController = Config.MaskingGlobal.masksController
+
+  if Debug then
+    Debug.masksController = masksController
+  end
+
+  if Presets then
+    Presets.masksController = masksController
+  end
+
+  if Settings then
+    Settings.masksController = masksController
+  end
+
+end
+
+function ObserveMasksController()
+  if masksController then
+    Observe(masksController, 'OnPlayerAttach', function()
+      masksControllerReady = true
+    end)
+
+    Observe(masksController, 'OnPlayerDetach', function()
+      masksControllerReady = false
+    end)
+
+    if Debug then
+      Debug.masksControllerReady = masksControllerReady
+    end
+
+    if Settings then
+      Settings.masksControllerReady = masksControllerReady
+    end
+
+    if Vectors then
+      Vectors.VehMasks.masksControllerReady = masksControllerReady
+    end
+  end
+end
+
+function FirstRun()
+  firstRun = true
+  NewInstall()
+  StartBenchmark()
+end
+
+function AfterFirstRun()
+  firstRun = false
+end
+
+function NewInstall()
+  newInstall = true
+end
+
+function AfterNewInstall()
+  newInstall = false
 end
 
 function GetGameState()
   isGamePaused = Game.GetSystemRequestsHandler():IsGamePaused()
+  isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
+
+  if Debug then
+    Debug.isGamePaused = isGamePaused
+  end
+
+  if Presets then
+    Presets.isGamePaused = isGamePaused
+  end
+
+  if Vectors then
+    Vectors.Game.isGamePaused = isGamePaused
+  end
 end
 
 function GetFps(deltaTime)
@@ -113,12 +234,9 @@ function GetFps(deltaTime)
   end
 
   if not masksControllerReady then return end
-  if isGamePaused then return end
+  if isGamePaused then RestartBenchmark() return end
+  if benchmarkRestart then RestartBenchmark() return end
   Benchmark()
-
-  if benchmark then return end
-  if skipBenchmark then return end
-  StartBenchmark()
 end
 
 function Benchmark()
@@ -132,12 +250,15 @@ function Benchmark()
   benchmarkRemainingTime = benchmarkDuration - benchmarkTime
 
   if benchmarkTime >= benchmarkDuration then
-    benchmark = false
-    benchmarkRemainingTime = 0
-    firstRun = false
-    newInstall = false
-    skipBenchmark = true
+    StopBenchmark()
     SetSuggestedSettings()
+
+    if not newInstall then return end
+    AfterNewInstall()
+
+    if not firstRun then return end
+    SaveUserSettings()
+    AfterFirstRun()
   end
 end
 
@@ -145,8 +266,26 @@ function StartBenchmark()
   benchmark = true
 end
 
+function RestartBenchmark()
+  benchmarkRestart = true
+
+  if isGamePaused then benchmarkRestartTime = 0 return end
+
+  benchmarkRestartTime = benchmarkRestartTime + gameDeltaTime
+  benchmarkRestartRemaining = benchmarkRestartDuration - benchmarkRestartTime
+
+  if benchmarkRestartTime >= benchmarkRestartDuration then
+    benchmarkRestart = false
+    return
+  end
+end
+
+function StopBenchmark()
+  benchmark = false
+  benchmarkRemainingTime = 0
+end
+
 function ResetBenchmark()
-  benchmarkSettings = false
   benchmarkTime = 0
   countFps = 0
   averageFps = 0
@@ -156,11 +295,11 @@ function SetSuggestedSettings()
   print(UIText.General.modname_log,UIText.General.settings_benchmarked_1,averageFps)
   print(UIText.General.modname_log,UIText.General.settings_benchmarked_2)
 
-  if averageFps >= 40 then
+  if averageFps >= 38 then
     enabledFPPOnFoot = true
   end
 
-  if averageFps >= 40 then
+  if averageFps >= 38 then
     enabledFPPBlockerAimOnFoot = true
   end
 
@@ -172,9 +311,8 @@ function SetSuggestedSettings()
     enabledFPPVignettePermamentOnFoot = true
   end
 
-  ApplyUserSettings()
-  if benchmarkSettings then
-    SaveUserSettings()
+  if Settings then
+    Settings.ApplySettings()
   end
 end
 
@@ -202,6 +340,7 @@ function LoadUserSettings()
     local userSettingsContents = file:read("*a")
     file:close()
     local userSettings = json.decode(userSettingsContents)
+    local version = nil
     userSettingsCache = userSettings or {}
 
     enabledWindshieldSettings = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.enabledWindshield or false
@@ -221,17 +360,17 @@ function LoadUserSettings()
 
     Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
 
-    firstRun = userSettings.General and userSettings.General.firstRun or false
-    newInstall = userSettings.General and userSettings.General.newInstall or false
+    version =  userSettings.General and userSettings.General.version or false
+
+    if version ~= FrameGenGhostingFix.__VERSION_NUMBER or not version then
+      NewInstall()
+    end
 
     if userSettings then
         print(UIText.General.modname_log, UIText.General.settings_loaded)
-        if not userSettings.General then
-          newInstall = true
-        end
     end
   else
-    skipBenchmark = false
+    FirstRun()
     SetAnotherDefaultPreset()
     Vectors.SetWindshieldDefault()
     Calculate.SetVignetteDefault()
@@ -255,11 +394,8 @@ function LoadUserSettingsCache()
   Calculate.FPPOnFoot.vignetteFootMarginTop = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootMarginTop or Calculate.FPPOnFoot.vignetteFootMarginTop
   Calculate.FPPOnFoot.vignetteFootSizeX = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
   Calculate.FPPOnFoot.vignetteFootSizeY = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
-  
+
   Presets.selectedPreset = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPreset or Presets.selectedPreset
-  
-  firstRun = userSettingsCache.General and userSettingsCache.General.firstRun or false
-  newInstall = userSettingsCache.General and userSettingsCache.General.newInstall or false
 
   if userSettingsCache then
     print(UIText.General.modname_log, UIText.General.settings_loaded)
@@ -291,8 +427,7 @@ function SaveUserSettings()
       vignetteFootSizeY = Calculate.FPPOnFoot.vignetteFootSizeY
     },
     General = {
-      firstRun = firstRun,
-      newInstall = newInstall,
+      version = FrameGenGhostingFix.__VERSION_NUMBER,
     }
   }
   userSettingsCache = userSettings or {}
@@ -308,58 +443,29 @@ function SaveUserSettings()
   end
 end
 
-function UpdateUserSettings()
-  if SettingsCtrl then
-    SettingsCtrl.enabledFPPOnFoot = enabledFPPOnFoot
-    SettingsCtrl.enabledFPPBlockerAimOnFoot = enabledFPPBlockerAimOnFoot
-    SettingsCtrl.enabledFPPVignetteAimOnFoot = enabledFPPVignetteAimOnFoot
-    SettingsCtrl.enabledFPPVignetteOnFoot = enabledFPPVignetteOnFoot
-    SettingsCtrl.enabledFPPVignettePermamentOnFoot = enabledFPPVignettePermamentOnFoot
-  end
-end
-function CheckCrossSetting()
-  if enabledFPPBlockerAimOnFoot then
-    enabledFPPVignetteAimOnFoot = false
-  end
+function UpdateSettings()
+  if Settings then
+    Settings.enabledFPPOnFoot = enabledFPPOnFoot
+    Settings.enabledFPPBlockerAimOnFoot = enabledFPPBlockerAimOnFoot
+    Settings.enabledFPPVignetteAimOnFoot = enabledFPPVignetteAimOnFoot
+    Settings.enabledFPPVignetteOnFoot = enabledFPPVignetteOnFoot
+    Settings.enabledFPPVignettePermamentOnFoot = enabledFPPVignettePermamentOnFoot
 
-  if enabledFPPVignetteAimOnFoot then
-    enabledFPPBlockerAimOnFoot = false
-  end
-end
+    Settings.CheckCrossSetting()
 
-function SaveUserSettingsOnFootLog()
-  print(UIText.General.modname_log,UIText.General.settings_saved_onfoot)
-  appliedOnFoot = true
-end
-
-function ApplyMaskingInVehiclesGlobal()
-  Vectors.VehMasks.enabled = Config.MaskingInVehiclesGlobal.enabled
-
-  Override(masksController, 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
-    local originalFunction = wrappedMethod()
-
-    if Config.MaskingInVehiclesGlobal.enabled then return originalFunction end
-    self:FrameGenGhostingFixVehicleToggle(false)
-  end)
-end
-
---apply user settings
-function ApplyUserSettings()
-  ApplyMaskingInVehiclesGlobal()
-  if SettingsCtrl then
-    SettingsCtrl.ApplyMasksOnFoot()
-    SettingsCtrl.ApplyBlockerAimOnFoot()
-    SettingsCtrl.ApplyVignetteAimOnFoot()
-    SettingsCtrl.ApplyVignetteOnFoot()
-    SettingsCtrl.TurnOffLiveViewWindshieldEditor()
-    SettingsCtrl.TurnOffLiveViewVignetteOnFootEditor()
+    appliedVeh = Settings.appliedVeh
+    appliedOnFoot = Settings.appliedOnFoot
+    enabledFPPBlockerAimOnFoot = Settings.enabledFPPBlockerAimOnFoot
+    enabledFPPVignetteAimOnFoot = Settings.enabledFPPVignetteAimOnFoot
   end
 end
 
 --initialize all stuff etc
 registerForEvent("onInit", function()
-  Diagnostics.CheckModsCompatibility()
-  CheckModules()
+  CheckVersion()
+  LoadModules()
+  LoadMasksController()
+  ObserveMasksController()
   Calculate.CalcAspectRatio()
   Calculate.GetAspectRatio()
   SetDefaultPreset()
@@ -378,7 +484,7 @@ registerForEvent("onInit", function()
   Calculate.VignetteX()
   Calculate.VignetteY()
   Calculate.SetHEDSize()
-  ApplyUserSettings()
+  Settings.ApplySettings()
 end)
 
 registerForEvent("onOverlayOpen", function()
@@ -389,8 +495,6 @@ registerForEvent("onOverlayClose", function()
   if not enabledWindow then
     OverlayEnabled = false
   end
-
-  appliedOnFoot = false
 
   Calculate.CalcAspectRatio()
   Calculate.GetAspectRatio()
@@ -403,28 +507,26 @@ registerForEvent("onOverlayClose", function()
   Calculate.VignetteX()
   Calculate.VignetteY()
   Calculate.SetHEDSize()
-  ApplyUserSettings()
+  Settings.LogResetOnFoot()
+  Settings.ApplySettings()
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
   GetGameState()
-  Vectors.GetCameraData()
-  Vectors.GetPlayerData()
-  Vectors.ProjectVehicleMasks()
-  if isGamePaused then return end
   if deltaTime == 0 then return end
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
-  if masksControllerReady then return end
-  ModStarter()
+  if isGamePaused then return end
+  Vectors.GetCameraData()
+  Vectors.GetPlayerData()
+  Vectors.ProjectVehicleMasks()
+  if not masksController then return end
+  ObserveMasksController()
 end)
 
 -- draw a ImGui window
 registerForEvent("onDraw", function()
-  if SettingsCtrl then
-    UpdateUserSettings()
-    CheckCrossSetting()
-  end
+  UpdateSettings()
 
   if OverlayEnabled then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
@@ -472,30 +574,45 @@ registerForEvent("onDraw", function()
         if newInstall then
           if ImGui.BeginTabItem(UIText.Info.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-            if not firstRun then
-              ImGui.Text(UIText.Info.benchmarkAsk)
-            else
+            if firstRun then
               ImGui.Text(UIText.Info.benchmark)
+            else
+              ImGui.Text(UIText.Info.benchmarkAsk)
+            end
+            if isGamePaused then
+              ImGui.Text("")
+              ImGui.Text(UIText.Options.Benchmark.benchmarkPause)
+            else
+              if benchmarkRestart then
+                ImGui.Text("")
+                ImGui.Text(UIText.Options.Benchmark.benchmarkRestart)
+                ImGui.SameLine()
+                ImGui.Text(tostring(benchmarkRestartRemaining))
+              else
+                if not isPreGame then
+                  ImGui.Text("")
+                  ImGui.Text(UIText.Options.Benchmark.currentFps)
+                  ImGui.SameLine()
+                  ImGui.Text(tostring(currentFpsInt))
+                  ImGui.Text(UIText.Options.Benchmark.currentFrametime)
+                  ImGui.SameLine()
+                  ImGui.Text(tostring(currentFrametime))
+                end
+              end
             end
             ImGui.Text("")
             ImGui.Text(UIText.Info.benchmarkRemaining)
             ImGui.SameLine()
             ImGui.Text(tostring(benchmarkRemainingTime))
-            if isGamePaused then
-              ImGui.Text("")
-              ImGui.Text(UIText.Options.Benchmark.benchmarkPause)
-            end
             ImGui.PopStyleColor()
-            if not firstRun then
+            if not firstRun and not benchmark then
               ImGui.Text("")
               if ImGui.Button(UIText.General.yes, 240, 40) then
-                firstRun = true
                 StartBenchmark()
               end
               ImGui.SameLine()
               if ImGui.Button(UIText.General.no, 240, 40) then
-                firstRun = false
-                newInstall = false
+                AfterNewInstall()
                 SaveUserSettings()
               end
             end
@@ -520,7 +637,7 @@ registerForEvent("onDraw", function()
               end
               if preset_selected then
                 ImGui.SetItemDefaultFocus()
-                appliedVeh = false
+                Settings.LogResetVehicles()
               end
             end
             ImGui.EndCombo()
@@ -535,7 +652,7 @@ registerForEvent("onDraw", function()
             SaveUserSettings()
             Presets.LoadPreset()
             Presets.ApplyPreset()
-            appliedVeh = true
+            Settings.LogApplyVehicles()
           end
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
           if Presets.selectedPresetPosition then
@@ -556,9 +673,9 @@ registerForEvent("onDraw", function()
             ImGui.Text(UIText.General.settings_applied_veh)
             ImGui.PopStyleColor() --PSC.3
           end
-          if Config.MaskingInVehiclesGlobal.enabled then
+          if Config.MaskingGlobal.enabled then
             --additional settings interface starts------------------------------------------------------------------------------------------------------------------
-            if SettingsCtrl then
+            if Settings then
               ImGui.Text("")
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
               ImGui.Text(UIText.General.title_fps90)
@@ -586,7 +703,7 @@ registerForEvent("onDraw", function()
                     if windshieldXChanged then
                       -- Vectors.ResizeBikeWindshieldMask()
                       saved = false
-                      SettingsCtrl.TurnOnLiveViewWindshieldEditor()
+                      Settings.TurnOnLiveViewWindshieldEditor()
                     end
                   ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
                   ImGui.Text(UIText.Vehicles.Windshield.setting_2)
@@ -595,7 +712,7 @@ registerForEvent("onDraw", function()
                     if windshieldYChanged then
                       -- Vectors.ResizeBikeWindshieldMask()
                       saved = false
-                      SettingsCtrl.TurnOnLiveViewWindshieldEditor()
+                      Settings.TurnOnLiveViewWindshieldEditor()
                     end
                   ImGui.Text("")
                   ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.7
@@ -606,7 +723,7 @@ registerForEvent("onDraw", function()
                   if ImGui.Button(UIText.General.settings_default, 240, 40) then
                     saved = false
                     Vectors.SetWindshieldDefault()
-                    SettingsCtrl.DefaultLiveViewWindshieldEditor()
+                    Settings.DefaultLiveViewWindshieldEditor()
                   end
                   ImGui.SameLine()
                   if ImGui.Button(UIText.General.settings_save, 240, 40) then
@@ -628,7 +745,7 @@ registerForEvent("onDraw", function()
           end
           ImGui.EndTabItem()
         end
-        if SettingsCtrl then
+        if Settings then
           if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.9
             ImGui.Text(UIText.General.title_general)
@@ -636,7 +753,7 @@ registerForEvent("onDraw", function()
             enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
             if fppOnFootEnabled then
               SaveUserSettings()
-              SaveUserSettingsOnFootLog()
+              Settings.LogApplyOnFoot()
             end
             ImGui.PopStyleColor()--PSC.9
             if ImGui.IsItemHovered() then
@@ -650,7 +767,7 @@ registerForEvent("onDraw", function()
               if fppBlockerAimOnFootEnabled then
                 enabledFPPVignetteAimOnFoot = false
                 SaveUserSettings()
-                SaveUserSettingsOnFootLog()
+                Settings.LogApplyOnFoot()
               end
               ImGui.PopStyleColor() --PSC.10
               if ImGui.IsItemHovered() then
@@ -676,7 +793,7 @@ registerForEvent("onDraw", function()
               if fppVignetteAimOnFootEnabled then
                 enabledFPPBlockerAimOnFoot = false
                 SaveUserSettings()
-                SaveUserSettingsOnFootLog()
+                Settings.LogApplyOnFoot()
               end
               ImGui.PopStyleColor() --PSC.13
               if ImGui.IsItemHovered() then
@@ -695,7 +812,7 @@ registerForEvent("onDraw", function()
             enabledFPPVignetteOnFoot, fppVignetteOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.Vignette.name, enabledFPPVignetteOnFoot)
             if fppVignetteOnFootEnabled then
               SaveUserSettings()
-              SaveUserSettingsOnFootLog()
+              Settings.LogApplyOnFoot()
             end
             ImGui.PopStyleColor() --PSC.15
             if ImGui.IsItemHovered() then
@@ -708,7 +825,7 @@ registerForEvent("onDraw", function()
               enabledFPPVignettePermamentOnFoot, fppVignettePermamentOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignettePermament.name, enabledFPPVignettePermamentOnFoot)
               if fppVignettePermamentOnFootEnabled then
                 SaveUserSettings()
-                SaveUserSettingsOnFootLog()
+                Settings.LogApplyOnFoot()
               end
               ImGui.PopStyleColor() --PSC.16
               if ImGui.IsItemHovered() then
@@ -731,7 +848,7 @@ registerForEvent("onDraw", function()
                   Calculate.VignetteCalcMarginX()
                   Calculate.VignetteX()
                   saved = false
-                  SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
+                  Settings.TurnOnLiveViewVignetteOnFootEditor()
                 end
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.18
               ImGui.Text(UIText.OnFoot.Vignette.setting_2)
@@ -741,7 +858,7 @@ registerForEvent("onDraw", function()
                   Calculate.VignetteCalcMarginY()
                   Calculate.VignetteY()
                   saved = false
-                  SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
+                  Settings.TurnOnLiveViewVignetteOnFootEditor()
                 end
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.19
               ImGui.Text(UIText.OnFoot.Vignette.setting_3)
@@ -751,7 +868,7 @@ registerForEvent("onDraw", function()
                   Calculate.VignetteCalcMarginX()
                   Calculate.VignettePosX()
                   saved = false
-                  SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
+                  Settings.TurnOnLiveViewVignetteOnFootEditor()
                 end
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.20
               ImGui.Text(UIText.OnFoot.Vignette.setting_4)
@@ -761,7 +878,7 @@ registerForEvent("onDraw", function()
                   Calculate.VignetteCalcMarginY()
                   Calculate.VignettePosY()
                   saved = false
-                  SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
+                  Settings.TurnOnLiveViewVignetteOnFootEditor()
                 end
               ImGui.Text("")
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.21
@@ -772,13 +889,13 @@ registerForEvent("onDraw", function()
               if ImGui.Button(UIText.General.settings_default, 240, 40) then
                 saved = false
                 Calculate.SetVignetteDefault()
-                SettingsCtrl.TurnOnLiveViewVignetteOnFootEditor()
+                Settings.TurnOnLiveViewVignetteOnFootEditor()
               end
               ImGui.SameLine()
               if ImGui.Button(UIText.General.settings_save, 240, 40) then
                 saved = true
                 SaveUserSettings()
-                SaveUserSettingsOnFootLog()
+                Settings.LogApplyOnFoot()
               end
             else
               enabledFPPVignettePermamentOnFoot = false
@@ -794,7 +911,7 @@ registerForEvent("onDraw", function()
         end
         --additional settings interface ends------------------------------------------------------------------------------------------------------------------
         --advanced options interface starts------------------------------------------------------------------------------------------------------------------
-        if addOptions and not newInstall then
+        if not newInstall then
           if ImGui.BeginTabItem(UIText.Options.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
             if Debug then
@@ -830,6 +947,14 @@ registerForEvent("onDraw", function()
               ImGui.Text("")
               if isGamePaused then
                 ImGui.Text(UIText.Options.Benchmark.benchmarkPause)
+                ImGui.Text("")
+              else
+                if benchmarkRestart then
+                  ImGui.Text(UIText.Options.Benchmark.benchmarkRestart)
+                  ImGui.SameLine()
+                  ImGui.Text(tostring(benchmarkRestartRemaining))
+                  ImGui.Text("")
+                end
               end
               ImGui.PopStyleColor()
               if not benchmark then
@@ -851,7 +976,7 @@ registerForEvent("onDraw", function()
               if benchmarkTime >= benchmarkDuration then
                 if ImGui.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 240, 40) then
                   LoadUserSettingsCache()
-                  ApplyUserSettings()
+                  Settings.ApplySettings()
                 end
                 ImGui.SameLine()
                 if not saved then
@@ -863,9 +988,11 @@ registerForEvent("onDraw", function()
               end
               ImGui.Separator()
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-              ImGui.Text(UIText.General.info_version)
-              ImGui.SameLine()
-              ImGui.Text(FrameGenGhostingFix.__VERSION)
+              if FrameGenGhostingFix.__VERSION then
+                ImGui.Text(UIText.General.info_version)
+                ImGui.SameLine()
+                ImGui.Text(FrameGenGhostingFix.__VERSION)
+              end
               ImGui.PopStyleColor()
             end
             ImGui.EndTabItem()

@@ -1,8 +1,9 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local Config = {
-  MaskingInVehiclesGlobal = {
-    enabled = true
+  __EDITION = "IV",
+  __VERSION_NUMBER = 480,
+  MaskingGlobal = {
+    enabled = true,
+    masksController = "gameuiCrosshairContainerController"
   },
   Vectors = {
     VehElements = {
@@ -74,7 +75,7 @@ local Config = {
     }
   },
   Default = {
-    MaskingInVehiclesGlobal = {
+    MaskingGlobal = {
       enabled = true
     },
     Vectors = {

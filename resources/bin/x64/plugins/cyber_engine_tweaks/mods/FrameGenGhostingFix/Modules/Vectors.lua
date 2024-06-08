@@ -1,6 +1,5 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local Vectors = {
+  __VERSION_NUMBER = 480,
   Camera = {
     Forward = nil,
     ForwardTable = {
@@ -26,6 +25,9 @@ local Vectors = {
     },
     Right = nil,
     Up = nil,
+  },
+  Game = {
+    isGamePaused = true,
   },
   PlayerBody = {
     dotProductMedian = nil,
@@ -316,6 +318,7 @@ local Vectors = {
       ScreenSpace = {x = 0, y = 0},
       visible = true
     },
+    masksControllerReady = nil,
     opacity = 0,
     opacityMax = 0.05
   },
@@ -1459,15 +1462,19 @@ function Vectors.SetVisibleVehMasks()
 end
 
 function Vectors.ProjectVehicleMasks()
-  if Vectors.Vehicle.isMounted and Vectors.VehMasks.enabled then
-    Vectors.GetVehicleData()
-    Vectors.GetDotProducts()
-    Vectors.GetCameraAnglesVehicle()
-    Vectors.GetDerivativeVehicleData()
-    Vectors.GetActivePerspective()
-    Vectors.FlushSizeCache()
-    Vectors.SetVisibleVehMasks()
-    Vectors.TransformVehMasks()
+  if Vectors.VehMasks.masksControllerReady then
+    if not Vectors.Game.isGamePaused then
+      if Vectors.Vehicle.isMounted and Vectors.VehMasks.enabled then
+        Vectors.GetVehicleData()
+        Vectors.GetDotProducts()
+        Vectors.GetCameraAnglesVehicle()
+        Vectors.GetDerivativeVehicleData()
+        Vectors.GetActivePerspective()
+        Vectors.FlushSizeCache()
+        Vectors.SetVisibleVehMasks()
+        Vectors.TransformVehMasks()
+      end
+    end
   end
 end
 

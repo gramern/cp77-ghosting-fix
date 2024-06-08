@@ -1,5 +1,5 @@
 local Preset = {
-  MaskingInVehiclesGlobal = {
+  MaskingGlobal = {
     enabled = false
   },
   Vectors = {
