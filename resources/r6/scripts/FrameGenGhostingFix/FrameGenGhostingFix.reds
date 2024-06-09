@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl-alpha2, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 4.8.0xl-alpha4, 2024 gramern (scz_g)
 
 //CET add-on customization---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixFPPBikeWindshieldEditorEvent extends Event {}
@@ -14,7 +14,8 @@ public class FrameGenGhostingFixCameraTPPBikeEvent extends Event {}
 public class FrameGenGhostingFixCameraTPPFarBikeEvent extends Event {}
 public class FrameGenGhostingFixCameraFPPBikeEvent extends Event {}
 //Vehicles masks deacitvation---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixDeActivationVehicleEvent extends Event {}
+public class FrameGenGhostingFixDeactivationMasksVehicleEvent extends Event {}
+public class FrameGenGhostingFixDeactivationHEDVehicleEvent extends Event {}
 
 //Masks set transformation methods-------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)

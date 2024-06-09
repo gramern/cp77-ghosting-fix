@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl-alpha2, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.8.0xl-alpha4, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_onFootLoopID: DelayID;
 
@@ -162,8 +162,11 @@ protected cb func OnInitialize() -> Bool {
   let fgfix = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root") as inkCompoundWidget;
   fgfix.SetName(n"fgfix");
 
-  let deactivationEvent: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
-  this.OnFrameGenGhostingFixDeActivationVehicleEvent(deactivationEvent);
+  let hedDeactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(hedDeactivationEvent);
+
+  let masksDeactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(masksDeactivationEvent);
 }
 
 @wrapMethod(gameuiCrosshairContainerController)

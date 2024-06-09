@@ -190,6 +190,7 @@ function Debug.DebugUI()
   end
   if ImGui.BeginTabItem("Vehicle Data") then
     ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.3
+    ImGui.Separator()
     ImGui.Text("Is in a Vehicle:")
     ImGui.SameLine()
     if Vectors.Vehicle.isMounted then
@@ -207,11 +208,13 @@ function Debug.DebugUI()
         ImGui.SameLine()
         ImGui.Text(tostring(Vectors.Vehicle.vehicleID.value))
       end
+      ImGui.Separator()
       ImGui.Text("Vehicle Current Speed:")
       if Vectors.Vehicle.currentSpeed then
         ImGui.SameLine()
         ImGui.Text(tostring(Vectors.Vehicle.currentSpeed))
       end
+      ImGui.Separator()
       ImGui.Text("Active Camera Perspective in Vehicle:")
       if Vectors.Vehicle.activePerspective then
         ImGui.SameLine()
@@ -418,6 +421,17 @@ function Debug.DebugUI()
       ImGui.SameLine()
       ImGui.Text(tostring(Vectors.VehMasks.Mask4.opacity))
     end
+    if Vectors.VehMasks.opacityDelayTime then
+      ImGui.Text("Opacity Transformation Delay Time:")
+      ImGui.SameLine()
+      ImGui.Text(tostring(Vectors.VehMasks.opacityDelayTime))
+      ImGui.Text("Normalize Opacity After Delay:")
+      ImGui.SameLine()
+      ImGui.Text(tostring(Vectors.VehMasks.opacityNormalize))
+      if Vectors.VehMasks.opacityNormalize then
+        ImGui.Text(tostring(Vectors.VehMasks.opacityNormalized))
+      end
+    end
     ImGui.Separator()
     ImGui.Text("HED Tracker Position:")
     if Vectors.VehMasks.HorizontalEdgeDown.Margin.Tracker then
@@ -490,15 +504,21 @@ function Debug.DebugUI()
     ImGui.PopStyleColor() --PSC.5
     ImGui.EndTabItem()
   end
-  -- if ImGui.BeginTabItem("V Data") then
-  --   ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
-  --   ImGui.Text("Has a Weapon in Hand:")
-  --   ImGui.SameLine()
-  --   ImGui.Text(tostring(Vectors.Vehicle.hasWeapon))
-  --   ImGui.Separator()
-  --   ImGui.PopStyleColor() --PSC.6
-  --   ImGui.EndTabItem()
-  -- end
+  if ImGui.BeginTabItem("Player Data") then
+    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
+    ImGui.Text("Is Moving:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.PlayerPuppet.isMoving))
+    ImGui.Text("Has a Weapon in Hand:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.PlayerPuppet.hasWeapon))
+    ImGui.Text("Is Mounted:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.Vehicle.isMounted))
+    ImGui.Separator()
+    ImGui.PopStyleColor() --PSC.6
+    ImGui.EndTabItem()
+  end
 end
 
 return Debug

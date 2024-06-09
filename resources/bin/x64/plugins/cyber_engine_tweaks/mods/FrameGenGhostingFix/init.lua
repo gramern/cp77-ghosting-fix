@@ -2,7 +2,8 @@ local FrameGenGhostingFix = {
   __NAME= "FrameGen Ghosting 'Fix'",
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
-  __VERSION_STATUS = "alpha3",
+  __VERSION_SUFFIX = "xl",
+  __VERSION_STATUS = "alpha4",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -119,8 +120,6 @@ function CheckVersion()
 
   if Config.MaskingGlobal.masksController ~= "IronsightGameController" then
     FrameGenGhostingFix.__VERSION_SUFFIX = "xl"
-  else
-    FrameGenGhostingFix.__VERSION_SUFFIX = ""
   end
 
   FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
@@ -227,7 +226,8 @@ function GetFps(deltaTime)
   currentFrametime = floor((deltaTime * 1000) + 0.5)
   gameDeltaTime = deltaTime
 
-  Vectors.Screen.currentFps = currentFps
+  Vectors.Game.currentFps = currentFps
+  Vectors.Game.gameDeltaTime = deltaTime
 
   if Debug then
     Debug.currentFps = currentFps
@@ -276,6 +276,7 @@ function RestartBenchmark()
 
   if benchmarkRestartTime >= benchmarkRestartDuration then
     benchmarkRestart = false
+    benchmarkRestartTime = 0
     return
   end
 end
@@ -303,11 +304,11 @@ function SetSuggestedSettings()
     enabledFPPBlockerAimOnFoot = true
   end
 
-  if averageFps >= 60 then
+  if averageFps >= 52 then
     enabledFPPVignetteOnFoot = true
   end
 
-  if averageFps >= 70 then
+  if averageFps >= 62 then
     enabledFPPVignettePermamentOnFoot = true
   end
 

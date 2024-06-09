@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl-alpha2, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.8.0xl-alpha4, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -49,8 +49,8 @@ private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) 
   
   this.m_isVehicleMountedFGGF = false;
 
-  let deactivationEvent: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
-  this.OnFrameGenGhostingFixDeActivationVehicleEvent(deactivationEvent);
+  let deactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(deactivationEvent);
 }
 
 //Global toggle for transtions, called in the main loop---------------------------------------------------------------------------------------
@@ -367,21 +367,29 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
+
 @addMethod(gameuiCrosshairContainerController)
-protected cb func OnFrameGenGhostingFixDeActivationVehicleEvent(evt: ref<FrameGenGhostingFixDeActivationVehicleEvent>)  -> Bool {
+protected cb func OnFrameGenGhostingFixDeactivationHEDVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>)  -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let hedCorners: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedCornersPath) as inkWidget;
   let hedFill: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedFillPath) as inkWidget;
   let hedTracker: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedTrackerPath) as inkWidget;
+
+  hedCorners.SetOpacity(0.0);
+  hedFill.SetOpacity(0.0);
+  hedTracker.SetOpacity(0.0);
+}
+
+@addMethod(gameuiCrosshairContainerController)
+protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>)  -> Bool {
+
+  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let mask1: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask1Path) as inkWidget;
   let mask2: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask2Path) as inkWidget;
   let mask3: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask3Path) as inkWidget;
   let mask4: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask4Path) as inkWidget;
 
-  hedCorners.SetOpacity(0.0);
-  hedFill.SetOpacity(0.0);
-  hedTracker.SetOpacity(0.0);
   mask1.SetOpacity(0.0);
   mask2.SetOpacity(0.0);
   mask3.SetOpacity(0.0);
@@ -405,10 +413,10 @@ protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Vo
 }
 
 @addMethod(DriveEvents)
-public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  let vehicleDeactivation: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
+public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleDeactivation: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
 
-  vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
+  vehicleDeactivation = new FrameGenGhostingFixDeactivationMasksVehicleEvent();
 
     scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
 }
@@ -519,23 +527,22 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
-        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
-      } else {
-        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
-        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
-      }
+      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       break;
     case gamedataVehicleType.Car:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
-        this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
-      } else {
-        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
-      }
+      this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
       break;
     default:
       break;
   }
+}
+
+@wrapMethod(DriveEvents)
+public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  wrappedMethod(stateContext,scriptInterface);
+
+  this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
+  // LogChannel(n"DEBUG", "Deactivating masks...");
 }
 
 //Setting context for vehicles masks while in combat starts here---------------------------------------------------------------------------------------
@@ -545,10 +552,10 @@ protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Vo
 }
 
 @addMethod(DriverCombatEvents)
-public final func FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  let vehicleDeactivation: ref<FrameGenGhostingFixDeActivationVehicleEvent>;
+public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleDeactivation: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
 
-  vehicleDeactivation = new FrameGenGhostingFixDeActivationVehicleEvent();
+  vehicleDeactivation = new FrameGenGhostingFixDeactivationMasksVehicleEvent();
 
     scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
 }
@@ -659,21 +666,20 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
-        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
-      } else {
-        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
-        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
-      }
+      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       break;
     case gamedataVehicleType.Car:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
-        this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
-      } else {
-        this.FrameGenGhostingFixVehicleStationaryDeactivation(scriptInterface);
-      }
+      this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
       break;
     default:
       break;
   }
+}
+
+@wrapMethod(DriverCombatEvents)
+public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  wrappedMethod(stateContext,scriptInterface);
+
+  this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
+  // LogChannel(n"DEBUG", "Deactivating masks...");
 }

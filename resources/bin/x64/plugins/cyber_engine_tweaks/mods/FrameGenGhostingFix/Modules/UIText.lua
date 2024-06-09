@@ -1,5 +1,3 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local UIText = {
   __VERSION_NUMBER = 480,
   General = {

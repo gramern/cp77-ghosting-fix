@@ -1,5 +1,5 @@
 local Settings ={ 
-   __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 480,
   appliedOnFoot = false,
   appliedVeh = false,
   enabledFPPOnFoot = false,

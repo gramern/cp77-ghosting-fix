@@ -1,6 +1,5 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local Calculate = {
+  __VERSION_NUMBER = 480,
   ScreenDetection = {
   width = nil,
   height = nil,
