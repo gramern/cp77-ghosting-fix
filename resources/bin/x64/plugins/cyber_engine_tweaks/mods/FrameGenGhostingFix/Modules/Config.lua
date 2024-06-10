@@ -70,8 +70,15 @@ local Config = {
           }
         }
       },
-      opacity = 0,
-      opacityMax = 0.05,
+      Opacity = {
+        Def = {
+          delayDuration = 1,
+          delayThreshold = 0.95,
+          max = 0.05,
+          speedFactor = 0.01,
+          stepFactor = 0.1
+        },
+      }
     }
   },
   Default = {
@@ -143,8 +150,15 @@ local Config = {
             }
           }
         },
-        opacity = 0,
-        opacityMax = 0.05,
+        Opacity = {
+          Def = {
+            delayDuration = 1,
+            delayThreshold = 0.95,
+            max = 0.05,
+            speedFactor = 0.01,
+            stepFactor = 0.1
+          },
+        }
       }
     },
     PresetInfo = {

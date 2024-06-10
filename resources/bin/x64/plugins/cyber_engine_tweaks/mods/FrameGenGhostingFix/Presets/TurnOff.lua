@@ -67,8 +67,15 @@ local Preset = {
           }
         }
       },
-      opacity = 0,
-      opacityMax = 0
+      Opacity = {
+        Def = {
+          delayDuration = 1,
+          delayThreshold = 1,
+          max = 0,
+          speedFactor = 1,
+          stepFactor = 1
+        },
+      }
     },
   },
   PresetInfo = {

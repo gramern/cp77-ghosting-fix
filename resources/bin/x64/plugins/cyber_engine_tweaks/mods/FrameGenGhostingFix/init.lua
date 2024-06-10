@@ -3,7 +3,7 @@ local FrameGenGhostingFix = {
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
   __VERSION_SUFFIX = "xl",
-  __VERSION_STATUS = "alpha4",
+  __VERSION_STATUS = "alpha5",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -176,10 +176,6 @@ function ObserveMasksController()
       Debug.masksControllerReady = masksControllerReady
     end
 
-    if Settings then
-      Settings.masksControllerReady = masksControllerReady
-    end
-
     if Vectors then
       Vectors.VehMasks.masksControllerReady = masksControllerReady
     end
@@ -210,14 +206,17 @@ function GetGameState()
 
   if Debug then
     Debug.isGamePaused = isGamePaused
+    Debug.isPreGame = isPreGame
   end
 
   if Presets then
     Presets.isGamePaused = isGamePaused
+    Presets.isPreGame = isPreGame
   end
 
   if Vectors then
     Vectors.Game.isGamePaused = isGamePaused
+    Vectors.Game.isPreGame = isPreGame
   end
 end
 
@@ -267,6 +266,7 @@ function StartBenchmark()
 end
 
 function RestartBenchmark()
+  if not benchmark then return end
   benchmarkRestart = true
 
   if isGamePaused then benchmarkRestartTime = 0 return end
@@ -345,8 +345,8 @@ function LoadUserSettings()
     userSettingsCache = userSettings or {}
 
     enabledWindshieldSettings = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.enabledWindshield or false
-    Vectors.VehMasks.Mask2.Scale.x = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.width or Vectors.VehMasks.Mask2.Scale.x
-    Vectors.VehMasks.Mask2.Scale.y = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.height or Vectors.VehMasks.Mask2.Scale.y
+    Vectors.VehMasks.Mask4.Scale.x = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.width or Vectors.VehMasks.Mask4.Scale.x
+    Vectors.VehMasks.Mask4.Scale.y = userSettings.FPPBikeWindshield and userSettings.FPPBikeWindshield.height or Vectors.VehMasks.Mask4.Scale.y
   
 
     enabledFPPOnFoot = userSettings.FPPOnFoot and userSettings.FPPOnFoot.enabledOnFoot or false
@@ -382,8 +382,8 @@ end
 
 function LoadUserSettingsCache()
   enabledWindshieldSettings = userSettingsCache.FPPBikeWindshield and userSettingsCache.FPPBikeWindshield.enabledWindshield or false
-  Vectors.VehMasks.Mask2.Scale.x = userSettingsCache.FPPBikeWindshield and userSettingsCache.FPPBikeWindshield.width or Vectors.VehMasks.Mask2.Scale.x
-  Vectors.VehMasks.Mask2.Scale.y = userSettingsCache.FPPBikeWindshield and userSettingsCache.FPPBikeWindshield.height or Vectors.VehMasks.Mask2.Scale.y
+  Vectors.VehMasks.Mask4.Scale.x = userSettingsCache.FPPBikeWindshield and userSettingsCache.FPPBikeWindshield.width or Vectors.VehMasks.Mask4.Scale.x
+  Vectors.VehMasks.Mask4.Scale.y = userSettingsCache.FPPBikeWindshield and userSettingsCache.FPPBikeWindshield.height or Vectors.VehMasks.Mask4.Scale.y
   
   
   enabledFPPOnFoot = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.enabledOnFoot or false
@@ -413,8 +413,8 @@ function SaveUserSettings()
     },
     FPPBikeWindshield = {
       enabledWindshield = enabledWindshieldSettings,
-      width = Vectors.VehMasks.Mask2.Cache.Scale.x,
-      height = Vectors.VehMasks.Mask2.Cache.Scale.y,
+      width = Vectors.VehMasks.Mask4.Cache.Scale.x,
+      height = Vectors.VehMasks.Mask4.Cache.Scale.y,
     },
     FPPOnFoot = {
       enabledOnFoot = enabledFPPOnFoot,
@@ -485,6 +485,7 @@ registerForEvent("onInit", function()
   Calculate.VignetteX()
   Calculate.VignetteY()
   Calculate.SetHEDSize()
+  UpdateSettings()
   Settings.ApplySettings()
 end)
 
@@ -513,7 +514,11 @@ registerForEvent("onOverlayClose", function()
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
+  if not masksController then return end
+  ObserveMasksController()
   GetGameState()
+  if isPreGame then return end
+  if not masksControllerReady then return end
   if deltaTime == 0 then return end
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
@@ -521,8 +526,6 @@ registerForEvent("onUpdate", function(deltaTime)
   Vectors.GetCameraData()
   Vectors.GetPlayerData()
   Vectors.ProjectVehicleMasks()
-  if not masksController then return end
-  ObserveMasksController()
 end)
 
 -- draw a ImGui window
@@ -700,18 +703,16 @@ registerForEvent("onDraw", function()
                   ImGui.Text("")
                   ImGui.Text(UIText.Vehicles.Windshield.setting_1)
                   ImGui.PopStyleColor() --PSC.5
-                  Vectors.VehMasks.Mask2.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask2.Scale.x, 70, 150, "%.0f")
+                  Vectors.VehMasks.Mask4.Scale.x, windshieldXChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,Vectors.VehMasks.Mask4.Scale.x, 70, 150, "%.0f")
                     if windshieldXChanged then
-                      -- Vectors.ResizeBikeWindshieldMask()
                       saved = false
                       Settings.TurnOnLiveViewWindshieldEditor()
                     end
                   ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
                   ImGui.Text(UIText.Vehicles.Windshield.setting_2)
                   ImGui.PopStyleColor() --PSC.6
-                  Vectors.VehMasks.Mask2.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask2.Scale.y, 70, 300, "%.0f")
+                  Vectors.VehMasks.Mask4.Scale.y, windshieldYChanged = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,Vectors.VehMasks.Mask4.Scale.y, 70, 300, "%.0f")
                     if windshieldYChanged then
-                      -- Vectors.ResizeBikeWindshieldMask()
                       saved = false
                       Settings.TurnOnLiveViewWindshieldEditor()
                     end

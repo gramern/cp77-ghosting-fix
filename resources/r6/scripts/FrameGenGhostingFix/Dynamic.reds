@@ -1,6 +1,6 @@
-//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl-alpha4, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.8.0xl-alpha5, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -11,6 +11,8 @@
 @addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfixcars/mask2";
 @addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfixcars/mask3";
 @addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfixcars/mask4";
+@addField(gameuiCrosshairContainerController) public let m_maskEditorPath: CName = n"fgfixcars/mask_editor";
+
 
 @addField(gameuiCrosshairContainerController) public let m_hedCornersDone: Bool = false;
 @addField(gameuiCrosshairContainerController) public let m_hedFillDone: Bool = false;
@@ -51,6 +53,10 @@ private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) 
 
   let deactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
   this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(deactivationEvent);
+  
+  let deactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(deactivationEvent);
+
 }
 
 //Global toggle for transtions, called in the main loop---------------------------------------------------------------------------------------
@@ -400,10 +406,12 @@ protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<Fr
 @addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent(evt: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>) -> Void {
 
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1300.0);
-  let mask2Size: Vector2 = new Vector2(2400.0, 1200.0);
+  let maskEditorMargin: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorSize: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorShear: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.7, true);
+  this.OnFrameGenGhostingFixTransformationMask2(this.m_maskEditorPath, maskEditorMargin, maskEditorSize, 0.0, maskEditorShear, maskEditorAnchorPoint, 0.0, false);
 }
 
 //Setting context for vehicles masks start here---------------------------------------------------------------------------------------
@@ -527,7 +535,12 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      } else {
+        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+      }
       break;
     case gamedataVehicleType.Car:
       this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
@@ -666,7 +679,12 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      } else {
+        this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+      }
       break;
     case gamedataVehicleType.Car:
       this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);

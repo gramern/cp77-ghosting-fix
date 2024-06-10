@@ -30,6 +30,7 @@ local Vectors = {
     currentFps = 0,
     gameDeltaTime = 0,
     isGamePaused = true,
+    isPreGame = true,
   },
   PlayerPuppet = {
     dotProductMedian = nil,
@@ -320,16 +321,29 @@ local Vectors = {
       ScreenSpace = {x = 0, y = 0},
       visible = true
     },
+    MaskEditor = {
+      maskPath = "fgfixcars/mask_editor",
+      rotation = 0,
+      Size = {x = 0, y = 0},
+      ScreenSpace = {x = 0, y = 0},
+    },
     masksControllerReady = nil,
-    opacity = 0,
-    opacityDelayed = 0,
-    opacityDelayTime = 0,
-    opacityDelayDuration = 1,
-    opacityDelayWhen = 0.5,
-    opacityMax = 0.05,
-    opacityMaxTrigger = false,
-    opacityNormalize = false,
-    opacityNormalized = 0,
+    Opacity = {
+      Def = {
+        delayDuration = 1,
+        delayThreshold = 0.95,
+        max = 0.05,
+        speedFactor = 0.01,
+        stepFactor = 0.1
+      },
+      value = 0,
+      delayedValue = 0,
+      delayTime = 0,
+      isDelayed = false,
+      isNormalized = true,
+      normalizedValue = 0,
+      speedValue = 0,
+    }
   },
 }
 
@@ -791,18 +805,24 @@ function Vectors.ResizeVehHED(baseDimension, multiplier, isX)
 end
 
 function Vectors.SetWindshieldDefault()
-  Vectors.VehMasks.Mask2.Scale.x = 100
-  Vectors.VehMasks.Mask2.Scale.y = 100
+  Vectors.VehMasks.Mask4.Scale.x = 100
+  Vectors.VehMasks.Mask4.Scale.y = 100
 end
 
 function Vectors.SaveCache()
-  Vectors.VehMasks.Mask2.Cache.Scale.x = Vectors.VehMasks.Mask2.Scale.x
-  Vectors.VehMasks.Mask2.Cache.Scale.y = Vectors.VehMasks.Mask2.Scale.y
+  Vectors.VehMasks.Mask4.Cache.Scale.x = Vectors.VehMasks.Mask4.Scale.x
+  Vectors.VehMasks.Mask4.Cache.Scale.y = Vectors.VehMasks.Mask4.Scale.y
 end
 
 function Vectors.ReadCache()
-  Vectors.VehMasks.Mask2.Scale.x = Vectors.VehMasks.Mask2.Cache.Scale.x
-  Vectors.VehMasks.Mask2.Scale.y = Vectors.VehMasks.Mask2.Cache.Scale.y
+  Vectors.VehMasks.Mask4.Scale.x = Vectors.VehMasks.Mask4.Cache.Scale.x
+  Vectors.VehMasks.Mask4.Scale.y = Vectors.VehMasks.Mask4.Cache.Scale.y
+end
+
+function Vectors.UpdateLiveViewWindshieldEditor()
+  Vectors.VehMasks.MaskEditor.Size = Vectors.VehMasks.Mask4.Size
+  Vectors.VehMasks.MaskEditor.ScreenSpace = Vectors.VehMasks.Mask4.ScreenSpace
+  Vectors.VehMasks.MaskEditor.rotation = Vectors.VehMasks.Mask4.rotation
 end
 
 function Vectors.TransformByFPS()
@@ -819,6 +839,9 @@ function Vectors.TransformByPerspective()
   else
     Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 0.92, true)
     Vectors.VehMasks.HorizontalEdgeDown.Size.y = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.y, 1.2)
+
+    if Vectors.Vehicle.vehicleBaseObject ~= 0 then return end
+    Vectors.UpdateLiveViewWindshieldEditor()
   end
 end
 
@@ -833,9 +856,9 @@ function Vectors.TransformByVehBaseObject()
       Vectors.VehMasks.Mask4.Def = Vectors.VehElements.CarSideMirrors.Right
     else
       Vectors.VehMasks.Mask1.Def = Vectors.VehElements.BikeSpeedometer
-      Vectors.VehMasks.Mask2.Def = Vectors.VehElements.BikeWindshield
-      Vectors.VehMasks.Mask3.Def = Vectors.VehElements.BikeHandlebars.Left
-      Vectors.VehMasks.Mask4.Def = Vectors.VehElements.BikeHandlebars.Right
+      Vectors.VehMasks.Mask2.Def = Vectors.VehElements.BikeHandlebars.Left
+      Vectors.VehMasks.Mask3.Def = Vectors.VehElements.BikeHandlebars.Right
+      Vectors.VehMasks.Mask4.Def = Vectors.VehElements.BikeWindshield
     end
   end
 end
@@ -844,7 +867,7 @@ function Vectors.TransformPositionBike()
   local new4 = Vector4.new
 
   --Mask1
-  local mask1NewOffset = new4(0, Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * -0.1, Vectors.Vehicle.Bumper.offset * -6)
+  local mask1NewOffset = new4(0, Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * 0.2, Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * Vectors.Vehicle.Bumper.offset)
   Vectors.VehMasks.Mask1.Position = Vectors.GetWorldPositionFromOffset(Vectors.Vehicle.Bumper.Position.Back, mask1NewOffset)
 
   --Mask4
@@ -1012,14 +1035,14 @@ function Vectors.TransformWidthBike()
     --Mask1
     Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x
 
+    --Mask2
+    Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.x
+
     --Mask3
     Vectors.VehMasks.Mask3.Size.x = Vectors.VehMasks.Mask3.Def.Size.x
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x
-
-    --Mask2
-    Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.x * (Vectors.VehMasks.Mask2.Scale.x * 0.01)
+    Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x * (Vectors.VehMasks.Mask4.Scale.x * 0.01)
   end
 end
 
@@ -1037,7 +1060,7 @@ function Vectors.TransformWidthCar()
     --HED
     local newHEDx = 0
     if Vectors.Camera.ForwardTable.DotProduct.Vehicle.up > -0.1 then
-      newHEDx = max(0.92, Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs)
+      newHEDx = max(0.92, Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs ^ 0.5)
       Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, newHEDx, true)
     end
     
@@ -1124,15 +1147,15 @@ function Vectors.TransformHeightBike()
   else
     --Mask1
     Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y
+    
+    --Mask2
+    Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.y
 
     --Mask3
     Vectors.VehMasks.Mask3.Size.y = Vectors.VehMasks.Mask3.Def.Size.y
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y
-
-    -- --Mask2
-    Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.y * (Vectors.VehMasks.Mask2.Scale.y * 0.01)
+    Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y * (Vectors.VehMasks.Mask4.Scale.y * 0.01)
   end
 end
 
@@ -1221,7 +1244,7 @@ function Vectors.TransformRotationBike()
     --Mask4
     Vectors.VehMasks.Mask4.rotation = Vectors.VehMasks.Mask1.rotation
   else
-    local steeringBarRotation = Vectors.GetLineScreenSpaceRotation(Vectors.VehMasks.Mask3.ScreenSpace, Vectors.VehMasks.Mask4.ScreenSpace)
+    local steeringBarRotation = Vectors.GetLineScreenSpaceRotation(Vectors.VehMasks.Mask2.ScreenSpace, Vectors.VehMasks.Mask3.ScreenSpace)
 
     --Mask1
     Vectors.VehMasks.Mask1.rotation = Vectors.VehMasks.Mask1.Def.rotation + steeringBarRotation
@@ -1321,121 +1344,138 @@ end
 function Vectors.TransformOpacityBike()
   local max = math.max
   local min = math.min
-  local opacityForward = Vectors.VehMasks.opacity * Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward * 0.8
-  local opacityRight = Vectors.VehMasks.opacity * Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * 1.5
+  local opacityForward = Vectors.VehMasks.Opacity.value * Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward * 0.8
+  local opacityRight = Vectors.VehMasks.Opacity.value * Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * 1.5
 
   if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
     --Mask1
     Vectors.VehMasks.Mask1.opacity = max(0, opacityForward)
 
     --Mask2
-    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask3
-    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask4
     if Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward > 0 then
-      Vectors.VehMasks.Mask4.opacity = min(Vectors.VehMasks.opacity, opacityRight)
+      Vectors.VehMasks.Mask4.opacity = min(Vectors.VehMasks.Opacity.value, opacityRight)
     else
-      Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.opacity
+      Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.Opacity.value
     end
 
   else
     --Mask1
-    Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask2
-    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask3
-    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask4
-    Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.Opacity.value
   end
 end
 
 function Vectors.TransformOpacityCar()
   local max = math.max
   local min = math.min
-  local opacityRight = Vectors.VehMasks.opacity * Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * 1.5
-  local opacityUp = Vectors.VehMasks.opacity * Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs * 2
+  local opacityRight = Vectors.VehMasks.Opacity.value * Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs * 1.5
+  local opacityUp = Vectors.VehMasks.Opacity.value * Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs * 2
 
   if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
     --Mask1
     if Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward < 0 then
       Vectors.VehMasks.Mask1.opacity = max(opacityUp, opacityRight)
-      Vectors.VehMasks.Mask1.opacity = min(Vectors.VehMasks.opacity, Vectors.VehMasks.Mask1.opacity)
+      Vectors.VehMasks.Mask1.opacity = min(Vectors.VehMasks.Opacity.value, Vectors.VehMasks.Mask1.opacity)
     else
-      Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.opacity
+      Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.Opacity.value
     end
 
     --Mask2
-    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.opacity * 0.8
+    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.Opacity.value * 0.8
 
     --Mask3
-    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.opacity * 0.8
+    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.Opacity.value * 0.8
 
     --Mask4
     if Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward > 0 then
       Vectors.VehMasks.Mask4.opacity = max(opacityUp, opacityRight)
-      Vectors.VehMasks.Mask4.opacity = min(Vectors.VehMasks.opacity, Vectors.VehMasks.Mask4.opacity)
+      Vectors.VehMasks.Mask4.opacity = min(Vectors.VehMasks.Opacity.value, Vectors.VehMasks.Mask4.opacity)
     else
-      Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.opacity
+      Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.Opacity.value
     end
   else
     --Mask1
-    Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask1.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask2
-    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask2.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask3
-    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask3.opacity = Vectors.VehMasks.Opacity.value
 
     --Mask4
-    Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.opacity
+    Vectors.VehMasks.Mask4.opacity = Vectors.VehMasks.Opacity.value
   end
 end
 
 function Vectors.SetNormalizeOpacity()
-  Vectors.VehMasks.opacityNormalize = true
-  Vectors.VehMasks.opacityNormalized = Vectors.VehMasks.opacity
+  Vectors.VehMasks.Opacity.isNormalized = false
+  Vectors.VehMasks.Opacity.normalizedValue = Vectors.VehMasks.Opacity.delayedValue
 end
 
 function Vectors.CancelNormalizeOpacity()
-  Vectors.VehMasks.opacityNormalize = false
-  Vectors.VehMasks.opacity = Vectors.VehMasks.opacityCache
+  Vectors.VehMasks.Opacity.isNormalized = true
 end
 
 function Vectors.NormalizeOpacity()
-  if not Vectors.VehMasks.opacityNormalize then return end
+  if Vectors.VehMasks.Opacity.isNormalized then return end
 
-  local opacityStep = Vectors.VehMasks.opacityMax * 0.1
+  if Vectors.VehMasks.Opacity.speedValue > Vectors.VehMasks.Opacity.normalizedValue then
+    Vectors.CancelNormalizeOpacity()
+    return
+  end
 
-  Vectors.VehMasks.opacityNormalized = Vectors.VehMasks.opacityNormalized - opacityStep
-  Vectors.VehMasks.opacity = Vectors.VehMasks.opacityNormalized
+  local opacityStep = Vectors.VehMasks.Opacity.Def.max * Vectors.VehMasks.Opacity.Def.stepFactor
 
-  if Vectors.VehMasks.opacityNormalized > Vectors.VehMasks.opacityCache then return end
+  Vectors.VehMasks.Opacity.normalizedValue = Vectors.VehMasks.Opacity.normalizedValue - opacityStep
+  Vectors.VehMasks.Opacity.value = Vectors.VehMasks.Opacity.normalizedValue
+
+  if Vectors.VehMasks.Opacity.normalizedValue > Vectors.VehMasks.Opacity.speedValue then return end
   Vectors.CancelNormalizeOpacity()
 end
 
+function Vectors.SetDelayTransformOpacity()
+  Vectors.VehMasks.Opacity.isDelayed = true
+  Vectors.VehMasks.Opacity.delayedValue = Vectors.VehMasks.Opacity.Def.max * Vectors.VehMasks.Opacity.Def.delayThreshold
+end
+
+function Vectors.ResetDelayTransformOpacity()
+  Vectors.VehMasks.Opacity.deltaFrames = 0
+  Vectors.VehMasks.Opacity.delayTime = 0
+end
+
 function Vectors.CancelDelayTransformOpacity()
-  Vectors.VehMasks.opacityDeltaFrames = 0
-  Vectors.VehMasks.opacityDelayTime = 0
+  Vectors.VehMasks.Opacity.isDelayed = false
 end
 
 function Vectors.DelayTransformOpacity()
-  if not Vectors.VehMasks.opacityMaxTrigger then return end
-  if Vectors.VehMasks.opacityDelayed < Vectors.VehMasks.opacityCache then Vectors.CancelDelayTransformOpacity() return end
+  if not Vectors.VehMasks.Opacity.isDelayed then return end
 
-  Vectors.VehMasks.opacity = Vectors.VehMasks.opacityDelayed
-  Vectors.VehMasks.opacityDelayTime = Vectors.VehMasks.opacityDelayTime + Vectors.Game.gameDeltaTime
+  if Vectors.VehMasks.Opacity.speedValue > Vectors.VehMasks.Opacity.delayedValue then
+    Vectors.ResetDelayTransformOpacity()
+    return
+  end
 
-  if Vectors.VehMasks.opacityDelayTime <= Vectors.VehMasks.opacityDelayDuration then return end
+  Vectors.VehMasks.Opacity.value = Vectors.VehMasks.Opacity.delayedValue
+  Vectors.VehMasks.Opacity.delayTime = Vectors.VehMasks.Opacity.delayTime + Vectors.Game.gameDeltaTime
+
+  if Vectors.VehMasks.Opacity.delayTime <= Vectors.VehMasks.Opacity.Def.delayDuration then return end
+  Vectors.ResetDelayTransformOpacity()
   Vectors.CancelDelayTransformOpacity()
-  Vectors.VehMasks.opacityMaxTrigger = false
   Vectors.SetNormalizeOpacity()
 end
 
@@ -1446,22 +1486,22 @@ function Vectors.TransformOpacity()
   local currentSpeedAbs = abs(Vectors.Vehicle.currentSpeed)
   local currentSpeedAbsInt = floor(currentSpeedAbs)
 
-  if Vectors.VehMasks.opacity ~= 1 then
-    Vectors.VehMasks.opacityDelayed = Vectors.VehMasks.opacityMax * Vectors.VehMasks.opacityDelayWhen
-
+  if Vectors.VehMasks.Opacity.Def.max ~= 1 then
     Vectors.VehMasks.HorizontalEdgeDown.opacity = min(Vectors.VehMasks.HorizontalEdgeDown.opacityMax, currentSpeedAbsInt * 0.005)
-    Vectors.VehMasks.opacityCache = min(Vectors.VehMasks.opacityMax, currentSpeedAbsInt * 0.01)
-    Vectors.VehMasks.opacity = Vectors.VehMasks.opacityCache
+    Vectors.VehMasks.Opacity.speedValue = min(Vectors.VehMasks.Opacity.Def.max, currentSpeedAbsInt * Vectors.VehMasks.Opacity.Def.speedFactor)
+    Vectors.VehMasks.Opacity.value = Vectors.VehMasks.Opacity.speedValue
 
-    if Vectors.VehMasks.opacityCache == Vectors.VehMasks.opacityMax then
-      Vectors.VehMasks.opacityMaxTrigger = true
+    if Vectors.VehMasks.Opacity.speedValue >= Vectors.VehMasks.Opacity.Def.max then
+      Vectors.SetDelayTransformOpacity()
     end
+
+    Vectors.DelayTransformOpacity()
+    Vectors.NormalizeOpacity()
+  else
+    Vectors.VehMasks.Opacity.value = Vectors.VehMasks.Opacity.Def.max
   end
 
-  Vectors.DelayTransformOpacity()
-  Vectors.NormalizeOpacity()
-
-  Vectors.VehMasks.HorizontalEdgeDown.opacityTracker = (Vectors.VehMasks.opacity + Vectors.VehMasks.HorizontalEdgeDown.opacity) * 0.5
+  Vectors.VehMasks.HorizontalEdgeDown.opacityTracker = (Vectors.VehMasks.Opacity.value + Vectors.VehMasks.HorizontalEdgeDown.opacity) * 0.5
 
   if Vectors.Vehicle.vehicleBaseObject == 1 then
     Vectors.TransformOpacityCar()
@@ -1537,6 +1577,7 @@ function Vectors.SetInVisibleVehMasks()
 end
 
 function Vectors.ProjectVehicleMasks()
+  if Vectors.Game.isPreGame then return end
   if Vectors.VehMasks.masksControllerReady then
     if not Vectors.Game.isGamePaused then
       if Vectors.Vehicle.isMounted and Vectors.VehMasks.enabled then

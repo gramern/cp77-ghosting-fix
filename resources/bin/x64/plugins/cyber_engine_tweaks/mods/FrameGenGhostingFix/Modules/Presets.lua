@@ -73,8 +73,7 @@ function Presets.LoadPreset()
     Vectors.VehMasks.HorizontalEdgeDown.opacityMax = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.opacityMax
     Vectors.VehMasks.HorizontalEdgeDown.Size.Base = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Size.Base
     Vectors.VehMasks.HorizontalEdgeDown.Visible.Base = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Visible.Base
-    Vectors.VehMasks.opacity = LoadDefault.Vectors.VehMasks.opacity
-    Vectors.VehMasks.opacityMax = LoadDefault.Vectors.VehMasks.opacityMax
+    Vectors.VehMasks.Opacity.Def = LoadDefault.Vectors.VehMasks.Opacity.Def
   else
     presetPath = string.gsub(presetPath, ".lua", "")
     local Preset = require(presetPath)
@@ -88,8 +87,7 @@ function Presets.LoadPreset()
         Vectors.VehMasks.HorizontalEdgeDown.opacityMax = Preset.Vectors.VehMasks.HorizontalEdgeDown.opacityMax
         Vectors.VehMasks.HorizontalEdgeDown.Size.Base = Preset.Vectors.VehMasks.HorizontalEdgeDown.Size.Base
         Vectors.VehMasks.HorizontalEdgeDown.Visible.Base = Preset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Base
-        Vectors.VehMasks.opacity = Preset.Vectors.VehMasks.opacity
-        Vectors.VehMasks.opacityMax = Preset.Vectors.VehMasks.opacityMax
+        Vectors.VehMasks.Opacity.Def = Preset.Vectors.VehMasks.Opacity.Def
       end
     end
   end
