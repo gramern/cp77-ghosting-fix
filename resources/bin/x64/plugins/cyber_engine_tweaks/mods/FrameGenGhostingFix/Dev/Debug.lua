@@ -340,21 +340,19 @@ function Debug.DebugUI()
       ImGui.SameLine()
       ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.y))
     end
-    if Vectors.Vehicle.Bumper.screenDistance then
+    if Vectors.Vehicle.Bumper.ScreenSpace.distance then
       ImGui.Separator()
       ImGui.Text("Bumpers Screen Space Distance:")
-      ImGui.Text(tostring(Vectors.Vehicle.Bumper.screenDistance))
-      ImGui.Text("Bumpers Screen Space Distance Perpendicular Projection:")
-      ImGui.Text(tostring(Vectors.Vehicle.Bumper.screenDistancePerp))
+      ImGui.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distance))
+      if Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation then
+        ImGui.Text("Distance (Longtitude Axis) Rotation:")
+        ImGui.SameLine()
+        ImGui.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation))
+      end
     end
     ImGui.Separator()
     ImGui.Text("Wheels' Axes Screen Data:")
     if Vectors.Vehicle.Axis.ScreenRotation.back then
-      ImGui.Text("Longtitude")
-      ImGui.Text("Rotation:")
-      ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.longtitude))
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.longtitudeTest))
       ImGui.Text("Back")
       ImGui.Text("Rotation:")
       ImGui.SameLine()
@@ -434,10 +432,10 @@ function Debug.DebugUI()
     end
     ImGui.Separator()
     ImGui.Text("HED Tracker Position:")
-    if Vectors.VehMasks.HorizontalEdgeDown.Margin.Tracker then
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Margin.Tracker.x))
+    if Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker then
+      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Margin.Tracker.y))
+      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.y))
     end
     ImGui.Separator()
     ImGui.Text("Masks Positions:")

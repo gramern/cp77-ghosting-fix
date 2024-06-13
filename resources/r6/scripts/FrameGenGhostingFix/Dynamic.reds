@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl-alpha5, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.8.0xl-alpha6, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -82,8 +82,8 @@ private cb func OnFrameGenGhostingFixTransformationHEDFill(setMaskPath: CName, s
 }
 
 @addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixTransformationHEDTracker(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
-  this.FrameGenGhostingFixSetSimpleTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskOpacity, setMaskVisible);
+private cb func OnFrameGenGhostingFixTransformationHEDTracker(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
+  this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -119,8 +119,10 @@ private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhosting
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -163,8 +165,10 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhost
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -207,8 +211,10 @@ private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhosting
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -252,8 +258,10 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostin
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -296,8 +304,10 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhos
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -340,8 +350,10 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
 
   let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
   let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
+  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
+  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationHEDTracker(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
 
   let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
   let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
@@ -373,7 +385,6 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
-
 @addMethod(gameuiCrosshairContainerController)
 protected cb func OnFrameGenGhostingFixDeactivationHEDVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>)  -> Bool {
 

@@ -3,7 +3,7 @@ local FrameGenGhostingFix = {
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
   __VERSION_SUFFIX = "xl",
-  __VERSION_STATUS = "alpha5",
+  __VERSION_STATUS = "alpha6",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -41,7 +41,6 @@ local UIText = require("Modules/UIText")
 local Vectors = require("Modules/Vectors")
 
 --scopes
-local floor = math.floor
 local io = io
 local json = json
 local ImGui = ImGui
@@ -84,6 +83,9 @@ local benchmarkTime = 0
 local averageFps = 0
 local countFps = 0
 
+--Vectors.lua properties
+local isMounted = false
+
 --user settings related
 local userSettingsCache = {}
 local saved = false
@@ -113,13 +115,16 @@ local vignetteFootSizeXChanged
 local vignetteFootSizeYChanged
 local vignetteFootMarginLeftChanged
 local vignetteFootMarginTopChanged
+local windowEnabled
 
 
 function CheckVersion()
   if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
 
-  if Config.MaskingGlobal.masksController ~= "IronsightGameController" then
-    FrameGenGhostingFix.__VERSION_SUFFIX = "xl"
+  if Config.MaskingGlobal.masksController == "IronsightGameController" then
+    FrameGenGhostingFix.__VERSION_SUFFIX = ""
+  elseif Config.__EDITION == "NV" then
+    FrameGenGhostingFix.__VERSION_SUFFIX = "nv"
   end
 
   FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
@@ -221,6 +226,8 @@ function GetGameState()
 end
 
 function GetFps(deltaTime)
+  local floor = math.floor
+
   currentFpsInt = floor(currentFps)
   currentFrametime = floor((deltaTime * 1000) + 0.5)
   gameDeltaTime = deltaTime
@@ -242,6 +249,8 @@ function Benchmark()
   if not benchmark then return end
   if not modsCompatibility then return end
   if not masksControllerReady then return end
+
+  local floor = math.floor
 
   benchmarkTime = benchmarkTime + gameDeltaTime
   countFps = countFps + 1
@@ -361,6 +370,7 @@ function LoadUserSettings()
 
     Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
 
+    enabledWindow = userSettings.General and userSettings.General.enabledWindow or false
     version =  userSettings.General and userSettings.General.version or false
 
     if version ~= FrameGenGhostingFix.__VERSION_NUMBER or not version then
@@ -398,6 +408,8 @@ function LoadUserSettingsCache()
 
   Presets.selectedPreset = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPreset or Presets.selectedPreset
 
+  enabledWindow = userSettingsCache.General and userSettingsCache.General.enabledWindow or false
+
   if userSettingsCache then
     print(UIText.General.modname_log, UIText.General.settings_loaded)
   else
@@ -428,6 +440,7 @@ function SaveUserSettings()
       vignetteFootSizeY = Calculate.FPPOnFoot.vignetteFootSizeY
     },
     General = {
+      enabledWindow = enabledWindow,
       version = FrameGenGhostingFix.__VERSION_NUMBER,
     }
   }
@@ -459,6 +472,10 @@ function UpdateSettings()
     enabledFPPBlockerAimOnFoot = Settings.enabledFPPBlockerAimOnFoot
     enabledFPPVignetteAimOnFoot = Settings.enabledFPPVignetteAimOnFoot
   end
+end
+
+function Update()
+  isMounted = Vectors.Vehicle.isMounted
 end
 
 --initialize all stuff etc
@@ -510,6 +527,7 @@ registerForEvent("onOverlayClose", function()
   Calculate.VignetteY()
   Calculate.SetHEDSize()
   Settings.LogResetOnFoot()
+  UpdateSettings()
   Settings.ApplySettings()
 end)
 
@@ -523,15 +541,15 @@ registerForEvent("onUpdate", function(deltaTime)
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
   if isGamePaused then return end
+  Update()
   Vectors.GetCameraData()
   Vectors.GetPlayerData()
+  if not isMounted then return end
   Vectors.ProjectVehicleMasks()
 end)
 
 -- draw a ImGui window
 registerForEvent("onDraw", function()
-  UpdateSettings()
-
   if OverlayEnabled then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
@@ -919,7 +937,10 @@ registerForEvent("onDraw", function()
             if Debug then
               enabledDebug = ImGui.Checkbox(UIText.Options.enabledDebug, enabledDebug)
             end
-            enabledWindow = ImGui.Checkbox(UIText.Options.enabledWindow, enabledWindow)
+            enabledWindow, windowEnabled = ImGui.Checkbox(UIText.Options.enabledWindow, enabledWindow)
+            if windowEnabled then
+              SaveUserSettings()
+            end
             ImGui.PopStyleColor()
             if ImGui.IsItemHovered() then
               ImGui.SetTooltip(UIText.Options.tooltipWindow)

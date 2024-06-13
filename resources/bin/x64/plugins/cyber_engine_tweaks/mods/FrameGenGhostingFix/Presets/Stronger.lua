@@ -1,4 +1,5 @@
 local Preset = {
+  __VERSION_NUMBER = 480,
   MaskingGlobal = {
     enabled = true
   },
@@ -62,8 +63,8 @@ local Preset = {
     VehMasks = {
       AnchorPoint = {x = 0.5, y = 0.5},
       HorizontalEdgeDown = {
-        opacity = 0,
-        opacityMax = 0.08,
+        opacity = 1,
+        opacityMax = 1,
         Size = {
           Base = {x = 4240, y = 1480} -- min size x = 3888
         },
@@ -77,18 +78,18 @@ local Preset = {
       },
       Opacity = {
         Def = {
-          delayDuration = 2,
-          delayThreshold = 0.9,
-          max = 0.1,
-          speedFactor = 0.02,
+          delayDuration = 1,
+          delayThreshold = 1,
+          max = 1,
+          speedFactor = 1,
           stepFactor = 0.1
         },
       }
     },
   },
   PresetInfo = {
-    name = "Reshade HDR Test 2",
-    description = "Testing preset for Reshade HDR. Looks bad with the in-game HDR.",
+    name = "Stronger",
+    description = "Some masks up to 20% bigger. Slap those on the screen.",
     author = nil
   }
 }

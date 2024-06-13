@@ -82,20 +82,20 @@ end
 
 function Calculate.SetHEDSize()
   if Calculate.ScreenDetection.screenType == 5 then
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.left = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top = 2640
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2640
     Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1
   elseif Calculate.ScreenDetection.screenType == 2 then
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.left = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top = 2400
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2400
     Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1
   elseif Calculate.ScreenDetection.screenType == 3 then
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.left = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top = 2280
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2280
     Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1.34
   elseif Calculate.ScreenDetection.screenType == 4 then
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.left = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.Margin.Base.top = 2280
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2280
     Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 2
   end
 
