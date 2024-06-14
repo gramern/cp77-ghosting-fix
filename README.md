@@ -20,6 +20,8 @@ The repo is configured to be placed 'as is' in the `source` folder of the mod's 
 
 The 'xl' edition has been the base for the other editions since 4.8.0xl-alpha2.
 
+**The 'classic' branches (`main` and `develop`) additionaly need modified `prototype_hud.inkhud` with added widget entries to work (available on Nexus).**
+
 # The mod's whiteboard on Miro (rough design notes)
 [https://miro.com/app/board/uXjVNrZBovU=/](https://miro.com/app/board/uXjVNrZBovU=/)
 
