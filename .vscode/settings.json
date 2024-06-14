@@ -1,0 +1,17 @@
+{
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/.DS_Store?": true,
+    "**/archive": true,
+    "**/customSounds": true,
+  },
+  "[lua]": {
+    "editor.tabSize": 2
+  },
+  "[reds]": {
+    "editor.tabSize": 2
+  }
+}
