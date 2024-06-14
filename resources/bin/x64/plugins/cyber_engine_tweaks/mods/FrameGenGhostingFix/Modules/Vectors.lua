@@ -1579,7 +1579,7 @@ function Vectors.TransformOpacityBike()
     Vectors.VehMasks.Mask3.opacity = opacityValue
 
     --Mask4
-    local mask4Opacity = max(opacityUpAbs, opacityForwardAbs) * opacityGain
+    local mask4Opacity = max(opacityUpAbs, opacityForwardAbs)
     Vectors.VehMasks.Mask4.opacity = min(opacityValue, mask4Opacity)
   else
     --Mask1
@@ -1592,7 +1592,7 @@ function Vectors.TransformOpacityBike()
     Vectors.VehMasks.Mask3.opacity = opacityValue
 
     --Mask4
-    Vectors.VehMasks.Mask4.opacity = opacityValue * 0.75
+    Vectors.VehMasks.Mask4.opacity = opacityValue
   end
 end
 
@@ -1790,6 +1790,10 @@ function Vectors.TransformVisibility()
     else
       hedVisible.fill = hedVisible.Base.fillLock
     end
+
+    if baseObject == 0 and hedVisible.Base.fillLock then
+      hedVisible.tracker = false
+    end
   else
     if baseObject == 0 and dotVeh.forward < 0.4 then
       Vectors.VehMasks.Mask1.visible = false
@@ -1803,7 +1807,7 @@ function Vectors.TransformVisibility()
       Vectors.VehMasks.Mask4.visible = Vectors.VehMasks.Mask4.Def.visible
     end
 
-    if baseObject == 0 and medianAngle >= 5 then
+    if baseObject == 0 and medianAngle >= 0 then
       hedVisible.fill = hedVisible.Base.fill
     elseif baseObject == 0 and hasWeapon then
       hedVisible.fill = hedVisible.Base.fill

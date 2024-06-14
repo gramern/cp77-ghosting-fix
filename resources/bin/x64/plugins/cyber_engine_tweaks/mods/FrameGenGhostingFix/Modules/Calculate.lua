@@ -11,7 +11,7 @@ local Calculate = {
     Space = {width = 3840, height = 2160},
     width = nil,
     height = nil,
-    aspectRatio = nil,
+    aspectRatio = 1,
     aspectRatioChange = false,
     screenType = 1,
     screenTypeName = "16:9",
@@ -64,7 +64,7 @@ function Calculate.CalcAspectRatio()
   vectorsScreen.Resolution.height = Calculate.Screen.height
   vectorsScreen.aspectRatio = Calculate.Screen.aspectRatio
 
-  if not previousAspectRatio then return end
+  if previousAspectRatio == 1 then return end
 
   if Calculate.Screen.aspectRatio ~= previousAspectRatio then
     Calculate.Screen.aspectRatioChange = true

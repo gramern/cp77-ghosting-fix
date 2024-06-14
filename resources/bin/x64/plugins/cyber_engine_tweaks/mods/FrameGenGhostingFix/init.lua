@@ -3,7 +3,7 @@ local FrameGenGhostingFix = {
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
   __VERSION_SUFFIX = "",
-  __VERSION_STATUS = "beta1",
+  __VERSION_STATUS = "rc",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License

@@ -91,7 +91,7 @@ local Preset = {
   },
   PresetInfo = {
     name = "Stronger",
-    description = "Masks' anti-ghosting strength is slightly greater and\nan masks state change delay on a sudden speed decrease\nis twice as long (2 sec.)",
+    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (2 sec.)",
     author = nil
   }
 }
