@@ -1,6 +1,11 @@
-/archive
+Dev
 /customSounds
 /raw
+Testing.lua
+HDR_Test_1.lua
+HDR_Test_2.lua
+HDR_Test_3.lua
+*.inkhud
 *.cpmodproj
 *.log
 *.sql
