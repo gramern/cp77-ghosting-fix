@@ -63,25 +63,27 @@ local Preset = {
     VehMasks = {
       AnchorPoint = {x = 0.5, y = 0.5},
       HorizontalEdgeDown = {
-        opacity = 1,
-        opacityMax = 1,
+        opacity = 0,
+        opacityMax = 0.03,
         Size = {
           Base = {x = 4240, y = 1480} -- min size x = 3888
         },
         Visible = {
           Base = {
             corners = true,
-            fill = false,
+            fill = true,
+            fillLock = true,
             tracker = true,
           }
         }
       },
       Opacity = {
         Def = {
-          delayDuration = 1,
-          delayThreshold = 1,
-          max = 1,
-          speedFactor = 1,
+          delayDuration = 2,
+          delayThreshold = 0.95,
+          gain = 3,
+          max = 0.05,
+          speedFactor = 0.01,
           stepFactor = 0.1
         },
       }
@@ -89,7 +91,7 @@ local Preset = {
   },
   PresetInfo = {
     name = "Stronger",
-    description = "Some masks up to 20% bigger. Slap those on the screen.",
+    description = "Masks' anti-ghosting strength is slightly greater and\nan masks state change delay on a sudden speed decrease\nis twice as long (2 sec.)",
     author = nil
   }
 }

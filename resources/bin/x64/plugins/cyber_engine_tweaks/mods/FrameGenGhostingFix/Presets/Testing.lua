@@ -71,7 +71,8 @@ local Preset = {
         Visible = {
           Base = {
             corners = true,
-            fill = false,
+            fill = true,
+            fillLock = false,
             tracker = true,
           }
         }
@@ -80,6 +81,7 @@ local Preset = {
         Def = {
           delayDuration = 1,
           delayThreshold = 1,
+          gain = 1,
           max = 1,
           speedFactor = 1,
           stepFactor = 0.1

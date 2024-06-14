@@ -1,30 +1,39 @@
 local Calculate = {
   __VERSION_NUMBER = 480,
-  ScreenDetection = {
-  width = nil,
-  height = nil,
-  aspectratio = 1.78,
+  Screen = {
+    Base = {width = 3840, height = 2160},
+    Edge = {
+      down = 2160,
+      left = 0,
+      right = 3840,
+    },
+    Factor = {width = 1, height = 1},
+    Space = {width = 3840, height = 2160},
+    width = nil,
+    height = nil,
+    aspectRatio = nil,
+    aspectRatioChange = false,
     screenType = 1,
-  screenTypeName = "16:9"
+    screenTypeName = "16:9",
   },
   FPPBikeWindshield = {
     width = 100,
     height = 100
   },
   FPPOnFoot = {
-  VignetteEditor = {
-    vignetteMinMarginX = 50,
-    vignetteMaxMarginX = 150,
-    vignetteMinSizeX = 80,
-    vignetteMaxSizeX = 130,
-    vignetteMinMarginY = 55,
-    vignetteMaxMarginY = 145,
-    vignetteMinSizeY = 85,
-    vignetteMaxSizeY = 130,
-  },
-  cornerDownLeftMargin = 0,
-  cornerDownRightMargin = 3840,
-  cornerDownMarginTop = 2160,
+    VignetteEditor = {
+      vignetteMinMarginX = 50,
+      vignetteMaxMarginX = 150,
+      vignetteMinSizeX = 80,
+      vignetteMaxSizeX = 130,
+      vignetteMinMarginY = 55,
+      vignetteMaxMarginY = 145,
+      vignetteMinSizeY = 85,
+      vignetteMaxSizeY = 130,
+    },
+    cornerDownLeftMargin = 0,
+    cornerDownRightMargin = 3840,
+    cornerDownMarginTop = 2160,
     vignetteFootMarginLeft = 100,
     vignetteFootMarginTop = 80,
     vignetteFootSizeX = 120,
@@ -33,11 +42,11 @@ local Calculate = {
     originalVignetteFootMarginTopPx = 1080,
     originalVignetteFootSizeXPx = 4840,
     originalVignetteFootSizeYPx = 2560,
-  newVignetteFootMarginLeftPx = nil,
+    newVignetteFootMarginLeftPx = nil,
     newVignetteFootMarginTopPx = nil,
     newVignetteFootSizeXPx = nil,
     newVignetteFootSizeYPx = nil,
-  aimFootSizeXPx = 3840,
+    aimFootSizeXPx = 3840,
     aimFootSizeYPx = 2440
   },
 }
@@ -45,108 +54,196 @@ local Calculate = {
 local Vectors = require("Modules/Vectors")
 
 function Calculate.CalcAspectRatio()
-  Calculate.ScreenDetection.width, Calculate.ScreenDetection.height = GetDisplayResolution();
-  Calculate.ScreenDetection.aspectratio = Calculate.ScreenDetection.width / Calculate.ScreenDetection.height
+  local vectorsScreen = Vectors.Screen
+  local previousAspectRatio = Calculate.Screen.aspectRatio
 
-  Vectors.Screen.Real.width = Calculate.ScreenDetection.width
-  Vectors.Screen.Real.height = Calculate.ScreenDetection.height
-  Vectors.Screen.aspectRatio = Calculate.ScreenDetection.aspectratio
-end
+  Calculate.Screen.width, Calculate.Screen.height = GetDisplayResolution();
+  Calculate.Screen.aspectRatio = Calculate.Screen.width / Calculate.Screen.height
 
-function Calculate.NameScreenType()
-  if Calculate.ScreenDetection.screenType == 1 then
-    Calculate.ScreenDetection.screenTypeName = "16:9"
-  elseif Calculate.ScreenDetection.screenType == 2 then
-    Calculate.ScreenDetection.screenTypeName = "16:10"
-  elseif Calculate.ScreenDetection.screenType == 3 then
-    Calculate.ScreenDetection.screenTypeName = "21:9"
-  elseif Calculate.ScreenDetection.screenType == 4 then
-    Calculate.ScreenDetection.screenTypeName = "32:9"
-  elseif Calculate.ScreenDetection.screenType == 5 then
-    Calculate.ScreenDetection.screenTypeName = "4:3"
+  vectorsScreen.Resolution.width = Calculate.Screen.width
+  vectorsScreen.Resolution.height = Calculate.Screen.height
+  vectorsScreen.aspectRatio = Calculate.Screen.aspectRatio
+
+  if not previousAspectRatio then return end
+
+  if Calculate.Screen.aspectRatio ~= previousAspectRatio then
+    Calculate.Screen.aspectRatioChange = true
   end
 end
 
 --get the game's aspect ratio
 function Calculate.GetAspectRatio()
-  if Calculate.ScreenDetection.aspectratio <= 1.59 then
-    Calculate.ScreenDetection.screenType = 5
-  elseif Calculate.ScreenDetection.aspectratio >= 1.6 and Calculate.ScreenDetection.aspectratio <= 1.7 then
-    Calculate.ScreenDetection.screenType = 2
-  elseif Calculate.ScreenDetection.aspectratio >= 2.2 and Calculate.ScreenDetection.aspectratio <= 3.4 then
-    Calculate.ScreenDetection.screenType = 3
-  elseif Calculate.ScreenDetection.aspectratio >= 3.41 then
-    Calculate.ScreenDetection.screenType = 4
+  local screenAspectRatio = Calculate.Screen.aspectRatio
+
+  if screenAspectRatio <= 1.59 then
+    Calculate.Screen.screenType = 5
+  elseif screenAspectRatio >= 1.6 and screenAspectRatio <= 1.7 then
+    Calculate.Screen.screenType = 2
+  elseif screenAspectRatio >= 2.2 and screenAspectRatio <= 3.4 then
+    Calculate.Screen.screenType = 3
+  elseif screenAspectRatio >= 3.41 then
+    Calculate.Screen.screenType = 4
   end
 end
 
-function Calculate.SetHEDSize()
-  if Calculate.ScreenDetection.screenType == 5 then
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2640
-    Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1
-  elseif Calculate.ScreenDetection.screenType == 2 then
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2400
-    Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1
-  elseif Calculate.ScreenDetection.screenType == 3 then
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2280
-    Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 1.34
-  elseif Calculate.ScreenDetection.screenType == 4 then
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.x = 1920
-    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Base.y = 2280
-    Vectors.VehMasks.HorizontalEdgeDown.Size.MultiplyBy.screen = 2
+function Calculate.NameScreenType()
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then
+    Calculate.Screen.screenTypeName = "16:9"
+  elseif screenType == 2 then
+    Calculate.Screen.screenTypeName = "16:10"
+  elseif screenType == 3 then
+    Calculate.Screen.screenTypeName = "21:9"
+  elseif screenType == 4 then
+    Calculate.Screen.screenTypeName = "32:9"
+  elseif screenType == 5 then
+    Calculate.Screen.screenTypeName = "4:3"
+  end
+end
+
+function Calculate.GetScreenEdges()
+  local screenType = Calculate.Screen.screenType
+  local vecScreenEdge = Vectors.Screen.Edge
+
+  if screenType == 1 then 
+    vecScreenEdge.left = Calculate.Screen.Edge.left
+    vecScreenEdge.right = Calculate.Screen.Edge.right
+    vecScreenEdge.down = Calculate.Screen.Edge.down
+    return
   end
 
-  Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeVehHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Base.x, 1, true)
+  if screenType == 5 then
+    Calculate.Screen.Edge.left = 0
+    Calculate.Screen.Edge.right = 3840
+    Calculate.Screen.Edge.down = 2640
+  elseif screenType == 2 then
+    Calculate.Screen.Edge.left = 0
+    Calculate.Screen.Edge.right = 3840
+    Calculate.Screen.Edge.down = 2280
+  elseif screenType == 3 then
+    Calculate.Screen.Edge.left = -640
+    Calculate.Screen.Edge.right = 4480
+    Calculate.Screen.Edge.down = 2160
+  elseif screenType == 4 then
+    Calculate.Screen.Edge.left = -1920
+    Calculate.Screen.Edge.right = 5760
+    Calculate.Screen.Edge.down = 2160
+  end
+
+  vecScreenEdge.left = Calculate.Screen.Edge.left
+  vecScreenEdge.right = Calculate.Screen.Edge.right
+  vecScreenEdge.down = Calculate.Screen.Edge.down
+end
+
+function Calculate.GetScreenFactors()
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then return end
+
+  if screenType == 2 then
+    Calculate.Screen.Factor.height = 1.22
+    Vectors.Screen.Factor.height = 1.22
+  elseif screenType == 3 then
+    Calculate.Screen.Factor.width = 1.34
+    Vectors.Screen.Factor.width = 1.34
+  elseif screenType == 4 then
+    Calculate.Screen.Factor.width = 2
+    Vectors.Screen.Factor.width = 2
+  elseif screenType == 5 then
+    Calculate.Screen.Factor.height = 1.06
+    Vectors.Screen.Factor.height = 1.06
+  end
+end
+
+function Calculate.GetScreenSpace()
+  local screenBase = Calculate.Screen.Base
+  local screenFactor = Calculate.Screen.Factor
+  local screenType = Calculate.Screen.screenType
+  
+  if screenType == 3 then
+    Calculate.Screen.Space.width = screenBase.width * screenFactor.width
+    Vectors.Screen.Space.width = Calculate.Screen.Space.width
+  elseif screenType == 4 then
+    Calculate.Screen.Space.width = screenBase.width * screenFactor.width
+    Vectors.Screen.Space.width = Calculate.Screen.Space.width
+  end
+end
+
+function Calculate.SetHED()
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then return end
+
+  local vectorsVehHED = Vectors.VehMasks.HorizontalEdgeDown
+
+  if screenType == 5 then
+    vectorsVehHED.ScreenSpace.Base.x = 1920
+    vectorsVehHED.ScreenSpace.Base.y = 2640
+  elseif screenType == 2 then
+    vectorsVehHED.ScreenSpace.Base.x = 1920
+    vectorsVehHED.ScreenSpace.Base.y = 2400
+  elseif screenType == 3 then
+    vectorsVehHED.ScreenSpace.Base.x = 1920
+    vectorsVehHED.ScreenSpace.Base.y = 2280
+  elseif screenType == 4 then
+    vectorsVehHED.ScreenSpace.Base.x = 1920
+    vectorsVehHED.ScreenSpace.Base.y = 2280
+  end
+
+  vectorsVehHED.Size.x = Vectors.ResizeVehHED(vectorsVehHED.Size.Base.x, 1, true)
+
+  Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.y = vectorsVehHED.ScreenSpace.Base.y
+  Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.y = vectorsVehHED.ScreenSpace.Base.y
 end
 
 function Calculate.SetCornersMargins()
-  if Calculate.ScreenDetection.screenType == 5 then
-    Calculate.FPPOnFoot.cornerDownLeftMargin = 0
-    Calculate.FPPOnFoot.cornerDownRightMargin = 3840
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then return end
+
+  local screenEdge = Calculate.Screen.Edge
+
+  if screenType == 5 then
+    Calculate.FPPOnFoot.cornerDownLeftMargin = screenEdge.left
+    Calculate.FPPOnFoot.cornerDownRightMargin = screenEdge.right
     Calculate.FPPOnFoot.cornerDownMarginTop = 2440
-  elseif Calculate.ScreenDetection.screenType == 2 then
-    Calculate.FPPOnFoot.cornerDownLeftMargin = 0
-    Calculate.FPPOnFoot.cornerDownRightMargin = 3840
+  elseif screenType == 2 then
+    Calculate.FPPOnFoot.cornerDownLeftMargin = screenEdge.left
+    Calculate.FPPOnFoot.cornerDownRightMargin = screenEdge.right
     Calculate.FPPOnFoot.cornerDownMarginTop = 2280
-  elseif Calculate.ScreenDetection.screenType == 3 then
-    Calculate.FPPOnFoot.cornerDownLeftMargin = -640
-    Calculate.FPPOnFoot.cornerDownRightMargin = 4480
-    Calculate.FPPOnFoot.cornerDownMarginTop = 2160
-  elseif Calculate.ScreenDetection.screenType == 4 then
-    Calculate.FPPOnFoot.cornerDownLeftMargin = -1920
-    Calculate.FPPOnFoot.cornerDownRightMargin = 5760
-    Calculate.FPPOnFoot.cornerDownMarginTop = 2160
+  else
+    Calculate.FPPOnFoot.cornerDownLeftMargin = screenEdge.left
+    Calculate.FPPOnFoot.cornerDownRightMargin = screenEdge.right
+    Calculate.FPPOnFoot.cornerDownMarginTop = screenEdge.down
   end
 end
 
 function Calculate.SetVignetteOrgMinMax()
-  if Calculate.ScreenDetection.screenType == 5 then
+  if Calculate.Screen.screenType == 5 then
     Calculate.FPPOnFoot.VignetteEditor.vignetteMinSizeY = 95
   end
 end
 
 function Calculate.SetVignetteOrgSize()
-  if Calculate.ScreenDetection.screenType == 5 then
-    Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx = 1920
-    Calculate.FPPOnFoot.originalVignetteFootMarginTopPx = 1080
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then return end
+
+  Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx = 1920
+  Calculate.FPPOnFoot.originalVignetteFootMarginTopPx = 1080
+
+  if screenType == 5 then
     Calculate.FPPOnFoot.originalVignetteFootSizeXPx = 4840
     Calculate.FPPOnFoot.originalVignetteFootSizeYPx = 3072
-  elseif Calculate.ScreenDetection.screenType == 2 then
-    Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx = 1920
-    Calculate.FPPOnFoot.originalVignetteFootMarginTopPx = 1080
+  elseif screenType == 2 then
     Calculate.FPPOnFoot.originalVignetteFootSizeXPx = 4840
     Calculate.FPPOnFoot.originalVignetteFootSizeYPx = 2880
-  elseif Calculate.ScreenDetection.screenType == 3 then
-    Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx = 1920
-    Calculate.FPPOnFoot.originalVignetteFootMarginTopPx = 1080
+  elseif screenType == 3 then
+
     Calculate.FPPOnFoot.originalVignetteFootSizeXPx = 6460
     Calculate.FPPOnFoot.originalVignetteFootSizeYPx = 2560
-  elseif Calculate.ScreenDetection.screenType == 4 then
-    Calculate.FPPOnFoot.originalVignetteFootMarginLeftPx = 1920
-    Calculate.FPPOnFoot.originalVignetteFootMarginTopPx = 1080
+  elseif screenType == 4 then
     Calculate.FPPOnFoot.originalVignetteFootSizeXPx = 9680
     Calculate.FPPOnFoot.originalVignetteFootSizeYPx = 2560
   end
@@ -155,16 +252,20 @@ function Calculate.SetVignetteOrgSize()
 end
 
 function Calculate.SetMaskingAimSize()
-  if Calculate.ScreenDetection.screenType == 5 then
+  local screenType = Calculate.Screen.screenType
+
+  if screenType == 1 then return end
+
+  if screenType == 5 then
     Calculate.FPPOnFoot.aimFootSizeXPx = 3840
     Calculate.FPPOnFoot.aimFootSizeYPx = 3072
-  elseif Calculate.ScreenDetection.screenType == 2 then
+  elseif screenType == 2 then
     Calculate.FPPOnFoot.aimFootSizeXPx = 3840
     Calculate.FPPOnFoot.aimFootSizeYPx = 2640
-  elseif Calculate.ScreenDetection.screenType == 3 then
+  elseif screenType == 3 then
     Calculate.FPPOnFoot.aimFootSizeXPx = 5140
     Calculate.FPPOnFoot.aimFootSizeYPx = 2440
-  elseif Calculate.ScreenDetection.screenType == 4 then
+  elseif screenType == 4 then
     Calculate.FPPOnFoot.aimFootSizeXPx = 7770
     Calculate.FPPOnFoot.aimFootSizeYPx = 2440
   end

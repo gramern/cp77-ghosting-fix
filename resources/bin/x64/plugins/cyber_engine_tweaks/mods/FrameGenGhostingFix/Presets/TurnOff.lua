@@ -71,6 +71,7 @@ local Preset = {
           Base = {
             corners = false,
             fill = false,
+            fillLock = false,
             tracker = true,
           }
         }

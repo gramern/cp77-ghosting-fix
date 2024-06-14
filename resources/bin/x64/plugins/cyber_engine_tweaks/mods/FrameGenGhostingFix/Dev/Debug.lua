@@ -1,6 +1,7 @@
 local Debug = {
   __VERSION_NUMBER = 480,
   currentFps = 0,
+  ironsightController = nil,
   isGamePaused = true,
   masksController = nil,
   masksControllerReady = false,
@@ -29,12 +30,23 @@ function Debug.DebugUI()
     ImGui.Separator()
     ImGui.Text("Screen Resolution:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Real.width))
+    ImGui.Text(tostring(Vectors.Screen.Resolution.width))
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Real.height))
+    ImGui.Text(tostring(Vectors.Screen.Resolution.height))
     ImGui.Text("Screen Aspect Ratio:")
     ImGui.SameLine()
     ImGui.Text(tostring(Vectors.Screen.aspectRatio))
+    ImGui.Text("Active Camera FOV:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.Camera.fov))
+    ImGui.Text("Screen Aspect Factor:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.Screen.widthFactor))
+    ImGui.Text("Screen Space:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.Screen.Space.width))
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.Screen.Space.height))
     ImGui.Separator()
     ImGui.Text("Is Pre-Game:")
     ImGui.SameLine()
@@ -56,6 +68,11 @@ function Debug.DebugUI()
     ImGui.Text("For Settings Module")
     ImGui.SameLine()
     ImGui.Text(tostring(Settings.masksController))
+    if Debug.ironsightController then
+      ImGui.Text("For init.lua")
+      ImGui.SameLine()
+      ImGui.Text(tostring(Debug.ironsightController))
+    end
     ImGui.Separator()
     ImGui.Text("Is Masks Controller Ready:")
     ImGui.SameLine()
@@ -89,31 +106,17 @@ function Debug.DebugUI()
       ImGui.Text(tostring(Calculate.FPPOnFoot.cornerDownMarginTop))
     end
     ImGui.Separator()
-    ImGui.Text("Camera Forward:")
-    if Vectors.Camera.Forward then
-      ImGui.Text("DotProduct Vehicle Forward:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward))
-      ImGui.Text("DotProduct Vehicle Forward Absolute:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs))
-      ImGui.Text("DotProduct Vehicle Right:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.right))
-      ImGui.Text("DotProduct Vehicle Right Absolute:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs))
-      ImGui.Text("DotProduct Vehicle Up:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.up))
-      ImGui.Text("DotProduct Vehicle Up Absolute:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs))
-      ImGui.Separator()
-      ImGui.Text("Camera Forward Angle:")
-      ImGui.Text("Vehicle Forward Horizontal Plane:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.horizontalPlane))
-      ImGui.Text("Vehicle Forward Median Plane:")
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane))
-      ImGui.Separator()
-      ImGui.Text("Camera Forward Z:")
-      ImGui.Text(tostring(Vectors.Camera.Forward.z))
+    ImGui.Text("Masks Paths:")
+    if Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath then
+      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath))
+      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedFillPath))
+      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath))
+      ImGui.Text(tostring(Vectors.VehMasks.Mask1.maskPath))
+      ImGui.Text(tostring(Vectors.VehMasks.Mask2.maskPath))
+      ImGui.Text(tostring(Vectors.VehMasks.Mask3.maskPath))
+      ImGui.Text(tostring(Vectors.VehMasks.Mask4.maskPath))
+      ImGui.Text(tostring(Vectors.VehMasks.MaskEditor.maskPath))
     end
-    ImGui.Separator()
     ImGui.PopStyleColor() --PSC.1
     ImGui.EndTabItem()
   end
@@ -419,6 +422,9 @@ function Debug.DebugUI()
       ImGui.SameLine()
       ImGui.Text(tostring(Vectors.VehMasks.Mask4.opacity))
     end
+    ImGui.Text("Opacity Gain:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.VehMasks.Opacity.Def.gain))
     if Vectors.VehMasks.Opacity.delayTime then
       ImGui.Text("Opacity Transformation Delay Time:")
       ImGui.SameLine()
@@ -431,6 +437,9 @@ function Debug.DebugUI()
       end
     end
     ImGui.Separator()
+    ImGui.Text("HED Fill Lock:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Base.fillLock))
     ImGui.Text("HED Tracker Position:")
     if Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker then
       ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))

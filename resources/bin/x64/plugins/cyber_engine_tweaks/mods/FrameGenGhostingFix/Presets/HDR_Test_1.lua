@@ -70,7 +70,8 @@ local Preset = {
         Visible = {
           Base = {
             corners = true,
-            fill = false,
+            fill = true,
+            fillLock = false,
             tracker = true,
           }
         }
@@ -79,6 +80,7 @@ local Preset = {
         Def = {
           delayDuration = 2,
           delayThreshold = 0.9,
+          gain = 1,
           max = 0.12,
           speedFactor = 0.02,
           stepFactor = 0.1
@@ -87,8 +89,8 @@ local Preset = {
     },
   },
   PresetInfo = {
-    name = "Reshade HDR Test 1",
-    description = "Testing preset for Reshade HDR. Looks bad with the in-game HDR.",
+    name = "RenoDX HDR Test 1",
+    description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
     author = nil
   }
 }

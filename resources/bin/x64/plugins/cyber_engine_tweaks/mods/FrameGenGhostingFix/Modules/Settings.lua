@@ -48,24 +48,6 @@ function Settings.ApplyMaskingGlobal()
   end
 end
 
-function Settings.LogApplyOnFoot()
-  Settings.appliedOnFoot = true
-
-  print(UIText.General.modname_log,UIText.General.settings_saved_onfoot)
-end
-
-function Settings.LogResetOnFoot()
-  Settings.appliedOnFoot = false
-end
-
-function Settings.LogApplyVehicles()
-  Settings.appliedVeh = true
-end
-
-function Settings.LogResetVehicles()
-  Settings.appliedVeh = false
-end
-
 function Settings.TurnOnLiveViewWindshieldEditor()
   if Settings.masksController then
     Override(Settings.masksController, 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)

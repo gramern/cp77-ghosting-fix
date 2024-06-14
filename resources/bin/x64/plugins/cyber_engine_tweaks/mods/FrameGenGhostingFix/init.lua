@@ -2,8 +2,8 @@ local FrameGenGhostingFix = {
   __NAME= "FrameGen Ghosting 'Fix'",
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
-  __VERSION_SUFFIX = "xl",
-  __VERSION_STATUS = "alpha6",
+  __VERSION_SUFFIX = "",
+  __VERSION_STATUS = "beta1",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -55,6 +55,7 @@ local windowTitle = Config and FrameGenGhostingFix.__NAME .. " " .. Config.__EDI
 --masks controller
 local masksController = nil
 local masksControllerReady = false
+local ironsightController = false
 
 --run diagnostics?
 local modsCompatibility = true
@@ -121,13 +122,15 @@ local windowEnabled
 function CheckVersion()
   if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
 
-  if Config.MaskingGlobal.masksController == "IronsightGameController" then
-    FrameGenGhostingFix.__VERSION_SUFFIX = ""
-  elseif Config.__EDITION == "NV" then
-    FrameGenGhostingFix.__VERSION_SUFFIX = "nv"
+  if Config.MaskingGlobal.ironsightController then
+    ironsightController = Config.MaskingGlobal.ironsightController
   end
 
-  FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
+  FrameGenGhostingFix.__VERSION_SUFFIX = Config.__VERSION_SUFFIX
+  FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX
+
+  if not FrameGenGhostingFix.__VERSION_STATUS then return end
+  FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
 end
 
 --set for available modules
@@ -165,6 +168,22 @@ function LoadMasksController()
     Settings.masksController = masksController
   end
 
+  if not ironsightController then return end
+
+  if Debug then
+    Debug.ironsightController = ironsightController
+  end
+
+  if Vectors then
+    Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath = Config.MaskingGlobal.Widgets.hedCorners
+    Vectors.VehMasks.HorizontalEdgeDown.hedFillPath = Config.MaskingGlobal.Widgets.hedFill
+    Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath = Config.MaskingGlobal.Widgets.hedTracker
+    Vectors.VehMasks.Mask1.maskPath = Config.MaskingGlobal.Widgets.mask1
+    Vectors.VehMasks.Mask2.maskPath = Config.MaskingGlobal.Widgets.mask2
+    Vectors.VehMasks.Mask3.maskPath = Config.MaskingGlobal.Widgets.mask3
+    Vectors.VehMasks.Mask4.maskPath = Config.MaskingGlobal.Widgets.mask4
+    Vectors.VehMasks.MaskEditor.maskPath = Config.MaskingGlobal.Widgets.maskEditor
+  end
 end
 
 function ObserveMasksController()
@@ -260,6 +279,7 @@ function Benchmark()
   if benchmarkTime >= benchmarkDuration then
     StopBenchmark()
     SetSuggestedSettings()
+    UpdateSettings()
 
     if not newInstall then return end
     AfterNewInstall()
@@ -309,15 +329,15 @@ function SetSuggestedSettings()
     enabledFPPOnFoot = true
   end
 
-  if averageFps >= 38 then
+  if averageFps >= 45 then
     enabledFPPBlockerAimOnFoot = true
   end
 
-  if averageFps >= 52 then
+  if averageFps >= 59 then
     enabledFPPVignetteOnFoot = true
   end
 
-  if averageFps >= 62 then
+  if averageFps >= 65 then
     enabledFPPVignettePermamentOnFoot = true
   end
 
@@ -335,12 +355,6 @@ end
 
 function SetDefaultPresetFile()
   table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
-end
-
-function SetAnotherDefaultPreset()
-  if Calculate.ScreenDetection.screenType == 5 then
-    Presets.selectedPreset = "Stronger"
-  end
 end
 
 --load user settigns
@@ -377,14 +391,15 @@ function LoadUserSettings()
       NewInstall()
     end
 
+    UpdateSettings()
     if userSettings then
         print(UIText.General.modname_log, UIText.General.settings_loaded)
     end
   else
     FirstRun()
-    SetAnotherDefaultPreset()
     Vectors.SetWindshieldDefault()
     Calculate.SetVignetteDefault()
+    UpdateSettings()
     print(UIText.General.modname_log,UIText.General.settings_notfound)
     print(UIText.General.modname_log,UIText.General.settings_benchmark_start)
   end
@@ -410,6 +425,7 @@ function LoadUserSettingsCache()
 
   enabledWindow = userSettingsCache.General and userSettingsCache.General.enabledWindow or false
 
+  UpdateSettings()
   if userSettingsCache then
     print(UIText.General.modname_log, UIText.General.settings_loaded)
   else
@@ -467,11 +483,27 @@ function UpdateSettings()
 
     Settings.CheckCrossSetting()
 
-    appliedVeh = Settings.appliedVeh
-    appliedOnFoot = Settings.appliedOnFoot
     enabledFPPBlockerAimOnFoot = Settings.enabledFPPBlockerAimOnFoot
     enabledFPPVignetteAimOnFoot = Settings.enabledFPPVignetteAimOnFoot
   end
+end
+
+function LogApplyOnFootSettings()
+  appliedOnFoot = true
+
+  print(UIText.General.modname_log,UIText.General.settings_saved_onfoot)
+end
+
+function LogResetOnFootSettings()
+  appliedOnFoot = false
+end
+
+function LogApplyVehicleSettings()
+  appliedVeh = true
+end
+
+function LogResetVehicleSettings()
+  appliedVeh = false
 end
 
 function Update()
@@ -486,6 +518,9 @@ registerForEvent("onInit", function()
   ObserveMasksController()
   Calculate.CalcAspectRatio()
   Calculate.GetAspectRatio()
+  Calculate.GetScreenEdges()
+  Calculate.GetScreenFactors()
+  Calculate.GetScreenSpace()
   SetDefaultPreset()
   Presets.ListPresets()
   SetDefaultPresetFile()
@@ -501,13 +536,18 @@ registerForEvent("onInit", function()
   Calculate.VignettePosY()
   Calculate.VignetteX()
   Calculate.VignetteY()
-  Calculate.SetHEDSize()
-  UpdateSettings()
-  Settings.ApplySettings()
+  Calculate.SetHED()
+  if Settings then
+    UpdateSettings()
+    Settings.ApplySettings()
+  end
 end)
 
 registerForEvent("onOverlayOpen", function()
   OverlayEnabled = true
+
+  Calculate.CalcAspectRatio()
+  Calculate.GetAspectRatio()
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -517,6 +557,9 @@ registerForEvent("onOverlayClose", function()
 
   Calculate.CalcAspectRatio()
   Calculate.GetAspectRatio()
+  Calculate.GetScreenEdges()
+  Calculate.GetScreenFactors()
+  Calculate.GetScreenSpace()
   Calculate.SetCornersMargins()
   Calculate.SetVignetteOrgMinMax()
   Calculate.SetVignetteOrgSize()
@@ -525,10 +568,12 @@ registerForEvent("onOverlayClose", function()
   Calculate.VignettePosY()
   Calculate.VignetteX()
   Calculate.VignetteY()
-  Calculate.SetHEDSize()
-  Settings.LogResetOnFoot()
-  UpdateSettings()
-  Settings.ApplySettings()
+  Calculate.SetHED()
+  LogResetOnFootSettings()
+  if Settings then
+    UpdateSettings()
+    Settings.ApplySettings()
+  end
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
@@ -641,6 +686,14 @@ registerForEvent("onDraw", function()
             ImGui.EndTabItem()
           end
         end
+        if Calculate.Screen.aspectRatioChange then
+          if ImGui.BeginTabItem(UIText.Info.tabname) then
+            ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+            ImGui.Text(UIText.General.info_aspectRatio)
+            ImGui.PopStyleColor()
+            ImGui.EndTabItem()
+          end
+        end
         if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.1
           ImGui.Text(UIText.General.title_general)
@@ -659,7 +712,7 @@ registerForEvent("onDraw", function()
               end
               if preset_selected then
                 ImGui.SetItemDefaultFocus()
-                Settings.LogResetVehicles()
+                LogResetVehicleSettings()
               end
             end
             ImGui.EndCombo()
@@ -674,7 +727,7 @@ registerForEvent("onDraw", function()
             SaveUserSettings()
             Presets.LoadPreset()
             Presets.ApplyPreset()
-            Settings.LogApplyVehicles()
+            LogApplyVehicleSettings()
           end
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
           if Presets.selectedPresetPosition then
@@ -773,7 +826,7 @@ registerForEvent("onDraw", function()
             enabledFPPOnFoot, fppOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.BottomCornersMasks.name, enabledFPPOnFoot)
             if fppOnFootEnabled then
               SaveUserSettings()
-              Settings.LogApplyOnFoot()
+              LogApplyOnFootSettings()
             end
             ImGui.PopStyleColor()--PSC.9
             if ImGui.IsItemHovered() then
@@ -787,7 +840,7 @@ registerForEvent("onDraw", function()
               if fppBlockerAimOnFootEnabled then
                 enabledFPPVignetteAimOnFoot = false
                 SaveUserSettings()
-                Settings.LogApplyOnFoot()
+                LogApplyOnFootSettings()
               end
               ImGui.PopStyleColor() --PSC.10
               if ImGui.IsItemHovered() then
@@ -813,7 +866,7 @@ registerForEvent("onDraw", function()
               if fppVignetteAimOnFootEnabled then
                 enabledFPPBlockerAimOnFoot = false
                 SaveUserSettings()
-                Settings.LogApplyOnFoot()
+                LogApplyOnFootSettings()
               end
               ImGui.PopStyleColor() --PSC.13
               if ImGui.IsItemHovered() then
@@ -832,7 +885,7 @@ registerForEvent("onDraw", function()
             enabledFPPVignetteOnFoot, fppVignetteOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.Vignette.name, enabledFPPVignetteOnFoot)
             if fppVignetteOnFootEnabled then
               SaveUserSettings()
-              Settings.LogApplyOnFoot()
+              LogApplyOnFootSettings()
             end
             ImGui.PopStyleColor() --PSC.15
             if ImGui.IsItemHovered() then
@@ -845,7 +898,7 @@ registerForEvent("onDraw", function()
               enabledFPPVignettePermamentOnFoot, fppVignettePermamentOnFootEnabled = ImGui.Checkbox(UIText.OnFoot.VignettePermament.name, enabledFPPVignettePermamentOnFoot)
               if fppVignettePermamentOnFootEnabled then
                 SaveUserSettings()
-                Settings.LogApplyOnFoot()
+                LogApplyOnFootSettings()
               end
               ImGui.PopStyleColor() --PSC.16
               if ImGui.IsItemHovered() then
@@ -915,7 +968,7 @@ registerForEvent("onDraw", function()
               if ImGui.Button(UIText.General.settings_save, 240, 40) then
                 saved = true
                 SaveUserSettings()
-                Settings.LogApplyOnFoot()
+                LogApplyOnFootSettings()
               end
             else
               enabledFPPVignettePermamentOnFoot = false

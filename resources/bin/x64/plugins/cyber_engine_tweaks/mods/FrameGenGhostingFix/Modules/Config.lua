@@ -1,9 +1,21 @@
 local Config = {
   __EDITION = "IV",
   __VERSION_NUMBER = 480,
+  __VERSION_SUFFIX = "xl",
   MaskingGlobal = {
     enabled = true,
-    masksController = "gameuiCrosshairContainerController"
+    ironsightController = false,
+    masksController = "gameuiCrosshairContainerController",
+    Widgets = {
+      hedCorners = "horizontaledgedowncorners",
+      hedFill = "horizontaledgedownfill",
+      hedTracker = "horizontaledgedowntracker",
+      mask1 = "mask1",
+      mask2 = "mask2",
+      mask3 = "mask3",
+      mask4 = "mask4",
+      maskEditor = "mask_editor",
+    }
   },
   Vectors = {
     VehElements = {
@@ -73,7 +85,8 @@ local Config = {
         Visible = {
           Base = {
             corners = true,
-            fill = false,
+            fill = true,
+            fillLock = false,
             tracker = true,
           }
         }
@@ -82,6 +95,7 @@ local Config = {
         Def = {
           delayDuration = 1,
           delayThreshold = 0.95,
+          gain = 1,
           max = 0.05,
           speedFactor = 0.01,
           stepFactor = 0.1
@@ -161,7 +175,8 @@ local Config = {
           Visible = {
             Base = {
               corners = true,
-              fill = false,
+              fill = true,
+              fillLock = false,
               tracker = true,
             }
           }
@@ -170,6 +185,7 @@ local Config = {
           Def = {
             delayDuration = 1,
             delayThreshold = 0.95,
+            gain = 1,
             max = 0.05,
             speedFactor = 0.01,
             stepFactor = 0.1

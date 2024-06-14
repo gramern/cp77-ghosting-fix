@@ -24,7 +24,8 @@ local UIText = {
     info_aim_onfoot = "[ ! ] You can enable one aiming/blocking feature at once.",
     info_version = "Mod version:",
     info_diagnostics = "Potential conflicts with other mods detected.",
-    info_config = "Can't find the 'Config' module. The mod won't work..."
+    info_config = "Can't find the 'Config' module. The mod won't work...",
+    info_aspectRatio = "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod will\nwork as intended."
   },
   Info = {
     tabname = "Info",
