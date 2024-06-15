@@ -3,7 +3,7 @@ local FrameGenGhostingFix = {
   __VERSION = "4.8.0",
   __VERSION_NUMBER = 480,
   __VERSION_SUFFIX = "",
-  __VERSION_STATUS = "rc",
+  __VERSION_STATUS = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -128,6 +128,10 @@ function CheckVersion()
 
   FrameGenGhostingFix.__VERSION_SUFFIX = Config.__VERSION_SUFFIX
   FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. FrameGenGhostingFix.__VERSION_SUFFIX
+
+  if Config.__VERSION_SUFFIX == "xl" then
+    Diagnostics = nil
+  end
 
   if not FrameGenGhostingFix.__VERSION_STATUS then return end
   FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
@@ -266,7 +270,7 @@ end
 
 function Benchmark()
   if not benchmark then return end
-  if not modsCompatibility then return end
+  -- if not modsCompatibility then return end
   if not masksControllerReady then return end
 
   local floor = math.floor
@@ -327,21 +331,30 @@ function SetSuggestedSettings()
 
   if averageFps >= 38 then
     enabledFPPOnFoot = true
+  else
+    enabledFPPOnFoot = false
   end
 
   if averageFps >= 45 then
     enabledFPPBlockerAimOnFoot = true
+  else
+    enabledFPPBlockerAimOnFoot = false
   end
 
   if averageFps >= 59 then
     enabledFPPVignetteOnFoot = true
+  else
+    enabledFPPVignetteOnFoot = false
   end
 
   if averageFps >= 65 then
     enabledFPPVignettePermamentOnFoot = true
+  else
+    enabledFPPVignettePermamentOnFoot = false
   end
 
   if Settings then
+    UpdateSettings()
     Settings.ApplySettings()
   end
 end
@@ -689,7 +702,7 @@ registerForEvent("onDraw", function()
         if Calculate.Screen.aspectRatioChange then
           if ImGui.BeginTabItem(UIText.Info.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-            ImGui.Text(UIText.General.info_aspectRatio)
+            ImGui.Text(UIText.Info.aspectRatioChange)
             ImGui.PopStyleColor()
             ImGui.EndTabItem()
           end
@@ -1035,6 +1048,7 @@ registerForEvent("onDraw", function()
               ImGui.PopStyleColor()
               if not benchmark then
                 if ImGui.Button(UIText.Options.Benchmark.benchmarkRun, 490, 40) then
+                  saved = false
                   ResetBenchmark()
                   StartBenchmark()
                 end
@@ -1051,7 +1065,9 @@ registerForEvent("onDraw", function()
               end
               if benchmarkTime >= benchmarkDuration then
                 if ImGui.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 240, 40) then
+                  saved = true
                   LoadUserSettingsCache()
+                  UpdateSettings()
                   Settings.ApplySettings()
                 end
                 ImGui.SameLine()

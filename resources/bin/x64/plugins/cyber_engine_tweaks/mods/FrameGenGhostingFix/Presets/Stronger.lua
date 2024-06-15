@@ -79,7 +79,7 @@ local Preset = {
       },
       Opacity = {
         Def = {
-          delayDuration = 2,
+          delayDuration = 3,
           delayThreshold = 0.95,
           gain = 3,
           max = 0.05,
@@ -91,7 +91,7 @@ local Preset = {
   },
   PresetInfo = {
     name = "Stronger",
-    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (2 sec.)",
+    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
     author = nil
   }
 }
