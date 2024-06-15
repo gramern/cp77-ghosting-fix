@@ -52,6 +52,7 @@ local Calculate = {
 }
 
 local Vectors = require("Modules/Vectors")
+local UIText = require("Modules/UIText")
 
 function Calculate.CalcAspectRatio()
   local vectorsScreen = Vectors.Screen
@@ -68,6 +69,7 @@ function Calculate.CalcAspectRatio()
 
   if Calculate.Screen.aspectRatio ~= previousAspectRatio then
     Calculate.Screen.aspectRatioChange = true
+    print(UIText.General.modname_log,UIText.General.info_aspectRatioChange)
   end
 end
 
