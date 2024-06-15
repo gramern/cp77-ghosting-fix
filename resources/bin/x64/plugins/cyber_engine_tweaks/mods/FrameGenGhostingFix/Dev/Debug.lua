@@ -1,8 +1,10 @@
 local Debug = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 481,
   currentFps = 0,
   ironsightController = nil,
   isGamePaused = true,
+  isGameLoaded = nil,
+  isPreGame = true,
   masksController = nil,
   masksControllerReady = false,
 }
@@ -51,6 +53,9 @@ function Debug.DebugUI()
     ImGui.Text("Is Pre-Game:")
     ImGui.SameLine()
     ImGui.Text(tostring(Debug.isPreGame))
+    ImGui.Text("Is Game Loaded:")
+    ImGui.SameLine()
+    ImGui.Text(tostring(Debug.isGameLoaded))
     ImGui.Text("Is Game Paused:")
     ImGui.SameLine()
     ImGui.Text(tostring(Debug.isGamePaused))
