@@ -1,7 +1,7 @@
 local FrameGenGhostingFix = {
   __NAME= "FrameGen Ghosting 'Fix'",
-  __VERSION = "4.8.1",
-  __VERSION_NUMBER = 481,
+  __VERSION = "4.8.2",
+  __VERSION_NUMBER = 482,
   __VERSION_SUFFIX = "",
   __VERSION_STATUS = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
@@ -156,11 +156,23 @@ function LoadModules()
   end
 end
 
+function MasksControllerReady(ready)
+  masksControllerReady = ready
+
+  if Debug then
+    Debug.masksControllerReady = masksControllerReady
+  end
+
+  if Vectors then
+    Vectors.VehMasks.masksControllerReady = masksControllerReady
+  end
+end
+
 function LoadMasksController()
   if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
 
   masksController = Config.MaskingGlobal.masksController
-  masksControllerReady = true
+  MasksControllerReady(true)
 
   if Debug then
     Debug.masksController = masksController
@@ -189,24 +201,6 @@ function LoadMasksController()
     Vectors.VehMasks.Mask3.maskPath = Config.MaskingGlobal.Widgets.mask3
     Vectors.VehMasks.Mask4.maskPath = Config.MaskingGlobal.Widgets.mask4
     Vectors.VehMasks.MaskEditor.maskPath = Config.MaskingGlobal.Widgets.maskEditor
-  end
-end
-
-function MasksControllerReady()
-  masksControllerReady = true
-end
-
-function MasksControllerNotReady()
-  masksControllerReady = false
-end
-
-function SetMasksController()
-  if Debug then
-    Debug.masksControllerReady = masksControllerReady
-  end
-
-  if Vectors then
-    Vectors.VehMasks.masksControllerReady = masksControllerReady
   end
 end
 
@@ -534,8 +528,7 @@ registerForEvent("onInit", function()
   CheckVersion()
   LoadModules()
   LoadMasksController()
-  if not masksController then return end
-  SetMasksController()
+  if not masksControllerReady then return end
 
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     IsGameLoaded(true)
