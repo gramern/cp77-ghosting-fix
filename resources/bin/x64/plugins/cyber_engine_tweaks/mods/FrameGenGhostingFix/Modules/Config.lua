@@ -93,7 +93,7 @@ local Config = {
       },
       Opacity = {
         Def = {
-          delayDuration = 1,
+          delayDuration = 1.5,
           delayThreshold = 0.95,
           gain = 1,
           max = 0.05,
@@ -183,7 +183,7 @@ local Config = {
         },
         Opacity = {
           Def = {
-            delayDuration = 1,
+            delayDuration = 1.5,
             delayThreshold = 0.95,
             gain = 1,
             max = 0.05,

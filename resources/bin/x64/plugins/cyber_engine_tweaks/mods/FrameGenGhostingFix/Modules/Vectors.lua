@@ -1559,7 +1559,6 @@ function Vectors.TransformOpacityBike()
   local min = math.max
   local activePerspective = Vectors.Vehicle.activePerspective
   local dotForward = Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward
-  local opacityGain = Vectors.VehMasks.Opacity.Def.gain
   local opacityValue = Vectors.VehMasks.Opacity.value
   local opacityForwardAbs = opacityValue * Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs
   local opacityUpAbs = opacityValue * Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs
@@ -1580,16 +1579,16 @@ function Vectors.TransformOpacityBike()
 
     --Mask4
     local mask4Opacity = max(opacityUpAbs, opacityForwardAbs)
-    Vectors.VehMasks.Mask4.opacity = min(opacityValue, mask4Opacity)
+    Vectors.VehMasks.Mask4.opacity = min(opacityValue, mask4Opacity) * 0.75
   else
     --Mask1
     Vectors.VehMasks.Mask1.opacity = opacityValue * 0.75
 
     --Mask2
-    Vectors.VehMasks.Mask2.opacity = opacityValue
+    Vectors.VehMasks.Mask2.opacity = opacityValue * 0.75
 
     --Mask3
-    Vectors.VehMasks.Mask3.opacity = opacityValue
+    Vectors.VehMasks.Mask3.opacity = opacityValue * 0.75
 
     --Mask4
     Vectors.VehMasks.Mask4.opacity = opacityValue
