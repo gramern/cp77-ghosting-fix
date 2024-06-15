@@ -1,7 +1,7 @@
 local FrameGenGhostingFix = {
   __NAME= "FrameGen Ghosting 'Fix'",
-  __VERSION = "4.8.0",
-  __VERSION_NUMBER = 480,
+  __VERSION = "4.8.2",
+  __VERSION_NUMBER = 482,
   __VERSION_SUFFIX = "",
   __VERSION_STATUS = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
@@ -61,10 +61,11 @@ local ironsightController = false
 local modsCompatibility = true
 
 --is it a first run?
-local firstRun = nil
-local newInstall = nil
+local isFirstRun = nil
+local isNewInstall = nil
 
 --speaks for itself
+local isGameLoaded = false
 local isGamePaused = nil
 local isPreGame = nil
 
@@ -155,10 +156,23 @@ function LoadModules()
   end
 end
 
+function MasksControllerReady(ready)
+  masksControllerReady = ready
+
+  if Debug then
+    Debug.masksControllerReady = masksControllerReady
+  end
+
+  if Vectors then
+    Vectors.VehMasks.masksControllerReady = masksControllerReady
+  end
+end
+
 function LoadMasksController()
   if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
 
   masksController = Config.MaskingGlobal.masksController
+  MasksControllerReady(true)
 
   if Debug then
     Debug.masksController = masksController
@@ -190,42 +204,22 @@ function LoadMasksController()
   end
 end
 
-function ObserveMasksController()
-  if masksController then
-    Observe(masksController, 'OnPlayerAttach', function()
-      masksControllerReady = true
-    end)
-
-    Observe(masksController, 'OnPlayerDetach', function()
-      masksControllerReady = false
-    end)
-
-    if Debug then
-      Debug.masksControllerReady = masksControllerReady
-    end
-
-    if Vectors then
-      Vectors.VehMasks.masksControllerReady = masksControllerReady
-    end
-  end
-end
-
 function FirstRun()
-  firstRun = true
+  isFirstRun = true
   NewInstall()
   StartBenchmark()
 end
 
 function AfterFirstRun()
-  firstRun = false
+  isFirstRun = false
 end
 
 function NewInstall()
-  newInstall = true
+  isNewInstall = true
 end
 
 function AfterNewInstall()
-  newInstall = false
+  isNewInstall = false
 end
 
 function GetGameState()
@@ -235,6 +229,7 @@ function GetGameState()
   if Debug then
     Debug.isGamePaused = isGamePaused
     Debug.isPreGame = isPreGame
+    Debug.isGameLoaded = isGameLoaded
   end
 
   if Presets then
@@ -246,6 +241,10 @@ function GetGameState()
     Vectors.Game.isGamePaused = isGamePaused
     Vectors.Game.isPreGame = isPreGame
   end
+end
+
+function IsGameLoaded(isLoaded)
+  isGameLoaded = isLoaded
 end
 
 function GetFps(deltaTime)
@@ -272,6 +271,7 @@ function Benchmark()
   if not benchmark then return end
   -- if not modsCompatibility then return end
   if not masksControllerReady then return end
+  if not isGameLoaded then return end
 
   local floor = math.floor
 
@@ -285,10 +285,10 @@ function Benchmark()
     SetSuggestedSettings()
     UpdateSettings()
 
-    if not newInstall then return end
+    if not isNewInstall then return end
     AfterNewInstall()
 
-    if not firstRun then return end
+    if not isFirstRun then return end
     SaveUserSettings()
     AfterFirstRun()
   end
@@ -519,7 +519,7 @@ function LogResetVehicleSettings()
   appliedVeh = false
 end
 
-function Update()
+function UpdateMounted()
   isMounted = Vectors.Vehicle.isMounted
 end
 
@@ -528,7 +528,16 @@ registerForEvent("onInit", function()
   CheckVersion()
   LoadModules()
   LoadMasksController()
-  ObserveMasksController()
+  if not masksControllerReady then return end
+
+  Observe('QuestTrackerGameController', 'OnInitialize', function()
+    IsGameLoaded(true)
+  end)
+
+  Observe('QuestTrackerGameController', 'OnUninitialize', function()
+    IsGameLoaded(false)
+  end)
+
   Calculate.CalcAspectRatio()
   Calculate.GetAspectRatio()
   Calculate.GetScreenEdges()
@@ -591,15 +600,15 @@ end)
 
 registerForEvent("onUpdate", function(deltaTime)
   if not masksController then return end
-  ObserveMasksController()
   GetGameState()
   if isPreGame then return end
-  if not masksControllerReady then return end
+  if not isGameLoaded then return end
+  -- if not masksControllerReady then return end
   if deltaTime == 0 then return end
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
   if isGamePaused then return end
-  Update()
+  UpdateMounted()
   Vectors.GetCameraData()
   Vectors.GetPlayerData()
   if not isMounted then return end
@@ -651,10 +660,10 @@ registerForEvent("onDraw", function()
             Debug.DebugUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
-        if newInstall then
+        if isNewInstall then
           if ImGui.BeginTabItem(UIText.Info.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-            if firstRun then
+            if isFirstRun then
               ImGui.Text(UIText.Info.benchmark)
             else
               ImGui.Text(UIText.Info.benchmarkAsk)
@@ -685,7 +694,7 @@ registerForEvent("onDraw", function()
             ImGui.SameLine()
             ImGui.Text(tostring(benchmarkRemainingTime))
             ImGui.PopStyleColor()
-            if not firstRun and not benchmark then
+            if not isFirstRun and not benchmark then
               ImGui.Text("")
               if ImGui.Button(UIText.General.yes, 240, 40) then
                 StartBenchmark()
@@ -997,7 +1006,7 @@ registerForEvent("onDraw", function()
         end
         --additional settings interface ends------------------------------------------------------------------------------------------------------------------
         --advanced options interface starts------------------------------------------------------------------------------------------------------------------
-        if not newInstall then
+        if not isNewInstall then
           if ImGui.BeginTabItem(UIText.Options.tabname) then
             ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
             if Debug then
