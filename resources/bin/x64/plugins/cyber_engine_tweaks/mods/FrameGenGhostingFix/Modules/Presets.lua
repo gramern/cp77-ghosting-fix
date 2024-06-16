@@ -1,5 +1,5 @@
 local Presets = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 484,
   isGamePaused = true,
   masksController = nil,
   selectedPreset = nil,
@@ -11,11 +11,16 @@ local Presets = {
 }
 
 local Config = require("Modules/Config")
+local Customize = require("Modules/Customize")
 local Vectors = require("Modules/Vectors")
 
 function Presets.GetPresets()
   local presetsDir = dir('Presets')
   local i = 1
+
+  if Customize then
+    i = 2
+  end
 
   for _, preset in ipairs(presetsDir) do
     if string.find(preset.name, '%.lua$') then
@@ -27,8 +32,17 @@ end
 
 function Presets.ListPresets()
   Presets.selectedPreset = Presets.presetsList[1]
+
+  if Customize then
+    Presets.selectedPreset = Presets.presetsList[2]
+  end
+
   Presets.GetPresets()
   local i = 1
+
+  if Customize then
+    i = 2
+  end
 
   for _,preset in pairs(Presets.presetsFile) do
     preset = string.gsub(preset, ".lua", "")
@@ -54,12 +68,17 @@ end
 
 function Presets.LoadPreset()
   local presetPath = nil
+  local defaultPresetPosition = 1
+
+  if Customize then
+    defaultPresetPosition = 2
+  end
 
   if Presets.presetsFile[Presets.selectedPresetPosition] then
     presetPath = "Presets/" .. Presets.presetsFile[Presets.selectedPresetPosition]
   end
 
-  if Presets.selectedPresetPosition == 1 or not presetPath then
+  if Presets.selectedPresetPosition == defaultPresetPosition or not presetPath then
     if not presetPath then
       Presets.selectedPreset = "Default"
       Presets.GetPresetInfo()
@@ -72,7 +91,17 @@ function Presets.LoadPreset()
     Vectors.VehMasks.HorizontalEdgeDown.opacity = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.opacity
     Vectors.VehMasks.HorizontalEdgeDown.opacityMax = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.opacityMax
     Vectors.VehMasks.HorizontalEdgeDown.Size.Base = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Size.Base
-    Vectors.VehMasks.HorizontalEdgeDown.Visible.Base = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Visible.Base
+    Vectors.VehMasks.HorizontalEdgeDown.Visible.Def = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def
+    Vectors.VehMasks.Opacity.Def = LoadDefault.Vectors.VehMasks.Opacity.Def
+  elseif Customize and Presets.selectedPresetPosition == 1 then
+    local LoadDefault = Config.Default
+    Config.MaskingGlobal.enabled = LoadDefault.MaskingGlobal.enabled
+    Vectors.VehElements = LoadDefault.Vectors.VehElements
+    Vectors.VehMasks.AnchorPoint = LoadDefault.Vectors.VehMasks.AnchorPoint
+    Vectors.VehMasks.HorizontalEdgeDown.opacity = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.opacity
+    Vectors.VehMasks.HorizontalEdgeDown.opacityMax = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.opacityMax
+    Vectors.VehMasks.HorizontalEdgeDown.Size.Base = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Size.Base
+    Vectors.VehMasks.HorizontalEdgeDown.Visible.Def = LoadDefault.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def
     Vectors.VehMasks.Opacity.Def = LoadDefault.Vectors.VehMasks.Opacity.Def
   else
     presetPath = string.gsub(presetPath, ".lua", "")
@@ -86,7 +115,7 @@ function Presets.LoadPreset()
         Vectors.VehMasks.HorizontalEdgeDown.opacity = Preset.Vectors.VehMasks.HorizontalEdgeDown.opacity
         Vectors.VehMasks.HorizontalEdgeDown.opacityMax = Preset.Vectors.VehMasks.HorizontalEdgeDown.opacityMax
         Vectors.VehMasks.HorizontalEdgeDown.Size.Base = Preset.Vectors.VehMasks.HorizontalEdgeDown.Size.Base
-        Vectors.VehMasks.HorizontalEdgeDown.Visible.Base = Preset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Base
+        Vectors.VehMasks.HorizontalEdgeDown.Visible.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def
         Vectors.VehMasks.Opacity.Def = Preset.Vectors.VehMasks.Opacity.Def
       end
     end

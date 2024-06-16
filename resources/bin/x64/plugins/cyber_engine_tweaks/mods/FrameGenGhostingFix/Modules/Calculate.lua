@@ -1,5 +1,5 @@
 local Calculate = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 484,
   Screen = {
     Base = {width = 3840, height = 2160},
     Edge = {

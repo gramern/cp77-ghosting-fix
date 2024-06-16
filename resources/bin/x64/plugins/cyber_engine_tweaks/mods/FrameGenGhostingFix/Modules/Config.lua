@@ -1,6 +1,6 @@
 local Config = {
   __EDITION = "IV",
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 484,
   __VERSION_SUFFIX = "xl",
   MaskingGlobal = {
     enabled = true,
@@ -83,7 +83,7 @@ local Config = {
           Base = {x = 4240, y = 1480}
         },
         Visible = {
-          Base = {
+          Def = {
             corners = true,
             fill = true,
             fillLock = false,
@@ -102,6 +102,14 @@ local Config = {
         },
       }
     }
+  },
+  Customize = {
+    PresetInfo = {
+      file = "Customize.lua",
+      name = "Customize",
+      description = "Customize your preset for vehicles.",
+      author = nil
+    },
   },
   Default = {
     MaskingGlobal = {
@@ -173,7 +181,7 @@ local Config = {
             Base = {x = 4240, y = 1480}
           },
           Visible = {
-            Base = {
+            Def = {
               corners = true,
               fill = true,
               fillLock = false,

@@ -1,5 +1,5 @@
 local Vectors = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 484,
   Camera = {
     Forward = nil,
     ForwardTable = {
@@ -232,13 +232,14 @@ local Vectors = {
         tracker = 0,
       },
       Size = {
+        lock = false,
         Base = {x = 4240, y = 1480},
         Tracker = {x = 0, y = 0},
         x = 4240,
         y = 1480
       },
       Visible = {
-        Base = {
+        Def = {
           corners = true,
           fill = true,
           fillLock = false,
@@ -611,10 +612,10 @@ function Vectors.GetBikeWheelsPositions()
   BackPos = new4(BackPos.x, BackPos.y, Vectors.Vehicle.Position.z, BackPos.w)
   FrontPos = new4(FrontPos.x, FrontPos.y, Vectors.Vehicle.Position.z, FrontPos.w)
 
-  wheelPos.Back.Left = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = 0, z = 0})
-  wheelPos.Front.Left = Vectors.GetWorldPositionFromOffset(FrontPos, {x = 0, y = 0, z = 0})
-  wheelPos.Back.Right = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = 0, z = 0})
-  wheelPos.Front.Right = Vectors.GetWorldPositionFromOffset(FrontPos, {x = 0, y = 0, z = 0})
+  wheelPos.Back.Left = BackPos
+  wheelPos.Front.Left = FrontPos
+  wheelPos.Back.Right = BackPos
+  wheelPos.Front.Right = FrontPos
 
   -- local simVehPosZ = (BackPos.z + FrontPos.z) / 2
   -- local diffVehPosZ = simVehPosZ - Vectors.Vehicle.Position.z
@@ -1222,8 +1223,10 @@ function Vectors.TransformWidthCar()
 
   if activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
-    local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-    hedSize.x = Vectors.ResizeVehHED(hedSize.Base.x, newHEDx, true)
+    if not hedSize.lock then
+      local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
+      hedSize.x = Vectors.ResizeVehHED(hedSize.Base.x, newHEDx, true)
+    end
     
     --HEDTracker
     local hedTrackerSizeX = max(axisLength.back * 4, bumpersScreenDistance * 3)
@@ -1775,8 +1778,8 @@ function Vectors.TransformVisibility()
   local hedVisible = Vectors.VehMasks.HorizontalEdgeDown.Visible
   local medianAngle = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane
 
-  hedVisible.corners = hedVisible.Base.corners
-  hedVisible.tracker = hedVisible.Base.tracker
+  hedVisible.corners = hedVisible.Def.corners
+  hedVisible.tracker = hedVisible.Def.tracker
 
   if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
     Vectors.VehMasks.Mask1.visible = true
@@ -1785,12 +1788,12 @@ function Vectors.TransformVisibility()
     Vectors.VehMasks.Mask4.visible = true
 
     if dotVeh.up > hedVisible.fillToggleValue then
-      hedVisible.fill = hedVisible.Base.fill
+      hedVisible.fill = hedVisible.Def.fill
     else
-      hedVisible.fill = hedVisible.Base.fillLock
+      hedVisible.fill = hedVisible.Def.fillLock
     end
 
-    if baseObject == 0 and hedVisible.Base.fillLock then
+    if baseObject == 0 and hedVisible.Def.fillLock then
       hedVisible.tracker = false
     end
   else
@@ -1807,13 +1810,13 @@ function Vectors.TransformVisibility()
     end
 
     if baseObject == 0 and medianAngle >= 0 then
-      hedVisible.fill = hedVisible.Base.fill
+      hedVisible.fill = hedVisible.Def.fill
     elseif baseObject == 0 and hasWeapon then
-      hedVisible.fill = hedVisible.Base.fill
+      hedVisible.fill = hedVisible.Def.fill
     elseif baseObject == 1 and hasWeapon and dotVeh.right < -0.1 then
-      hedVisible.fill = hedVisible.Base.fill
+      hedVisible.fill = hedVisible.Def.fill
     else
-      hedVisible.fill = hedVisible.Base.fillLock
+      hedVisible.fill = hedVisible.Def.fillLock
     end
 
     hedVisible.tracker = false

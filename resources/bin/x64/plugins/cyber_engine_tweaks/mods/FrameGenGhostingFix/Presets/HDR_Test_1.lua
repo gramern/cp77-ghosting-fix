@@ -1,4 +1,5 @@
 local Preset = {
+  __VERSION_NUMBER = 484,
   MaskingGlobal = {
     enabled = true
   },
@@ -68,7 +69,7 @@ local Preset = {
           Base = {x = 4240, y = 1480} -- min size x = 3888
         },
         Visible = {
-          Base = {
+          Def = {
             corners = true,
             fill = true,
             fillLock = false,

@@ -1,5 +1,5 @@
 local UIText = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 484,
   General = {
     modname_log = "[FrameGen Ghosting 'Fix']",
     title_general = "General Settings:",
@@ -36,6 +36,9 @@ local UIText = {
   },
   Vehicles = {
     tabname = "Vehicles",
+    Customize = {
+
+    },
     MaskingPresets = {
       name = "Use this preset for vehicles:",
       tooltip = "Choose a preset of anti-ghosting for vehicles.",

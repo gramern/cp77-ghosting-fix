@@ -1,9 +1,9 @@
 local FrameGenGhostingFix = {
   __NAME= "FrameGen Ghosting 'Fix'",
-  __VERSION = "4.8.2",
-  __VERSION_NUMBER = 482,
+  __VERSION = "4.8.4",
+  __VERSION_NUMBER = 484,
   __VERSION_SUFFIX = "",
-  __VERSION_STATUS = nil,
+  __VERSION_STATUS = "alpha1",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -33,6 +33,7 @@ local FrameGenGhostingFix = {
 --modules
 local Calculate = require("Modules/Calculate")
 local Config = require("Modules/Config")
+local Customize = require("Modules/Customize")
 local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
@@ -360,14 +361,28 @@ function SetSuggestedSettings()
 end
 
 --set default preset
-function SetDefaultPreset()
-  table.insert(Presets.presetsList, 1, Config.Default.PresetInfo.name)
-  table.insert(Presets.presetsDesc, 1, Config.Default.PresetInfo.description)
-  table.insert(Presets.presetsAuth, 1, Config.Default.PresetInfo.author)
+function SetDefaultPresets()
+  if Customize then
+    table.insert(Presets.presetsList, 1, Config.Customize.PresetInfo.name)
+    table.insert(Presets.presetsDesc, 1, Config.Customize.PresetInfo.description)
+    table.insert(Presets.presetsAuth, 1, Config.Customize.PresetInfo.author)
+    table.insert(Presets.presetsList, 2, Config.Default.PresetInfo.name)
+    table.insert(Presets.presetsDesc, 2, Config.Default.PresetInfo.description)
+    table.insert(Presets.presetsAuth, 2, Config.Default.PresetInfo.author)
+  else
+    table.insert(Presets.presetsList, 1, Config.Default.PresetInfo.name)
+    table.insert(Presets.presetsDesc, 1, Config.Default.PresetInfo.description)
+    table.insert(Presets.presetsAuth, 1, Config.Default.PresetInfo.author)
+  end
 end
 
-function SetDefaultPresetFile()
-  table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
+function SetDefaultPresetsFiles()
+  if Customize then
+    table.insert(Presets.presetsFile, 1, Config.Customize.PresetInfo.file)
+    table.insert(Presets.presetsFile, 2, Config.Default.PresetInfo.file)
+  else
+    table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
+  end
 end
 
 --load user settigns
@@ -543,9 +558,9 @@ registerForEvent("onInit", function()
   Calculate.GetScreenEdges()
   Calculate.GetScreenFactors()
   Calculate.GetScreenSpace()
-  SetDefaultPreset()
+  SetDefaultPresets()
   Presets.ListPresets()
-  SetDefaultPresetFile()
+  SetDefaultPresetsFiles()
   LoadUserSettings()
   Presets.GetPresetInfo()
   Presets.LoadPreset()
@@ -772,7 +787,7 @@ registerForEvent("onDraw", function()
           end
           if Config.MaskingGlobal.enabled then
             --additional settings interface starts------------------------------------------------------------------------------------------------------------------
-            if Settings then
+            if Settings and Presets.selectedPreset == "Customize" then
               ImGui.Text("")
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
               ImGui.Text(UIText.General.title_fps90)

@@ -1,5 +1,5 @@
 local Debug = {
-  __VERSION_NUMBER = 481,
+  __VERSION_NUMBER = 484,
   currentFps = 0,
   ironsightController = nil,
   isGamePaused = true,
@@ -444,7 +444,7 @@ function Debug.DebugUI()
     ImGui.Separator()
     ImGui.Text("HED Fill Lock:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Base.fillLock))
+    ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock))
     ImGui.Text("HED Tracker Position:")
     if Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker then
       ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))
