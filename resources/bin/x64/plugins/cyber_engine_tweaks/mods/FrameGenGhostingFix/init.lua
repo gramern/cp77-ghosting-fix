@@ -3,7 +3,7 @@ local FrameGenGhostingFix = {
   __VERSION = "4.8.4",
   __VERSION_NUMBER = 484,
   __VERSION_SUFFIX = "",
-  __VERSION_STATUS = "alpha1",
+  __VERSION_STATUS = "alpha2",
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -122,7 +122,7 @@ local windowEnabled
 
 
 function CheckVersion()
-  if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
+  if not Config then return end
 
   if Config.MaskingGlobal.ironsightController then
     ironsightController = Config.MaskingGlobal.ironsightController
@@ -137,6 +137,13 @@ function CheckVersion()
 
   if not FrameGenGhostingFix.__VERSION_STATUS then return end
   FrameGenGhostingFix.__VERSION = FrameGenGhostingFix.__VERSION .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
+end
+
+function CheckModules()
+  if not Calculate then print(UIText.General.modname_log,UIText.General.info_calculateMissing) return end
+  if not Config then print(UIText.General.modname_log,UIText.General.info_configMissing) return end
+  if not Presets then print(UIText.General.modname_log,UIText.General.info_presetsMissing) return end
+  if not Vectors then print(UIText.General.modname_log,UIText.General.info_vectorsMissing) return end
 end
 
 --set for available modules
@@ -231,11 +238,6 @@ function GetGameState()
     Debug.isGamePaused = isGamePaused
     Debug.isPreGame = isPreGame
     Debug.isGameLoaded = isGameLoaded
-  end
-
-  if Presets then
-    Presets.isGamePaused = isGamePaused
-    Presets.isPreGame = isPreGame
   end
 
   if Vectors then
@@ -357,31 +359,6 @@ function SetSuggestedSettings()
   if Settings then
     UpdateSettings()
     Settings.ApplySettings()
-  end
-end
-
---set default preset
-function SetDefaultPresets()
-  if Customize then
-    table.insert(Presets.presetsList, 1, Config.Customize.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 1, Config.Customize.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 1, Config.Customize.PresetInfo.author)
-    table.insert(Presets.presetsList, 2, Config.Default.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 2, Config.Default.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 2, Config.Default.PresetInfo.author)
-  else
-    table.insert(Presets.presetsList, 1, Config.Default.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 1, Config.Default.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 1, Config.Default.PresetInfo.author)
-  end
-end
-
-function SetDefaultPresetsFiles()
-  if Customize then
-    table.insert(Presets.presetsFile, 1, Config.Customize.PresetInfo.file)
-    table.insert(Presets.presetsFile, 2, Config.Default.PresetInfo.file)
-  else
-    table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
   end
 end
 
@@ -540,6 +517,7 @@ end
 
 --initialize all stuff etc
 registerForEvent("onInit", function()
+  CheckModules()
   CheckVersion()
   LoadModules()
   LoadMasksController()
@@ -558,9 +536,9 @@ registerForEvent("onInit", function()
   Calculate.GetScreenEdges()
   Calculate.GetScreenFactors()
   Calculate.GetScreenSpace()
-  SetDefaultPresets()
+  Presets.SetDefaultPreset()
+  Presets.GetPresets()
   Presets.ListPresets()
-  SetDefaultPresetsFiles()
   LoadUserSettings()
   Presets.GetPresetInfo()
   Presets.LoadPreset()
@@ -574,11 +552,27 @@ registerForEvent("onInit", function()
   Calculate.VignetteX()
   Calculate.VignetteY()
   Calculate.SetHED()
+
   if Settings then
     UpdateSettings()
     Settings.ApplySettings()
   end
 end)
+
+if Debug then
+  registerInput('printPresets', 'Print the presets list', function(keypress)
+  
+    if not keypress then
+        return
+    end
+    if Presets then
+      Presets.PrintPresets()
+    else
+      print("No 'Presets' module.")
+    end
+    
+  end)
+end
 
 registerForEvent("onOverlayOpen", function()
   OverlayEnabled = true

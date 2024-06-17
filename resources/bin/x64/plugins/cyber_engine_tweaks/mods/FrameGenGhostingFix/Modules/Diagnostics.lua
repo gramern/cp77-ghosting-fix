@@ -1,6 +1,5 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local Diagnostics = {
+  __VERSION_NUMBER = 480,
   modscompatibility = true,
   modfiles = {},
   updateinfo = false

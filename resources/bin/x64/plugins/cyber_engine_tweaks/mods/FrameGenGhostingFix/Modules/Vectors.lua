@@ -220,20 +220,27 @@ local Vectors = {
       hedFillPath = "fgfixcars/horizontaledgedownfill",
       hedTrackerPath = "fgfixcars/horizontaledgedowntracker",
       ScreenSpace = {
-        Base = {x = 1920, y = 2280},
+        Def = {x = 1920, y = 2280},
         x = 1920,
         Tracker = {x = 0, y = 0},
         y = 2280,
       },
-      opacity = 0,
-      opacityMax = 0.03,
-      opacityTracker = 0,
+      Opacity = {
+        Def = {
+          max = 0.03
+        },
+        tracker = 0,
+        value = 0
+      },
       Rotation = {
         tracker = 0,
       },
       Size = {
-        lock = false,
-        Base = {x = 4240, y = 1480},
+        Def = {
+          lock = false,
+          x = 4240,
+          y = 1480
+        },
         Tracker = {x = 0, y = 0},
         x = 4240,
         y = 1480
@@ -927,11 +934,11 @@ function Vectors.TransformByPerspective()
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
 
   if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
-    hedSize.x = hedSize.Base.x
-    hedSize.y = hedSize.Base.y
+    hedSize.x = hedSize.Def.x
+    hedSize.y = hedSize.Def.y
   else
-    hedSize.x = Vectors.ResizeVehHED(hedSize.Base.x, 0.92, true)
-    hedSize.y = Vectors.ResizeVehHED(hedSize.Base.y, 1.2)
+    hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, 0.92, true)
+    hedSize.y = Vectors.ResizeVehHED(hedSize.Def.y, 1.2)
 
     if Vectors.Vehicle.vehicleBaseObject ~= 0 then return end
     Vectors.UpdateLiveViewWindshieldEditor()
@@ -1175,7 +1182,7 @@ function Vectors.TransformWidthBike()
   if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-    hedSize.x = Vectors.ResizeVehHED(hedSize.Base.x, newHEDx, true)
+    hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, newHEDx, true)
 
     --HEDTracker
     hedSize.Tracker.x = max(wheelbaseScreen * 4, wheelbaseScreenPerp * 4)
@@ -1223,11 +1230,11 @@ function Vectors.TransformWidthCar()
 
   if activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
-    if not hedSize.lock then
+    if not hedSize.Def.lock then
       local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-      hedSize.x = Vectors.ResizeVehHED(hedSize.Base.x, newHEDx, true)
+      hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, newHEDx, true)
     end
-    
+  
     --HEDTracker
     local hedTrackerSizeX = max(axisLength.back * 4, bumpersScreenDistance * 3)
     hedSize.Tracker.x = hedTrackerSizeX * (1 + dotVeh.rightAbs)
@@ -1680,7 +1687,7 @@ function Vectors.NormalizeOpacity()
   local opacityStep = opacity.Def.max * opacity.Def.stepFactor
 
   opacity.normalizedValue = opacity.normalizedValue - opacityStep
-  Vectors.VehMasks.Opacity.value = opacity.normalizedValue
+  opacity.value = opacity.normalizedValue
 
   if opacity.normalizedValue > opacity.speedValue then return end
   Vectors.CancelNormalizeOpacity()
@@ -1728,13 +1735,12 @@ function Vectors.TransformOpacity()
   local currentSpeedAbs = abs(Vectors.Vehicle.currentSpeed)
   local currentSpeedAbsInt = floor(currentSpeedAbs)
   local opacity = Vectors.VehMasks.Opacity
-  local opacityHED = Vectors.VehMasks.HorizontalEdgeDown
-  
+  local opacityHED = Vectors.VehMasks.HorizontalEdgeDown.Opacity
 
   if opacity.Def.max ~= 1 then
-    Vectors.VehMasks.HorizontalEdgeDown.opacity = min(opacityHED.opacityMax, currentSpeedAbsInt * 0.005)
+    opacityHED.value = min(opacityHED.Def.max, currentSpeedAbsInt * 0.005)
     opacity.speedValue = min(opacity.Def.max, currentSpeedAbsInt * opacity.Def.speedFactor)
-    Vectors.VehMasks.Opacity.value = opacity.speedValue
+    opacity.value = opacity.speedValue
 
     if opacity.speedValue >= opacity.Def.max then
       Vectors.SetDelayTransformOpacity()
@@ -1743,10 +1749,11 @@ function Vectors.TransformOpacity()
     Vectors.DelayTransformOpacity()
     Vectors.NormalizeOpacity()
   else
-    Vectors.VehMasks.Opacity.value = opacity.Def.max
+    opacityHED.value = opacityHED.Def.max
+    opacity.value = opacity.Def.max
   end
 
-  Vectors.VehMasks.HorizontalEdgeDown.opacityTracker = (opacity.value + opacityHED.opacity) * 0.5
+  opacityHED.tracker = (opacity.value + opacityHED.value) * 0.5
 
   if Vectors.Vehicle.vehicleBaseObject == 1 then
     Vectors.TransformOpacityCar()
@@ -1836,14 +1843,13 @@ function Vectors.ProjectVehicleMasks()
 
   if game.isPreGame then return end
   if Vectors.VehMasks.masksControllerReady then
-    if not game.isGamePaused then
-      Vectors.GetVehicleData()
-      Vectors.GetDotProducts()
-      Vectors.GetCameraAnglesVehicle()
-      Vectors.GetDerivativeVehicleData()
-      Vectors.GetActivePerspective()
-      Vectors.TransformVehMasks()
-    end
+    if game.isGamePaused then return end
+    Vectors.GetVehicleData()
+    Vectors.GetDotProducts()
+    Vectors.GetCameraAnglesVehicle()
+    Vectors.GetDerivativeVehicleData()
+    Vectors.GetActivePerspective()
+    Vectors.TransformVehMasks()
   end
 end
 

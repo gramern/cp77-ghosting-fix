@@ -77,10 +77,17 @@ local Config = {
     VehMasks = {
       AnchorPoint = {x = 0.5, y = 0.5},
       HorizontalEdgeDown = {
-        opacity = 0,
-        opacityMax = 0.03,
+        Opacity = {
+          Def = {
+            max = 0.03,
+          }
+        },
         Size = {
-          Base = {x = 4240, y = 1480}
+          Def = {
+            lock = false,
+            x = 4240,
+            y = 1480
+          },
         },
         Visible = {
           Def = {
@@ -175,10 +182,17 @@ local Config = {
       VehMasks = {
         AnchorPoint = {x = 0.5, y = 0.5},
         HorizontalEdgeDown = {
-          opacity = 0,
-          opacityMax = 0.03,
+          Opacity = {
+            Def = {
+              max = 0.03,
+            }
+          },
           Size = {
-            Base = {x = 4240, y = 1480}
+            Def = {
+              lock = false,
+              x = 4240,
+              y = 1480
+            },
           },
           Visible = {
             Def = {

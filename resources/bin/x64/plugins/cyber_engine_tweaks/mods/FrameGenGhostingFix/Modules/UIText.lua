@@ -24,7 +24,10 @@ local UIText = {
     info_aim_onfoot = "[ ! ] You can enable one aiming/blocking feature at once.",
     info_version = "Mod version:",
     info_diagnostics = "Potential conflicts with other mods detected.",
-    info_config = "Can't find the 'Config' module. The mod won't work...",
+    info_calculateMissing = "Can't find the 'Calculate' module. The mod won't work...",
+    info_configMissing = "Can't find the 'Config' module. The mod won't work...",
+    info_presetsMissing = "Can't find the 'Presets' module. The mod won't work...",
+    info_vectorsMissing = "Can't find the 'Vectors' module. The mod won't work...",
     info_aspectRatioChange = "The aspect ratio of your screen has changed. Please restart the game to ensure the mod will work as intended."
   },
   Info = {
