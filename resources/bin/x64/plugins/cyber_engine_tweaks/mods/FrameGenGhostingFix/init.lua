@@ -388,6 +388,7 @@ function LoadUserSettings()
     Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
     Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
+    Presets.selectedPresetShow = userSettings.Vehicles and userSettings.Vehicles.selectedPresetShow or Presets.selectedPresetShow
 
     enabledWindow = userSettings.General and userSettings.General.enabledWindow or false
     version =  userSettings.General and userSettings.General.version or false
@@ -427,6 +428,7 @@ function LoadUserSettingsCache()
   Calculate.FPPOnFoot.vignetteFootSizeY = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
   Presets.selectedPreset = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPreset or Presets.selectedPreset
+  Presets.selectedPresetShow = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPresetShow or Presets.selectedPresetShow
 
   enabledWindow = userSettingsCache.General and userSettingsCache.General.enabledWindow or false
 
@@ -443,6 +445,7 @@ function SaveUserSettings()
   local userSettings = {
     Vehicles = {
       selectedPreset = Presets.selectedPreset,
+      selectedPresetShow = Presets.selectedPresetShow,
     },
     FPPBikeWindshield = {
       enabledWindshield = enabledWindshieldSettings,
@@ -734,11 +737,12 @@ registerForEvent("onDraw", function()
           if Presets.selectedPresetPosition == nil then
             Presets.GetPresetInfo()
           end
-          if ImGui.BeginCombo("##", Presets.selectedPreset) then
-            for _, preset in ipairs(Presets.presetsList) do
-              local preset_selected = (Presets.selectedPreset == preset)
+          if ImGui.BeginCombo("##", Presets.selectedPresetShow) then
+            for int, preset in ipairs(Presets.presetsShow) do
+              local preset_selected = (Presets.selectedPresetShow == preset)
               if ImGui.Selectable(preset, preset_selected) then
-                Presets.selectedPreset = preset
+                Presets.selectedPreset = Presets.presetsList[int]
+                Presets.selectedPresetShow = Presets.presetsShow[int]
                 Presets.GetPresetInfo()
               end
               if preset_selected then
@@ -763,11 +767,11 @@ registerForEvent("onDraw", function()
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
           if Presets.selectedPresetPosition then
             if Presets.presetsDesc[Presets.selectedPresetPosition] then
-              ImGui.Text("Preset's info:")
+              ImGui.Text(UIText.Presets.infoname)
               ImGui.Text(Presets.presetsDesc[Presets.selectedPresetPosition])
             end
             if Presets.presetsAuth[Presets.selectedPresetPosition] then
-              ImGui.Text("Preset's author:")
+              ImGui.Text(UIText.Presets.authorname)
               ImGui.SameLine()
               ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
             end

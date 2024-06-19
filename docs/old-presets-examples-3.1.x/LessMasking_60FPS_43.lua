@@ -30,7 +30,10 @@ local Preset = {
         enabled = true
     },
 	PresetInfo = {
+        --name is the name of the preset its like before (but not visible on UI it's system only)
         name = "Less masking for 4:3 (60+ FPS with FG ON)",
+        --display is the name of the preset if a translation is available (visible on UI only)
+        display = "",
 		description = "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
         author = nil
 	}

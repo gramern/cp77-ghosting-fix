@@ -1,3 +1,5 @@
+local UIText = require("Modules/UIText")
+
 local Preset = {
   __VERSION_NUMBER = 484,
   MaskingGlobal = {
@@ -97,9 +99,11 @@ local Preset = {
     },
   },
   PresetInfo = {
+    --name is the name of the preset its like before (but not visible on UI it's system only)
     name = "Testing",
-    description = "Testing preset, all masks visible.",
-    author = nil
+    --display is the name of the preset if a translation is available (visible on UI only)
+    display = UIText.Presets.Testing.name,
+    description = UIText.Presets.Testing.description,
   }
 }
 

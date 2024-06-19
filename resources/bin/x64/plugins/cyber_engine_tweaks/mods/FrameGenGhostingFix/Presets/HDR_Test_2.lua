@@ -1,3 +1,5 @@
+local UIText = require("Modules/UIText")
+
 local Preset = {
   __VERSION_NUMBER = 484,
   MaskingGlobal = {
@@ -99,8 +101,11 @@ local Preset = {
     },
   },
   PresetInfo = {
+    --name is the name of the preset its like before (but not visible on UI it's system only)
     name = "RenoDX HDR Test 2",
-    description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
+    --display is the name of the preset if a translation is available (visible on UI only)
+    display = UIText.Presets.HDRTest2.name,
+    description = UIText.Presets.HDRTest2.description,
     author = nil
   }
 }

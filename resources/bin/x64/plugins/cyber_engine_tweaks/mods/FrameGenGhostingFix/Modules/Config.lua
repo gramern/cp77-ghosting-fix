@@ -1,3 +1,5 @@
+local UIText = require('Modules/UIText')
+
 local Config = {
   __EDITION = "IV",
   __VERSION_NUMBER = 484,
@@ -113,8 +115,11 @@ local Config = {
   Customize = {
     PresetInfo = {
       file = "Customize.lua",
+      --name is the name of the preset its like before (but not visible on UI it's system only)
       name = "Customize",
-      description = "Customize your preset for vehicles.",
+      --display is the name of the preset if a translation is available (visible on UI only)
+      display = UIText.Presets.Customize.name,
+      description = UIText.Presets.Customize.description,
       author = nil
     },
   },
@@ -217,9 +222,11 @@ local Config = {
     },
     PresetInfo = {
       file = "Default.lua",
+      --name is the name of the preset its like before (but not visible on UI it's system only)
       name = "Default",
-      description = "Default preset for vehicles.",
-      author = nil
+      --display is the name of the preset if a translation is available (visible on UI only)
+      display = UIText.Presets.Default.name,
+      description = UIText.Presets.Default.description,
     },
   },
 }

@@ -1,3 +1,5 @@
+local UIText = require("Modules/UIText")
+
 local Preset = {
   __VERSION_NUMBER = 484,
   MaskingGlobal = {
@@ -99,9 +101,11 @@ local Preset = {
     },
   },
   PresetInfo = {
+    --name is the name of the preset its like before (but not visible on UI it's system only)
     name = "Stronger",
-    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
-    author = nil
+    --display is the name of the preset if a translation is available (visible on UI only)
+    display = UIText.Presets.Stronger.name,
+    description = UIText.Presets.Stronger.description,
   }
 }
 

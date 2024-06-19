@@ -1,3 +1,5 @@
+local UIText = require("Modules/UIText")
+
 local Preset = {
   __VERSION_NUMBER = 484,
   MaskingGlobal = {
@@ -99,8 +101,11 @@ local Preset = {
     },
   },
   PresetInfo = {
+    --name is the name of the preset its like before (but not visible on UI it's system only)
     name = "Turn off anti-ghosting masking",
-    description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+    --display is the name of the preset if a translation is available (visible on UI only)
+    display = UIText.Presets.TurnOff.name,
+    description = UIText.Presets.TurnOff.description,
     author = nil
   }
 }
