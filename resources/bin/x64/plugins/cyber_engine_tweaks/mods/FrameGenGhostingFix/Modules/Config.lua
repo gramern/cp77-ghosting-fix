@@ -227,6 +227,7 @@ local Config = {
       --display is the name of the preset if a translation is available (visible on UI only)
       display = UIText.Presets.Default.name,
       description = UIText.Presets.Default.description,
+      author = nil,
     },
   },
 }

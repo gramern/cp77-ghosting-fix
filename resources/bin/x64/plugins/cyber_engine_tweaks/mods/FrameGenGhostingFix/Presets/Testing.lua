@@ -104,6 +104,7 @@ local Preset = {
     --display is the name of the preset if a translation is available (visible on UI only)
     display = UIText.Presets.Testing.name,
     description = UIText.Presets.Testing.description,
+    author = nil,
   }
 }
 
