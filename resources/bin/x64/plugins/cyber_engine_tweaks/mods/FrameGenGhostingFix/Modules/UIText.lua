@@ -3,7 +3,7 @@ local UITranslation = require("Modules/Translation")
 local UIText = {
   __VERSION_NUMBER = 484,
   General = {
-    modname_log = UITranslation.General.modname_log or "[FrameGen Ghosting 'Fix']",
+    modname_log = "[FrameGen Ghosting 'Fix']",
     title_general = UITranslation.General.title_general or "General Settings:",
     title_fps90 = UITranslation.General.title_fps90 or "90+ FPS FG ON Settings:",
     title_fps100 = UITranslation.General.title_fps100 or "100+ FPS FG ON Settings:",
@@ -120,38 +120,6 @@ local UIText = {
   Presets = {
     infoname = UITranslation.Presets.infoname or "Preset's info:",
     authorname = UITranslation.Presets.authorname or "Preset's author:",
-    Customize = {
-      name = UITranslation.Presets.Customize.name or "Customize",
-      description = UITranslation.Presets.Customize.description or "Customize your preset for vehicles.",
-    },
-    Default = {
-      name = UITranslation.Presets.Default.name or "Default",
-      description = UITranslation.Presets.Default.description or "Default preset for vehicles.",
-    },
-    HDRTest1 = {
-      name = UITranslation.Presets.HDRTest1.name or "RenoDX HDR Test 1",
-      description = UITranslation.Presets.HDRTest1.description or "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-    },
-    HDRTest2 = {
-      name = UITranslation.Presets.HDRTest2.name or "RenoDX HDR Test 2",
-      description = UITranslation.Presets.HDRTest2.description or "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-    },
-    HDRTest3 = {
-      name = UITranslation.Presets.HDRTest3.name or "RenoDX HDR Test 3",
-      description = UITranslation.Presets.HDRTest3.description or "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-    },
-    Stronger = {
-      name = UITranslation.Presets.Stronger.name or "Stronger",
-      description = UITranslation.Presets.Stronger.description or "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
-    },
-    Testing = {
-      name = UITranslation.Presets.Testing.name or "Testing",
-      description = UITranslation.Presets.Testing.description or "Testing preset, all masks visible.",
-    },
-    TurnOff = {
-      name = UITranslation.Presets.TurnOff.name or "Turn off anti-ghosting masking",
-      description = UITranslation.Presets.TurnOff.description or "Turns off TPP and FPP anti-ghosting masks for all vehicles",
-    },
   }
 }
 

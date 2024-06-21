@@ -1,4 +1,6 @@
 --persepctive settings pattern: vehicleCameraPerspective + gamedataVehicleType = { transition event assigned to a vehicle's current speed  = { dumbo1setSize.X --> number, dumbo1setSize.Y --> number, dumbo2setSize.X --> number, dumbo2setSize.Y --> number, dumbo3setSize.X --> number, dumbo3setSize.Y --> number dumbo1setOpacity --> number, dumbo2setOpacity --> number, dumbo3setOpacity --> number, dumbo45setOpacity --> number, dynamic_dumbo1setOpacity --> number, dynamic_dumbo2setOpacity --> number, dynamic_dumbo3setOpacity --> number } }
+-- to add support for translations make this your first line of code: local UITranslation = require("Modules/Translation")
+local UITranslation = require("Modules/Translation")
 
 local Preset = {
     TPPCar = {
@@ -30,11 +32,15 @@ local Preset = {
         enabled = true
     },
 	PresetInfo = {
-        --name is the name of the preset its like before (but not visible on UI it's system only)
+        -- name is the name of the preset that won't be visible on UI
         name = "Less masking (60+ FPS with FG ON)",
-        --display is the name of the preset if a translation is available (visible on UI only)
-        display = "",
-		description = "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
+        -- display is the name of the preset that will be visible on UI only
+        -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
+        -- without supporting transitions: display = "Less masking (60+ FPS with FG ON)",
+        display = UITranslation.Presets.MyAuthorName.My_Special_Preset.name or "Less masking (60+ FPS with FG ON)",
+        -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
+        -- without supporting transitions: description = "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
+		    description = UITranslation.Presets.MyAuthorName.My_Special_Preset.description or "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
         author = nil
 	}
 }

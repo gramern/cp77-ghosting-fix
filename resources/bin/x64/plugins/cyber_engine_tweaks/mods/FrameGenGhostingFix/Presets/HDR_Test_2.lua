@@ -1,4 +1,5 @@
-local UIText = require("Modules/UIText")
+-- to add support for translations make this your first line of code: local UITranslation = require("Modules/Translation")
+local UITranslation = require("Modules/Translation")
 
 local Preset = {
   __VERSION_NUMBER = 484,
@@ -101,11 +102,13 @@ local Preset = {
     },
   },
   PresetInfo = {
-    --name is the name of the preset its like before (but not visible on UI it's system only)
+    -- name is the name of the preset that won't be visible on UI
     name = "RenoDX HDR Test 2",
-    --display is the name of the preset if a translation is available (visible on UI only)
-    display = UIText.Presets.HDRTest2.name,
-    description = UIText.Presets.HDRTest2.description,
+    -- display is the name of the preset that will be visible on UI only
+    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
+    display = UITranslation.Presets.Gramern.HDRTest2.name or "RenoDX HDR Test 2",
+    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
+    description = UITranslation.Presets.Gramern.HDRTest2.description or "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
     author = nil
   }
 }

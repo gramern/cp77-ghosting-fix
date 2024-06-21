@@ -37,6 +37,10 @@ The picture shows how masks, called 'dumbos' are located on the screen. In a pre
 
 12. Change the name of your new preset using the `name` and `display` parameter for "My Preset" e.g. Your new preset's displayname will appear in the mod's ImGui window on a dropdown list. You can also set the preset's description and author.
 
-13. Edit the file in different ways following the pattern. Save the file, run the game, observe, and iterate. 
+13. To have your preset support translations put `local UITranslation = require("Modules/Translation")` above `local Preset = {`
 
-14. Have fun!
+14. Add `UITranslation.Presets.<AuthorNameHere>.<PresetNameHere>.name or ` before your `display`'s value and `UITranslation.Presets.<AuthorNameHere>.<PresetNameHere>.description or ` before your `description`'s value to allow translations to be shown on the UI
+
+15. Edit the file in different ways following the pattern. Save the file, run the game, observe, and iterate. 
+
+16. Have fun!

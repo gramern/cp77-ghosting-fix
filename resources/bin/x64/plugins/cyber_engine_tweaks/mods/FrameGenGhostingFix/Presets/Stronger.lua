@@ -1,4 +1,5 @@
-local UIText = require("Modules/UIText")
+-- to add support for translations make this your first line of code: local UITranslation = require("Modules/Translation")
+local UITranslation = require("Modules/Translation")
 
 local Preset = {
   __VERSION_NUMBER = 484,
@@ -101,12 +102,14 @@ local Preset = {
     },
   },
   PresetInfo = {
-    --name is the name of the preset its like before (but not visible on UI it's system only)
+    -- name is the name of the preset that won't be visible on UI
     name = "Stronger",
-    --display is the name of the preset if a translation is available (visible on UI only)
-    display = UIText.Presets.Stronger.name,
-    description = UIText.Presets.Stronger.description,
-    author = nil,
+    -- display is the name of the preset that will be visible on UI only
+    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
+    display = UITranslation.Presets.Gramern.Stronger.name or "Stronger",
+    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
+    description = UITranslation.Presets.Gramern.Stronger.description or "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
+    author = nil
   }
 }
 

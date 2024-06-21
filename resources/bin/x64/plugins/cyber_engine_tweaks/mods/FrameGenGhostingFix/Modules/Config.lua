@@ -1,4 +1,5 @@
-local UIText = require('Modules/UIText')
+-- to add support for translations make this your first line of code: local UITranslation = require("Modules/Translation")
+local UITranslation = require("Modules/Translation")
 
 local Config = {
   __EDITION = "IV",
@@ -115,11 +116,13 @@ local Config = {
   Customize = {
     PresetInfo = {
       file = "Customize.lua",
-      --name is the name of the preset its like before (but not visible on UI it's system only)
+      -- name is the name of the preset that won't be visible on UI
       name = "Customize",
-      --display is the name of the preset if a translation is available (visible on UI only)
-      display = UIText.Presets.Customize.name,
-      description = UIText.Presets.Customize.description,
+      -- display is the name of the preset that will be visible on UI only
+      -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
+      display = UITranslation.Presets.Gramern.Customize.name or "Customize",
+      -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
+      description = UITranslation.Presets.Gramern.Customize.description or "Customize your preset for vehicles.",
       author = nil
     },
   },
@@ -222,11 +225,13 @@ local Config = {
     },
     PresetInfo = {
       file = "Default.lua",
-      --name is the name of the preset its like before (but not visible on UI it's system only)
+      -- name is the name of the preset that won't be visible on UI
       name = "Default",
-      --display is the name of the preset if a translation is available (visible on UI only)
-      display = UIText.Presets.Default.name,
-      description = UIText.Presets.Default.description,
+      -- display is the name of the preset that will be visible on UI only
+      -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
+      display = UITranslation.Presets.Gramern.Default.name or "Default",
+      -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
+      description = UITranslation.Presets.Gramern.Default.description or "Default preset for vehicles.",
       author = nil,
     },
   },
