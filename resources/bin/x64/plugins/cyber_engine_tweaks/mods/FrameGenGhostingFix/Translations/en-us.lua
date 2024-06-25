@@ -1,8 +1,7 @@
---This is where the translation comes in, if a field is not translated or omitted completely, UIText will load the original version
---File has to be saved as "Translation.lua"
-
-local UITranslation = {
+local translation = {
+  __VERSION_NUMBER = 484,
   General = {
+    modname_log = "[FrameGen Ghosting 'Fix']",
     title_general = "General Settings:",
     title_fps90 = "90+ FPS FG ON Settings:",
     title_fps100 = "100+ FPS FG ON Settings:",
@@ -117,51 +116,17 @@ local UITranslation = {
     textfield_4 = "Potentially conflicting mods:"
   },
   Presets = {
-    infoname = "Preset's info:",
-    authorname = "Preset's info:",
-    -- Authorname: {
-      -- Presetname: {
-        -- name = "Preset's name",
-        -- description = "Preset's description"
-      --},
-    -- },
-
-    -- Presets by gramern
-    Gramern = {
-      Customize = {
-        name = "Customize",
-        description = "Customize your preset for vehicles.",
-      },
-      Default = {
-        name = "Default",
-        description = "Default preset for vehicles.",
-      },
-      HDRTest1 = {
-        name = "RenoDX HDR Test 1",
-        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-      },
-      HDRTest2 = {
-        name = "RenoDX HDR Test 2",
-        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-      },
-      HDRTest3 = {
-        name = "RenoDX HDR Test 3",
-        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-      },
-      Stronger = {
-        name = "Stronger",
-        description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
-      },
-      Testing = {
-        name = "Testing",
-        description = "Testing preset, all masks visible.",
-      },
-      TurnOff = {
-        name = "Turn off anti-ghosting masking",
-        description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
-      },
-    },
+    infotabname = "Preset's info:",
+    authtabname = "Preset's author:"
+    --[=====[ Other Translations Continue here with
+    Info = {
+      [PresetID] = {
+        name = "Preset's name",
+        description = "Preset's description"
+      }
+    }
+    --]=====]
   }
 }
 
-return UITranslation
+return translation

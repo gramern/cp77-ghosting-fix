@@ -5,7 +5,8 @@ local Diagnostics = {
   updateinfo = false
 }
 
-local UIText = require("Modules/UIText")
+local Localization = require("Modules/Localization")
+local UIText = Localization.UIText
 
 function Diagnostics.DiagnosticsUI()
   if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then

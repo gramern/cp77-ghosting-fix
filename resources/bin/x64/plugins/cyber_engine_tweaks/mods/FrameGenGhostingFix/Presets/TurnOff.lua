@@ -1,6 +1,3 @@
--- to add support for translations make this your first line of code: local UITranslation = require("Modules/Translation")
-local UITranslation = require("Modules/Translation")
-
 local Preset = {
   __VERSION_NUMBER = 484,
   MaskingGlobal = {
@@ -102,13 +99,8 @@ local Preset = {
     },
   },
   PresetInfo = {
-    -- name is the name of the preset that won't be visible on UI
     name = "Turn off anti-ghosting masking",
-    -- display is the name of the preset that will be visible on UI only
-    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.name or " and then your own value
-    display = UITranslation.Presets.Gramern.TurnOff.name or "Turn off anti-ghosting masking",
-    -- to support translations add "UITranslation.Presets.<Authorname>.<Preset's name without special characters except underscore>.description or " and then your own value
-    description = UITranslation.Presets.Gramern.TurnOff.description or "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+    description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
     author = nil
   }
 }
