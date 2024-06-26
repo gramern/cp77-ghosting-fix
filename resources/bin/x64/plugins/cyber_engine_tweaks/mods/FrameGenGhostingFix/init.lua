@@ -780,7 +780,7 @@ registerForEvent("onDraw", function()
             if UIText.Presets.Info[Config.selectedPresetID].author then
               ImGui.Text(UIText.Presets.authtabname)
               ImGui.SameLine()
-              ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
+              ImGui.Text(UIText.Presets.Info[Config.selectedPresetID].author)
             end
           end
           ImGui.PopStyleColor() --PSC.2
