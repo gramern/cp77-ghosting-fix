@@ -744,7 +744,7 @@ registerForEvent("onDraw", function()
           if Presets.selectedPresetPosition == nil then
             Presets.GetPresetInfo()
           end
-          if ImGui.BeginCombo("##", Localization.UIText.Presets.Info[Config.selectedPresetID].name) then
+          if ImGui.BeginCombo("##", UIText.Presets.Info[Config.selectedPresetID].name) then
             for i, presetId in ipairs(Localization.presetsIDs) do
               local presetName = Localization.presetsList[i]
               local preset_selected = (Config.selectedPresetID == presetId)
@@ -772,12 +772,12 @@ registerForEvent("onDraw", function()
             LogApplyVehicleSettings()
           end
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
-          if Presets.selectedPresetPosition then
-            if Presets.presetsDesc[Presets.selectedPresetPosition] then
+          if Config.selectedPresetID then
+            if UIText.Presets.Info[Config.selectedPresetID] then
               ImGui.Text(UIText.Presets.infotabname)
-              ImGui.Text(Presets.presetsDesc[Presets.selectedPresetPosition])
+              ImGui.Text(UIText.Presets.Info[Config.selectedPresetID]. description)
             end
-            if Presets.presetsAuth[Presets.selectedPresetPosition] then
+            if UIText.Presets.Info[Config.selectedPresetID].author then
               ImGui.Text(UIText.Presets.authtabname)
               ImGui.SameLine()
               ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
