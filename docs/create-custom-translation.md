@@ -17,7 +17,7 @@ FrameGen Ghosting 'Fix' uses a localization system that automatically reads the 
     | Czech | `cz-cz.lua` |
     | French | `fr-fr.lua` |
     | German |`de-de.lua` |
-    | Hungarian | `hu-hulua` |
+    | Hungarian | `hu-hu.lua` |
     | Italian | `it-it.lua` |
     | Japanese | `jp-jp.lua` |
     | Korean | `kr-kr.lua` |

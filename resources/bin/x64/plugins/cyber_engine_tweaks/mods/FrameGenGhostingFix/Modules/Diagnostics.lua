@@ -6,9 +6,10 @@ local Diagnostics = {
 }
 
 local Localization = require("Modules/Localization")
-local UIText = Localization.UIText
 
 function Diagnostics.DiagnosticsUI()
+  local UIText = Localization.UIText
+
   if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
     if not Diagnostics.modscompatibility then
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
