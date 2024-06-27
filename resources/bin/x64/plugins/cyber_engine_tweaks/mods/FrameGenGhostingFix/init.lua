@@ -28,7 +28,6 @@ local FrameGenGhostingFix = {
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
   ]],
-  __DEFAULT_LANGUAGE = "en-us"
 }
 
 --modules
@@ -40,7 +39,6 @@ local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
 local Settings = require("Modules/Settings")
 local Localization = require("Modules/Localization")
-local ConsoleText = require("Translations/" .. FrameGenGhostingFix.__DEFAULT_LANGUAGE)
 local Vectors = require("Modules/Vectors")
 
 --scopes
@@ -49,9 +47,10 @@ local json = json
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
 local ImGuiCond = ImGuiCond
-local UIText = Localization.UIText
+local ConsoleText = Localization.Text
 local ImGuiStyleVar = ImGuiStyleVar
 local ImGuiWindowFlags = ImGuiWindowFlags
+
 
 --ui window title
 local windowTitle = Config and FrameGenGhostingFix.__NAME .. " " .. Config.__EDITION or FrameGenGhostingFix.__NAME
@@ -123,10 +122,6 @@ local vignetteFootMarginLeftChanged
 local vignetteFootMarginTopChanged
 local windowEnabled
 
--- Set user's onscreen game language
-function SetLanguage()
-  Localization.GameOnScreenLang = Game.NameToString(Game.GetSettingsSystem():GetVar("/language", "OnScreen"):GetValue())
-end
 
 function CheckVersion()
   if not Config then return end
@@ -394,7 +389,7 @@ function LoadUserSettings()
     Calculate.FPPOnFoot.vignetteFootSizeX = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
     Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
-    Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
+    Presets.selectedPresetID = userSettings.Vehicles and userSettings.Vehicles.selectedPresetID or Presets.selectedPresetID
 
     enabledWindow = userSettings.General and userSettings.General.enabledWindow or false
     version =  userSettings.General and userSettings.General.version or false
@@ -433,7 +428,7 @@ function LoadUserSettingsCache()
   Calculate.FPPOnFoot.vignetteFootSizeX = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
   Calculate.FPPOnFoot.vignetteFootSizeY = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
-  Presets.selectedPreset = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPreset or Presets.selectedPreset
+  Presets.selectedPresetID = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPresetID or Presets.selectedPresetID
 
   enabledWindow = userSettingsCache.General and userSettingsCache.General.enabledWindow or false
 
@@ -449,7 +444,7 @@ end
 function SaveUserSettings()
   local userSettings = {
     Vehicles = {
-      selectedPreset = Presets.selectedPreset,
+      selectedPresetID = Presets.selectedPresetID,
     },
     FPPBikeWindshield = {
       enabledWindshield = enabledWindshieldSettings,
@@ -522,6 +517,16 @@ function UpdateMounted()
   isMounted = Vectors.Vehicle.isMounted
 end
 
+function UpdateUIText()
+  
+  -- 1. Get the set language
+  Localization.getScreenLanguage()
+  -- 2. Transalte the UI
+  Localization.translateUI()
+  -- 3. Get the translated preset info from the translated UI
+  Localization.updatePresets()
+end
+
 --initialize all stuff etc
 registerForEvent("onInit", function()
   CheckModules()
@@ -550,6 +555,9 @@ registerForEvent("onInit", function()
   Presets.GetPresetInfo()
   Presets.LoadPreset()
   Presets.ApplyPreset()
+  Localization.init()
+  -- translate everything before showing the UI
+  UpdateUIText()
   Calculate.SetCornersMargins()
   Calculate.SetVignetteOrgMinMax()
   Calculate.SetVignetteOrgSize()
@@ -568,23 +576,22 @@ end)
 
 if Debug then
   registerInput('printPresets', 'Print the presets list', function(keypress)
-  
     if not keypress then
         return
     end
     if Presets then
       Presets.PrintPresets()
     else
-      print("No 'Presets' module.")
+      print(ConsoleText.General.modname_log,ConsoleText.General.info_presetmodule)
     end
     
   end)
 end
 
 registerForEvent("onOverlayOpen", function()
-  SetLanguage()
-  Localization.translate()
-  Localization.presetsUpdate()
+  -- translate everything before showing the UI
+  UpdateUIText()
+
   OverlayEnabled = true
 
   Calculate.CalcAspectRatio()
@@ -637,6 +644,8 @@ end)
 -- draw a ImGui window
 registerForEvent("onDraw", function()
   if OverlayEnabled then
+    local UIText = Localization.UIText
+
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
 
@@ -744,12 +753,14 @@ registerForEvent("onDraw", function()
           if Presets.selectedPresetPosition == nil then
             Presets.GetPresetInfo()
           end
-          if ImGui.BeginCombo("##", UIText.Presets.Info[Config.selectedPresetID].name) then
-            for i, presetId in ipairs(Localization.presetsIDs) do
-              local presetName = Localization.presetsList[i]
-              local preset_selected = (Config.selectedPresetID == presetId)
-              if ImGui.Selectable(presetName, preset_selected) then
-                Config.selectedPresetID = presetId
+
+          -- Show translated presets on dropdown and save the selected id
+          if ImGui.BeginCombo("##", UIText.Presets.Info[Presets.selectedPresetID].name) then
+            for location, id in ipairs(Localization.presetIDs) do
+              local preset_name = Localization.presetsList[location]
+              local preset_selected = (Presets.selectedPresetID == id)
+              if ImGui.Selectable(preset_name, preset_selected) then
+                Presets.selectedPresetID = id
                 Presets.GetPresetInfo()
               end
               if preset_selected then
@@ -771,16 +782,17 @@ registerForEvent("onDraw", function()
             Presets.ApplyPreset()
             LogApplyVehicleSettings()
           end
+          -- Show translated preset information
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
-          if Config.selectedPresetID then
-            if UIText.Presets.Info[Config.selectedPresetID] then
+          if Presets.selectedPresetID then
+            if UIText.Presets.Info[Presets.selectedPresetID].description then
               ImGui.Text(UIText.Presets.infotabname)
-              ImGui.Text(UIText.Presets.Info[Config.selectedPresetID]. description)
+              ImGui.Text(UIText.Presets.Info[Presets.selectedPresetID].description)
             end
-            if UIText.Presets.Info[Config.selectedPresetID].author then
+            if UIText.Presets.Info[Presets.selectedPresetID].author then
               ImGui.Text(UIText.Presets.authtabname)
               ImGui.SameLine()
-              ImGui.Text(UIText.Presets.Info[Config.selectedPresetID].author)
+              ImGui.Text(UIText.Presets.Info[Presets.selectedPresetID].author)
             end
           end
           ImGui.PopStyleColor() --PSC.2
@@ -792,7 +804,7 @@ registerForEvent("onDraw", function()
           end
           if Config.MaskingGlobal.enabled then
             --additional settings interface starts------------------------------------------------------------------------------------------------------------------
-            if Settings and Presets.selectedPreset == "Customize" then
+            if Settings and Presets.selectedPresetID == 0 then
               ImGui.Text("")
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
               ImGui.Text(UIText.General.title_fps90)

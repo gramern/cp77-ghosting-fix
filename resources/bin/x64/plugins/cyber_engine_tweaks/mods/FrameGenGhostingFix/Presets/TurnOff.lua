@@ -99,6 +99,7 @@ local Preset = {
     },
   },
   PresetInfo = {
+    id = 3,
     name = "Turn off anti-ghosting masking",
     description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
     author = nil

@@ -52,7 +52,8 @@ local Calculate = {
 }
 
 local Vectors = require("Modules/Vectors")
-local ConsoleText = require("Translations/en-us")
+local Localization = require("Modules/Localization")
+local ConsoleText = Localization.Text
 
 function Calculate.CalcAspectRatio()
   local vectorsScreen = Vectors.Screen

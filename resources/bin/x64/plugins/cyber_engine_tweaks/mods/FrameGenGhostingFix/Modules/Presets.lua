@@ -1,12 +1,12 @@
 local Presets = {
   __VERSION_NUMBER = 484,
   masksController = nil,
-  selectedPreset = nil,
+  selectedPresetID = nil,
   selectedPresetPosition = nil,
   presetsFile = {},
   presetsList = {},
-  presetsDesc = {},
-  presetsAuth = {},
+  presetsID = {},
+  presetStackInfo = {}
 }
 
 local Config = require("Modules/Config")
@@ -17,24 +17,36 @@ function Presets.SetDefaultPreset()
   if Customize then
     table.insert(Presets.presetsFile, 1, Config.Customize.PresetInfo.file)
     table.insert(Presets.presetsList, 1, Config.Customize.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 1, Config.Customize.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 1, Config.Customize.PresetInfo.author)
+    table.insert(Presets.presetsID, 1, Config.Customize.PresetInfo.id)
+
+    Presets.presetStackInfo[Config.Customize.PresetInfo.id] = {
+      name = Config.Customize.PresetInfo.name,
+      description = Config.Customize.PresetInfo.description,
+    }
 
     table.insert(Presets.presetsFile, 2, Config.Default.PresetInfo.file)
     table.insert(Presets.presetsList, 2, Config.Default.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 2, Config.Default.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 2, Config.Default.PresetInfo.author)
+    table.insert(Presets.presetsID, 2, Config.Default.PresetInfo.id)
+
+    Presets.presetStackInfo[Config.Default.PresetInfo.id] = {
+      name = Config.Default.PresetInfo.name,
+      description = Config.Default.PresetInfo.description,
+    }
   else
     table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
     table.insert(Presets.presetsList, 1, Config.Default.PresetInfo.name)
-    table.insert(Presets.presetsDesc, 1, Config.Default.PresetInfo.description)
-    table.insert(Presets.presetsAuth, 1, Config.Default.PresetInfo.author)
+    table.insert(Presets.presetsID, 1, Config.Default.PresetInfo.id)
+
+    Presets.presetStackInfo[Config.Default.PresetInfo.id] = {
+      name = Config.Default.PresetInfo.name,
+      description = Config.Default.PresetInfo.description,
+    }
   end
 
-  Presets.selectedPreset = Presets.presetsList[1]
+  Presets.selectedPresetID = Presets.presetsID[1]
 
   if Customize then
-    Presets.selectedPreset = Presets.presetsList[2]
+    Presets.selectedPresetID = Presets.presetsID[2]
   end
 end
 
@@ -67,8 +79,13 @@ function Presets.ListPresets()
     local Preset = require(presetPath)
     if Preset and Preset.PresetInfo.name then
       table.insert(Presets.presetsList, i, Preset.PresetInfo.name)
-      table.insert(Presets.presetsDesc, i, Preset.PresetInfo.description)
-      table.insert(Presets.presetsAuth, i, Preset.PresetInfo.author)
+      table.insert(Presets.presetsID, i, Preset.PresetInfo.id)
+
+      Presets.presetStackInfo[Preset.PresetInfo.id] = {
+        name = Preset.PresetInfo.name,
+        description = Preset.PresetInfo.description,
+      }
+
       i = i + 1
     end
   end
@@ -81,8 +98,8 @@ function Presets.PrintPresets()
 end
 
 function Presets.GetPresetInfo()
-  for i, preset in ipairs(Presets.presetsList) do
-    if preset == Presets.selectedPreset then
+  for i, preset in ipairs(Presets.presetsID) do
+    if preset == Presets.selectedPresetID then
       Presets.selectedPresetPosition = i
       return i
     end
@@ -105,7 +122,7 @@ function Presets.LoadPreset()
 
   if Presets.selectedPresetPosition == defaultPresetPosition or Presets.selectedPresetPosition == customizePresetPosition or not presetPath then
     if not presetPath then
-      Presets.selectedPreset = "Default"
+      Presets.selectedPresetID = 1
       Presets.GetPresetInfo()
     end
 

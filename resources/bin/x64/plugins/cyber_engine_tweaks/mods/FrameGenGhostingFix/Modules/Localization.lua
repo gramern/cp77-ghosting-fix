@@ -1,83 +1,77 @@
 local Localization = {
-  defaultLang = "en-us",
-  GameOnScreenLang = nil,
-  UIText = nil,
+  defaultLanguage = "en-us",
+  game_screen_language = nil,
+  defaultTranslationFallback = {},
   presetsList = {},
-  presetsIDs = {}
+  presetIDs = {},
+  UIText = {}
 }
 
-function Localization.translate()
-  local Config = require("Modules/Config")
-  local loadedPresets = Config.presetInfoStack or {}
-  --[=====[ 
-  Config.presetInfoStack = { PresetID = {name = "Preset's Name", description = "Preset's description", author = "Preset's author name" }, PresetID = {name = "Preset's Name", description = "Preset's description", author = "Preset's author name" }, ... }
+local Presets = require("Modules/Presets")
 
-  For Example:
+-- Get the default language file first
+local default_translation_file = require("Translations/" .. Localization.defaultLanguage)
+Localization.Text = default_translation_file
 
-  local loadedPresets = {
-      [90] = {
-          name = "Test for 90",
-          description = "Test with ID 90",
-          author = "90s",
-      },
-      [2000] = {
-          name = "Test for 2000",
-          description = "Test with ID 2000",
-          author = "2000s",
-      },
-  }
 
-  local PresetName = loadedPresets[90].name
+-- Initialize localization module after presets where loaded!
+function Localization.init()
+  -- Get the loaded Presets
+  local LoadedPresets = Presets.presetStackInfo
+  Localization.Text.Presets.Info = LoadedPresets
 
-  --]=====]
+  -- Set the fallback translation with preset information for the translation on ui open
+  Localization.defaultTranslationFallback = Localization.Text
+end
 
-  -- Load the default language file
-  -- Once UIText.lua is now en-us.lua
-  local defautlTranslation = require("Translations/" .. Localization.defaultLang)
+-- Get the players curent set game onscreen language code
+function Localization.getScreenLanguage()
+  Localization.game_screen_language = Game.NameToString(Game.GetSettingsSystem():GetVar("/language", "OnScreen"):GetValue())
+end
 
-  -- Add presets to the default translation
-  defautlTranslation.Presets.Info = loadedPresets
-
-  -- Try to load the selected game onscreen language file
-  local selectedTranslation = require("Translations/" .. Localization.GameOnScreenLang)
+-- Translate the ui to the players screen language
+function Localization.translateUI()
+  -- Get the translated values for the UIText
+  local selectedTranslation = require("Translations/" .. Localization.game_screen_language)
   if not selectedTranslation then
-      selectedTranslation = {}
+    selectedTranslation = {}
+    print(Localization.Text.General.modname_log, Localization.Text.Localization.translation_not_found .. Localization.game_screen_language)
+  else
+    print(Localization.Text.General.modname_log, Localization.Text.Localization.translation_found .. Localization.game_screen_language)
   end
 
-
-  -- Function to merge translation file with default text values
-  local function mergeTranslations(fallback, selected)
-      local merged = {}
-      -- Add all keys of fallback into merged with selected values if possible else use fallback values
-      for key, value in pairs(fallback) do
-          if type(value) == "table" then
-              merged[key] = mergeTranslations(value, selected[key] or {})
-          else
-              merged[key] = selected[key] or value
-          end
+  -- Replace the default language values with the found translated values
+  local function mergeLanguages(default, selected)
+    local merged = {}
+    -- Add all used keys into merged with either translated values or the default values
+    for key, defaultValue in pairs(default) do
+      if type(defaultValue) == "table" then
+        merged[key] = mergeLanguages(defaultValue, selected[key] or {})
+      else
+        merged[key] = selected[key] or defaultValue
       end
-      -- Add all keys of selected if not already done using fallback keys
-      for key, value in pairs(selected) do
-          if merged[key] == nil then
-              merged[key] = value
-          end
-      end
+    end
 
-      return merged
+    return merged
   end
+  -- End of replacing default language values
 
-  local finalTranslation = mergeTranslations(defautlTranslation, selectedTranslation)
+  -- Execute the replacement of default language values
+  local finalTranslation = mergeLanguages(Localization.defaultTranslationFallback, selectedTranslation)
+  -- set the translation as new UIText, this is seperated to prevent a bug that I wasn't able to redo after I rewrote this file
   Localization.UIText = finalTranslation
 end
 
-function Localization.presetsUpdate()
+
+
+-- Update the presets information to the current known translation
+function Localization.updatePresets()
   local i = 1
   for id, preset in pairs(Localization.UIText.Presets.Info) do
-    Localization.presetsIDs[i] = id
-    Localization.presetsList[i] = preset.name
+    table.insert(Localization.presetsList, i, preset.name)
+    table.insert(Localization.presetIDs, i, id)
     i = i + 1
   end
 end
-
 
 return Localization

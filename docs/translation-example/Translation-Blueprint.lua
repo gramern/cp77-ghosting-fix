@@ -1,39 +1,62 @@
+--[=====[ 
+
+  Rename this file fitting to your translation. Following Codes are supported by the game:
+    ar-ar = Arabic
+    zh-cn = Chinese (Simplified)
+    zh-tw = Chinese (Traditional)
+    cz-cz = Czech
+    fr-fr = French
+    de-de = German
+    hu-hu = Hungarian
+    it-it = Italian
+    jp-jp = Japanese
+    kr-kr = Korean
+    pl-pl = Polish
+    pt-br = Portuguese (Brazillian)
+    ru-ru = Russian
+    es-mx = Spanish (Latin American)
+    es-es = Spanish
+    th-th = Thai
+    tr-tr = Turkish
+    ua-ua = Ukrainian
+  
+  A translation for German would be called de-de.lua for example.
+  Authros can upload their own presets. Presets are saved using IDs translating those will be a litte more complex:
+  Further down you'll find Presets.Info follow the instrunctions for translating a preset
+
+
+  If you don't know how to translate something you can either keep it on english or delete the key
+  for example:
+  {
+    infolog = "Here is the requested info",
+    warnlog = "This is a warning do not follow it"
+  }
+    would then be
+  {
+      infolog = "Hier sind die angeforderten Infos",
+      --warnlog = "This is a warning do not follow it"
+  }
+
+  -- creates a comment, that way you can translate it later without having to search for the key again before being able to translate it
+
+--]=====]
+
 local translation = {
-  __VERSION_NUMBER = 484,
   General = {
-    modname_log = "[FrameGen Ghosting 'Fix']",
     title_general = "General Settings:",
     title_fps90 = "90+ FPS FG ON Settings:",
     title_fps100 = "100+ FPS FG ON Settings:",
     title_fps120 = "120+ FPS FG ON Settings:",
     yes = "Yes",
     no = "No",
-    settings_loaded = "User settings loaded.",
-    settings_loaded_preset = "Preset loaded",
     settings_apply = "  Apply  ",
     settings_applied_veh = "[ ! ] Selected preset applied.",
     settings_save = "Save settings",
     settings_saved = "[ ! ] Your settings are saved.",
     settings_saved_onfoot = "[ ! ] Redraw your weapon to accept changes.",
-    settings_save_path = "Your settings have been saved in your '.../cyber_engine_tweaks/mods/FrameGenGhostingFix/user_settings.json' file.",
-    settings_notfound = "A 'user_settings.json' file hasn't been found.",
-    settings_benchmark_start = "Starting benchmark...",
-    settings_benchmarked_1 = "Measured average FPS without frame generation =",
-    settings_benchmarked_2 = "Applying settings accordingly...",
     settings_default = "Set to default",
     info_aim_onfoot = "[ ! ] You can enable one aiming/blocking feature at once.",
     info_version = "Mod version:",
-    info_diagnostics = "Potential conflicts with other mods detected.",
-    info_calculateMissing = "Can't find the 'Calculate' module. The mod won't work...",
-    info_configMissing = "Can't find the 'Config' module. The mod won't work...",
-    info_presetsMissing = "Can't find the 'Presets' module. The mod won't work...",
-    info_vectorsMissing = "Can't find the 'Vectors' module. The mod won't work...",
-    info_aspectRatioChange = "The aspect ratio of your screen has changed. Please restart the game to ensure the mod will work as intended.",
-    info_presetmodule = "No 'Presets' module.",
-  },
-  Localization = {
-    translation_found = "Found a translation for language code: ",
-    translation_not_found = "Couldn't find any translation for language code: ",
   },
   Info = {
     tabname = "Info",
@@ -243,14 +266,58 @@ local translation = {
     infotabname = "Preset's info:",
     authtabname = "Preset's author:",
     Info = {
-      --[=====[ Other Translations Continue here with
+      --[=====[
+      Presets are saved using IDs, to translate a preset you need the ID of it. The structure looks like following
       [PresetID] = {
         name = "Preset's name",
         description = "Preset's description"
       }
+
+      IDs have to be covered by brackets [], else your translation will fail!
+      To find the ID of a preset just ask the author or take a look at the website were it'S been published.
       --]=====]
+      [0] = {
+        -- Customize
+        name = "Customize",
+        description = "Customize your preset for vehicles.",
+      },
+      [1] = {
+        -- Default
+        name = "Default",
+        description = "Default preset for vehicles.",
+      },
+      [2] = {
+        -- Stronger
+        name = "Stronger",
+    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
+      },
+      [3] = {
+        -- TurnOff
+        name = "Turn off anti-ghosting masking",
+        description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+      },
+      [4] = {
+        -- Testing
+        name = "Testing",
+        description = "Testing preset, all masks visible.",
+      },
+      [5] = {
+        -- HDRTest1
+        name = "RenoDX HDR Test 1",
+        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
+      },
+      [6] = {
+        -- HDRTest2
+        name = "RenoDX HDR Test 2",
+        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
+      },
+      [7] = {
+        -- HDRTest3
+        name = "RenoDX HDR Test 3",
+        description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
+      },
     },
-  }
+  },
 }
 
 return translation
