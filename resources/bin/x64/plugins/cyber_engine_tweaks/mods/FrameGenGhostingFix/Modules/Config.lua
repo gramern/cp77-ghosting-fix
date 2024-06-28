@@ -113,6 +113,7 @@ local Config = {
   Customize = {
     PresetInfo = {
       file = "Customize.lua",
+      id = 0,
       name = "Customize",
       description = "Customize your preset for vehicles.",
       author = nil
@@ -217,6 +218,7 @@ local Config = {
     },
     PresetInfo = {
       file = "Default.lua",
+      id = 1,
       name = "Default",
       description = "Default preset for vehicles.",
       author = nil

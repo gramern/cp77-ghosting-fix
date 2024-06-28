@@ -38,7 +38,7 @@ local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
 local Settings = require("Modules/Settings")
-local UIText = require("Modules/UIText")
+local Localization = require("Modules/Localization")
 local Vectors = require("Modules/Vectors")
 
 --scopes
@@ -47,8 +47,10 @@ local json = json
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
 local ImGuiCond = ImGuiCond
+local ConsoleText = Localization.Text
 local ImGuiStyleVar = ImGuiStyleVar
 local ImGuiWindowFlags = ImGuiWindowFlags
+
 
 --ui window title
 local windowTitle = Config and FrameGenGhostingFix.__NAME .. " " .. Config.__EDITION or FrameGenGhostingFix.__NAME
@@ -140,10 +142,10 @@ function CheckVersion()
 end
 
 function CheckModules()
-  if not Calculate then print(UIText.General.modname_log,UIText.General.info_calculateMissing) return end
-  if not Config then print(UIText.General.modname_log,UIText.General.info_configMissing) return end
-  if not Presets then print(UIText.General.modname_log,UIText.General.info_presetsMissing) return end
-  if not Vectors then print(UIText.General.modname_log,UIText.General.info_vectorsMissing) return end
+  if not Calculate then print(ConsoleText.General.modname_log,ConsoleText.General.info_calculateMissing) return end
+  if not Config then print(ConsoleText.General.modname_log,ConsoleText.General.info_configMissing) return end
+  if not Presets then print(ConsoleText.General.modname_log,ConsoleText.General.info_presetsMissing) return end
+  if not Vectors then print(ConsoleText.General.modname_log,ConsoleText.General.info_vectorsMissing) return end
 end
 
 --set for available modules
@@ -159,7 +161,7 @@ function LoadModules()
     modsCompatibility = Diagnostics.modsCompatibility
 
     if not modsCompatibility then
-      print(UIText.General.modname_log,UIText.General.info_diagnostics)
+      print(ConsoleText.General.modname_log,ConsoleText.General.info_diagnostics)
     end
   end
 end
@@ -177,7 +179,7 @@ function MasksControllerReady(ready)
 end
 
 function LoadMasksController()
-  if not Config then print(UIText.General.modname_log,UIText.General.info_config) return end
+  if not Config then print(ConsoleText.General.modname_log,ConsoleText.General.info_config) return end
 
   masksController = Config.MaskingGlobal.masksController
   MasksControllerReady(true)
@@ -329,8 +331,8 @@ function ResetBenchmark()
 end
 
 function SetSuggestedSettings()
-  print(UIText.General.modname_log,UIText.General.settings_benchmarked_1,averageFps)
-  print(UIText.General.modname_log,UIText.General.settings_benchmarked_2)
+  print(ConsoleText.General.modname_log,ConsoleText.General.settings_benchmarked_1,averageFps)
+  print(ConsoleText.General.modname_log,ConsoleText.General.settings_benchmarked_2)
 
   if averageFps >= 38 then
     enabledFPPOnFoot = true
@@ -387,7 +389,7 @@ function LoadUserSettings()
     Calculate.FPPOnFoot.vignetteFootSizeX = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
     Calculate.FPPOnFoot.vignetteFootSizeY = userSettings.FPPOnFoot and userSettings.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
-    Presets.selectedPreset = userSettings.Vehicles and userSettings.Vehicles.selectedPreset or Presets.selectedPreset
+    Presets.selectedPresetID = userSettings.Vehicles and userSettings.Vehicles.selectedPresetID or Presets.selectedPresetID
 
     enabledWindow = userSettings.General and userSettings.General.enabledWindow or false
     version =  userSettings.General and userSettings.General.version or false
@@ -398,15 +400,15 @@ function LoadUserSettings()
 
     UpdateSettings()
     if userSettings then
-        print(UIText.General.modname_log, UIText.General.settings_loaded)
+        print(ConsoleText.General.modname_log, ConsoleText.General.settings_loaded)
     end
   else
     FirstRun()
     Vectors.SetWindshieldDefault()
     Calculate.SetVignetteDefault()
     UpdateSettings()
-    print(UIText.General.modname_log,UIText.General.settings_notfound)
-    print(UIText.General.modname_log,UIText.General.settings_benchmark_start)
+    print(ConsoleText.General.modname_log,ConsoleText.General.settings_notfound)
+    print(ConsoleText.General.modname_log,ConsoleText.General.settings_benchmark_start)
   end
 end
 
@@ -426,15 +428,15 @@ function LoadUserSettingsCache()
   Calculate.FPPOnFoot.vignetteFootSizeX = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeX or Calculate.FPPOnFoot.vignetteFootSizeX
   Calculate.FPPOnFoot.vignetteFootSizeY = userSettingsCache.FPPOnFoot and userSettingsCache.FPPOnFoot.vignetteFootSizeY or Calculate.FPPOnFoot.vignetteFootSizeY
 
-  Presets.selectedPreset = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPreset or Presets.selectedPreset
+  Presets.selectedPresetID = userSettingsCache.Vehicles and userSettingsCache.Vehicles.selectedPresetID or Presets.selectedPresetID
 
   enabledWindow = userSettingsCache.General and userSettingsCache.General.enabledWindow or false
 
   UpdateSettings()
   if userSettingsCache then
-    print(UIText.General.modname_log, UIText.General.settings_loaded)
+    print(ConsoleText.General.modname_log, ConsoleText.General.settings_loaded)
   else
-    print(UIText.General.modname_log,UIText.General.settings_notfound)
+    print(ConsoleText.General.modname_log,ConsoleText.General.settings_notfound)
   end
 end
 
@@ -442,7 +444,7 @@ end
 function SaveUserSettings()
   local userSettings = {
     Vehicles = {
-      selectedPreset = Presets.selectedPreset,
+      selectedPresetID = Presets.selectedPresetID,
     },
     FPPBikeWindshield = {
       enabledWindshield = enabledWindshieldSettings,
@@ -474,7 +476,7 @@ function SaveUserSettings()
     -- print(userSettingsContents)
     file:write(userSettingsContents)
     file:close()
-    print(UIText.General.modname_log,UIText.General.settings_save_path)
+    print(ConsoleText.General.modname_log,ConsoleText.General.settings_save_path)
   end
 end
 
@@ -496,7 +498,7 @@ end
 function LogApplyOnFootSettings()
   appliedOnFoot = true
 
-  print(UIText.General.modname_log,UIText.General.settings_saved_onfoot)
+  print(ConsoleText.General.modname_log,ConsoleText.General.settings_saved_onfoot)
 end
 
 function LogResetOnFootSettings()
@@ -513,6 +515,16 @@ end
 
 function UpdateMounted()
   isMounted = Vectors.Vehicle.isMounted
+end
+
+function UpdateUIText()
+  
+  -- 1. Get the set language
+  Localization.getScreenLanguage()
+  -- 2. Transalte the UI
+  Localization.translateUI()
+  -- 3. Get the translated preset info from the translated UI
+  Localization.updatePresets()
 end
 
 --initialize all stuff etc
@@ -543,6 +555,9 @@ registerForEvent("onInit", function()
   Presets.GetPresetInfo()
   Presets.LoadPreset()
   Presets.ApplyPreset()
+  Localization.init()
+  -- translate everything before showing the UI
+  UpdateUIText()
   Calculate.SetCornersMargins()
   Calculate.SetVignetteOrgMinMax()
   Calculate.SetVignetteOrgSize()
@@ -561,20 +576,22 @@ end)
 
 if Debug then
   registerInput('printPresets', 'Print the presets list', function(keypress)
-  
     if not keypress then
         return
     end
     if Presets then
       Presets.PrintPresets()
     else
-      print("No 'Presets' module.")
+      print(ConsoleText.General.modname_log,ConsoleText.General.info_presetmodule)
     end
     
   end)
 end
 
 registerForEvent("onOverlayOpen", function()
+  -- translate everything before showing the UI
+  UpdateUIText()
+
   OverlayEnabled = true
 
   Calculate.CalcAspectRatio()
@@ -627,6 +644,8 @@ end)
 -- draw a ImGui window
 registerForEvent("onDraw", function()
   if OverlayEnabled then
+    local UIText = Localization.UIText
+
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
 
@@ -734,11 +753,14 @@ registerForEvent("onDraw", function()
           if Presets.selectedPresetPosition == nil then
             Presets.GetPresetInfo()
           end
-          if ImGui.BeginCombo("##", Presets.selectedPreset) then
-            for _, preset in ipairs(Presets.presetsList) do
-              local preset_selected = (Presets.selectedPreset == preset)
-              if ImGui.Selectable(preset, preset_selected) then
-                Presets.selectedPreset = preset
+
+          -- Show translated presets on dropdown and save the selected id
+          if ImGui.BeginCombo("##", UIText.Presets.Info[Presets.selectedPresetID].name) then
+            for location, id in ipairs(Localization.presetIDs) do
+              local preset_name = Localization.presetsList[location]
+              local preset_selected = (Presets.selectedPresetID == id)
+              if ImGui.Selectable(preset_name, preset_selected) then
+                Presets.selectedPresetID = id
                 Presets.GetPresetInfo()
               end
               if preset_selected then
@@ -760,16 +782,17 @@ registerForEvent("onDraw", function()
             Presets.ApplyPreset()
             LogApplyVehicleSettings()
           end
+          -- Show translated preset information
           ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
-          if Presets.selectedPresetPosition then
-            if Presets.presetsDesc[Presets.selectedPresetPosition] then
-              ImGui.Text("Preset's info:")
-              ImGui.Text(Presets.presetsDesc[Presets.selectedPresetPosition])
+          if Presets.selectedPresetID then
+            if UIText.Presets.Info[Presets.selectedPresetID].description then
+              ImGui.Text(UIText.Presets.infotabname)
+              ImGui.Text(UIText.Presets.Info[Presets.selectedPresetID].description)
             end
-            if Presets.presetsAuth[Presets.selectedPresetPosition] then
-              ImGui.Text("Preset's author:")
+            if UIText.Presets.Info[Presets.selectedPresetID].author then
+              ImGui.Text(UIText.Presets.authtabname)
               ImGui.SameLine()
-              ImGui.Text(Presets.presetsAuth[Presets.selectedPresetPosition])
+              ImGui.Text(UIText.Presets.Info[Presets.selectedPresetID].author)
             end
           end
           ImGui.PopStyleColor() --PSC.2
@@ -781,7 +804,7 @@ registerForEvent("onDraw", function()
           end
           if Config.MaskingGlobal.enabled then
             --additional settings interface starts------------------------------------------------------------------------------------------------------------------
-            if Settings and Presets.selectedPreset == "Customize" then
+            if Settings and Presets.selectedPresetID == 0 then
               ImGui.Text("")
               ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
               ImGui.Text(UIText.General.title_fps90)

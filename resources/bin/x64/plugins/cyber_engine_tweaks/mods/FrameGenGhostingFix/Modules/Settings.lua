@@ -12,7 +12,6 @@ local Settings ={
 
 local Calculate = require("Modules/Calculate")
 local Config = require("Modules/Config")
-local UIText = require("Modules/UIText")
 local Vectors = require("Modules/Vectors")
 
 function Settings.CheckCrossSetting()

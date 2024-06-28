@@ -1,4 +1,4 @@
-local UIText = {
+local translation = {
   __VERSION_NUMBER = 484,
   General = {
     modname_log = "[FrameGen Ghosting 'Fix']",
@@ -28,7 +28,12 @@ local UIText = {
     info_configMissing = "Can't find the 'Config' module. The mod won't work...",
     info_presetsMissing = "Can't find the 'Presets' module. The mod won't work...",
     info_vectorsMissing = "Can't find the 'Vectors' module. The mod won't work...",
-    info_aspectRatioChange = "The aspect ratio of your screen has changed. Please restart the game to ensure the mod will work as intended."
+    info_aspectRatioChange = "The aspect ratio of your screen has changed. Please restart the game to ensure the mod will work as intended.",
+    info_presetmodule = "No 'Presets' module.",
+  },
+  Localization = {
+    translation_found = "Found a translation for language code: ",
+    translation_not_found = "Couldn't find any translation for language code: ",
   },
   Info = {
     tabname = "Info",
@@ -114,7 +119,138 @@ local UIText = {
     textfield_2 = "Conflicting mods:",
     textfield_3 = "Seems like you have a potentially conflicting mod\ninstalled.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems in the future, please visit\nFrameGenGhosting 'Fix's Nexus page to download and\ninstall the 'Preem Compatibility Edition - ArchiveXL'\nversion of the mod instead.\n\nWith the new version you no longer need any\ncompatibility tweaks.",
     textfield_4 = "Potentially conflicting mods:"
+  },
+  Debug = {
+    back = "Back",
+    front = "Front",
+    right = "Right",
+    left = "Left",
+    rotation = "Rotation",
+    length = "Length",
+    General = {
+      tabname = "General Data",
+      topic_diagnostic = "Diagnostics:",
+      compatibility = "Mods Compatibility",
+      missing_diagnostic = "Diagnostics module not present",
+      screen_resolution = "Screen Resolution:",
+      screen_aspect_ratio = "Screen Aspect Ratio:",
+      camera_fov = "Active Camera FOV:",
+      screen_aspect_factor = "Screen Aspect Factor:",
+      screen_space = "Screen Space:",
+      pre_game = "Is Pre-Game:",
+      loaded_game = "Is Game Loaded:",
+      paused_game = "Is Game Paused:",
+      current_fps = "Current FPS:",
+      masked_controller = "Masks Controller:",
+      module_presets = "For Presets Module:",
+      module_settings = "For Settings Module:",
+      module_vectors = "For Vectors Module",
+      init_file = "For init.lua",
+      masked_controller_ready = "Is Masks Controller Ready:",
+      enabled_masking = "Masking enabled:",
+      vehicle_mask = "Vehicles HED Mask Size:",
+      hed_toggle_value = "HED Fill/Tracker Toggle Value:",
+      foot_mask = "On Foot Corner Masks Margins:",
+      mask_path = "Masks Paths:",
+    },
+    Vector = {
+      tabname = "Vectors Data",
+      camera = "Camera Forward:",
+      DotProduct = {
+        vehicle = "DotProduct Vehicle Forward:",
+        vehicle_absolute = "DotProduct Vehicle Forward Absolute:",
+        vehicle_right = "DotProduct Vehicle Right:",
+        vehicle_right_absolute = "DotProduct Vehicle Right Absolute:",
+        vehicle_up = "DotProduct Vehicle Up:",
+        vehicle_up_absolute = "DotProduct Vehicle Up Absolute:",
+      },
+      camera_angle = "Camera Forward Angle:",
+      vehicle_forward_horizontal = "Vehicle Forward Horizontal Plane:",
+      vehicle_forward_median = "Vehicle Forward Median Plane:",
+      camera_forward_z = "Camera Forward Z:",
+      camera_forward_xyz = "Camera Forward (x, y, z, w = 0):",
+      camera_right_xyz = "Camera Right (x, y, z, w = 0):",
+      camera_up_xyz = "Camera Up (x, y, z, w = 0):",
+      vehicle_forward_xyz = "Vehicle Forward (x, y, z, w = 0):",
+      vehicle_right_xyz = "Vehicle Right (x, y, z, w = 0):",
+      vehicle_up_xyz = "Vehicle Up (x, y, z, w = 0):",
+    },
+    Vehicle = {
+      tabname = "Vehicle Data",
+      inside = "Is in a Vehicle:",
+      inside_negative_answer = "false",
+      Mounted = {
+        bike = "bike",
+        car = "car",
+        tank = "tank",
+        unknown = "vehicle"
+      },
+      id = "Current Vehicle's ID",
+      speed = "Vehicle Current Speed:",
+      perspective = "Active Camera Perspective in Vehicle:",
+      position = "Vehicle's Position:",
+      wheels_position = "Wheels Positions:",
+      wheel_bl = "Back Left",
+      wheel_br = "Back Right",
+      wheel_fl = "Front Left",
+      wheel_fr = "Front Right",
+      wheel_base = "Vehicle's Wheelbase:",
+      wheel_axes_postion = "Vehicle Axes Midpoints' Positions:",
+      wheel_axis_back = "Back Wheels' Axis",
+      wheel_axes_front = "Front Wheels' Axis",
+      wheel_axis_left = "Left Wheels' Axis",
+      wheel_axis_right = "Right Wheels' Axis",
+      bumper_position = "Vehicle Bumpers Positions:",
+      bumper_back = "Back",
+      bumper_front = "Front",
+      bumper_distance = "Distance Between Bumpers:",
+      bumper_offset = "Bumpers Offset From Wheels:",
+    },
+    ScreenSpace = {
+      tabname = "Screen Space Data",
+      wheels_position = "Wheels Screen Space Positions:",
+      bumper_position = "Bumpers Screen Space Distance:",
+      axis_rotation = "Distance (Longtitude Axis) Rotation:",
+      axes_screen = "Wheels' Axes Screen Data:",
+    },
+    Masks = {
+      tabname ="Masks Data",
+      hed_opacity = "Current HED Opacity:",
+      hed_tracker_opacity = "Current HED Tracker Opacity:",
+      hed_tracker_size = "HED Tracker Size (x, y):",
+      opacity = "Current Masks Opacities:",
+      opacity_gain = "Opacity Gain:",
+      opacity_delay = "Opacity Transformation Delay Time:",
+      opacity_normal = "Is Opacity Normalized:",
+      position = "Masks Positions:",
+      sizes = "Masks Sizes:",
+      cached_size = "Cached Masks Sizes:",
+      [1] = "Mask 1",
+      [2] = "Mask 2",
+      [3] = "Mask 3",
+      [4] = "Mask 4",
+      hed_fill = "HED Fill Lock:",
+      hed_tracker = "HED Tracker Position:",
+    },
+    Player = {
+      tabname = "Player Data",
+      is_moving = "Is Moving:",
+      has_weapon = "Has a Weapon in Hand:",
+      is_mounted = "Is Mounted:",
+    }
+  },
+  Presets = {
+    infotabname = "Preset's info:",
+    authtabname = "Preset's author:",
+    Info = {
+      --[=====[ Other Translations Continue here with
+      [PresetID] = {
+        name = "Preset's name",
+        description = "Preset's description"
+      }
+      --]=====]
+    },
   }
 }
 
-return UIText
+return translation

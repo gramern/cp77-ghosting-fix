@@ -99,6 +99,7 @@ local Preset = {
     },
   },
   PresetInfo = {
+    id = 5,
     name = "RenoDX HDR Test 1",
     description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
     author = nil

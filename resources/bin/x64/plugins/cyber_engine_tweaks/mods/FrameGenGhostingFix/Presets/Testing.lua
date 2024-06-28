@@ -97,6 +97,7 @@ local Preset = {
     },
   },
   PresetInfo = {
+    id = 4,
     name = "Testing",
     description = "Testing preset, all masks visible.",
     author = nil
