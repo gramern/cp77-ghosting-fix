@@ -22,6 +22,7 @@ function Presets.SetDefaultPreset()
     Presets.presetStackInfo[Config.Customize.PresetInfo.id] = {
       name = Config.Customize.PresetInfo.name,
       description = Config.Customize.PresetInfo.description,
+      author = Config.Customize.PresetInfo.author
     }
 
     table.insert(Presets.presetsFile, 2, Config.Default.PresetInfo.file)
@@ -31,6 +32,7 @@ function Presets.SetDefaultPreset()
     Presets.presetStackInfo[Config.Default.PresetInfo.id] = {
       name = Config.Default.PresetInfo.name,
       description = Config.Default.PresetInfo.description,
+      author = Config.Default.PresetInfo.author
     }
   else
     table.insert(Presets.presetsFile, 1, Config.Default.PresetInfo.file)
@@ -40,6 +42,7 @@ function Presets.SetDefaultPreset()
     Presets.presetStackInfo[Config.Default.PresetInfo.id] = {
       name = Config.Default.PresetInfo.name,
       description = Config.Default.PresetInfo.description,
+      author = Config.Default.PresetInfo.author
     }
   end
 
@@ -84,6 +87,7 @@ function Presets.ListPresets()
       Presets.presetStackInfo[Preset.PresetInfo.id] = {
         name = Preset.PresetInfo.name,
         description = Preset.PresetInfo.description,
+        author = Preset.PresetInfo.author
       }
 
       i = i + 1

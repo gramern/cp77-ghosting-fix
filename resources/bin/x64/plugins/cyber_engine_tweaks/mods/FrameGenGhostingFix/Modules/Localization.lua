@@ -66,6 +66,11 @@ end
 
 -- Update the presets information to the current known translation
 function Localization.updatePresets()
+  -- Clear known list first
+  Localization.presetIDs = {}
+  Localization.presetsList = {}
+
+  -- Add translated presets to list
   local i = 1
   for id, preset in pairs(Localization.UIText.Presets.Info) do
     table.insert(Localization.presetsList, i, preset.name)
