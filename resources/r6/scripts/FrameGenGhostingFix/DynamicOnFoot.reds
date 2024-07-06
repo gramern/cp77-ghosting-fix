@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_masksOnFootEnabled: Bool = false;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEnabled: Bool = false;
@@ -34,9 +34,10 @@
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootSizeY: Float;
 @addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeX: Float;
 @addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeY: Float;
-@addField(gameuiCrosshairContainerController) public let m_aimOnFootDimensionsSet: Bool = false;
 
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEditor: Bool = false;
+
+@addField(gameuiCrosshairContainerController) public let m_onFootSetNewDimensions: Bool = false;
 
 //Corner masks transition functions---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)

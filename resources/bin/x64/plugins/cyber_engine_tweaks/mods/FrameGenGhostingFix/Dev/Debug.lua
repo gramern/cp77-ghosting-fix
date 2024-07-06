@@ -1,537 +1,635 @@
 local Debug = {
-  __VERSION_NUMBER = 484,
-  currentFps = 0,
-  ironsightController = nil,
-  isGamePaused = true,
-  isGameLoaded = nil,
-  isPreGame = true,
-  masksController = nil,
-  masksControllerReady = false,
+  __NAME = "Debug",
+  __VERSION_NUMBER = 490,
 }
 
+local Config = require("Modules/Config")
 local Calculate = require("Modules/Calculate")
 local Diagnostics = require("Modules/Diagnostics")
 local Presets = require("Modules/Presets")
-local Settings = require("Modules/Settings")
 local Vectors = require("Modules/Vectors")
-local Localization = require("Modules/Localization")
+local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
+local ImGuiExt = {
 
-function Debug.DebugUI()
-  local UIText = Localization.UIText
+  TextWhite = function(string)
+    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
+    ImGui.Text(string)
+    ImGui.PopStyleColor()
+  end
+}
 
-  if ImGui.BeginTabItem(UIText.Debug.General.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.1
-    ImGui.Text(UIText.Debug.General.topic_diagnostic)
-    if Diagnostics then
-      ImGui.Text(UIText.Debug.General.compatibility)
+function Debug.DrawUI()
+  if ImGui.BeginTabItem("General Data") then
+    if Diagnostics and Diagnostics.modscompatibility then
+      ImGuiExt.TextWhite("Diagnostics:")
+      ImGuiExt.TextWhite("Mods Compatibility")
       ImGui.SameLine()
-      ImGui.Text(tostring(Diagnostics.modscompatibility))
+      ImGuiExt.TextWhite(tostring(Diagnostics.modscompatibility))
+    elseif Diagnostics and Diagnostics.modscompatibility == nil then
+      ImGuiExt.TextWhite("Diagnostics module deactivated")
     else
-      ImGui.Text(UIText.Debug.General.missing_diagnostic)
+      ImGuiExt.TextWhite("Diagnostics module not present")
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.screen_resolution)
+    ImGuiExt.TextWhite("Screen Resolution:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Resolution.width))
+    ImGuiExt.TextWhite(tostring(Config.Screen.Resolution.width))
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Resolution.height))
-    ImGui.Text(UIText.Debug.General.screen_aspect_ratio)
+    ImGuiExt.TextWhite(tostring(Config.Screen.Resolution.height))
+    ImGuiExt.TextWhite("Screen Aspect Ratio:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.aspectRatio))
-    ImGui.Text(UIText.Debug.General.camera_fov)
+    ImGuiExt.TextWhite(tostring(Config.Screen.aspectRatio))
+    ImGuiExt.TextWhite("Screen Type:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Camera.fov))
-    ImGui.Text(UIText.Debug.General.screen_aspect_factor)
+    ImGuiExt.TextWhite(tostring(Config.Screen.typeName))
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.widthFactor))
-    ImGui.Text(UIText.Debug.General.screen_space)
+    ImGuiExt.TextWhite(tostring(Config.Screen.type))
+    ImGuiExt.TextWhite("Screen Width Factor:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Space.width))
+    ImGuiExt.TextWhite(tostring(Config.Screen.Factor.width))
+    ImGuiExt.TextWhite("Screen Space:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Screen.Space.height))
+    ImGuiExt.TextWhite(tostring(Config.Screen.Space.width))
+    ImGui.SameLine()
+    ImGuiExt.TextWhite(tostring(Config.Screen.Space.height))
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.pre_game)
+    ImGuiExt.TextWhite("Active Camera FOV:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Debug.isPreGame))
-    ImGui.Text(UIText.Debug.General.loaded_game)
-    ImGui.SameLine()
-    ImGui.Text(tostring(Debug.isGameLoaded))
-    ImGui.Text(UIText.Debug.General.paused_game)
-    ImGui.SameLine()
-    ImGui.Text(tostring(Debug.isGamePaused))
+    ImGuiExt.TextWhite(tostring(Vectors.Camera.fov))
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.current_fps)
+    ImGuiExt.TextWhite("Is Pre-Game:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Debug.currentFps))
+    ImGuiExt.TextWhite(tostring(Config.GameState.isPreGame))
+    ImGuiExt.TextWhite("Is Game Loaded:")
+    ImGui.SameLine()
+    ImGuiExt.TextWhite(tostring(Config.GameState.isGameLoaded))
+    ImGuiExt.TextWhite("Is Game Paused:")
+    ImGui.SameLine()
+    ImGuiExt.TextWhite(tostring(Config.GameState.isGamePaused))
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.masked_controller)
+    ImGuiExt.TextWhite("Current FPS:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Debug.masksController))
-    ImGui.Text(UIText.Debug.General.module_presets)
-    ImGui.SameLine()
-    ImGui.Text(tostring(Presets.masksController))
-    ImGui.Text(UIText.Debug.General.module_settings)
-    ImGui.SameLine()
-    ImGui.Text(tostring(Settings.masksController))
-    if Debug.ironsightController then
-      ImGui.Text(UIText.Debug.General.init_file)
+    ImGuiExt.TextWhite(tostring(Config.GameState.currentFps))
+
+    ImGui.Separator()
+    ImGuiExt.TextWhite("Masks Controller:")
+    
+    if Vectors then
+      ImGuiExt.TextWhite("For Vectors Module")
       ImGui.SameLine()
-      ImGui.Text(tostring(Debug.ironsightController))
+      ImGuiExt.TextWhite(tostring(Vectors.MaskingGlobal.masksController))
     end
+    if VectorsCustomize then
+      ImGuiExt.TextWhite("For VectorsCustomize Module")
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(VectorsCustomize.MaskingGlobal.masksController))
+    end
+    if Calculate then
+      ImGuiExt.TextWhite("For Calculate Module")
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.MaskingGlobal.masksController))
+    end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.masked_controller_ready)
+    ImGuiExt.TextWhite("Is Mod Ready:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Debug.masksControllerReady))
-    ImGui.Text(UIText.Debug.General.module_vectors)
-    ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.VehMasks.masksControllerReady))
+    ImGuiExt.TextWhite(tostring(Config.ModState.isReady))
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.enabled_masking)
+
+    ImGuiExt.TextWhite("Masking enabled:")
+    ImGuiExt.TextWhite("For Vectors Module")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.VehMasks.enabled))
+    ImGuiExt.TextWhite(tostring(Vectors.MaskingGlobal.vehicles))
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.vehicle_mask)
+
+    ImGuiExt.TextWhite("Vehicles HED Mask Size:")
     if Vectors.VehMasks.HorizontalEdgeDown.Size.x then
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.y))
     end
-    ImGui.Text(UIText.Debug.General.hed_toggle_value)
+
+    ImGuiExt.TextWhite("HED Fill/Tracker Toggle Value:")
     if Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue then
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue))
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.foot_mask)
-    if Calculate.FPPOnFoot.cornerDownLeftMargin then
-      ImGui.Text(tostring(Calculate.FPPOnFoot.cornerDownLeftMargin))
-      ImGui.SameLine()
-      ImGui.Text(tostring(Calculate.FPPOnFoot.cornerDownRightMargin))
-      ImGui.SameLine()
-      ImGui.Text(tostring(Calculate.FPPOnFoot.cornerDownMarginTop))
-    end
-    ImGui.Separator()
-    ImGui.Text(UIText.Debug.General.mask_path)
+
+    ImGuiExt.TextWhite("Masks Paths:")
+
     if Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath then
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath))
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedFillPath))
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.maskPath))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.maskPath))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.maskPath))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.maskPath))
-      ImGui.Text(tostring(Vectors.VehMasks.MaskEditor.maskPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedFillPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.maskPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.maskPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.maskPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.maskPath))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.MaskEditor1.maskPath))
     end
-    ImGui.PopStyleColor() --PSC.1
+
     ImGui.EndTabItem()
   end
-  if ImGui.BeginTabItem(UIText.Debug.Vector.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.2
-    ImGui.Text(UIText.Debug.Vector.camera)
+
+  if ImGui.BeginTabItem("Vectors Data") then
+    ImGuiExt.TextWhite("Camera Forward:")
     if Vectors.Camera.Forward then
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward))
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle_absolute)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs))
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle_right)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.right))
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle_right_absolute)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs))
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle_up)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.up))
-      ImGui.Text(UIText.Debug.Vector.DotProduct.vehicle_up_absolute)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs))
+      ImGuiExt.TextWhite("DotProduct Vehicle Forward:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward))
+      ImGuiExt.TextWhite("DotProduct Vehicle Forward Absolute:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs))
+      ImGuiExt.TextWhite("DotProduct Vehicle Right:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.right))
+      ImGuiExt.TextWhite("DotProduct Vehicle Right Absolute:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs))
+      ImGuiExt.TextWhite("DotProduct Vehicle Up:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.up))
+      ImGuiExt.TextWhite("DotProduct Vehicle Up Absolute:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs))
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vector.camera_angle)
-      ImGui.Text(UIText.Debug.Vector.vehicle_forward_horizontal)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.horizontalPlane))
-      ImGui.Text(UIText.Debug.Vector.vehicle_forward_median)
-      ImGui.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane))
+      ImGuiExt.TextWhite("Camera Forward Angle:")
+      ImGuiExt.TextWhite("Vehicle Forward Horizontal Plane:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.horizontalPlane))
+      ImGuiExt.TextWhite("Vehicle Forward Median Plane:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane))
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vector.camera_forward_z)
-      ImGui.Text(tostring(Vectors.Camera.Forward.z))
+      ImGuiExt.TextWhite("Camera Forward Z:")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Forward.z))
     end
+
     ImGui.Separator()
+
     if Vectors.Camera.Forward then
-      ImGui.Text(UIText.Debug.Vector.camera_forward_xyz)
-      ImGui.Text(tostring(Vectors.Camera.Forward.x))
-      ImGui.Text(tostring(Vectors.Camera.Forward.y))
-      ImGui.Text(tostring(Vectors.Camera.Forward.z))
+      ImGuiExt.TextWhite("Camera Forward (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Forward.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Forward.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Forward.z))
     end
+
     ImGui.Separator()
+
     if Vectors.Camera.Right then
-      ImGui.Text(UIText.Debug.Vector.camera_right_xyz)
-      ImGui.Text(tostring(Vectors.Camera.Right.x))
-      ImGui.Text(tostring(Vectors.Camera.Right.y))
-      ImGui.Text(tostring(Vectors.Camera.Right.z))
+      ImGuiExt.TextWhite("Camera Right (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Right.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Right.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Right.z))
     end
+
     ImGui.Separator()
+
     if Vectors.Camera.Up then
-      ImGui.Text(UIText.Debug.Vector.camera_up_xyz)
-      ImGui.Text(tostring(Vectors.Camera.Up.x))
-      ImGui.Text(tostring(Vectors.Camera.Up.y))
-      ImGui.Text(tostring(Vectors.Camera.Up.z))
+      ImGuiExt.TextWhite("Camera Up (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Up.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Up.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Camera.Up.z))
     end
+
     ImGui.Separator()
+
     if Vectors.Vehicle.Forward then
-      ImGui.Text(UIText.Debug.Vector.vehicle_forward_xyz)
-      ImGui.Text(tostring(Vectors.Vehicle.Forward.x))
-      ImGui.Text(tostring(Vectors.Vehicle.Forward.y))
-      ImGui.Text(tostring(Vectors.Vehicle.Forward.z))
+      ImGuiExt.TextWhite("Vehicle Forward (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Forward.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Forward.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Forward.z))
     end
+
     ImGui.Separator()
+
     if Vectors.Vehicle.Right then
-      ImGui.Text(UIText.Debug.Vector.vehicle_right_xyz)
-      ImGui.Text(tostring(Vectors.Vehicle.Right.x))
-      ImGui.Text(tostring(Vectors.Vehicle.Right.y))
-      ImGui.Text(tostring(Vectors.Vehicle.Right.z))
+      ImGuiExt.TextWhite("Vehicle Right (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Right.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Right.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Right.z))
     end
+
     ImGui.Separator()
+    
     if Vectors.Vehicle.Up then
-      ImGui.Text(UIText.Debug.Vector.vehicle_up_xyz)
-      ImGui.Text(tostring(Vectors.Vehicle.Up.x))
-      ImGui.Text(tostring(Vectors.Vehicle.Up.y))
-      ImGui.Text(tostring(Vectors.Vehicle.Up.z))
+      ImGuiExt.TextWhite("Vehicle Up (x, y, z, w = 0):")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Up.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Up.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Up.z))
     end
-    ImGui.PopStyleColor() --PSC.2
+
     ImGui.EndTabItem()
   end
-  if ImGui.BeginTabItem(UIText.Debug.Vehicle.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.3
-    ImGui.Separator()
-    ImGui.Text(UIText.Debug.Vehicle.inside)
+
+  if ImGui.BeginTabItem("Vehicle Data") then
+    ImGuiExt.TextWhite("Is in a Vehicle:")
     ImGui.SameLine()
     if Vectors.Vehicle.isMounted then
       if Vectors.Vehicle.vehicleBaseObject == 0 then
-        ImGui.Text(UIText.Debug.Vehicle.Mounted.bike)
+        ImGuiExt.TextWhite("bike")
       elseif Vectors.Vehicle.vehicleBaseObject == 1 then
-        ImGui.Text(UIText.Debug.Vehicle.Mounted.car)
+        ImGuiExt.TextWhite("car")
       elseif Vectors.Vehicle.vehicleBaseObject == 2 then
-        ImGui.Text(UIText.Debug.Vehicle.Mounted.tank)
+        ImGuiExt.TextWhite("tank")
       else
-        ImGui.Text(UIText.Debug.Vehicle.Mounted.unknown)
+        ImGuiExt.TextWhite("vehicle")
       end
-      ImGui.Text(UIText.Debug.Vehicle.id)
+
+      ImGuiExt.TextWhite("Current Vehicle's ID")
       if Vectors.Vehicle.vehicleID then
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.vehicleID.value))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.vehicleID.value))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.speed)
+
+      ImGuiExt.TextWhite("Vehicle Current Speed:")
       if Vectors.Vehicle.currentSpeed then
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.currentSpeed))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.currentSpeed))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.perspective)
-      if Vectors.Vehicle.activePerspective then
+
+      ImGuiExt.TextWhite("Active Camera Perspective:")
+      if Vectors.Camera.activePerspective then
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.activePerspective.value))
+        ImGuiExt.TextWhite(tostring(Vectors.Camera.activePerspective.value))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.position)
+
+      ImGuiExt.TextWhite("Vehicle's Position:")
       if Vectors.Vehicle.Position then
-        ImGui.Text(tostring(Vectors.Vehicle.Position.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Position.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Position.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Position.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Position.z))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Position.z))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.wheels_position)
+
+      ImGuiExt.TextWhite("Wheels Positions:")
       if Vectors.Vehicle.Wheel.Position.Back.Left then
-        ImGui.Text(UIText.Debug.Vehicle.wheel_bl)
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.x))
+        ImGuiExt.TextWhite("Back Left")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_br)
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.z))
+        ImGuiExt.TextWhite("Back Right")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_fl)
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.z))
+        ImGuiExt.TextWhite("Front Left")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_fr)
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.z))
+        ImGuiExt.TextWhite("Front Right")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.z))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.z))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.wheel_base)
+
+      ImGuiExt.TextWhite("Vehicle's Wheelbase:")
       if Vectors.Vehicle.Wheel.wheelbase then
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Wheel.wheelbase))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.wheelbase))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.wheel_axes_postion)
+
+      ImGuiExt.TextWhite("Vehicle Axes Midpoints' Positions:")
       if Vectors.Vehicle.Midpoint.Position.Back then
-        ImGui.Text(UIText.Debug.Vehicle.wheel_axis_back)
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.x))
+        ImGuiExt.TextWhite("Back Wheels' Axis")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Back.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Back.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_axes_front)
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Back.z))
+        ImGuiExt.TextWhite("Front Wheels' Axis")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Front.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Front.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_axis_left)
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Front.z))
+        ImGuiExt.TextWhite("Left Wheels' Axis")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Left.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Left.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.z))
-        ImGui.Text(UIText.Debug.Vehicle.wheel_axis_right)
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Left.z))
+        ImGuiExt.TextWhite("Right Wheels' Axis")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Right.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Right.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.z))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Midpoint.Position.Right.z))
       end
+
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.Vehicle.bumper_position)
+
+      ImGuiExt.TextWhite("Vehicle Bumpers Positions:")
       if Vectors.Vehicle.Bumper.Position.Back then
-        ImGui.Text(UIText.Debug.Vehicle.bumper_back)
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.x))
+        ImGuiExt.TextWhite("Back")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Back.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Back.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.z))
-        ImGui.Text(UIText.Debug.Vehicle.bumper_front)
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.x))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Back.z))
+        ImGuiExt.TextWhite("Front")
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Front.x))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.y))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Front.y))
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.z))
-        ImGui.Text(UIText.Debug.Vehicle.bumper_distance)
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.Position.Front.z))
+        ImGuiExt.TextWhite("Distance Between Bumpers:")
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.distance))
-        ImGui.Text(UIText.Debug.Vehicle.bumper_offset)
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.distance))
+        ImGuiExt.TextWhite("Bumpers Offset From Wheels:")
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.offset))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.offset))
       end
     else
-      ImGui.Text(UIText.Debug.Vehicle.inside_negative_answer)
+      ImGuiExt.TextWhite("false")
     end
-    ImGui.PopStyleColor() --PSC.3
+
     ImGui.EndTabItem()
   end
-  if ImGui.BeginTabItem(UIText.Debug.ScreenSpace.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.4
-    ImGui.Text(UIText.Debug.ScreenSpace.wheels_position)
+
+  if ImGui.BeginTabItem("Screen Space Data") then
+
+    ImGuiExt.TextWhite("Wheels Screen Space Positions:")
     if Vectors.Vehicle.Wheel.ScreenSpace.Back.Left then
-      ImGui.Text(UIText.Debug.Vehicle.wheel_bl)
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.x))
+      ImGuiExt.TextWhite("Back Left")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.y))
-      ImGui.Text(UIText.Debug.Vehicle.wheel_br)
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.y))
+      ImGuiExt.TextWhite("Back Right")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.y))
-      ImGui.Text(UIText.Debug.Vehicle.wheel_fl)
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.y))
+      ImGuiExt.TextWhite("Front Left")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.y))
-      ImGui.Text(UIText.Debug.Vehicle.wheel_fr)
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.x))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.y))
+      ImGuiExt.TextWhite("Front Right")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.y))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.y))
     end
+
     if Vectors.Vehicle.Bumper.ScreenSpace.distance then
       ImGui.Separator()
-      ImGui.Text(UIText.Debug.ScreenSpace.bumper_position)
-      ImGui.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distance))
+      ImGuiExt.TextWhite("Bumpers Screen Space Distance:")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distance))
+
       if Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation then
-        ImGui.Text(UIText.Debug.ScreenSpace.axis_rotation)
+        ImGuiExt.TextWhite("Distance (Longtitude Axis) Rotation:")
         ImGui.SameLine()
-        ImGui.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation))
+        ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation))
       end
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.ScreenSpace.axes_screen)
+
+    ImGuiExt.TextWhite("Wheels' Axes Screen Data:")
     if Vectors.Vehicle.Axis.ScreenRotation.back then
-      ImGui.Text(UIText.Debug.back)
-      ImGui.Text(UIText.Debug.rotation .. ":")
+      ImGuiExt.TextWhite("Back")
+      ImGuiExt.TextWhite("Rotation:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.back))
-      ImGui.Text(UIText.Debug.length .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenRotation.back))
+      ImGuiExt.TextWhite("Length:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.back))
-      ImGui.Text(UIText.Debug.front)
-      ImGui.Text(UIText.Debug.rotation .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenLength.back))
+      ImGuiExt.TextWhite("Front")
+      ImGuiExt.TextWhite("Rotation:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.front))
-      ImGui.Text(UIText.Debug.length .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenRotation.front))
+      ImGuiExt.TextWhite("Length:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.front))
-      ImGui.Text(UIText.Debug.left)
-      ImGui.Text(UIText.Debug.rotation .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenLength.front))
+      ImGuiExt.TextWhite("Left")
+      ImGuiExt.TextWhite("Rotation:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.left))
-      ImGui.Text(UIText.Debug.length .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenRotation.left))
+      ImGuiExt.TextWhite("Length:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.left))
-      ImGui.Text(UIText.Debug.right)
-      ImGui.Text(UIText.Debug.rotation .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenLength.left))
+      ImGuiExt.TextWhite("Right")
+      ImGuiExt.TextWhite("Rotation:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.right))
-      ImGui.Text(UIText.Debug.length .. ":")
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenRotation.right))
+      ImGuiExt.TextWhite("Length:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.right))
+      ImGuiExt.TextWhite(tostring(Vectors.Vehicle.Axis.ScreenLength.right))
     end
-    ImGui.PopStyleColor() --PSC.4
+
     ImGui.EndTabItem()
   end
-  if ImGui.BeginTabItem(UIText.Debug.Masks.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.5
-    ImGui.Text(UIText.Debug.Masks.hed_opacity)
-    if Vectors.VehMasks.HorizontalEdgeDown.opacity then
+
+  if ImGui.BeginTabItem("Masks Data") then
+    ImGuiExt.TextWhite("Current HED Opacity:")
+    if Vectors.VehMasks.HorizontalEdgeDown.Opacity.value then
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.opacity))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Opacity.value))
     end
-    ImGui.Text(UIText.Debug.Masks.hed_tracker_opacity)
-    if Vectors.VehMasks.HorizontalEdgeDown.opacityTracker then
+
+    ImGuiExt.TextWhite("Current HED Tracker Opacity:")
+    if Vectors.VehMasks.HorizontalEdgeDown.Opacity.tracker then
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.opacityTracker))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Opacity.tracker))
     end
-    ImGui.Text(UIText.Debug.General.hed_toggle_value)
-    if Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue then
+
+    ImGuiExt.TextWhite("HED Fill Toggle Value:")
+    if Vectors.VehMasks.HorizontalEdgeDown.fillToggleValue then
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue))
     end
-    ImGui.Text(UIText.Debug.Masks.opacity)
+
+    ImGuiExt.TextWhite("Current Masks Opacities:")
     if Vectors.VehMasks.Opacity.value then
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Opacity.value))
-      ImGui.Text(UIText.Debug.Masks[1])
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Opacity.value))
+      ImGuiExt.TextWhite("Mask 1")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.opacity))
-      ImGui.Text(UIText.Debug.Masks[2])
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.opacity))
+      ImGuiExt.TextWhite("Mask 2")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.opacity))
-      ImGui.Text(UIText.Debug.Masks[3])
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.opacity))
+      ImGuiExt.TextWhite("Mask 3")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.opacity))
-      ImGui.Text(UIText.Debug.Masks[4])
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.opacity))
+      ImGuiExt.TextWhite("Mask 4")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.opacity))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.opacity))
     end
-    ImGui.Text(UIText.Debug.Masks.opacity_gain)
+
+    ImGuiExt.TextWhite("Opacity Gain:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.VehMasks.Opacity.Def.gain))
+    ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Opacity.Def.gain))
+
     if Vectors.VehMasks.Opacity.delayTime then
-      ImGui.Text(UIText.Debug.Masks.opacity_delay)
+      ImGuiExt.TextWhite("Opacity Transformation Delay Time:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Opacity.delayTime))
-      ImGui.Text(UIText.Debug.Masks.opacity_normal)
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Opacity.delayTime))
+      ImGuiExt.TextWhite("Is Opacity Normalized:")
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Opacity.isNormalized))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Opacity.isNormalized))
+
       if not Vectors.VehMasks.Opacity.isNormalized then
-        ImGui.Text(tostring(Vectors.VehMasks.Opacity.normalizedValue))
+        ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Opacity.normalizedValue))
       end
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.Masks.hed_fill)
+
+    ImGuiExt.TextWhite("HED Fill Lock:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock))
-    ImGui.Text(UIText.Debug.Masks.hed_tracker)
+    ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock))
+
+    ImGuiExt.TextWhite("HED Tracker Position:")
     if Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker then
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.y))
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.Masks.position)
+
+    ImGuiExt.TextWhite("Masks Positions:")
     if Vectors.VehMasks.Mask1.Position then
-      ImGui.Text(UIText.Debug.Masks[1] .. ":")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Position.x))
+      ImGuiExt.TextWhite("Mask1")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Position.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Position.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Position.y))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Position.z))
-      ImGui.Text(UIText.Debug.Masks[2] .. ":")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Position.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Position.z))
+      ImGuiExt.TextWhite("Mask2")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Position.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Position.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Position.y))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Position.z))
-      ImGui.Text(UIText.Debug.Masks[3] .. ":")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Position.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Position.z))
+      ImGuiExt.TextWhite("Mask3")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Position.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Position.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Position.y))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Position.z))
-      ImGui.Text(UIText.Debug.Masks[4] .. ":")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Position.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Position.z))
+      ImGuiExt.TextWhite("Mask4")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Position.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Position.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Position.y))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Position.z))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Position.z))
     end
+
     ImGui.Separator()
-    ImGui.Text(UIText.Debug.Masks.hed_tracker_size)
+
+    ImGuiExt.TextWhite("HED Size Lock:")
+    ImGui.SameLine()
+    ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock))
+
+    ImGuiExt.TextWhite("HED Tracker Size (x, y):")
     if Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker then
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.x))
       ImGui.SameLine()
-      ImGui.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.y))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.y))
     end
+
     ImGui.Separator()
-    ImGui.Text()
+
+    ImGuiExt.TextWhite("Masks Sizes:")
     if Vectors.VehMasks.Mask1.Size.x then
-      ImGui.Text(UIText.Debug.Masks[1] .. " (x, y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Size.x))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Size.y))
-      ImGui.Text(UIText.Debug.Masks[2] .. " (x, y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Size.x))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Size.y))
-      ImGui.Text(UIText.Debug.Masks[3] .. " (x, y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Size.x))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Size.y))
-      ImGui.Text(UIText.Debug.Masks[4] .. " (x, y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Size.x))
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Size.y))
+      ImGuiExt.TextWhite("Mask1 (x, y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Size.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Size.y))
+      ImGuiExt.TextWhite("Mask2 (x, y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Size.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Size.y))
+      ImGuiExt.TextWhite("Mask3 (x, y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Size.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Size.y))
+      ImGuiExt.TextWhite("Mask4 (x, y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Size.x))
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Size.y))
     end
-    ImGui.Text()
+
+    ImGuiExt.TextWhite("Cached Masks Sizes:")
     if Vectors.VehMasks.Mask2.Cache.Size.y then
-      ImGui.Text(UIText.Debug.Masks[1] .. " (y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask1.Cache.Size.y))
-      ImGui.Text(UIText.Debug.Masks[2] .. " (y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask2.Cache.Size.y))
-      ImGui.Text(UIText.Debug.Masks[3] .. " (y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask3.Cache.Size.y))
-      ImGui.Text(UIText.Debug.Masks[4] .. " (y)")
-      ImGui.Text(tostring(Vectors.VehMasks.Mask4.Cache.Size.y))
+      ImGuiExt.TextWhite("Mask1 (y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask1.Cache.Size.y))
+      ImGuiExt.TextWhite("Mask2 (y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask2.Cache.Size.y))
+      ImGuiExt.TextWhite("Mask3 (y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask3.Cache.Size.y))
+      ImGuiExt.TextWhite("Mask4 (y)")
+      ImGuiExt.TextWhite(tostring(Vectors.VehMasks.Mask4.Cache.Size.y))
     end
-    ImGui.PopStyleColor() --PSC.5
+
     ImGui.EndTabItem()
   end
-  if ImGui.BeginTabItem(UIText.Debug.Player.tabname) then
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1) --PSC.6
-    ImGui.Text(UIText.Debug.Player.is_moving)
+
+  if ImGui.BeginTabItem("Player Data") then
+    ImGuiExt.TextWhite("Is Moving:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.PlayerPuppet.isMoving))
-    ImGui.Text(UIText.Debug.Player.has_weapon)
+    ImGuiExt.TextWhite(tostring(Vectors.PlayerPuppet.isMoving))
+    ImGuiExt.TextWhite("Has a Weapon in Hand:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.PlayerPuppet.hasWeapon))
-    ImGui.Text(UIText.Debug.Player.is_mounted)
+    ImGuiExt.TextWhite(tostring(Vectors.PlayerPuppet.hasWeapon))
+    ImGuiExt.TextWhite("Is Mounted:")
     ImGui.SameLine()
-    ImGui.Text(tostring(Vectors.Vehicle.isMounted))
+    ImGuiExt.TextWhite(tostring(Vectors.Vehicle.isMounted))
+
+    ImGui.EndTabItem()
+  end
+
+  if ImGui.BeginTabItem("Calculate Module") then
+    ImGuiExt.TextWhite("Corner Masks Screen Space:")
+    if Calculate.Corners.ScreenSpace.Left.x then
+      ImGuiExt.TextWhite(tostring(Calculate.Corners.ScreenSpace.Left.x))
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.Corners.ScreenSpace.Right.x))
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.Corners.ScreenSpace.Bottom.y))
+    end
+
     ImGui.Separator()
-    ImGui.PopStyleColor() --PSC.6
+
+    ImGuiExt.TextWhite("Blocker Size:")
+    if Calculate.Blocker.Size.x then
+      ImGuiExt.TextWhite(tostring(Calculate.Blocker.Size.x))
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.Blocker.Size.y))
+    end
+
+    ImGui.Separator()
+
+    ImGuiExt.TextWhite("Vignette Screen Space:")
+    if Calculate.Vignette.ScreenSpace.x then
+      ImGuiExt.TextWhite(tostring(Calculate.Vignette.ScreenSpace.x))
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.Vignette.ScreenSpace.y))
+    end
+
+    ImGuiExt.TextWhite("Vignette Size:")
+    if Calculate.Vignette.ScreenSpace.x then
+      ImGuiExt.TextWhite(tostring(Calculate.Vignette.Size.x))
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(Calculate.Vignette.Size.y))
+    end
+
     ImGui.EndTabItem()
   end
 end

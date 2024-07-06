@@ -4,6 +4,8 @@ FrameGen Ghosting 'Fix' uses predefined .inkwidget files to store masks (widgets
 
 This manual will briefly explain how to create your anti-ghosting presets that may be used to better fit your preferences, customize anti-ghosting for your average framerate, or just for fun and learning purposes - this manual is for anyone who likes to tinker and learn new stuff.
 
+**NOTE: The below tutorial isn't applicable for version 4.0.0-alpha and higher; however, it gives worthy insights into the basics of frame generation anti-ghosting methods used by the mod.**
+
 **Some knowledge of how Lua's tables are built and skills on how to follow a presented pattern without breaking it are required.**
 
 ## Creating your anti-ghosting preset

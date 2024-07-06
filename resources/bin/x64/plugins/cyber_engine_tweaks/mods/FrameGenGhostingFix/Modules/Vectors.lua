@@ -1,6 +1,12 @@
 local Vectors = {
-  __VERSION_NUMBER = 484,
+  __NAME = "Vectors",
+  __VERSION_NUMBER = 490,
+  MaskingGlobal = {
+    masksController = nil,
+    vehicles = true,
+  },
   Camera = {
+    activePerspective = nil,
     Forward = nil,
     ForwardTable = {
       Abs = {x=nil, y = nil, z = nil},
@@ -24,6 +30,7 @@ local Vectors = {
       },
     },
     fov = nil,
+    lastPerspective = nil,
     Right = nil,
     Up = nil,
   },
@@ -98,8 +105,6 @@ local Vectors = {
     },
   },
   Screen = {
-    aspectRatio = nil,
-    Base = {width = 3840, height = 2160},
     Edge = {
       down = 2160,
       left = 0,
@@ -107,10 +112,9 @@ local Vectors = {
     },
     Factor = {width = 1, height = 1},
     Space = {width = 3840, height = 2160},
-    Resolution = {width = nil, height = nil},
+    type = 169,
   },
   Vehicle = {
-    activePerspective = nil,
     Axis = {
       ScreenRotation = {
         back = 0,
@@ -142,7 +146,6 @@ local Vectors = {
     },
     Forward =  nil,
     isMounted = nil,
-    lastPerspective = nil,
     Midpoint = {
       Position = {
         Back = nil,
@@ -160,7 +163,7 @@ local Vectors = {
     Up = nil,
     vehicleBaseObject = 4,
     vehicleID = nil,
-    vehicleMaskingOn = true,
+    vehicleTypeKnown = true,
     vehicleRecord = nil,
     vehicleType = nil,
     Wheel = {
@@ -352,13 +355,18 @@ local Vectors = {
       ScreenSpace = {x = 0, y = 0},
       visible = true
     },
-    MaskEditor = {
-      maskPath = "fgfixcars/mask_editor",
+    MaskEditor1 = {
+      maskPath = "fgfixcars/mask_editor1",
       rotation = 0,
       Size = {x = 0, y = 0},
       ScreenSpace = {x = 0, y = 0},
     },
-    masksControllerReady = nil,
+    MaskEditor2 = {
+      maskPath = "fgfixcars/mask_editor2",
+      rotation = 0,
+      Size = {x = 0, y = 0},
+      ScreenSpace = {x = 0, y = 0},
+    },
     Opacity = {
       Def = {
         delayDuration = 1,
@@ -378,6 +386,8 @@ local Vectors = {
     }
   },
 }
+
+local Config = require("Modules/Config")
 
 --Universal methods start here----------------------------------------------------------------------------------------------------------------------
 
@@ -504,7 +514,7 @@ function Vectors.GetWorldToScreenSpace(pos)
   return screenPos
 end
 
-function Vectors.ResizeVehHED(baseDimension, multiplier, isX)
+function Vectors.ResizeHED(baseDimension, multiplier, isX)
   local floor = math.floor
   local max = math.max
   local newDimension = baseDimension
@@ -529,28 +539,40 @@ end
 
 function Vectors.IsMounted()
   local isMounted = Game['GetMountedVehicle;GameObject'](Game.GetPlayer())
+  local print
 
   if isMounted then
     Vectors.Vehicle.isMounted = true
+    print = true
   else
     Vectors.Vehicle.isMounted = nil
+    print = false
   end
+
+  return print
 end
 
 function Vectors.IsMoving()
   local isMoving = Game.GetPlayer():IsMoving()
 
   Vectors.PlayerPuppet.isMoving = isMoving
+
+  return isMoving
 end
 
 function Vectors.HasWeapon()
   local hasWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
+  local print
 
   if hasWeapon then
     Vectors.PlayerPuppet.hasWeapon = true
+    print = true
   else
     Vectors.PlayerPuppet.hasWeapon = false
+    print = false
   end
+
+  return print
 end
 
 function Vectors.GetPlayerData()
@@ -561,6 +583,34 @@ function Vectors.GetPlayerData()
     Vectors.IsMounted()
     Vectors.IsMoving()
     Vectors.HasWeapon()
+  end
+
+  return player
+end
+
+function Vectors.GetCameraData()
+  local abs = math.abs
+  local cameraSystem = Game.GetCameraSystem()
+
+  Vectors.Camera.fov = cameraSystem:GetActiveCameraFOV()
+
+  Vectors.Camera.Forward = cameraSystem:GetActiveCameraForward()
+  Vectors.Camera.Right = cameraSystem:GetActiveCameraRight()
+  Vectors.Camera.Up = cameraSystem:GetActiveCameraUp()
+
+  Vectors.Camera.ForwardTable.Abs.z = abs(Vectors.Camera.Forward.z)
+end
+
+function Vectors.GetActivePerspective()
+  local player = Game.GetPlayer()
+  local vehicle = Game.GetMountedVehicle(player) or false
+  local currentSpeed = Vectors.Vehicle.currentSpeed
+
+  if vehicle and Vectors.Vehicle.isMounted and currentSpeed ~= nil then
+    if currentSpeed > 0.1 or currentSpeed < -0.1 then
+      Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
+      Vectors.Camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
+    end
   end
 end
 
@@ -581,14 +631,19 @@ function Vectors.GetVehicleRecord()
   Vectors.Vehicle.vehicleID = Vectors.Vehicle.vehicleRecord:GetID()
 end
 
-function Vectors.SetVehicleMaskingState()
+function Vectors.IsVehicleKnown()
   local baseObject = Vectors.Vehicle.vehicleBaseObject
+  local print
 
   if baseObject == 0 or baseObject == 1 then
-    Vectors.Vehicle.vehicleMaskingOn = true
+    Vectors.Vehicle.vehicleTypeKnown = true
+    print = true
   else
-    Vectors.Vehicle.vehicleMaskingOn = false
+    Vectors.Vehicle.vehicleTypeKnown = false
+    print = false
   end
+
+  return print
 end
 
 function Vectors.GetBikeWheelsPositions()
@@ -806,12 +861,12 @@ function Vectors.GetVehicleData()
     Vectors.Vehicle.currentSpeed = vehicle:GetCurrentSpeed()
     Vectors.GetVehicleBaseObject()
     Vectors.GetVehicleRecord()
-    Vectors.SetVehicleMaskingState()
+    Vectors.IsVehicleKnown()
   end
 end
 
 function Vectors.GetDerivativeVehicleData()
-  if not Vectors.Vehicle.vehicleMaskingOn then return end
+  if not Vectors.Vehicle.vehicleTypeKnown then return end
   Vectors.GetVehWheelsPositions()
   Vectors.GetVehMidpointsPositions()
   Vectors.GetVehBumpersPositions()
@@ -820,41 +875,11 @@ function Vectors.GetDerivativeVehicleData()
   Vectors.GetVehAxesScreenData()
 end
 
-function Vectors.GetCameraData()
-  local abs = math.abs
-  local cameraSystem = Game.GetCameraSystem()
-
-  Vectors.Camera.fov = cameraSystem:GetActiveCameraFOV()
-
-  Vectors.Camera.Forward = cameraSystem:GetActiveCameraForward()
-  Vectors.Camera.Right = cameraSystem:GetActiveCameraRight()
-  Vectors.Camera.Up = cameraSystem:GetActiveCameraUp()
-
-  Vectors.Camera.ForwardTable.Abs.z = abs(Vectors.Camera.Forward.z)
-end
-
 function Vectors.GetCameraAnglesVehicle()
   local angleVeh = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward
 
   angleVeh.horizontalPlane = Vector4.GetAngleDegAroundAxis(Vectors.Camera.Forward, Vectors.Vehicle.Forward, Vectors.Vehicle.Up)
   angleVeh.medianPlane = Vector4.GetAngleDegAroundAxis(Vectors.Camera.Forward, Vectors.Vehicle.Forward, Vectors.Vehicle.Right)
-end
-
-function Vectors.GetActivePerspective()
-  local player = Game.GetPlayer()
-  local vehicle = Game.GetMountedVehicle(player) or false
-  local currentSpeed = Vectors.Vehicle.currentSpeed
-
-  if vehicle and Vectors.Vehicle.isMounted and currentSpeed ~= nil then
-    if currentSpeed > 0.1 or currentSpeed < -0.1 then
-      Vectors.GetLastPerspective()
-      Vectors.Vehicle.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
-    end
-  end
-end
-
-function Vectors.GetLastPerspective()
-  Vectors.Vehicle.lastPerspective = Vectors.Vehicle.activePerspective
 end
 
 function Vectors.GetDotProducts()
@@ -893,32 +918,6 @@ function Vectors.GetDotProductsBackup()
 end
 
 --Data gathering methods end here----------------------------------------------------------------------------------------------------------------------
---Customization methods start here----------------------------------------------------------------------------------------------------------------------
-
-function Vectors.SetWindshieldDefault()
-  Vectors.VehMasks.Mask4.Scale.x = 100
-  Vectors.VehMasks.Mask4.Scale.y = 100
-end
-
-function Vectors.SaveCache()
-  Vectors.VehMasks.Mask4.Cache.Scale.x = Vectors.VehMasks.Mask4.Scale.x
-  Vectors.VehMasks.Mask4.Cache.Scale.y = Vectors.VehMasks.Mask4.Scale.y
-end
-
-function Vectors.ReadCache()
-  Vectors.VehMasks.Mask4.Scale.x = Vectors.VehMasks.Mask4.Cache.Scale.x
-  Vectors.VehMasks.Mask4.Scale.y = Vectors.VehMasks.Mask4.Cache.Scale.y
-end
-
-function Vectors.UpdateLiveViewWindshieldEditor()
-  local maskEditor = Vectors.VehMasks.MaskEditor
-
-  maskEditor.Size = Vectors.VehMasks.Mask4.Size
-  maskEditor.ScreenSpace = Vectors.VehMasks.Mask4.ScreenSpace
-  maskEditor.rotation = Vectors.VehMasks.Mask4.rotation
-end
-
---Customization methods end here----------------------------------------------------------------------------------------------------------------------
 --Transformation methods start here----------------------------------------------------------------------------------------------------------------------
 
 --Transform By
@@ -933,22 +932,19 @@ end
 function Vectors.TransformByPerspective()
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
 
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     hedSize.x = hedSize.Def.x
     hedSize.y = hedSize.Def.y
   else
-    hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, 0.92, true)
-    hedSize.y = Vectors.ResizeVehHED(hedSize.Def.y, 1.2)
-
-    if Vectors.Vehicle.vehicleBaseObject ~= 0 then return end
-    Vectors.UpdateLiveViewWindshieldEditor()
+    hedSize.x = Vectors.ResizeHED(hedSize.Def.x, 0.92, true)
+    hedSize.y = Vectors.ResizeHED(hedSize.Def.y, 1.2)
   end
 end
 
 function Vectors.TransformByVehBaseObject()
   local vehElements = Vectors.VehElements
 
-  if Vectors.Vehicle.isMounted and Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Vehicle.isMounted and Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     return
   else
     if Vectors.Vehicle.vehicleBaseObject == 1 then
@@ -1048,7 +1044,7 @@ end
 function Vectors.TransformPosition()
   local vehiclePos = Vectors.Vehicle.Position
 
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     if Vectors.Vehicle.vehicleBaseObject == 1 then
       Vectors.TransformPositionCar()
     else
@@ -1073,7 +1069,7 @@ function Vectors.TransformScreenSpaceBike()
   local max = math.max
   local min = math.min
   local new4 = Vector4.new
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
   local dotForward = Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward
@@ -1143,7 +1139,7 @@ function Vectors.TransformScreenSpaceCar()
 end
 
 function Vectors.TransformScreenSpace()
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     if Vectors.Vehicle.vehicleBaseObject == 1 then
       Vectors.TransformScreenSpaceCar()
     else
@@ -1179,10 +1175,10 @@ function Vectors.TransformWidthBike()
   local wheelbaseScreen = Vectors.Vehicle.Wheel.wheelbaseScreen
   local wheelbaseScreenPerp = Vectors.Vehicle.Wheel.wheelbaseScreenPerp
 
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-    hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, newHEDx, true)
+    hedSize.x = Vectors.ResizeHED(hedSize.Def.x, newHEDx, true)
 
     --HEDTracker
     hedSize.Tracker.x = max(wheelbaseScreen * 4, wheelbaseScreenPerp * 4)
@@ -1221,7 +1217,7 @@ function Vectors.TransformWidthCar()
   local abs = math.abs
   local max = math.max
   local min = math.min
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
   local bumpersScreenDistance = Vectors.Vehicle.Bumper.ScreenSpace.distance
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -1232,7 +1228,7 @@ function Vectors.TransformWidthCar()
     --HED
     if not hedSize.Def.lock then
       local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-      hedSize.x = Vectors.ResizeVehHED(hedSize.Def.x, newHEDx, true)
+      hedSize.x = Vectors.ResizeHED(hedSize.Def.x, newHEDx, true)
     end
   
     --HEDTracker
@@ -1285,7 +1281,7 @@ end
 
 function Vectors.TransformHeightBike()
   local max = math.max
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local hedTrackerSize = Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker
@@ -1352,7 +1348,7 @@ end
 
 function Vectors.TransformHeightCar()
   local max = math.max
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
   local bumpersScreenDistance = Vectors.Vehicle.Bumper.ScreenSpace.distance
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -1425,7 +1421,7 @@ function Vectors.TransformHeight()
 end
 
 function Vectors.TransformRotationBike()
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local horizontalAngle = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.horizontalPlane
@@ -1478,7 +1474,7 @@ function Vectors.TransformRotationBike()
 end
 
 function Vectors.TransformRotationCar()
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
   local bumpersRotation = Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation
   local dotForwardAbs = Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs
@@ -1553,7 +1549,7 @@ function Vectors.TransformShearCar()
 end
 
 function Vectors.TransformShear()
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local baseObject = Vectors.Vehicle.vehicleBaseObject
 
   if activePerspective ~= vehicleCameraPerspective.FPP and baseObject == 1 then
@@ -1567,7 +1563,7 @@ end
 function Vectors.TransformOpacityBike()
   local max = math.max
   local min = math.max
-  local activePerspective = Vectors.Vehicle.activePerspective
+  local activePerspective = Vectors.Camera.activePerspective
   local dotForward = Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward
   local opacityValue = Vectors.VehMasks.Opacity.value
   local opacityForwardAbs = opacityValue * Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs
@@ -1614,7 +1610,7 @@ function Vectors.TransformOpacityCar()
   local opacityRightAbs = opacityValue * dotVeh.rightAbs
   local opacityUpAbs = opacityValue * dotVeh.upAbs
 
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     --Mask1
     if dotVeh.forward < 0 then
       local mask1Opacity = max(opacityUpAbs * 2, opacityRightAbs * 1.5) * opacityGain
@@ -1764,7 +1760,7 @@ end
 
 function Vectors.TransformVehMasks()
   Vectors.TransformVisibility()
-  if not Vectors.VehMasks.enabled then return end
+  if not Vectors.MaskingGlobal.vehicles then return end
   Vectors.TransformByFPS()
   Vectors.TransformByPerspective()
   Vectors.TransformByVehBaseObject()
@@ -1780,7 +1776,7 @@ end
 function Vectors.TransformVisibility()
   local baseObject = Vectors.Vehicle.vehicleBaseObject
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
-  local enabledVeh = Vectors.VehMasks.enabled
+  local maskingVeh = Vectors.MaskingGlobal.vehicles
   local hasWeapon = Vectors.PlayerPuppet.hasWeapon
   local hedVisible = Vectors.VehMasks.HorizontalEdgeDown.Visible
   local medianAngle = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane
@@ -1788,7 +1784,7 @@ function Vectors.TransformVisibility()
   hedVisible.corners = hedVisible.Def.corners
   hedVisible.tracker = hedVisible.Def.tracker
 
-  if Vectors.Vehicle.activePerspective ~= vehicleCameraPerspective.FPP then
+  if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     Vectors.VehMasks.Mask1.visible = true
     Vectors.VehMasks.Mask2.visible = true
     Vectors.VehMasks.Mask3.visible = true
@@ -1829,7 +1825,10 @@ function Vectors.TransformVisibility()
     hedVisible.tracker = false
   end
 
-  if enabledVeh then return end
+  if maskingVeh then return end
+  hedVisible.corners = false
+  hedVisible.fill = false
+  hedVisible.tracker = false
   Vectors.VehMasks.Mask1.visible = false
   Vectors.VehMasks.Mask2.visible = false
   Vectors.VehMasks.Mask3.visible = false
@@ -1838,18 +1837,187 @@ end
 
 --Transformation methods end here----------------------------------------------------------------------------------------------------------------------
 
-function Vectors.ProjectVehicleMasks()
-  local game = Vectors.Game
+function Vectors.OnUpdate()
+  Vectors.GetPlayerData()
+  Vectors.GetCameraData()
+  if not Vectors.Vehicle.isMounted then return end
+  Vectors.GetActivePerspective()
+  Vectors.GetVehicleData()
+  Vectors.GetDotProducts()
+  Vectors.GetCameraAnglesVehicle()
+  Vectors.GetDerivativeVehicleData()
+  Vectors.TransformVehMasks()
+end
 
-  if game.isPreGame then return end
-  if Vectors.VehMasks.masksControllerReady then
-    if game.isGamePaused then return end
-    Vectors.GetVehicleData()
-    Vectors.GetDotProducts()
-    Vectors.GetCameraAnglesVehicle()
-    Vectors.GetDerivativeVehicleData()
-    Vectors.GetActivePerspective()
-    Vectors.TransformVehMasks()
+function Vectors.OnInitialize()
+  Vectors.ApplyMasksController()
+  Vectors.ApplyScreen()
+  Vectors.ApplyScreenSpaceHed()
+  Vectors.ApplySizeHed()
+  Vectors.ApplyPreset()
+end
+
+function Vectors.OnOverlayOpen()
+  Vectors.ApplyMasksController()
+  Vectors.ApplyScreen()
+  Vectors.ApplyScreenSpaceHed()
+  Vectors.ApplySizeHed()
+  Vectors.ApplyPreset()
+end
+
+function Vectors.ApplyMasksController()
+  Vectors.MaskingGlobal.masksController = Config.GetMasksController()
+
+  if Vectors.MaskingGlobal.masksController ~= Config.GetLegacyController() then return end
+
+  local widgets = Config.GetWidgets()
+
+  Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath = widgets.hedCorners
+  Vectors.VehMasks.HorizontalEdgeDown.hedFillPath = widgets.hedFill
+  Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath = widgets.hedTracker
+  Vectors.VehMasks.Mask1.maskPath = widgets.mask1
+  Vectors.VehMasks.Mask2.maskPath = widgets.mask2
+  Vectors.VehMasks.Mask3.maskPath = widgets.mask3
+  Vectors.VehMasks.Mask4.maskPath = widgets.mask4
+  Vectors.VehMasks.MaskEditor1.maskPath = widgets.maskEditor1
+  Vectors.VehMasks.MaskEditor2.maskPath = widgets.maskEditor2
+end
+
+function Vectors.ApplyScreen()
+  local screen = Config.GetScreen()
+
+  Vectors.Screen.Edge = screen.Edge
+  Vectors.Screen.Factor = screen.Factor
+  Vectors.Screen.Space = screen.Space
+  Vectors.Screen.type = screen.type
+end
+
+function Vectors.ApplyScreenSpaceHed()
+  local hedScreenSpace = Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace
+  local screenType = Vectors.Screen.type
+
+  if screenType == 169 or screenType == 219 or screenType == 329 then
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.x = hedScreenSpace.Def.x
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.y = hedScreenSpace.Def.y
+  elseif screenType == 43 then
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.y = 2640
+  elseif screenType == 1610 then
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.x = 1920
+    Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.y = 2400
+  end
+end
+
+function Vectors.ApplySizeHed()
+  Vectors.VehMasks.HorizontalEdgeDown.Size.x = Vectors.ResizeHED(Vectors.VehMasks.HorizontalEdgeDown.Size.Def.x, 1, true)
+end
+
+--self:FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible)
+
+function Vectors.ApplyPreset()
+  local cname = CName.new
+  local new2 = Vector2.new
+
+  local masksController = Vectors.MaskingGlobal.masksController
+  local vehMasks = Vectors.VehMasks
+
+  local hed = vehMasks.HorizontalEdgeDown
+  local mask1 = vehMasks.Mask1
+  local mask2 = vehMasks.Mask2
+  local mask3 = vehMasks.Mask3
+  local mask4 = vehMasks.Mask4
+
+  local hedCornersPath = cname(hed.hedCornersPath)
+  local hedFillPath = cname(hed.hedFillPath)
+  local hedTrackerPath = cname(hed.hedTrackerPath)
+  local mask1Path = cname(mask1.maskPath)
+  local mask2Path = cname(mask2.maskPath)
+  local mask3Path = cname(mask3.maskPath)
+  local mask4Path = cname(mask4.maskPath)
+
+  local Preset = Config.GetWhiteBoard("Presets")
+  
+  Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
+  Vectors.VehElements = Preset.Vectors.VehElements
+  Vectors.VehMasks.AnchorPoint = Preset.Vectors.VehMasks.AnchorPoint
+  Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def
+  Vectors.VehMasks.HorizontalEdgeDown.Size.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def
+  Vectors.VehMasks.HorizontalEdgeDown.Visible.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def
+  Vectors.VehMasks.Opacity.Def = Preset.Vectors.VehMasks.Opacity.Def
+
+  if masksController then
+    --TPP Car
+    Override(masksController, 'OnFrameGenGhostingFixCameraTPPCarEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    --TPPFar Car
+    Override(masksController, 'OnFrameGenGhostingFixCameraTPPFarCarEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    --FPP Car
+    Override(masksController, 'OnFrameGenGhostingFixCameraFPPCarEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    --TPP Bike
+    Override(masksController, 'OnFrameGenGhostingFixCameraTPPBikeEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    --TPPFar Bike
+    Override(masksController, 'OnFrameGenGhostingFixCameraTPPFarBikeEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    --FPP Bike
+    Override(masksController, 'OnFrameGenGhostingFixCameraFPPBikeEvent', function(self)
+      self:OnFrameGenGhostingFixTransformationHEDCorners(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
+      self:OnFrameGenGhostingFixTransformationHEDFill(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
+      self:OnFrameGenGhostingFixTransformationHEDTracker(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
+      self:OnFrameGenGhostingFixTransformationMask1(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
+      self:OnFrameGenGhostingFixTransformationMask2(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
+      self:OnFrameGenGhostingFixTransformationMask3(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
+      self:OnFrameGenGhostingFixTransformationMask4(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
+    end)
+
+    Override(masksController, 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
+      local originalFunction = wrappedMethod()
+
+      if Vectors.MaskingGlobal.vehicles then return originalFunction end
+      self:FrameGenGhostingFixVehicleToggle(false)
+    end)
   end
 end
 

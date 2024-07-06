@@ -1,7 +1,8 @@
 local Preset = {
-  __VERSION_NUMBER = 484,
+  __VERSION_NUMBER = 490,
   MaskingGlobal = {
-    enabled = true
+    vehicles = true,
+    onfoot = true
   },
   Vectors = {
     VehElements = {
@@ -70,7 +71,7 @@ local Preset = {
         },
         Size = {
           Def = {
-            lock = true,
+            lock = false,
             x = 4240, -- min size x = 3888
             y = 1480
           },
@@ -97,10 +98,10 @@ local Preset = {
     },
   },
   PresetInfo = {
-    id = 4,
     name = "Testing",
     description = "Testing preset, all masks visible.",
-    author = nil
+    author = nil,
+    id = "a004",
   }
 }
 

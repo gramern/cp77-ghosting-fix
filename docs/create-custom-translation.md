@@ -30,13 +30,13 @@ FrameGen Ghosting 'Fix' uses a localization system that automatically reads the 
     | Turkish | `tr-tr.lua` |
     | Ukrainian | `ua-ua.lua` |
 4. Transalte the values of each key with string values. If you don't know a specifc translation, just keep it in english or comment it out by putting `-- ` at the beginning of the line.
-5. Presets are using IDs. The ID has to be the key and between brackets `[]`. Here is the structure for the preset with the ID `99`:
+5. Presets are using alphanumeric IDs that start with a letter. Here is the structure for the preset with the exemplary ID `chill420`:
   ```lua
     -- inside translation file
     Presets = {
         -- Other keys
         Info = {
-            [99] = {
+            chill420 = {
                 name = "Name of the preset",
                 description = "Description of the preset",
             },
@@ -47,3 +47,5 @@ FrameGen Ghosting 'Fix' uses a localization system that automatically reads the 
 6. Go pack to your root path with the `bin` folder. Right click the folder and press `compress in ZIP` or use any other preferred Tool for it.
 7. Upload your `.zip` file if you want to publish it.
 
+#
+_Create custom translation for FrameGen Ghosting 'Fix'_, Orginal text: Neclaex 2024

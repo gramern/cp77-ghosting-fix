@@ -1,7 +1,8 @@
 local Preset = {
-  __VERSION_NUMBER = 484,
+  __VERSION_NUMBER = 490,
   MaskingGlobal = {
-    enabled = true
+    vehicles = true,
+    onfoot = true
   },
   Vectors = {
     VehElements = {
@@ -69,12 +70,10 @@ local Preset = {
           }
         },
         Size = {
-          Size = {
-            Def = {
-              lock = false,
-              x = 4240, -- min size x = 3888
-              y = 1480
-            },
+          Def = {
+            lock = false,
+            x = 4240, -- min size x = 3888
+            y = 1480
           },
         },
         Visible = {
@@ -99,10 +98,10 @@ local Preset = {
     },
   },
   PresetInfo = {
-    id = 7,
     name = "RenoDX HDR Test 3",
     description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
-    author = nil
+    author = nil,
+    id = "a007",
   }
 }
 

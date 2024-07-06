@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
@@ -11,7 +11,8 @@
 @addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfixcars/mask2";
 @addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfixcars/mask3";
 @addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfixcars/mask4";
-@addField(gameuiCrosshairContainerController) public let m_maskEditorPath: CName = n"fgfixcars/mask_editor";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor1Path: CName = n"fgfixcars/mask_editor1";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor2Path: CName = n"fgfixcars/mask_editor2";
 
 
 @addField(gameuiCrosshairContainerController) public let m_hedCornersDone: Bool = false;
@@ -413,16 +414,27 @@ protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<Fr
   mask4.SetOpacity(0.0);
 }
 
-//Setting masks for windshield editor---------------------------------------------------------------------------------------
+//Setting masks for masks editor---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent(evt: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>) -> Void {
+private cb func OnFrameGenGhostingFixMaskEditor1Event(evt: ref<FrameGenGhostingFixMaskEditor1Event>) -> Void {
 
   let maskEditorMargin: Vector2 = new Vector2(0.0, 0.0);
   let maskEditorSize: Vector2 = new Vector2(0.0, 0.0);
   let maskEditorShear: Vector2 = new Vector2(0.0, 0.0);
   let maskEditorAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
 
-  this.OnFrameGenGhostingFixTransformationMask2(this.m_maskEditorPath, maskEditorMargin, maskEditorSize, 0.0, maskEditorShear, maskEditorAnchorPoint, 0.0, false);
+  this.OnFrameGenGhostingFixTransformationMask2(this.m_maskEditor1Path, maskEditorMargin, maskEditorSize, 0.0, maskEditorShear, maskEditorAnchorPoint, 0.0, false);
+}
+
+@addMethod(gameuiCrosshairContainerController)
+private cb func OnFrameGenGhostingFixMaskEditor2Event(evt: ref<FrameGenGhostingFixMaskEditor2Event>) -> Void {
+
+  let maskEditorMargin: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorSize: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorShear: Vector2 = new Vector2(0.0, 0.0);
+  let maskEditorAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
+
+  this.OnFrameGenGhostingFixTransformationMask3(this.m_maskEditor2Path, maskEditorMargin, maskEditorSize, 0.0, maskEditorShear, maskEditorAnchorPoint, 0.0, false);
 }
 
 //Setting context for vehicles masks start here---------------------------------------------------------------------------------------
@@ -441,10 +453,10 @@ public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: r
 }
 
 @addMethod(DriveEvents)
-public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  let windshieldEditorContext: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>;
+public final func FrameGenGhostingFixMaskEditor1Context(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let windshieldEditorContext: ref<FrameGenGhostingFixMaskEditor1Event>;
 
-  windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
+  windshieldEditorContext = new FrameGenGhostingFixMaskEditor1Event();
 
     scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
 }
@@ -550,7 +562,7 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       } else {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
-        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+        this.FrameGenGhostingFixMaskEditor1Context(scriptInterface);
       }
       break;
     case gamedataVehicleType.Car:
@@ -585,10 +597,10 @@ public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: r
 }
 
 @addMethod(DriverCombatEvents)
-public final func FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  let windshieldEditorContext: ref<FrameGenGhostingFixFPPBikeWindshieldEditorEvent>;
+public final func FrameGenGhostingFixMaskEditor1Context(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let windshieldEditorContext: ref<FrameGenGhostingFixMaskEditor1Event>;
 
-  windshieldEditorContext = new FrameGenGhostingFixFPPBikeWindshieldEditorEvent();
+  windshieldEditorContext = new FrameGenGhostingFixMaskEditor1Event();
 
     scriptInterface.executionOwner.QueueEvent(windshieldEditorContext);
 }
@@ -694,7 +706,7 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       } else {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
-        this.FrameGenGhostingFixBikeStationaryWindshieldEditorContext(scriptInterface);
+        this.FrameGenGhostingFixMaskEditor1Context(scriptInterface);
       }
       break;
     case gamedataVehicleType.Car:
