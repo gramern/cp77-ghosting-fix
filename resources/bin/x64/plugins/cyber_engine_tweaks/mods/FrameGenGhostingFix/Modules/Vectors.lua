@@ -1938,12 +1938,8 @@ function Vectors.ApplyPreset()
   local Preset = Config.GetWhiteBoard("Presets")
   
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
-  Vectors.VehElements = Preset.Vectors.VehElements
-  Vectors.VehMasks.AnchorPoint = Preset.Vectors.VehMasks.AnchorPoint
-  Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def
-  Vectors.VehMasks.HorizontalEdgeDown.Size.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def
-  Vectors.VehMasks.HorizontalEdgeDown.Visible.Def = Preset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def
-  Vectors.VehMasks.Opacity.Def = Preset.Vectors.VehMasks.Opacity.Def
+
+  Config.MergeTables(Vectors,Preset.Vectors)
 
   if masksController then
     --TPP Car
