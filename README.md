@@ -21,7 +21,7 @@ The repo is configured to be placed 'as is' in the `source` folder of the mod's 
 The 'xl' edition has been the base for the other editions since 4.8.0xl-alpha2.
 
 # Translations for the mod
-Thanks to Neclaex's contribution, the mod supports UI translations. Necessary information on how to prepare a translation (which you can publish later on Nexus) can be found [here](resources/bin/x64/plugins/cyber_engine_tweaks/Translations/Translation-Blueprint.lua) or [here](docs/translation-example/Translation-Blueprint.lua).
+Thanks to Neclaex's contribution, the mod supports UI translations. Necessary information on how to prepare a translation (which you can publish later on Nexus) can be found [here](resources/bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix/Translations/Translation-Blueprint.lua) or [here](docs/translation-example/Translation-Blueprint.lua).
 
 # The mod's whiteboard on Miro (rough design notes)
 [https://miro.com/app/board/uXjVNrZBovU=/](https://miro.com/app/board/uXjVNrZBovU=/)
