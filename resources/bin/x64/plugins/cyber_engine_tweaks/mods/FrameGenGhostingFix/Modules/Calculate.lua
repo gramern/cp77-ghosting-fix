@@ -65,8 +65,11 @@ local Calculate = {
   },
 }
 
+local UserSettings = {}
+
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -221,10 +224,24 @@ function Calculate.ApplyScreen()
   Calculate.Screen.type = screen.type
 end
 
+function Calculate.GetUserSettings()
+  UserSettings = {
+    Blocker = {onAim = Calculate.Blocker.onAim},
+    Corners = {onWeapon = Calculate.Corners.onWeapon},
+    Vignette = {
+      permament = Calculate.Vignette.permament,
+      onAim = Calculate.Vignette.onAim,
+      onWeapon = Calculate.Vignette.onWeapon,
+      ScreenPosition = {x = Calculate.Vignette.ScreenPosition.x, y = Calculate.Vignette.ScreenPosition.y},
+      Scale = {x = Calculate.Vignette.Scale.x, y = Calculate.Vignette.Scale.y},
+    }
+  }
+
+  return UserSettings
+end
+
 function Calculate.ApplySuggestedSettings(averageFps)
-  Config.SetFallback("Calculate",Calculate.Corners,"Corners")
-  Config.SetFallback("Calculate",Calculate.Blocker,"Blocker")
-  Config.SetFallback("Calculate",Calculate.Vignette,"Vignette")
+  Config.SetFallback("Calculate",Calculate.GetUserSettings())
 
   if averageFps >= 38 then
     Calculate.Corners.onWeapon = true
@@ -254,18 +271,24 @@ function Calculate.ApplySuggestedSettings(averageFps)
 
   Calculate.Toggle()
 
+  Calculate.SaveUserSettings()
+
   Config.Print(LogText.calculate_applySettings,nil,nil,Calculate.__NAME)
 end
 
-function Calculate.RestoreUserSettings()
-  local Fallback = Config.GetFallback("Calculate")
+function Calculate.SaveUserSettings()
+  Settings.WriteUserSettings("Calculate",Calculate.GetUserSettings())
+end
 
-  Calculate.Corners = Config.MergeTables(Calculate.Corners,Fallback.Corners)
-  Calculate.Blocker = Config.MergeTables(Calculate.Blocker,Fallback.Blocker)
-  Calculate.Vignette = Config.MergeTables(Calculate.Vignette,Fallback.Vignette)
+function Calculate.RestoreUserSettings()
+  Calculate = Config.MergeTables(Calculate,Config.GetFallback("Calculate"))
+
+  if Calculate == nil then Config.Print("The 'Calculate' table is empty...",nil,nil,"Calculate") end
+  Calculate.SaveUserSettings()
 end
 
 function Calculate.OnInitialize()
+  Config.MergeTables(Calculate,Settings.GetUserSettings("Calculate"))
   Calculate.ApplyMasksController()
   Calculate.ApplyScreen()
   Calculate.ApplyCornersScreenSpace()
@@ -490,7 +513,7 @@ function Calculate.DrawUI()
 
     Calculate.Corners.onWeapon, cornersOnWeaponToggle = ImGuiExt.Checkbox.TextWhite(UIText.OnFoot.BottomCornersMasks.name, Calculate.Corners.onWeapon)
     if cornersOnWeaponToggle then
-      Config.SaveUserSettings()
+      Calculate.SaveUserSettings()
 
       Config.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
@@ -504,11 +527,9 @@ function Calculate.DrawUI()
         Config.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
-      Config.SaveUserSettings()
+      Calculate.SaveUserSettings()
     end
     ImGuiExt.OnItemHovered.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
-
-
 
     ImGui.Text("")
     ImGuiExt.TextWhite(UIText.General.title_fps120)
@@ -522,13 +543,13 @@ function Calculate.DrawUI()
         Config.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
-      Config.SaveUserSettings()
+      Calculate.SaveUserSettings()
     end
     ImGuiExt.OnItemHovered.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
 
     Calculate.Vignette.onWeapon, vignetteOnWeaponToggle = ImGuiExt.Checkbox.TextWhite(UIText.OnFoot.Vignette.name, Calculate.Vignette.onWeapon)
     if vignetteOnWeaponToggle then
-      Config.SaveUserSettings()
+      Calculate.SaveUserSettings()
 
       Config.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
@@ -538,7 +559,7 @@ function Calculate.DrawUI()
       if not Config.IsMounted() then
         Calculate.Vignette.permament, vignettePermamentToggle = ImGuiExt.Checkbox.TextWhite(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
         if vignettePermamentToggle then
-          Config.SaveUserSettings()
+          Calculate.SaveUserSettings()
 
           Config.SetStatusBar(UIText.General.settings_applied_onfoot)
         end
@@ -582,7 +603,6 @@ function Calculate.DrawUI()
         if vignettePositionToggle.y then
           Calculate.OnVignetteChange('y')
           Calculate.TurnOnLiveView()
-          Config.SaveUserSettings()
         end
       
         ImGui.Text("")
@@ -591,7 +611,6 @@ function Calculate.DrawUI()
           Calculate.SetVignetteDefault('x')
           Calculate.SetVignetteDefault('y')
           Calculate.TurnOnLiveView()
-          Config.SaveUserSettings()
 
           Config.SetStatusBar(UIText.General.settings_default)
         end
@@ -599,7 +618,7 @@ function Calculate.DrawUI()
         ImGui.SameLine()
       
         if ImGui.Button(UIText.General.settings_save, 240, 40) then
-          Config.SaveUserSettings()
+          Calculate.SaveUserSettings()
 
           Config.SetStatusBar(UIText.General.settings_saved)
         end

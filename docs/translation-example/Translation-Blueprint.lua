@@ -1,6 +1,6 @@
 --[=====[ 
 
-  Rename this file fitting to your translation. Following Codes are supported by the game:
+  Rename this file fitting to your translation and keep it in the 'Translations' folder. Following Codes are supported by the game:
     ar-ar = Arabic
     zh-cn = Chinese (Simplified)
     zh-tw = Chinese (Traditional)
@@ -60,7 +60,7 @@ local translation = {
       settings_applied_veh = "[ ! ] Selected preset applied.",
       settings_restored = "Restored your previous settings.",
       settings_save = "Save settings",
-      settings_saved = "[ ! ] Your settings are saved.",
+      settings_saved = "[ ! ] Your settings will be saved.",
       settings_applied_onfoot = "[ ! ] Redraw your weapon to accept changes.",
       settings_default = "Default settings restored.",
       info_getOut = "[ ! ] V must exit a vehicle to customize this option.",
@@ -136,14 +136,15 @@ local translation = {
         benchmark = "Benchmark enabled:",
         benchmarkRemaining = "Remaining benchmark time (s):",
         benchmarkPause = "[ ! ] Benchmark is paused. Unpause the game to continue.",
+        benchmarkPauseOverlay = "[ ! ] Benchmark is paused. Exit CET's overlay to continue.",
         benchmarkRestart = "[ ! ] Benchmark restarting in:",
         benchmarkRun = "Run benchmark",
-        benchmarkSaveSettings = "Save suggested settings",
+        benchmarkSetSuggestedSettings = "Set suggested settings",
         benchmarkRevertSettings = "Revert to my settings",
         benchmarkStop = "Stop benchmark",
         benchmarkEnabled = "Benchmark enabled.",
         benchmarkFinished = "Finished benchmarking.",
-        tooltipRunBench = "Runs the benchmark to measure your game's performance and applies\nsuggested settings once completed. The new settings won't be saved\n- you can revert them."
+        tooltipRunBench = "Runs the benchmark to measure your game's performance and applies\nsuggested settings once completed. When finished you can review\nthe new settings and revert to your current ones if needed."
       },
     },
     Diagnostics = {

@@ -1,5 +1,47 @@
-local Localization = {
-  __NAME = "Localization",
+--[=====[ 
+
+  Rename this file fitting to your translation and keep it in the 'Translations' folder. Following Codes are supported by the game:
+    ar-ar = Arabic
+    zh-cn = Chinese (Simplified)
+    zh-tw = Chinese (Traditional)
+    cz-cz = Czech
+    fr-fr = French
+    de-de = German
+    hu-hu = Hungarian
+    it-it = Italian
+    jp-jp = Japanese
+    kr-kr = Korean
+    pl-pl = Polish
+    pt-br = Portuguese (Brazillian)
+    ru-ru = Russian
+    es-mx = Spanish (Latin American)
+    es-es = Spanish
+    th-th = Thai
+    tr-tr = Turkish
+    ua-ua = Ukrainian
+  
+  A translation for German would be called de-de.lua for example.
+  Authros can upload their own presets. Presets are saved using IDs translating those will be a litte more complex:
+  Further down you'll find Presets.Info follow the instrunctions for translating a preset
+
+
+  If you don't know how to translate something you can either keep it on english or delete the key
+  for example:
+  {
+    infolog = "Here is the requested info",
+    warnlog = "This is a warning do not follow it"
+  }
+    would then be
+  {
+      infolog = "Hier sind die angeforderten Infos",
+      --warnlog = "This is a warning do not follow it"
+  }
+
+  -- creates a comment, that way you can translate it later without having to search for the key again before being able to translate it
+
+--]=====]
+
+local translation = {
   __VERSION_NUMBER = 490,
   UIText = {
     General = {
@@ -119,32 +161,38 @@ local Localization = {
       authtabname = "Preset's author:",
     }
   },
-  LogText = {
-    benchmark_starting = "Starting benchmark...",
-    benchmark_restarting = "Restarting benchmark...",
-    benchmark_avgFpsResult = "Measured average FPS without frame generation =",
-    calculate_applySettings = "Applying settings accordingly...",
-    calculate_missing = "Can't find the 'Calculate' module. The mod's anti-ghosting feature for on-foot gameplay won't work.",
-    config_aspectRatioChange = "The aspect ratio of the screen has changed. Please restart the game to ensure the mod will work as intended.",
-    config_controllerMissing = "Masks controller not set.  The mod won't work...",
-    config_missing = "Can't find the 'Config' module. The mod won't work...",
-    config_wrongVersion = "The mod's 'Config' module seems to be not compatible with the mod's current version. The mod won't work...",
-    translate_baseLocalization = "Set the mod to the default language:",
-    translate_keyNotFound = "Error: check translation files, couldn't find a key/table in a file:",
-    translate_translationFound = "Found a translation for language code: ",
-    translate_translationNotFound = "Couldn't find any translation for language code: ",
-    presets_missing = "Can't find the 'Presets' module. The mod won't let you load anti-ghosting presets.",
-    presets_skippedFile = "Skipped a preset file. There is a conflict with an already indexed preset, please check presets names and IDs and try again:",
-    presets_skippedFilePos = "Another preset exists on the received position, skipped the file. Try a lower position",
-    settings_missing = "Can't find the 'Settings' module. The mod won't let you save your settings.",
-    settings_fileNotFound = "A 'user_settings.json' file hasn't been found.",
-    settings_loaded = "User settings loaded.",
-    settings_savedToFile = "Your settings have been saved in your '.../cyber_engine_tweaks/mods/FrameGenGhostingFix/user_settings.json' file.",
-    settings_notSavedToFile = "Error: Couldn't save user settings to a file.",
-    settings_savedToCache = "Your current settings have been saved to memory.",
-    settings_restoredCache = "Your previous settings have been restored.",
-    vectors_missing = "Can't find the 'Vectors' module. The mod's anti-ghosting feature for vehicles won't work.",
+  PresetsInfo = {
+    --[=====[
+    Presets are saved using IDs, to translate a preset you need the ID of it. The structure looks like following
+    [PresetID] = {
+      name = "Preset's name",
+      description = "Preset's description"
+    }
+
+    IDs have to be covered by brackets [], else your translation will fail!
+    To find the ID of a preset just ask the author or take a look at the website were it'S been published.
+    --]=====]
+    a000 = {
+      name = "Default",
+      description = "Default preset.",
+      author = nil,
+    },
+    a001 = {
+      name = "Customize",
+      description = "Customize your preset.",
+      author = nil,
+    },
+    a003 = {
+      name = "Stronger",
+      description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
+      author = nil,
+    },
+    a004 = {
+      name = "Turn off anti-ghosting masking",
+      description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+      author = nil,
+    }
   },
 }
 
-return Localization
+return translation

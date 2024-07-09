@@ -130,8 +130,11 @@ local DefaultPresets = {
   },
 }
 
+local UserSettings = {}
+
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 local Translate = require("Modules/Translate")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
@@ -302,7 +305,20 @@ function Presets.LoadPreset()
   end
 end
 
+function Presets.GetUserSettings()
+  UserSettings = {
+    selectedPreset = Presets.selectedPreset
+  }
+
+  return UserSettings
+end
+
+function Presets.SaveUserSettings()
+  Settings.WriteUserSettings("Presets",Presets.GetUserSettings())
+end
+
 function Presets.OnInitialize()
+  Config.MergeTables(Presets,Settings.GetUserSettings("Presets"))
   Presets.GetDefaultPreset()
   Presets.GetPresets()
   Presets.ApplySelectedPreset()
@@ -384,9 +400,9 @@ function Presets.DrawUI()
     ImGui.SameLine()
     if ImGui.Button("   " .. UIText.General.apply .. "   ") then
       Presets.LoadPreset()
+      Presets.SaveUserSettings()
       Vectors.ApplyPreset()
-      Config.SaveUserSettings()
-      
+
       Config.SetStatusBar(UIText.General.settings_applied_veh)
     end
 

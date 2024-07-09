@@ -11,8 +11,11 @@ local VectorsCustomize = {
   }
 }
 
+local UserSettings = {}
+
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 local Vectors = require("Modules/Vectors")
 
 local UIText = Localization.UIText
@@ -26,7 +29,20 @@ function VectorsCustomize.SetWindshieldDefault()
   Vectors.VehMasks.Mask4.Scale.y = 100
 end
 
+function VectorsCustomize.GetUserSettings()
+  UserSettings = {
+    Bike = VectorsCustomize.Bike
+  }
+
+  return UserSettings
+end
+
+function VectorsCustomize.SaveUserSettings()
+  Settings.WriteUserSettings("VectorsCustomize",VectorsCustomize.GetUserSettings())
+end
+
 function VectorsCustomize.OnInitialize()
+  Config.MergeTables(VectorsCustomize,Settings.GetUserSettings("VectorsCustomize"))
   VectorsCustomize.ApplyMasksController()
 end
 
@@ -99,26 +115,6 @@ function VectorsCustomize.TurnOffLiveView()
   end
 end
 
--- function VectorsCustomize.SetFallback()
---   VectorsCustomize.Bike.Windshield.Scale = {
---     x = Vectors.VehMasks.Mask4.Scale.x,
---     y = Vectors.VehMasks.Mask4.Scale.y
---   }
-
---   local Fallback = {
---     Bike = VectorsCustomize.Bike
---   }
-
---   Config.SetFallback(VectorsCustomize.__NAME,Fallback)
--- end
-
--- function VectorsCustomize.SaveSettings()
---   local UserSettings = Config.GetFallback(VectorsCustomize.__NAME)
-
---   Config.WriteUserSettings(UserSettings,VectorsCustomize.__NAME)
---   Config.SaveUserSettings()
--- end
-
 --UI
 
 local ImGui = ImGui
@@ -185,12 +181,13 @@ function VectorsCustomize.DrawUI()
       if ImGui.Button(UIText.General.default, 240, 40) then
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
+        VectorsCustomize.SaveUserSettings()
       end
 
       ImGui.SameLine()
 
       if ImGui.Button(UIText.General.settings_save, 240, 40) then
-        Config.SaveUserSettings()
+        Settings.WriteUserSettings()
       end
     else
       ImGuiExt.TextWhite(UIText.Vehicles.Windshield.warning)

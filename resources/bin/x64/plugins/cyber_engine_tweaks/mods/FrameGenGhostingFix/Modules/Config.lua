@@ -68,12 +68,13 @@ local WhiteBoard = {}
 local FallbackBoard = {}
 
 local Localization = require("Modules/Localization")
--- local Settings = require("Modules/Settings")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
 
 function Config.Deepcopy(contents)
+  if contents == nil then return contents end
+  
   local contentsType = type(contents)
   local copy
 
@@ -92,23 +93,42 @@ function Config.Deepcopy(contents)
   return copy
 end
 
-function Config.MergeTables(target, source)
-  if type(target) ~= "table" then Config.Print("Can't merge. The target is not a table:",target) end
-  if type(source) ~= "table" then Config.Print("Can't merge. The source is not a table:",source) end
+function Config.MergeTables(mergeTo, mergeA)
+  if type(mergeTo) ~= "table" then Config.Print("Can't merge. The mergeTo is not a table:", mergeTo) return mergeTo end
+  if mergeA == nil then return mergeTo end
+  if type(mergeA) ~= "table" then Config.Print("Can't merge. The mergeA is not a table:", mergeA) return mergeTo end
 
-  for key, value in pairs(source) do
-      if type(value) == "table" then
-          if type(target[key]) == "table" then
-              target[key] = Config.MergeTables(target[key], value)
+  for key, value in pairs(mergeA) do
+      if mergeTo[key] ~= nil then  -- Only proceed if the key exists in mergeTo
+          if type(value) == "table" and type(mergeTo[key]) == "table" then
+              mergeTo[key] = Config.MergeTables(mergeTo[key], value)
           else
-              target[key] = Config.MergeTables({}, value)
+              mergeTo[key] = value
           end
-      else
-          target[key] = value
       end
   end
 
-  return target
+  return mergeTo
+end
+
+function Config.ForceMergeTables(mergeTo, mergeA)
+  if type(mergeTo) ~= "table" then Config.Print("Can't merge. The mergeTo is not a table:",mergeTo) end
+  if mergeA == nil then return end
+  if type(mergeA) ~= "table" then Config.Print("Can't merge. The mergeA is not a table:",mergeA) end
+
+  for key, value in pairs(mergeA) do
+      if type(value) == "table" then
+          if type(mergeTo[key]) == "table" then
+              mergeTo[key] = Config.MergeTables(mergeTo[key], value)
+          else
+              mergeTo[key] = Config.MergeTables({}, value)
+          end
+      else
+          mergeTo[key] = value
+      end
+  end
+
+  return mergeTo
 end
 
 function Config.Print(contents1,contents2,contents3,moduleName)
@@ -154,6 +174,14 @@ function Config.SetNewInstall(boolean)
   Config.ModState.isNewInstall = boolean
 end
 
+function Config.KeepWindow(boolean)
+  Config.ModState.keepWindow = boolean
+end
+
+function Config.OpenWindow(boolean)
+  Config.ModState.openWindow = boolean
+end
+
 function Config.GetMasksController()
   return Config.MaskingGlobal.masksController
 end
@@ -184,16 +212,10 @@ function Config.IsMounted()
   return Config.PlayerState.isMounted
 end
 
-function Config.SaveUserSettings()
-  -- if Settings then
-
-  -- end
-end
-
 -- writes to WhiteBoard for the module name under a key if one is given
 function Config.WriteWhiteBoard(moduleName,contents,key)
-  if moduleName and not contents then Config.Print("Can't write to the mod's WhiteBoard, check the code...",nil,nil,moduleName) end
-  if not moduleName or not contents then Config.Print("Can't write to the mod's WhiteBoard, check the code...") end
+  if moduleName and not contents then Config.Print("Can't write to the mod's WhiteBoard, check the code...",nil,nil,moduleName) end --debug
+  if not moduleName or not contents then Config.Print("Can't write to the mod's WhiteBoard, check the code...") end --debug
 
   local copiedContents = Config.Deepcopy(contents)
 
@@ -207,8 +229,8 @@ end
 
 -- returns a table from WhiteBoard for the module name and key
 function Config.GetWhiteBoard(moduleName,key)
-  if WhiteBoard[moduleName] == nil then Config.Print("There's no pool in the mod's WhiteBoard for the given moduleName:",moduleName) end
-  if key and WhiteBoard[moduleName][key] == nil then Config.Print("There's no pool in the mod's WhiteBoard for the given module name and key:",moduleName,key) end
+  if WhiteBoard[moduleName] == nil then Config.Print("There's no pool in the mod's WhiteBoard for the given moduleName:",moduleName) end --debug
+  if key and WhiteBoard[moduleName][key] == nil then Config.Print("There's no pool in the mod's WhiteBoard for the given module name and key:",moduleName,key) end --debug
 
   if key then
     return WhiteBoard[moduleName][key]
@@ -219,7 +241,7 @@ end
 
 --sets a fallback for a module
 function Config.SetFallback(owner,contents,key)
-  if not contents or not owner then Config.Print("Can't set a fallback.") return end
+  if not contents or not owner then Config.Print("Can't set a fallback.") end
 
   local copiedContents = Config.Deepcopy(contents)
 
@@ -233,8 +255,8 @@ end
 
 --gets a fallback for the module if exists
 function Config.GetFallback(owner,key)
-  if FallbackBoard[owner] == nil then Config.Print("There are no fallbacks for the owner:",owner) end
-  if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then Config.Print("There is no fallback for the given key:",key,owner) end
+  if FallbackBoard[owner] == nil then Config.Print("There are no fallbacks for the owner:",owner) end --debug
+  if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then Config.Print("There is no fallback for the given key:",key,owner) end --debug
 
   if key then
     return FallbackBoard[owner][key]

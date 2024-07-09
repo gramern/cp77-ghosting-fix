@@ -37,6 +37,7 @@ local FrameGenGhostingFix = {
 --necessary modules
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -47,7 +48,6 @@ local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Translate = require("Modules/Translate")
 local Presets = require("Modules/Presets")
-local Settings = require("Modules/Settings")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
@@ -60,12 +60,13 @@ local currentFrametime = 0
 --benchmark related
 local isBenchmark = false
 local isBenchmarkFinished = false
-local benchmarkDuration = 5
+local benchmarkDuration = 30
 local benchmarkRemainingTime = benchmarkDuration
 local benchmarkRestart = false
 local benchmarkRestartDuration = 4
 local benchmarkRestartTime = 0
 local benchmarkRestartRemaining = benchmarkRestartDuration
+local benchmarkSetSuggested = false
 local benchmarkTime = 0
 local averageFps = 0
 local countFps = 0
@@ -73,7 +74,6 @@ local countFps = 0
 --ui
 local windowTitle
 local openOverlay
-local openWindow
 local keepWindowToggle
 
 --ImGui scopes
@@ -140,7 +140,7 @@ function GetFps(deltaTime)
 
   GameState.currentFps = currentFps
 
-  if GameState.isGamePaused then RestartBenchmark() return end
+  if openOverlay or GameState.isGamePaused then RestartBenchmark() return end
   if benchmarkRestart then RestartBenchmark() return end
   Benchmark()
 end
@@ -167,11 +167,14 @@ function Benchmark()
       Calculate.ApplySuggestedSettings(averageFps)
     end
 
+    benchmarkSetSuggested = true
+
     if not Config.ModState.isNewInstall then return end
-    FrameGenGhostingFix.SetNewInstall(false)
+    Settings.SaveFile()
+    Config.SetNewInstall(false)
 
     if not Config.ModState.isFirstRun then return end
-    FrameGenGhostingFix.SetFirstRun(false)
+    Config.SetFirstRun(false)
   end
 end
 
@@ -201,11 +204,25 @@ function ResetBenchmarkResults()
   averageFps = 0
 end
 
+function SetSuggestedSettings()
+  if averageFps ~= 0 then
+    Calculate.ApplySuggestedSettings(averageFps)
+  end
+
+  benchmarkSetSuggested = true
+end
+
+function RestorePreviousSettings()
+  Calculate.RestoreUserSettings()
+
+  benchmarkSetSuggested = false
+end
+
 function RestartBenchmark()
   if not isBenchmark then return end
   benchmarkRestart = true
 
-  if FrameGenGhostingFix.GameState.isGamePaused then benchmarkRestartTime = 0 return end
+  if openOverlay or FrameGenGhostingFix.GameState.isGamePaused then benchmarkRestartTime = 0 return end
 
   benchmarkRestartTime = benchmarkRestartTime + gameDeltaTime
   benchmarkRestartRemaining = benchmarkRestartDuration - benchmarkRestartTime
@@ -214,6 +231,43 @@ function RestartBenchmark()
     benchmarkRestart = false
     benchmarkRestartTime = 0
     return
+  end
+end
+
+function BenchmarkUI()
+  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFps)
+  ImGui.SameLine()
+  ImGuiExt.TextWhite(tostring(currentFpsInt))
+  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFrametime)
+  ImGui.SameLine()
+  ImGuiExt.TextWhite(tostring(currentFrametime))
+  ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmark)
+  ImGui.SameLine()
+  ImGuiExt.TextWhite(tostring(isBenchmark))
+  ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRemaining)
+  ImGui.SameLine()
+  ImGuiExt.TextWhite(tostring(benchmarkRemainingTime))
+
+  if isBenchmarkFinished then
+    ImGui.Text("")
+    ImGuiExt.TextWhite(UIText.Options.Benchmark.averageFps)
+    ImGui.SameLine()
+    ImGuiExt.TextWhite(tostring(averageFps))
+  end
+
+  if FrameGenGhostingFix.GameState.isGamePaused then
+    ImGui.Text("")
+    ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPause)
+  elseif openOverlay then
+    ImGui.Text("")
+    ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPauseOverlay)
+  else
+    if benchmarkRestart then
+      ImGui.Text("")
+      ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRestart)
+      ImGui.SameLine()
+      ImGuiExt.TextWhite(tostring(benchmarkRestartRemaining))
+    end
   end
 end
 
@@ -234,6 +288,7 @@ registerForEvent("onInit", function()
   end
 
   if not Config.ModState.isReady then return end
+  if Config.ModState.isFirstRun then SetBenchmark(true) end
 
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     IsGameLoaded(true)
@@ -243,9 +298,9 @@ registerForEvent("onInit", function()
     IsGameLoaded(false)
   end)
 
-  -- if Settings then
-  --   Settings.OnInitialize()
-  -- end
+  if Settings then
+    Settings.OnInitialize()
+  end
 
   if Presets then
     Presets.OnInitialize()
@@ -269,7 +324,7 @@ registerForEvent("onInit", function()
 
   if Debug then
     Config.ModState.enabledDebug = true
-    Config.ModState.keepWindow = true
+    Config.KeepWindow(true)
   end
 end)
 
@@ -289,8 +344,7 @@ end
 
 registerForEvent("onOverlayOpen", function()
   openOverlay = true
-  openWindow = true
-  Config.ModState.openWindow = true
+  Config.OpenWindow(true)
 
   --translate UIText before other modules access it
   if Translate then
@@ -326,8 +380,7 @@ registerForEvent("onOverlayClose", function()
   openOverlay = false
 
   if not Config.ModState.keepWindow then
-    openWindow = false
-    Config.ModState.openWindow = false
+    Config.OpenWindow(false)
   end
 
   Config.OnOverlayClose()
@@ -338,6 +391,10 @@ registerForEvent("onOverlayClose", function()
 
   if Vectors and VectorsCustomize then
     VectorsCustomize.OnOverlayClose()
+  end
+
+  if Settings then
+    Settings.OnOverlayClose()
   end
 end)
 
@@ -360,7 +417,7 @@ end)
 
 -- draw a ImGui window
 registerForEvent("onDraw", function()
-  if openWindow then
+  if Config.ModState.openWindow then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
 
@@ -414,46 +471,35 @@ registerForEvent("onDraw", function()
             else
               ImGuiExt.TextWhite(UIText.Info.benchmarkAsk)
             end
-            if FrameGenGhostingFix.GameState.isGamePaused then
-              ImGui.Text("")
-              ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPause)
-            else
-              if benchmarkRestart then
-                ImGui.Text("")
-                ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRestart)
-                ImGui.SameLine()
-                ImGuiExt.TextWhite(tostring(benchmarkRestartRemaining))
-              else
-                if not FrameGenGhostingFix.GameState.isPreGame then
-                  ImGui.Text("")
-                  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFps)
-                  ImGui.SameLine()
-                  ImGuiExt.TextWhite(tostring(currentFpsInt))
-                  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFrametime)
-                  ImGui.SameLine()
-                  ImGuiExt.TextWhite(tostring(currentFrametime))
-                end
-              end
-            end
+
             ImGui.Text("")
-            ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRemaining)
-            ImGui.SameLine()
-            ImGuiExt.TextWhite(tostring(benchmarkRemainingTime))
+            BenchmarkUI()
+            ImGui.Text("")
+
+            Config.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+            if keepWindowToggle then
+              Config.SetStatusBar(UIText.General.settings_saved)
+            end
+            ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
             if not Config.ModState.isFirstRun and not isBenchmark then
               ImGui.Text("")
+
               if ImGui.Button(UIText.General.yes, 240, 40) then
                 SetBenchmark(true)
               end
+
               ImGui.SameLine()
+
               if ImGui.Button(UIText.General.no, 240, 40) then
                 Config.SetNewInstall(false)
-                Config.SaveUserSettings()
+                Settings.SaveFile()
               end
             end
             ImGui.EndTabItem()
           end
         end
+
         if Config.Screen.isAspectRatioChange then
           if ImGui.BeginTabItem(UIText.Info.tabname) then
 
@@ -483,82 +529,41 @@ registerForEvent("onDraw", function()
 
             Config.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
-              Config.SaveUserSettings()
-
               Config.SetStatusBar(UIText.General.settings_saved)
             end
             ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
+            ImGui.Separator()
+
             if currentFps then
-              ImGui.Separator()
-              ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFps)
-              ImGui.SameLine()
-              ImGuiExt.TextWhite(tostring(currentFpsInt))
-              ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFrametime)
-              ImGui.SameLine()
-              ImGuiExt.TextWhite(tostring(currentFrametime))
-              ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmark)
-              ImGui.SameLine()
-              ImGuiExt.TextWhite(tostring(isBenchmark))
-              ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRemaining)
-              ImGui.SameLine()
-              ImGuiExt.TextWhite(tostring(benchmarkRemainingTime))
-
-              if isBenchmarkFinished then
-                ImGuiExt.TextWhite(UIText.Options.Benchmark.averageFps)
-                ImGui.SameLine()
-                ImGuiExt.TextWhite(tostring(averageFps))
-              end
-
+              BenchmarkUI()
               ImGui.Text("")
 
-              if FrameGenGhostingFix.GameState.isGamePaused then
-                ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPause)
-                ImGui.Text("")
-              else
-                if benchmarkRestart then
-                  ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRestart)
-                  ImGui.SameLine()
-                  ImGuiExt.TextWhite(tostring(benchmarkRestartRemaining))
-                  ImGui.Text("")
-                end
-              end
               if not isBenchmark then
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkRun, 490, 40) then
-                  -- saved = false
+                if ImGui.Button(UIText.Options.Benchmark.benchmarkRun, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(true)
+                  Config.KeepWindow(true)
                 end
-                if ImGui.IsItemHovered() then
-                  ImGui.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)
-                else
-                  ImGui.SetTooltip(nil)
-                end
-              end
-
-              if isBenchmark then
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkStop, 490, 40) then
+                ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)
+              else
+                if ImGui.Button(UIText.Options.Benchmark.benchmarkStop, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(false)
                 end
               end
 
               if isBenchmarkFinished then
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 240, 40) then
-                  Calculate.RestoreUserSettings()
+                if not benchmarkSetSuggested and ImGui.Button(UIText.Options.Benchmark.benchmarkSetSuggestedSettings, 480, 40) then
+                  SetSuggestedSettings()
+                end
+
+                if benchmarkSetSuggested and ImGui.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 480, 40) then
+                  RestorePreviousSettings()
 
                   Config.SetStatusBar(UIText.General.settings_restored)
                   Config.Print(LogText.settings_restoredCache)
                 end
-                ImGui.SameLine()
-                -- if not saved then
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkSaveSettings, 240, 40) then
-                  -- saved = true
-                  Config.SaveUserSettings()
-
-                  Config.SetStatusBar(UIText.General.settings_saved)
-                end
-                -- end
               end
 
               ImGui.Separator()
