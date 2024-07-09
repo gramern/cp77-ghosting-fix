@@ -38,6 +38,7 @@ local FrameGenGhostingFix = {
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
+local UI = require("Modules/UI")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -75,47 +76,6 @@ local countFps = 0
 local windowTitle
 local openOverlay
 local keepWindowToggle
-
---ImGui scopes
-local ImGui = ImGui
-local ImGuiCol = ImGuiCol
-local ImGuiCond = ImGuiCond
-local ImGuiStyleVar = ImGuiStyleVar
-local ImGuiWindowFlags = ImGuiWindowFlags
-local ImGuiExt = {
-
-  Checkbox = {
-    TextWhite = function(string, setting, toggle)
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      setting, toggle = ImGui.Checkbox(string, setting)
-      ImGui.PopStyleColor()
-
-      return setting, toggle
-    end,
-  },
-
-  OnItemHovered = {
-    SetTooltip = function(string)
-      if ImGui.IsItemHovered() then
-        ImGui.SetTooltip(string)
-      else
-        ImGui.SetTooltip(nil)
-      end
-    end,
-  },
-
-  TextRed = function(string)
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-    ImGui.Text(string)
-    ImGui.PopStyleColor()
-  end,
-
-  TextWhite = function(string)
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-    ImGui.Text(string)
-    ImGui.PopStyleColor()
-  end,
-}
 
 function GetGameState()
   local GameState = FrameGenGhostingFix.GameState
@@ -235,38 +195,38 @@ function RestartBenchmark()
 end
 
 function BenchmarkUI()
-  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFps)
-  ImGui.SameLine()
-  ImGuiExt.TextWhite(tostring(currentFpsInt))
-  ImGuiExt.TextWhite(UIText.Options.Benchmark.currentFrametime)
-  ImGui.SameLine()
-  ImGuiExt.TextWhite(tostring(currentFrametime))
-  ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmark)
-  ImGui.SameLine()
-  ImGuiExt.TextWhite(tostring(isBenchmark))
-  ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRemaining)
-  ImGui.SameLine()
-  ImGuiExt.TextWhite(tostring(benchmarkRemainingTime))
+  UI.Ext.TextWhite(UIText.Options.Benchmark.currentFps)
+  UI.Std.SameLine()
+  UI.Ext.TextWhite(tostring(currentFpsInt))
+  UI.Ext.TextWhite(UIText.Options.Benchmark.currentFrametime)
+  UI.Std.SameLine()
+  UI.Ext.TextWhite(tostring(currentFrametime))
+  UI.Ext.TextWhite(UIText.Options.Benchmark.benchmark)
+  UI.Std.SameLine()
+  UI.Ext.TextWhite(tostring(isBenchmark))
+  UI.Ext.TextWhite(UIText.Options.Benchmark.benchmarkRemaining)
+  UI.Std.SameLine()
+  UI.Ext.TextWhite(tostring(benchmarkRemainingTime))
 
   if isBenchmarkFinished then
-    ImGui.Text("")
-    ImGuiExt.TextWhite(UIText.Options.Benchmark.averageFps)
-    ImGui.SameLine()
-    ImGuiExt.TextWhite(tostring(averageFps))
+    UI.Std.Text("")
+    UI.Ext.TextWhite(UIText.Options.Benchmark.averageFps)
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(averageFps))
   end
 
   if FrameGenGhostingFix.GameState.isGamePaused then
-    ImGui.Text("")
-    ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPause)
+    UI.Std.Text("")
+    UI.Ext.TextWhite(UIText.Options.Benchmark.benchmarkPause)
   elseif openOverlay then
-    ImGui.Text("")
-    ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkPauseOverlay)
+    UI.Std.Text("")
+    UI.Ext.TextWhite(UIText.Options.Benchmark.benchmarkPauseOverlay)
   else
     if benchmarkRestart then
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Options.Benchmark.benchmarkRestart)
-      ImGui.SameLine()
-      ImGuiExt.TextWhite(tostring(benchmarkRestartRemaining))
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Options.Benchmark.benchmarkRestart)
+      UI.Std.SameLine()
+      UI.Ext.TextWhite(tostring(benchmarkRestartRemaining))
     end
   end
 end
@@ -415,41 +375,15 @@ registerForEvent("onUpdate", function(deltaTime)
   Vectors.OnUpdate()
 end)
 
--- draw a ImGui window
+-- draw a UI.Std window
 registerForEvent("onDraw", function()
   if Config.ModState.openWindow then
-    ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
-    ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 300, 100)
+    UI.Std.SetNextWindowPos(400, 200, UI.Cond.FirstUseEver)
+    
+    UI.PushStyle()
 
-    ImGui.PushStyleColor(ImGuiCol.Button, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.ButtonActive, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.CheckMark, 0, 0, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.FrameBg, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.FrameBgActive, 0.74, 0.58, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.Header, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.PopupBg, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.ResizeGrip, 0.78, 0.612, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.ResizeGripActive, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.SliderGrab, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.Tab, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TabHovered, 1, 0.85, 0.31, 1)
-    ImGui.PushStyleColor(ImGuiCol.TabActive, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TabUnfocused, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TabUnfocusedActive, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.Text, 0, 0, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TitleBg, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TitleBgActive, 1, 0.78, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, 0.73, 0.56, 0, 1)
-    ImGui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0.75)
-
-    if ImGui.Begin(windowTitle, ImGuiWindowFlags.AlwaysAutoResize) then
-      if ImGui.BeginTabBar('Tabs') then
+    if UI.Std.Begin(windowTitle, UI.WindowFlags.AlwaysAutoResize) then
+      if UI.Std.BeginTabBar('Tabs') then
         
         --diagnostics interface starts------------------------------------------------------------------------------------------------------------------
         if Diagnostics and Diagnostics.isUpdateRecommended then
@@ -464,48 +398,48 @@ registerForEvent("onDraw", function()
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         
         if Config.ModState.isNewInstall then
-          if ImGui.BeginTabItem(UIText.Info.tabname) then
+          if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
             if Config.ModState.isFirstRun then
-              ImGuiExt.TextWhite(UIText.Info.benchmark)
+              UI.Ext.TextWhite(UIText.Info.benchmark)
             else
-              ImGuiExt.TextWhite(UIText.Info.benchmarkAsk)
+              UI.Ext.TextWhite(UIText.Info.benchmarkAsk)
             end
 
-            ImGui.Text("")
+            UI.Std.Text("")
             BenchmarkUI()
-            ImGui.Text("")
+            UI.Std.Text("")
 
-            Config.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+            Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
               Config.SetStatusBar(UIText.General.settings_saved)
             end
-            ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
             if not Config.ModState.isFirstRun and not isBenchmark then
-              ImGui.Text("")
+              UI.Std.Text("")
 
-              if ImGui.Button(UIText.General.yes, 240, 40) then
+              if UI.Std.Button(UIText.General.yes, 240, 40) then
                 SetBenchmark(true)
               end
 
-              ImGui.SameLine()
+              UI.Std.SameLine()
 
-              if ImGui.Button(UIText.General.no, 240, 40) then
+              if UI.Std.Button(UIText.General.no, 240, 40) then
                 Config.SetNewInstall(false)
                 Settings.SaveFile()
               end
             end
-            ImGui.EndTabItem()
+            UI.Std.EndTabItem()
           end
         end
 
         if Config.Screen.isAspectRatioChange then
-          if ImGui.BeginTabItem(UIText.Info.tabname) then
+          if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
-            ImGuiExt.TextWhite(UIText.Info.aspectRatioChange)
+            UI.Ext.TextWhite(UIText.Info.aspectRatioChange)
 
-            ImGui.EndTabItem()
+            UI.Std.EndTabItem()
           end
         end
 
@@ -521,44 +455,44 @@ registerForEvent("onDraw", function()
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
         if not Config.ModState.isNewInstall then
-          if ImGui.BeginTabItem(UIText.Options.tabname) then
+          if UI.Std.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
-              Config.ModState.enabledDebug = ImGuiExt.Checkbox.TextWhite(UIText.Options.enabledDebug, Config.ModState.enabledDebug)
+              Config.ModState.enabledDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Config.ModState.enabledDebug)
             end
 
-            Config.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+            Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
               Config.SetStatusBar(UIText.General.settings_saved)
             end
-            ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
-            ImGui.Separator()
+            UI.Std.Separator()
 
             if currentFps then
               BenchmarkUI()
-              ImGui.Text("")
+              UI.Std.Text("")
 
               if not isBenchmark then
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkRun, 480, 40) then
+                if UI.Std.Button(UIText.Options.Benchmark.benchmarkRun, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(true)
                   Config.KeepWindow(true)
                 end
-                ImGuiExt.OnItemHovered.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)
+                UI.Ext.OnItemHovered.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)
               else
-                if ImGui.Button(UIText.Options.Benchmark.benchmarkStop, 480, 40) then
+                if UI.Std.Button(UIText.Options.Benchmark.benchmarkStop, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(false)
                 end
               end
 
               if isBenchmarkFinished then
-                if not benchmarkSetSuggested and ImGui.Button(UIText.Options.Benchmark.benchmarkSetSuggestedSettings, 480, 40) then
+                if not benchmarkSetSuggested and UI.Std.Button(UIText.Options.Benchmark.benchmarkSetSuggestedSettings, 480, 40) then
                   SetSuggestedSettings()
                 end
 
-                if benchmarkSetSuggested and ImGui.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 480, 40) then
+                if benchmarkSetSuggested and UI.Std.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 480, 40) then
                   RestorePreviousSettings()
 
                   Config.SetStatusBar(UIText.General.settings_restored)
@@ -566,21 +500,19 @@ registerForEvent("onDraw", function()
                 end
               end
 
-              ImGui.Separator()
-
-              ImGuiExt.TextWhite(Config.GetStatusBar())
+              UI.Ext.StatusBar(Config.GetStatusBar())
 
             end
-            ImGui.EndTabItem()
+            UI.Std.EndTabItem()
           end
         end
         --additonal options interface ends------------------------------------------------------------------------------------------------------------------
-        ImGui.EndTabBar()
+        UI.Std.EndTabBar()
       end
     end
-    ImGui.End()
-    ImGui.PopStyleColor(26)
-    ImGui.PopStyleVar(1)
+    UI.Std.End()
+
+    UI.PopStyle()
   end
 end)
 

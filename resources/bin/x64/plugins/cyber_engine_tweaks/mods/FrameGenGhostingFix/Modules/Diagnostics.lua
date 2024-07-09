@@ -8,6 +8,7 @@ local Diagnostics = {
 
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
+local UI = require("Modules/UI")
 
 local UIText = Localization.UIText
 
@@ -77,52 +78,28 @@ function Diagnostics.OnOverlayOpen()
   UIText = Localization.UIText
 end
 
---UI
-
-local ImGui = ImGui
-local ImGuiCol = ImGuiCol
-local ImGuiExt = {
-
-TextGreen = function(string)
-  ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-  ImGui.Text(string)
-  ImGui.PopStyleColor()
-end,
-
-TextRed = function(string)
-  ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-  ImGui.Text(string)
-  ImGui.PopStyleColor()
-end,
-
-TextWhite = function(string)
-  ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-  ImGui.Text(string)
-  ImGui.PopStyleColor()
-end
-}
-
+--Local UI
 function Diagnostics.DrawUI()
-  if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
+  if UI.Std.BeginTabItem(UIText.Diagnostics.tabname) then
     if not Diagnostics.isModsCompatibility then
-      ImGuiExt.TextRed(UIText.Diagnostics.title_warning)
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Diagnostics.textfield_1)
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Diagnostics.textfield_2)
+      UI.Ext.TextRed(UIText.Diagnostics.title_warning)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_1)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_2)
     else
-      ImGuiExt.TextGreen(UIText.Diagnostics.title_info)
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Diagnostics.textfield_3)
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Diagnostics.textfield_4)
+      UI.Ext.TextGreen(UIText.Diagnostics.title_info)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_3)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_4)
     end
 
     for modfile,mod in pairs(Diagnostics.modfiles) do
-      ImGuiExt.TextWhite(mod)
+      UI.Ext.TextWhite(mod)
     end
    
-    ImGui.EndTabItem()
+    UI.Std.EndTabItem()
   end
 end
 

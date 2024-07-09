@@ -16,6 +16,8 @@ local UserSettings = {}
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
+local UI = require("Modules/UI")
+
 local Vectors = require("Modules/Vectors")
 
 local UIText = Localization.UIText
@@ -115,36 +117,7 @@ function VectorsCustomize.TurnOffLiveView()
   end
 end
 
---UI
-
-local ImGui = ImGui
-local ImGuiCol = ImGuiCol
-local ImGuiExt = {
-  Checkbox = {
-    TextWhite = function(string, setting, toggle)
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      setting, toggle = ImGui.Checkbox(string, setting)
-      ImGui.PopStyleColor()
-
-      return setting, toggle
-    end,
-  },
-  OnItemHovered = {
-    SetTooltip = function(string)
-      if ImGui.IsItemHovered() then
-        ImGui.SetTooltip(string)
-      else
-        ImGui.SetTooltip(nil)
-      end
-    end,
-  },
-  TextWhite = function(string)
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-    ImGui.Text(string)
-    ImGui.PopStyleColor()
-  end
-}
-
+--Local UI
 local camera = Vectors.Camera
 local vehMasks = Vectors.VehMasks
 local vehicle = Vectors.Vehicle
@@ -154,46 +127,46 @@ local windshieldScaleToggle = {}
 function VectorsCustomize.DrawUI()
   VectorsCustomize.UpdateLiveView()
 
-  ImGuiExt.TextWhite(UIText.General.title_fps90)
-  ImGui.Separator()
+  UI.Ext.TextWhite(UIText.General.title_fps90)
+  UI.Std.Separator()
 
   if Vectors and Vectors.__VERSION_NUMBER == VectorsCustomize.__VERSION_NUMBER then
     if vehicle.currentSpeed ~= nil and vehicle.currentSpeed < 1 and vehicle.vehicleBaseObject == 0 and camera.activePerspective == vehicleCameraPerspective.FPP then
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Vehicles.Windshield.textfield_1)
-      ImGui.Text("")
-      ImGuiExt.TextWhite(UIText.Vehicles.Windshield.setting_1)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Vehicles.Windshield.textfield_1)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_1)
 
-      vehMasks.Mask4.Scale.x, windshieldScaleToggle.x = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_1,vehMasks.Mask4.Scale.x, 70, 150, "%.0f")
+      vehMasks.Mask4.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat(UIText.Vehicles.Windshield.comment_1,vehMasks.Mask4.Scale.x, 70, 150, "%.0f")
       if windshieldScaleToggle.x then
         VectorsCustomize.TurnOnLiveView()
       end
 
-      ImGuiExt.TextWhite(UIText.Vehicles.Windshield.setting_2)
+      UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_2)
 
-      vehMasks.Mask4.Scale.y, windshieldScaleToggle.y = ImGui.SliderFloat(UIText.Vehicles.Windshield.comment_2,vehMasks.Mask4.Scale.y, 70, 300, "%.0f")
+      vehMasks.Mask4.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat(UIText.Vehicles.Windshield.comment_2,vehMasks.Mask4.Scale.y, 70, 300, "%.0f")
       if windshieldScaleToggle.y then
         VectorsCustomize.TurnOnLiveView()
       end
 
-      ImGui.Text("")
+      UI.Std.Text("")
 
-      if ImGui.Button(UIText.General.default, 240, 40) then
+      if UI.Std.Button(UIText.General.default, 240, 40) then
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
         VectorsCustomize.SaveUserSettings()
       end
 
-      ImGui.SameLine()
+      UI.Std.SameLine()
 
-      if ImGui.Button(UIText.General.settings_save, 240, 40) then
+      if UI.Std.Button(UIText.General.settings_save, 240, 40) then
         Settings.WriteUserSettings()
       end
     else
-      ImGuiExt.TextWhite(UIText.Vehicles.Windshield.warning)
+      UI.Ext.TextWhite(UIText.Vehicles.Windshield.warning)
     end
   else
-    ImGuiExt.TextWhite(UIText.General.info_vectorsMissing)
+    UI.Ext.TextWhite(UIText.General.info_vectorsMissing)
   end
 end
 

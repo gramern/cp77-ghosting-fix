@@ -135,12 +135,14 @@ local UserSettings = {}
 local Config = require("Modules/Config")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
-local Translate = require("Modules/Translate")
-local Vectors = require("Modules/Vectors")
-local VectorsCustomize = require("Modules/VectorsCustomize")
+local UI = require("Modules/UI")
 
 local UIText = Localization.UIText
 local LogText = Localization.LogText
+
+local Translate = require("Modules/Translate")
+local Vectors = require("Modules/Vectors")
+local VectorsCustomize = require("Modules/VectorsCustomize")
 
 function Presets.AddPreset(pos, presetFileName, presetInfoTable)
   if Presets.List.File[pos] ~= nil then Config.Print(LogText.presets_skippedFilePos,nil,nil,Presets.__NAME) return end
@@ -338,67 +340,38 @@ function Presets.OnOverlayOpen()
   end
 end
 
---UI
-
-local ImGui = ImGui
-local ImGuiCol = ImGuiCol
-local ImGuiExt = {
-  Checkbox = {
-    TextWhite = function(string, setting, toggle)
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      setting, toggle = ImGui.Checkbox(string, setting)
-      ImGui.PopStyleColor()
-
-      return setting, toggle
-    end,
-  },
-  OnItemHovered = {
-    SetTooltip = function(string)
-      if ImGui.IsItemHovered() then
-        ImGui.SetTooltip(string)
-      else
-        ImGui.SetTooltip(nil)
-      end
-    end,
-  },
-  TextWhite = function(string)
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-    ImGui.Text(string)
-    ImGui.PopStyleColor()
-  end
-}
-
+--Local UI
 function Presets.DrawUI()
-  if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
+  if UI.Std.BeginTabItem(UIText.Vehicles.tabname) then
 
-    ImGuiExt.TextWhite(UIText.General.title_general)
+    UI.Ext.TextWhite(UIText.General.title_general)
 
-    ImGui.Separator()
+    UI.Std.Separator()
 
-    ImGuiExt.TextWhite(UIText.Vehicles.MaskingPresets.name)
+    UI.Ext.TextWhite(UIText.Vehicles.MaskingPresets.name)
     if Presets.selectedPresetPosition == nil then
       Presets.GetSelectedPreset()
     end
 
     -- displays list of onScreen presets' names and sets a preset
-    if ImGui.BeginCombo("##", Presets.List.OnScreenName[Presets.selectedPresetPosition]) then
+    if UI.Std.BeginCombo("##", Presets.List.OnScreenName[Presets.selectedPresetPosition]) then
       for _,preset in ipairs(Presets.List.OnScreenName) do
         local presetSelected = (Presets.selectedPresetOnScreenName == preset)
-        if ImGui.Selectable(preset, presetSelected) then
+        if UI.Std.Selectable(preset, presetSelected) then
           Presets.selectedPresetOnScreenName = preset
           Presets.SetSelectedPreset()
         end
         if presetSelected then
-          ImGui.SetItemDefaultFocus()
+          UI.Std.SetItemDefaultFocus()
           Config.ResetStatusBar()
         end
       end
-      ImGui.EndCombo()
+      UI.Std.EndCombo()
     end
-    ImGuiExt.OnItemHovered.SetTooltip(UIText.Vehicles.MaskingPresets.tooltip)
+    UI.Ext.OnItemHovered.SetTooltip(UIText.Vehicles.MaskingPresets.tooltip)
 
-    ImGui.SameLine()
-    if ImGui.Button("   " .. UIText.General.apply .. "   ") then
+    UI.Std.SameLine()
+    if UI.Std.Button("   " .. UIText.General.apply .. "   ") then
       Presets.LoadPreset()
       Presets.SaveUserSettings()
       Vectors.ApplyPreset()
@@ -408,32 +381,30 @@ function Presets.DrawUI()
 
     if Presets.selectedPreset then
       if Presets.PresetsInfo[Presets.selectedPreset].description then
-        ImGuiExt.TextWhite(UIText.Presets.infotabname)
-        ImGuiExt.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].description)
+        UI.Ext.TextWhite(UIText.Presets.infotabname)
+        UI.Ext.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].description)
       end
 
       if Presets.PresetsInfo[Presets.selectedPreset].author then
-        ImGuiExt.TextWhite(UIText.Presets.authtabname)
-        ImGui.SameLine()
-        ImGuiExt.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].author)
+        UI.Ext.TextWhite(UIText.Presets.authtabname)
+        UI.Std.SameLine()
+        UI.Ext.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].author)
       end
     end
 
     --VectorsCustomize interface starts------------------------------------------------------------------------------------------------------------------
     if VectorsCustomize and Presets.selectedPreset == "a001" then
       if Config.IsMounted() then
-        ImGui.Text("")
+        UI.Std.Text("")
         VectorsCustomize.DrawUI()
       else
         Config.SetStatusBar(UIText.General.info_getIn)
       end
     end
 
-    ImGui.Separator()
+    UI.Ext.StatusBar(Config.GetStatusBar())
 
-    ImGuiExt.TextWhite(Config.GetStatusBar())
-
-    ImGui.EndTabItem()
+    UI.Std.EndTabItem()
   end
 end
 
