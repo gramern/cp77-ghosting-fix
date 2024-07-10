@@ -575,7 +575,7 @@ function Vectors.HasWeapon()
   return print
 end
 
-function Vectors.GetPlayerData()
+local function GetPlayerData()
   local player = Game.GetPlayer()
 
   if player then
@@ -584,11 +584,9 @@ function Vectors.GetPlayerData()
     Vectors.IsMoving()
     Vectors.HasWeapon()
   end
-
-  return player
 end
 
-function Vectors.GetCameraData()
+local function GetCameraData()
   local abs = math.abs
   local cameraSystem = Game.GetCameraSystem()
 
@@ -617,7 +615,7 @@ function Vectors.GetActivePerspective()
 end
 
 function Vectors.GetVehicleBaseObject()
-  if not Vectors.Vehicle.isMounted then return Vectors.Vehicle.vehicleBaseObject end
+  if not Vectors.Vehicle.isMounted then return end
 
   if Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") then
     Vectors.Vehicle.vehicleBaseObject = 0
@@ -633,6 +631,8 @@ function Vectors.GetVehicleBaseObject()
 end
 
 function Vectors.GetVehicleRecord()
+  if not Vectors.Vehicle.isMounted then return end
+
   Vectors.Vehicle.vehicleRecord = Vectors.Vehicle.vehicleType:GetRecord()
   Vectors.Vehicle.vehicleID = Vectors.Vehicle.vehicleRecord:GetID()
 
@@ -640,6 +640,8 @@ function Vectors.GetVehicleRecord()
 end
 
 function Vectors.IsVehicleKnown()
+  if not Vectors.Vehicle.isMounted then return end
+
   local baseObject = Vectors.Vehicle.vehicleBaseObject
   local print
 
@@ -654,7 +656,35 @@ function Vectors.IsVehicleKnown()
   return print
 end
 
-function Vectors.GetBikeWheelsPositions()
+local function GetDefaultBikeWheelsPositions()
+  local dist = Vector4.Distance
+  local wheelPos = Vectors.Vehicle.Wheel.Position
+  local vehOffsetBike = Vectors.Vehicle.Wheel.Offset.Bike
+  local vehPos = Vectors.Vehicle.Position
+
+  wheelPos.Back.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Back.Left)
+  wheelPos.Front.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Front.Left)
+  wheelPos.Back.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Back.Right)
+  wheelPos.Front.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Front.Right)
+
+  Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
+end
+
+local function GetDefaultCarWheelsPositions()
+  local dist = Vector4.Distance
+  local wheelPos = Vectors.Vehicle.Wheel.Position
+  local vehOffsetCar = Vectors.Vehicle.Wheel.Offset.Car
+  local vehPos = Vectors.Vehicle.Position
+
+  wheelPos.Back.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Back.Left)
+  wheelPos.Front.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Front.Left)
+  wheelPos.Back.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Back.Right)
+  wheelPos.Front.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Front.Right)
+
+  Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
+end
+
+local function GetBikeWheelsPositions()
   local dist = Vector4.Distance
   local mtxTr = Matrix.GetTranslation
   local new4 = Vector4.new
@@ -663,14 +693,14 @@ function Vectors.GetBikeWheelsPositions()
   local wheelPos = Vectors.Vehicle.Wheel.Position
 
   if not vehicle then
-    Vectors.GetDefaultBikeWheelsPositions()
+    GetDefaultBikeWheelsPositions()
     return
   end
 
   local Back = vehicle:GetVehicleComponent():FindComponentByName("WheelAudioEmitterBack") or false
 
   if not Back then
-    Vectors.GetDefaultBikeWheelsPositions()
+    GetDefaultBikeWheelsPositions()
     return
   end
 
@@ -698,7 +728,7 @@ function Vectors.GetBikeWheelsPositions()
   Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
 end
 
-function Vectors.GetVehWheelsPositions()
+local function GetVehWheelsPositions()
   local dist = Vector4.Distance
   local mtxTr = Matrix.GetTranslation
   local player = Game.GetPlayer()
@@ -706,19 +736,19 @@ function Vectors.GetVehWheelsPositions()
   local wheelPos = Vectors.Vehicle.Wheel.Position
 
   if Vectors.Vehicle.vehicleBaseObject == 0 then
-    Vectors.GetBikeWheelsPositions()
+    GetBikeWheelsPositions()
     return
   end
 
   if not vehicle then
-    Vectors.GetDefaultCarWheelsPositions()
+    GetDefaultCarWheelsPositions()
     return
   end
 
   local BackLeft = vehicle:GetVehicleComponent():FindComponentByName("back_left_tire") or false
 
   if not BackLeft then
-    Vectors.GetDefaultCarWheelsPositions()
+    GetDefaultCarWheelsPositions()
     return
   end
 
@@ -739,35 +769,7 @@ function Vectors.GetVehWheelsPositions()
   Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
 end
 
-function Vectors.GetDefaultBikeWheelsPositions()
-  local dist = Vector4.Distance
-  local wheelPos = Vectors.Vehicle.Wheel.Position
-  local vehOffsetBike = Vectors.Vehicle.Wheel.Offset.Bike
-  local vehPos = Vectors.Vehicle.Position
-
-  wheelPos.Back.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Back.Left)
-  wheelPos.Front.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Front.Left)
-  wheelPos.Back.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Back.Right)
-  wheelPos.Front.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetBike.Front.Right)
-
-  Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
-end
-
-function Vectors.GetDefaultCarWheelsPositions()
-  local dist = Vector4.Distance
-  local wheelPos = Vectors.Vehicle.Wheel.Position
-  local vehOffsetCar = Vectors.Vehicle.Wheel.Offset.Car
-  local vehPos = Vectors.Vehicle.Position
-
-  wheelPos.Back.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Back.Left)
-  wheelPos.Front.Left = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Front.Left)
-  wheelPos.Back.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Back.Right)
-  wheelPos.Front.Right = Vectors.GetWorldPositionFromOffset(vehPos, vehOffsetCar.Front.Right)
-
-  Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
-end
-
-function Vectors.GetVehMidpointsPositions()
+local function GetVehMidpointsPositions()
   local midpointPos = Vectors.Vehicle.Midpoint.Position
   local wheelPos = Vectors.Vehicle.Wheel.Position
 
@@ -777,7 +779,7 @@ function Vectors.GetVehMidpointsPositions()
   midpointPos.Right = Vectors.GetMidpointPosition(wheelPos.Back.Right, wheelPos.Front.Right)
 end
 
-function Vectors.GetVehBumpersPositions()
+local function GetVehBumpersPositions()
   local dist = Vector4.Distance
   local new4 = Vector4.new
   local bumperOffset = Vectors.Vehicle.Bumper.offset
@@ -802,7 +804,7 @@ function Vectors.GetVehBumpersPositions()
   Vectors.Vehicle.Bumper.distance = dist(bumperPos.Back, bumperPos.Front)
 end
 
-function Vectors.GetVehWheelsScreenData()
+local function GetVehWheelsScreenData()
   local dist = Vector4.Distance
   local new4 = Vector4.new
   local wheelPos = Vectors.Vehicle.Wheel.Position
@@ -828,7 +830,7 @@ function Vectors.GetVehWheelsScreenData()
   Vectors.Vehicle.Wheel.wheelbaseScreenPerp = dist(wheelScreen.Back.Left, wheelbasePerpProjection)
 end
 
-function Vectors.GetVehBumpersScreenData()
+local function GetVehBumpersScreenData()
   local dist = Vector4.Distance
   local bumperPos = Vectors.Vehicle.Bumper.Position
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
@@ -839,7 +841,7 @@ function Vectors.GetVehBumpersScreenData()
   bumperScreen.distanceLineRotation = Vectors.GetLineRotationScreenSpace(bumperScreen.Back, bumperScreen.Front)
 end
 
-function Vectors.GetVehAxesScreenData()
+local function GetVehAxesScreenData()
   local dist = Vector4.Distance
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
@@ -856,7 +858,7 @@ function Vectors.GetVehAxesScreenData()
   axisLength.front = dist(wheelScreen.Front.Left, wheelScreen.Front.Right)
 end
 
-function Vectors.GetVehicleData()
+local function GetVehicleData()
   local player = Game.GetPlayer()
   local vehicle = Game.GetMountedVehicle(player) or false
 
@@ -873,45 +875,24 @@ function Vectors.GetVehicleData()
   end
 end
 
-function Vectors.GetDerivativeVehicleData()
+local function GetDerivativeVehicleData()
   if not Vectors.Vehicle.vehicleTypeKnown then return end
-  Vectors.GetVehWheelsPositions()
-  Vectors.GetVehMidpointsPositions()
-  Vectors.GetVehBumpersPositions()
-  Vectors.GetVehWheelsScreenData()
-  Vectors.GetVehBumpersScreenData()
-  Vectors.GetVehAxesScreenData()
+  GetVehWheelsPositions()
+  GetVehMidpointsPositions()
+  GetVehBumpersPositions()
+  GetVehWheelsScreenData()
+  GetVehBumpersScreenData()
+  GetVehAxesScreenData()
 end
 
-function Vectors.GetCameraAnglesVehicle()
+local function GetCameraAnglesVehicle()
   local angleVeh = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward
 
   angleVeh.horizontalPlane = Vector4.GetAngleDegAroundAxis(Vectors.Camera.Forward, Vectors.Vehicle.Forward, Vectors.Vehicle.Up)
   angleVeh.medianPlane = Vector4.GetAngleDegAroundAxis(Vectors.Camera.Forward, Vectors.Vehicle.Forward, Vectors.Vehicle.Right)
 end
 
-function Vectors.GetDotProducts()
-  local abs = math.abs
-  local dot = Vector4.Dot
-  local cameraForward = Vectors.Camera.Forward
-  local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
-
-  dotVeh.forward = dot(Vectors.Vehicle.Forward, cameraForward) or false
-
-  if not dotVeh.forward then
-    Vectors.GetDotProductsBackup()
-    return
-  end
-
-  dotVeh.right = dot(Vectors.Vehicle.Right, cameraForward)
-  dotVeh.up = dot(Vectors.Vehicle.Up, cameraForward)
-
-  dotVeh.forwardAbs = abs(dotVeh.forward)
-  dotVeh.rightAbs = abs(dotVeh.right)
-  dotVeh.upAbs = abs(dotVeh.up)
-end
-
-function Vectors.GetDotProductsBackup()
+local function GetDotProductsBackup()
   local abs = math.abs
   local cameraForward = Vectors.Camera.Forward
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -925,19 +906,40 @@ function Vectors.GetDotProductsBackup()
   dotVeh.upAbs = abs(dotVeh.up)
 end
 
+local function GetDotProducts()
+  local abs = math.abs
+  local dot = Vector4.Dot
+  local cameraForward = Vectors.Camera.Forward
+  local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
+
+  dotVeh.forward = dot(Vectors.Vehicle.Forward, cameraForward) or false
+
+  if not dotVeh.forward then
+    GetDotProductsBackup()
+    return
+  end
+
+  dotVeh.right = dot(Vectors.Vehicle.Right, cameraForward)
+  dotVeh.up = dot(Vectors.Vehicle.Up, cameraForward)
+
+  dotVeh.forwardAbs = abs(dotVeh.forward)
+  dotVeh.rightAbs = abs(dotVeh.right)
+  dotVeh.upAbs = abs(dotVeh.up)
+end
+
 --Data gathering methods end here----------------------------------------------------------------------------------------------------------------------
 --Transformation methods start here----------------------------------------------------------------------------------------------------------------------
 
 --Transform By
 
-function Vectors.TransformByFPS()
+local function TransformByFPS()
   local min = math.min
 
   local fillToggleValue = (Vectors.Game.currentFps - 30) * 0.01
   Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue = min(0.1, fillToggleValue)
 end
 
-function Vectors.TransformByPerspective()
+local function TransformByPerspective()
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
 
   if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
@@ -949,7 +951,7 @@ function Vectors.TransformByPerspective()
   end
 end
 
-function Vectors.TransformByVehBaseObject()
+local function TransformByVehBaseObject()
   local vehElements = Vectors.VehElements
 
   if Vectors.Vehicle.isMounted and Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
@@ -971,7 +973,7 @@ end
 
 --Transform Properties
 
-function Vectors.TransformPositionBike()
+local function TransformPositionBike()
   local new4 = Vector4.new
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local midpointPos = Vectors.Vehicle.Midpoint.Position
@@ -1004,7 +1006,7 @@ function Vectors.TransformPositionBike()
   Vectors.VehMasks.Mask3.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
-function Vectors.TransformPositionCar()
+local function TransformPositionCar()
   local new4 = Vector4.new
   local bumper = Vectors.Vehicle.Bumper
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -1049,14 +1051,14 @@ function Vectors.TransformPositionCar()
   Vectors.VehMasks.Mask3.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
-function Vectors.TransformPosition()
+local function TransformPosition()
   local vehiclePos = Vectors.Vehicle.Position
 
   if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     if Vectors.Vehicle.vehicleBaseObject == 1 then
-      Vectors.TransformPositionCar()
+      TransformPositionCar()
     else
-      Vectors.TransformPositionBike()
+      TransformPositionBike()
     end
   else
     --Mask1
@@ -1073,7 +1075,7 @@ function Vectors.TransformPosition()
   end
 end
 
-function Vectors.TransformScreenSpaceBike()
+local function TransformScreenSpaceBike()
   local max = math.max
   local min = math.min
   local new4 = Vector4.new
@@ -1115,7 +1117,7 @@ function Vectors.TransformScreenSpaceBike()
   end
 end
 
-function Vectors.TransformScreenSpaceCar()
+local function TransformScreenSpaceCar()
   local max = math.max
   local min = math.min
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
@@ -1146,12 +1148,12 @@ function Vectors.TransformScreenSpaceCar()
   end
 end
 
-function Vectors.TransformScreenSpace()
+local function TransformScreenSpace()
   if Vectors.Camera.activePerspective ~= vehicleCameraPerspective.FPP then
     if Vectors.Vehicle.vehicleBaseObject == 1 then
-      Vectors.TransformScreenSpaceCar()
+      TransformScreenSpaceCar()
     else
-      Vectors.TransformScreenSpaceBike()
+      TransformScreenSpaceBike()
     end
   end
 
@@ -1176,7 +1178,7 @@ function Vectors.TransformScreenSpace()
   end
 end
 
-function Vectors.TransformWidthBike()
+local function TransformWidthBike()
   local max = math.max
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
@@ -1221,7 +1223,7 @@ function Vectors.TransformWidthBike()
   end
 end
 
-function Vectors.TransformWidthCar()
+local function TransformWidthCar()
   local abs = math.abs
   local max = math.max
   local min = math.min
@@ -1279,15 +1281,15 @@ function Vectors.TransformWidthCar()
   end
 end
 
-function Vectors.TransformWidth()
+local function TransformWidth()
   if Vectors.Vehicle.vehicleBaseObject == 1 then
-    Vectors.TransformWidthCar()
+    TransformWidthCar()
   else
-    Vectors.TransformWidthBike()
+    TransformWidthBike()
   end
 end
 
-function Vectors.TransformHeightBike()
+local function TransformHeightBike()
   local max = math.max
   local activePerspective = Vectors.Camera.activePerspective
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
@@ -1354,7 +1356,7 @@ function Vectors.TransformHeightBike()
   end
 end
 
-function Vectors.TransformHeightCar()
+local function TransformHeightCar()
   local max = math.max
   local activePerspective = Vectors.Camera.activePerspective
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
@@ -1420,15 +1422,15 @@ function Vectors.TransformHeightCar()
   end
 end
 
-function Vectors.TransformHeight()
+local function TransformHeight()
   if Vectors.Vehicle.vehicleBaseObject == 1 then
-    Vectors.TransformHeightCar()
+    TransformHeightCar()
   else
-    Vectors.TransformHeightBike()
+    TransformHeightBike()
   end
 end
 
-function Vectors.TransformRotationBike()
+local function TransformRotationBike()
   local activePerspective = Vectors.Camera.activePerspective
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -1481,7 +1483,7 @@ function Vectors.TransformRotationBike()
   end
 end
 
-function Vectors.TransformRotationCar()
+local function TransformRotationCar()
   local activePerspective = Vectors.Camera.activePerspective
   local axisRotation = Vectors.Vehicle.Axis.ScreenRotation
   local bumpersRotation = Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation
@@ -1523,15 +1525,15 @@ function Vectors.TransformRotationCar()
   end
 end
 
-function Vectors.TransformRotation()
+local function TransformRotation()
   if Vectors.Vehicle.vehicleBaseObject == 1 then
-    Vectors.TransformRotationCar()
+    TransformRotationCar()
   else
-    Vectors.TransformRotationBike()
+    TransformRotationBike()
   end
 end
 
-function Vectors.TransformShearCar()
+local function TransformShearCar()
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
 
   -- Mask1
@@ -1556,19 +1558,19 @@ function Vectors.TransformShearCar()
   end
 end
 
-function Vectors.TransformShear()
+local function TransformShear()
   local activePerspective = Vectors.Camera.activePerspective
   local baseObject = Vectors.Vehicle.vehicleBaseObject
 
   if activePerspective ~= vehicleCameraPerspective.FPP and baseObject == 1 then
-    Vectors.TransformShearCar()
+    TransformShearCar()
   else
     Vectors.VehMasks.Mask1.Shear.y = 0
     Vectors.VehMasks.Mask4.Shear.y = 0
   end
 end
 
-function Vectors.TransformOpacityBike()
+local function TransformOpacityBike()
   local max = math.max
   local min = math.max
   local activePerspective = Vectors.Camera.activePerspective
@@ -1609,7 +1611,7 @@ function Vectors.TransformOpacityBike()
   end
 end
 
-function Vectors.TransformOpacityCar()
+local function TransformOpacityCar()
   local max = math.max
   local min = math.min
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
@@ -1667,24 +1669,24 @@ function Vectors.TransformOpacityCar()
   end
 end
 
-function Vectors.SetNormalizeOpacity()
+local function SetNormalizeOpacity()
   local opacity = Vectors.VehMasks.Opacity
 
   opacity.isNormalized = false
   opacity.normalizedValue = opacity.delayedValue
 end
 
-function Vectors.CancelNormalizeOpacity()
+local function CancelNormalizeOpacity()
   Vectors.VehMasks.Opacity.isNormalized = true
 end
 
-function Vectors.NormalizeOpacity()
+local function NormalizeOpacity()
   local opacity = Vectors.VehMasks.Opacity
 
   if opacity.isNormalized then return end
 
   if opacity.speedValue > opacity.normalizedValue then
-    Vectors.CancelNormalizeOpacity()
+    CancelNormalizeOpacity()
     return
   end
 
@@ -1694,32 +1696,32 @@ function Vectors.NormalizeOpacity()
   opacity.value = opacity.normalizedValue
 
   if opacity.normalizedValue > opacity.speedValue then return end
-  Vectors.CancelNormalizeOpacity()
+  CancelNormalizeOpacity()
 end
 
-function Vectors.SetDelayTransformOpacity()
+local function SetDelayTransformOpacity()
   local opacity = Vectors.VehMasks.Opacity
 
   opacity.isDelayed = true
   opacity.delayedValue = opacity.Def.max * opacity.Def.delayThreshold
 end
 
-function Vectors.ResetDelayTransformOpacity()
+local function ResetDelayTransformOpacity()
   Vectors.VehMasks.Opacity.deltaFrames = 0
   Vectors.VehMasks.Opacity.delayTime = 0
 end
 
-function Vectors.CancelDelayTransformOpacity()
+local function CancelDelayTransformOpacity()
   Vectors.VehMasks.Opacity.isDelayed = false
 end
 
-function Vectors.DelayTransformOpacity()
+local function DelayTransformOpacity()
   local opacity = Vectors.VehMasks.Opacity
 
   if not opacity.isDelayed then return end
 
   if opacity.speedValue > opacity.delayedValue then
-    Vectors.ResetDelayTransformOpacity()
+    ResetDelayTransformOpacity()
     return
   end
 
@@ -1727,12 +1729,12 @@ function Vectors.DelayTransformOpacity()
   opacity.delayTime = opacity.delayTime + Vectors.Game.gameDeltaTime
 
   if opacity.delayTime <= opacity.Def.delayDuration then return end
-  Vectors.ResetDelayTransformOpacity()
-  Vectors.CancelDelayTransformOpacity()
-  Vectors.SetNormalizeOpacity()
+  ResetDelayTransformOpacity()
+  CancelDelayTransformOpacity()
+  SetNormalizeOpacity()
 end
 
-function Vectors.TransformOpacity()
+local function TransformOpacity()
   local abs = math.abs
   local floor = math.floor
   local min = math.min
@@ -1747,11 +1749,11 @@ function Vectors.TransformOpacity()
     opacity.value = opacity.speedValue
 
     if opacity.speedValue >= opacity.Def.max then
-      Vectors.SetDelayTransformOpacity()
+      SetDelayTransformOpacity()
     end
 
-    Vectors.DelayTransformOpacity()
-    Vectors.NormalizeOpacity()
+    DelayTransformOpacity()
+    NormalizeOpacity()
   else
     opacityHED.value = opacityHED.Def.max
     opacity.value = opacity.Def.max
@@ -1760,25 +1762,10 @@ function Vectors.TransformOpacity()
   opacityHED.tracker = (opacity.value + opacityHED.value) * 0.5
 
   if Vectors.Vehicle.vehicleBaseObject == 1 then
-    Vectors.TransformOpacityCar()
+    TransformOpacityCar()
   else
-    Vectors.TransformOpacityBike()
+    TransformOpacityBike()
   end
-end
-
-function Vectors.TransformVehMasks()
-  Vectors.TransformVisibility()
-  if not Vectors.MaskingGlobal.vehicles then return end
-  Vectors.TransformByFPS()
-  Vectors.TransformByPerspective()
-  Vectors.TransformByVehBaseObject()
-  Vectors.TransformPosition()
-  Vectors.TransformScreenSpace()
-  Vectors.TransformWidth()
-  Vectors.TransformHeight()
-  Vectors.TransformRotation()
-  Vectors.TransformShear()
-  Vectors.TransformOpacity()
 end
 
 function Vectors.TransformVisibility()
@@ -1843,17 +1830,32 @@ function Vectors.TransformVisibility()
   Vectors.VehMasks.Mask4.visible = false
 end
 
+function Vectors.TransformVehMasks()
+  Vectors.TransformVisibility()
+  if not Vectors.MaskingGlobal.vehicles then return end
+  TransformByFPS()
+  TransformByPerspective()
+  TransformByVehBaseObject()
+  TransformPosition()
+  TransformScreenSpace()
+  TransformWidth()
+  TransformHeight()
+  TransformRotation()
+  TransformShear()
+  TransformOpacity()
+end
+
 --Transformation methods end here----------------------------------------------------------------------------------------------------------------------
 
 function Vectors.OnUpdate()
-  Vectors.GetPlayerData()
-  Vectors.GetCameraData()
+  GetPlayerData()
+  GetCameraData()
   if not Vectors.Vehicle.isMounted then return end
   Vectors.GetActivePerspective()
-  Vectors.GetVehicleData()
-  Vectors.GetDotProducts()
-  Vectors.GetCameraAnglesVehicle()
-  Vectors.GetDerivativeVehicleData()
+  GetVehicleData()
+  GetDotProducts()
+  GetCameraAnglesVehicle()
+  GetDerivativeVehicleData()
   Vectors.TransformVehMasks()
 end
 
