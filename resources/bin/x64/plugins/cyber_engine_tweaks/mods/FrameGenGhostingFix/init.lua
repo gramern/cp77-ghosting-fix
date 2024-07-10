@@ -1,4 +1,4 @@
-local FrameGenGhostingFix = {
+FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __VERSION_NUMBER = 490,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
@@ -28,6 +28,7 @@ local FrameGenGhostingFix = {
   GameState = {
     averageFps = 0,
     currentFps = 0,
+    gameDeltaTime = 0,
     isGameLoaded = false,
     isGamePaused = false,
     isPreGame = false,
@@ -82,8 +83,6 @@ function GetGameState()
 
   GameState.isGamePaused = Game.GetSystemRequestsHandler():IsGamePaused()
   GameState.isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
-
-  Config.GameState = GameState
 end
 
 function IsGameLoaded(isLoaded)
@@ -99,6 +98,7 @@ function GetFps(deltaTime)
   gameDeltaTime = deltaTime
 
   GameState.currentFps = currentFps
+  GameState.gameDeltaTime = gameDeltaTime
 
   if openOverlay or GameState.isGamePaused then RestartBenchmark() return end
   if benchmarkRestart then RestartBenchmark() return end
@@ -370,8 +370,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
   if FrameGenGhostingFix.GameState.isGamePaused then return end
 
-  Vectors.Game.currentFps = currentFps
-  Vectors.Game.gameDeltaTime = deltaTime
   Vectors.OnUpdate()
 end)
 

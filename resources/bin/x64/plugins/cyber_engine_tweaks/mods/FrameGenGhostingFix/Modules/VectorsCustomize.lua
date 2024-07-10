@@ -13,9 +13,10 @@ local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
 
-local Vectors = require("Modules/Vectors")
-
+local LogText = Localization.LogText
 local UIText = Localization.UIText
+
+local Vectors = require("Modules/Vectors")
 
 function VectorsCustomize.SetDefault()
   VectorsCustomize.SetWindshieldDefault()

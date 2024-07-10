@@ -5,13 +5,6 @@ local Config = {
   __VERSION_NUMBER = 490,
   __VERSION_SUFFIX = "xl",
   __VERSION_STATUS = "alpha4",
-  GameState = {
-    averageFps = 0,
-    currentFps = 0,
-    isGameLoaded = false,
-    isGamePaused = false,
-    isPreGame = false,
-  },
   ModState = {
     enabledDebug = false,
     keepWindow = false,

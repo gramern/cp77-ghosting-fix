@@ -34,15 +34,15 @@ local Vectors = {
     Right = nil,
     Up = nil,
   },
-  Game = {
-    currentFps = 0,
-    gameDeltaTime = 0,
-    isGamePaused = true,
-    isPreGame = true,
-  },
   PlayerPuppet = {
     dotProductMedian = nil,
     dotProductHorizontal = nil,
+    Hands = {
+      Position = {
+        Left = nil,
+        Right = nil,
+      }
+    },
     hasWeapon = nil,
     isMoving = nil,
     Forward = nil,
@@ -935,7 +935,7 @@ end
 local function TransformByFPS()
   local min = math.min
 
-  local fillToggleValue = (Vectors.Game.currentFps - 30) * 0.01
+  local fillToggleValue = (FrameGenGhostingFix.GameState.currentFps - 30) * 0.01
   Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue = min(0.1, fillToggleValue)
 end
 
@@ -1630,7 +1630,7 @@ local function TransformOpacityCar()
     end
 
     --Mask2
-    if dotVeh.right > -0.2 or dotVeh.forward < 0 then
+    if dotVeh.right > -0.2 or dotVeh.forward < -0.6 then
       local mask2Opacity = max(opacityUpAbs * 2, opacityRightAbs * 3) * opacityGain
       Vectors.VehMasks.Mask2.opacity = min(opacityValue, mask2Opacity)
     else
@@ -1639,7 +1639,7 @@ local function TransformOpacityCar()
     end
 
     --Mask3
-    if dotVeh.right < 0.2 or dotVeh.forward < 0 then
+    if dotVeh.right < 0.2 or dotVeh.forward < -0.6 then
       local mask3Opacity = max(opacityUpAbs * 2, opacityRightAbs * 3) * opacityGain
       Vectors.VehMasks.Mask3.opacity = min(opacityValue, mask3Opacity)
     else
@@ -1726,7 +1726,7 @@ local function DelayTransformOpacity()
   end
 
   opacity.value = opacity.delayedValue
-  opacity.delayTime = opacity.delayTime + Vectors.Game.gameDeltaTime
+  opacity.delayTime = opacity.delayTime + FrameGenGhostingFix.GameState.gameDeltaTime
 
   if opacity.delayTime <= opacity.Def.delayDuration then return end
   ResetDelayTransformOpacity()
