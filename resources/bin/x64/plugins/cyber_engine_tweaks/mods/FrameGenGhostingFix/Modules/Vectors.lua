@@ -610,11 +610,15 @@ function Vectors.GetActivePerspective()
     if currentSpeed > 0.1 or currentSpeed < -0.1 then
       Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
       Vectors.Camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
+
+      return Vectors.Camera.activePerspective
     end
   end
 end
 
 function Vectors.GetVehicleBaseObject()
+  if not Vectors.Vehicle.isMounted then return Vectors.Vehicle.vehicleBaseObject end
+
   if Vectors.Vehicle.vehicleType:IsA("vehicleBikeBaseObject") then
     Vectors.Vehicle.vehicleBaseObject = 0
   elseif Vectors.Vehicle.vehicleType:IsA("vehicleCarBaseObject") then
@@ -624,11 +628,15 @@ function Vectors.GetVehicleBaseObject()
   else
     Vectors.Vehicle.vehicleBaseObject = 4
   end
+
+  return Vectors.Vehicle.vehicleBaseObject
 end
 
 function Vectors.GetVehicleRecord()
   Vectors.Vehicle.vehicleRecord = Vectors.Vehicle.vehicleType:GetRecord()
   Vectors.Vehicle.vehicleID = Vectors.Vehicle.vehicleRecord:GetID()
+
+  return Vectors.Vehicle.vehicleRecord
 end
 
 function Vectors.IsVehicleKnown()
@@ -1939,7 +1947,7 @@ function Vectors.ApplyPreset()
   
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
 
-  Config.MergeTables(Vectors,Preset.Vectors)
+  Config.SafeMergeTables(Vectors,Preset.Vectors)
 
   if masksController then
     --TPP Car

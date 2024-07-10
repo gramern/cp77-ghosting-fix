@@ -93,7 +93,7 @@ function Config.Deepcopy(contents)
   return copy
 end
 
-function Config.MergeTables(mergeTo, mergeA)
+function Config.SafeMergeTables(mergeTo, mergeA)
   if type(mergeTo) ~= "table" then Config.Print("Can't merge. The mergeTo is not a table:", mergeTo) return mergeTo end
   if mergeA == nil then return mergeTo end
   if type(mergeA) ~= "table" then Config.Print("Can't merge. The mergeA is not a table:", mergeA) return mergeTo end
@@ -101,7 +101,7 @@ function Config.MergeTables(mergeTo, mergeA)
   for key, value in pairs(mergeA) do
       if mergeTo[key] ~= nil then  -- Only proceed if the key exists in mergeTo
           if type(value) == "table" and type(mergeTo[key]) == "table" then
-              mergeTo[key] = Config.MergeTables(mergeTo[key], value)
+              mergeTo[key] = Config.SafeMergeTables(mergeTo[key], value)
           else
               mergeTo[key] = value
           end
@@ -111,7 +111,7 @@ function Config.MergeTables(mergeTo, mergeA)
   return mergeTo
 end
 
-function Config.ForceMergeTables(mergeTo, mergeA)
+function Config.MergeTables(mergeTo, mergeA)
   if type(mergeTo) ~= "table" then Config.Print("Can't merge. The mergeTo is not a table:",mergeTo) end
   if mergeA == nil then return end
   if type(mergeA) ~= "table" then Config.Print("Can't merge. The mergeA is not a table:",mergeA) end

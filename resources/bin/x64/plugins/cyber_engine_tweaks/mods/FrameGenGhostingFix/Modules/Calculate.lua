@@ -282,14 +282,14 @@ function Calculate.SaveUserSettings()
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Config.MergeTables(Calculate,Config.GetFallback("Calculate"))
+  Calculate = Config.SafeMergeTables(Calculate,Config.GetFallback("Calculate"))
 
   if Calculate == nil then Config.Print("The 'Calculate' table is empty...",nil,nil,"Calculate") end
   Calculate.SaveUserSettings()
 end
 
 function Calculate.OnInitialize()
-  Config.MergeTables(Calculate,Settings.GetUserSettings("Calculate"))
+  Config.SafeMergeTables(Calculate,Settings.GetUserSettings("Calculate"))
   Calculate.ApplyMasksController()
   Calculate.ApplyScreen()
   Calculate.ApplyCornersScreenSpace()

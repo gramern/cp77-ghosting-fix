@@ -323,8 +323,8 @@ function Presets.OnInitialize()
   Config.MergeTables(Presets,Settings.GetUserSettings("Presets"))
   Presets.GetDefaultPreset()
   Presets.GetPresets()
-  Presets.ApplySelectedPreset()
   Presets.GetSelectedPreset()
+  Presets.ApplySelectedPreset()
   Presets.LoadPreset()
 end
 

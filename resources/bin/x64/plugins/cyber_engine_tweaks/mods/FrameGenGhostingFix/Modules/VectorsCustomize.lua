@@ -4,11 +4,6 @@ local VectorsCustomize = {
   MaskingGlobal = {
     masksController = nil,
   },
-  Bike = {
-    Windshield = {
-      Scale = {x = 100, y = 100}
-    }
-  }
 }
 
 local UserSettings = {}
@@ -33,19 +28,37 @@ end
 
 function VectorsCustomize.GetUserSettings()
   UserSettings = {
-    Bike = VectorsCustomize.Bike
+    Bike = {
+      Windshield = {
+        Scale = Vectors.VehMasks.Mask4.Scale,
+      }
+    }
   }
 
   return UserSettings
 end
 
+function VectorsCustomize.LoadUserSettings()
+  Vectors.VehMasks.Mask4.Scale = Config.SafeMergeTables(Vectors.VehMasks.Mask4.Scale,UserSettings.Bike.Windshield.Scale)
+end
+
 function VectorsCustomize.SaveUserSettings()
+  Vectors.ApplyPreset()
   Settings.WriteUserSettings("VectorsCustomize",VectorsCustomize.GetUserSettings())
 end
 
 function VectorsCustomize.OnInitialize()
-  Config.MergeTables(VectorsCustomize,Settings.GetUserSettings("VectorsCustomize"))
+  UserSettings = Config.MergeTables(UserSettings,Settings.GetUserSettings("VectorsCustomize"))
   VectorsCustomize.ApplyMasksController()
+  VectorsCustomize.LoadUserSettings()
+
+  Observe('hudCarController', 'OnMountingEvent', function()
+    VectorsCustomize.LoadUserSettings()
+  end)
+
+  Observe('hudCarController', 'OnMountingEvent', function()
+    VectorsCustomize.LoadUserSettings()
+  end)
 end
 
 function VectorsCustomize.OnOverlayOpen()
@@ -154,13 +167,16 @@ function VectorsCustomize.DrawUI()
       if UI.Std.Button(UIText.General.default, 240, 40) then
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
-        VectorsCustomize.SaveUserSettings()
+
+        Config.SetStatusBar(UIText.General.settings_default)
       end
 
       UI.Std.SameLine()
 
       if UI.Std.Button(UIText.General.settings_save, 240, 40) then
-        Settings.WriteUserSettings()
+        VectorsCustomize.SaveUserSettings()
+
+        Config.SetStatusBar(UIText.General.settings_saved)
       end
     else
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.warning)

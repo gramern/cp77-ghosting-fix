@@ -375,11 +375,11 @@ registerForEvent("onUpdate", function(deltaTime)
   Vectors.OnUpdate()
 end)
 
--- draw a UI.Std window
+-- draw the mod's window
 registerForEvent("onDraw", function()
   if Config.ModState.openWindow then
     UI.Std.SetNextWindowPos(400, 200, UI.Cond.FirstUseEver)
-    
+
     UI.PushStyle()
 
     if UI.Std.Begin(windowTitle, UI.WindowFlags.AlwaysAutoResize) then
