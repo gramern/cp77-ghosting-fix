@@ -1,6 +1,8 @@
 local Preset = {
+  __VERSION_NUMBER = 490,
   MaskingGlobal = {
-    enabled = false
+    vehicles = false,
+    onfoot = false
   },
   Vectors = {
     VehElements = {
@@ -62,13 +64,20 @@ local Preset = {
     VehMasks = {
       AnchorPoint = {x = 0.5, y = 0.5},
       HorizontalEdgeDown = {
-        opacity = 0,
-        opacityMax = 0,
+        Opacity = {
+          Def = {
+            max = 0,
+          }
+        },
         Size = {
-          Base = {x = 4240, y = 1480} -- min size x = 3888
+          Def = {
+            lock = false,
+            x = 4240, -- min size x = 3888
+            y = 1480
+          },
         },
         Visible = {
-          Base = {
+          Def = {
             corners = false,
             fill = false,
             fillLock = false,
@@ -80,6 +89,7 @@ local Preset = {
         Def = {
           delayDuration = 1,
           delayThreshold = 1,
+          gain = 1,
           max = 0,
           speedFactor = 1,
           stepFactor = 1
@@ -90,7 +100,8 @@ local Preset = {
   PresetInfo = {
     name = "Turn off anti-ghosting masking",
     description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
-    author = nil
+    author = nil,
+    id = "a003",
   }
 }
 

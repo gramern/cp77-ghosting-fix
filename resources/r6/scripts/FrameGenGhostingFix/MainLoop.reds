@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0xl, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_onFootLoopID: DelayID;
 
@@ -94,7 +94,7 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
       if Equals(this.masksController.m_vignetteOnFootEditor,true) {
         this.masksController.FrameGenGhostingFixVignetteOnFootEditor();
       }
-    }  
+    }
 
     this.masksController.FrameGenGhostingFixLoop();
   }
@@ -136,7 +136,10 @@ protected cb func OnInitialize() -> Bool {
   if IsDefined(this.GetChildWidgetByPath(this.m_mask4Path)) {
     return false;
   }
-  if IsDefined(this.GetChildWidgetByPath(this.m_maskEditorPath)) {
+  if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor1Path)) {
+    return false;
+  }
+    if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor2Path)) {
     return false;
   }
   if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownLeftOnFoot")) {

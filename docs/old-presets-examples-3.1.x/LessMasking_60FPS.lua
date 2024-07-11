@@ -30,8 +30,9 @@ local Preset = {
         enabled = true
     },
 	PresetInfo = {
+        id = 102, -- ID has to be between 100 and 999999, duplicated IDs will fail the loading process
         name = "Less masking (60+ FPS with FG ON)",
-		description = "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
+		    description = "Preset tuned to improve smoothness when using modded\nFSR3 frame generation in lower framerates. Limits anti-\nghosting masks for a price of more visible ghosting/frame\ngeneration artefacts.",
         author = nil
 	}
 }
