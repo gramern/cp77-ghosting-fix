@@ -1,7 +1,8 @@
 local Preset = {
-  __VERSION_NUMBER = 480,
+  __VERSION_NUMBER = 490,
   MaskingGlobal = {
-    enabled = true
+    vehicles = true,
+    onfoot = true
   },
   Vectors = {
     VehElements = {
@@ -63,13 +64,20 @@ local Preset = {
     VehMasks = {
       AnchorPoint = {x = 0.5, y = 0.5},
       HorizontalEdgeDown = {
-        opacity = 1,
-        opacityMax = 1,
+        Opacity = {
+          Def = {
+            max = 1,
+          }
+        },
         Size = {
-          Base = {x = 4240, y = 1480} -- min size x = 3888
+          Def = {
+            lock = false,
+            x = 4240, -- min size x = 3888
+            y = 1480
+          },
         },
         Visible = {
-          Base = {
+          Def = {
             corners = true,
             fill = true,
             fillLock = false,
@@ -92,7 +100,8 @@ local Preset = {
   PresetInfo = {
     name = "Testing",
     description = "Testing preset, all masks visible.",
-    author = nil
+    author = nil,
+    id = "a004",
   }
 }
 

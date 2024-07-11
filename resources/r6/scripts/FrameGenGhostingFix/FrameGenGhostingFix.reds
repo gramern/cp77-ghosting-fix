@@ -1,9 +1,10 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.8.0, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 4.9.0, 2024 gramern (scz_g)
 
 //CET add-on customization---------------------------------------------------------------------------------------
-public class FrameGenGhostingFixFPPBikeWindshieldEditorEvent extends Event {}
+public class FrameGenGhostingFixMaskEditor1Event extends Event {}
+public class FrameGenGhostingFixMaskEditor2Event extends Event {}
 public class FrameGenGhostingFixVignetteOnFootEditorEvent extends Event {}
 //Car camera change---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixCameraTPPCarEvent extends Event {}

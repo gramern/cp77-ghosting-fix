@@ -1,97 +1,105 @@
---FrameGen Ghosting Fix 4.8.0xl-alpha2
-
 local Diagnostics = {
-  modscompatibility = true,
+  __NAME = "Diagnostics",
+  __VERSION_NUMBER = 490,
+  isModsCompatibility = true,
   modfiles = {},
-  updateinfo = false
+  isUpdateRecommended = false
 }
 
-local UIText = require("Modules/UIText")
+local Config = require("Modules/Config")
+local Localization = require("Modules/Localization")
+local UI = require("Modules/UI")
 
-function Diagnostics.DiagnosticsUI()
-  if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
-    if not Diagnostics.modscompatibility then
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
-      ImGui.Text(UIText.Diagnostics.title_warning)
-      ImGui.PopStyleColor()
-      ImGui.Text("")
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      ImGui.Text(UIText.Diagnostics.textfield_1)
-      ImGui.Text("")
-      ImGui.Text(UIText.Diagnostics.textfield_2)
-      ImGui.PopStyleColor()
-    else
-      ImGui.PushStyleColor(ImGuiCol.Text, 0.2, 1, 0.2, 1)
-      ImGui.Text(UIText.Diagnostics.title_info)
-      ImGui.PopStyleColor()
-      ImGui.Text("")
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      ImGui.Text(UIText.Diagnostics.textfield_3)
-      ImGui.Text("")
-      ImGui.Text(UIText.Diagnostics.textfield_4)
-      ImGui.PopStyleColor()
-    end
-    ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-    for modfile,mod in pairs(Diagnostics.modfiles) do
-      ImGui.Text(mod)
-    end
-    ImGui.PopStyleColor()
-  ImGui.EndTabItem()
-  end
-end
+local UIText = Localization.UIText
 
 --check for compatibility with other mods
 function Diagnostics.CheckModsCompatibility()
   if ModArchiveExists('LimitedHUD.archive') then
     table.insert(Diagnostics.modfiles, 1, "Limited HUD")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
   end
 
   if ModArchiveExists('basegame_hud_minimap_scanner_tweak.archive') then
     table.insert(Diagnostics.modfiles, 2, "Limited HUD's Scanner Tweak")
-    Diagnostics.updateinfo = true
-    Diagnostics.modscompatibility = false
+    Diagnostics.isUpdateRecommended = true
+    Diagnostics.isModsCompatibility = false
   end
 
   if ModArchiveExists('###framegenghostingfix_LimitedHUD.archive') then
     table.insert(Diagnostics.modfiles, 3, "Limited HUD")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
   end
 
   if ModArchiveExists('##ReduxUI_AddonSpeedometer.archive') then
     table.insert(Diagnostics.modfiles, 4, "Redux UI E3 Speedometer")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
 
     if not ModArchiveExists('###framegenghostingfix_RUIE3Speed.archive') then
-      Diagnostics.modscompatibility = false
+      Diagnostics.isModsCompatibility = false
     end
   end
 
   if ModArchiveExists('#Project-E3_HUD.archive') then
     table.insert(Diagnostics.modfiles, 5, "Project E3 - HUD")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
 
     if not ModArchiveExists('###framegenghostingfix_ProjectE3.archive') then
-      Diagnostics.modscompatibility = false
+      Diagnostics.isModsCompatibility = false
     end
   end
 
   if ModArchiveExists('#Project-E3_HUD-Lite.archive') then
     table.insert(Diagnostics.modfiles, 6, "Project E3 - HUD (Lite)")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
 
     if not ModArchiveExists('###framegenghostingfix_ProjectE3Lite.archive') then
-      Diagnostics.modscompatibility = false
+      Diagnostics.isModsCompatibility = false
     end
   end
 
   if ModArchiveExists('dxstreamlined.archive') then
     table.insert(Diagnostics.modfiles, 7, "Streamlined HUD")
-    Diagnostics.updateinfo = true
+    Diagnostics.isUpdateRecommended = true
 
     if not ModArchiveExists('###framegenghostingfix_StreamlinedHUD.archive') then
-      Diagnostics.modscompatibility = false
+      Diagnostics.isModsCompatibility = false
     end
+  end
+end
+
+function Diagnostics.OnInitialize()
+  Diagnostics.CheckModsCompatibility()
+  if Diagnostics.isModsCompatibility then return end
+  Config.SetModReady(false)
+end
+
+function Diagnostics.OnOverlayOpen()
+  Localization = require("Modules/Localization")
+  UIText = Localization.UIText
+end
+
+--Local UI
+function Diagnostics.DrawUI()
+  if UI.Std.BeginTabItem(UIText.Diagnostics.tabname) then
+    if not Diagnostics.isModsCompatibility then
+      UI.Ext.TextRed(UIText.Diagnostics.title_warning)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_1)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_2)
+    else
+      UI.Ext.TextGreen(UIText.Diagnostics.title_info)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_3)
+      UI.Std.Text("")
+      UI.Ext.TextWhite(UIText.Diagnostics.textfield_4)
+    end
+
+    for modfile,mod in pairs(Diagnostics.modfiles) do
+      UI.Ext.TextWhite(mod)
+    end
+   
+    UI.Std.EndTabItem()
   end
 end
 

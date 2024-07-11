@@ -66,7 +66,7 @@ local Preset = {
       HorizontalEdgeDown = {
         Opacity = {
           Def = {
-            max = 0.03,
+            max = 1,
           }
         },
         Size = {
@@ -87,21 +87,21 @@ local Preset = {
       },
       Opacity = {
         Def = {
-          delayDuration = 3,
-          delayThreshold = 0.95,
-          gain = 3,
-          max = 0.05,
-          speedFactor = 0.01,
+          delayDuration = 1,
+          delayThreshold = 1,
+          gain = 1,
+          max = 1,
+          speedFactor = 1,
           stepFactor = 0.1
         },
       }
     },
   },
   PresetInfo = {
-    name = "Stronger",
-    description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
+    name = "Testing Stronger",
+    description = "Testing 'Storonger' preset, all masks visible. Opacity\nnormalization doesn't work in this one (Masks are visible\nall the time)",
     author = nil,
-    id = "a002",
+    id = "a010",
   }
 }
 
