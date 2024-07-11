@@ -1,6 +1,6 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0, 2024 gramern (scz_g)
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g)
 
 //CET add-on customization---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixMaskEditor1Event extends Event {}
@@ -19,7 +19,7 @@ public class FrameGenGhostingFixDeactivationMasksVehicleEvent extends Event {}
 public class FrameGenGhostingFixDeactivationHEDVehicleEvent extends Event {}
 
 //Masks set transformation methods-------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixSetTransformation(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
 
   if NotEquals(this.m_isMaskingInVehiclesEnabledFGGF,false) {
@@ -45,7 +45,7 @@ private cb func FrameGenGhostingFixSetTransformation(setMaskPath: CName, setMask
   }
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixSetSimpleTransformation(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
 
   if NotEquals(this.m_isMaskingInVehiclesEnabledFGGF,false) {

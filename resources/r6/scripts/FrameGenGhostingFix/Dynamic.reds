@@ -1,25 +1,25 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
-@addField(IronsightGameController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
-@addField(IronsightGameController) public let m_isVehicleMountedFGGF: Bool = false;
-@addField(IronsightGameController) public let m_hedCornersPath: CName = n"horizontaledgedowncorners";
-@addField(IronsightGameController) public let m_hedFillPath: CName = n"horizontaledgedownfill";
-@addField(IronsightGameController) public let m_hedTrackerPath: CName = n"horizontaledgedowntracker";
-@addField(IronsightGameController) public let m_mask1Path: CName = n"mask1";
-@addField(IronsightGameController) public let m_mask2Path: CName = n"mask2";
-@addField(IronsightGameController) public let m_mask3Path: CName = n"mask3";
-@addField(IronsightGameController) public let m_mask4Path: CName = n"mask4";
-@addField(IronsightGameController) public let m_maskEditor1Path: CName = n"mask_editor1";
-@addField(IronsightGameController) public let m_maskEditor2Path: CName = n"mask_editor2";
+@addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
+@addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_hedCornersPath: CName = n"fgfixcars/horizontaledgedowncorners";
+@addField(gameuiCrosshairContainerController) public let m_hedFillPath: CName = n"fgfixcars/horizontaledgedownfill";
+@addField(gameuiCrosshairContainerController) public let m_hedTrackerPath: CName = n"fgfixcars/horizontaledgedowntracker";
+@addField(gameuiCrosshairContainerController) public let m_mask1Path: CName = n"fgfixcars/mask1";
+@addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfixcars/mask2";
+@addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfixcars/mask3";
+@addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfixcars/mask4";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor1Path: CName = n"fgfixcars/mask_editor1";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor2Path: CName = n"fgfixcars/mask_editor2";
 
 
-@addField(IronsightGameController) public let m_hedCornersDone: Bool = false;
-@addField(IronsightGameController) public let m_hedFillDone: Bool = false;
-@addField(IronsightGameController) public let m_mask1Done: Bool = false;
-@addField(IronsightGameController) public let m_mask2Done: Bool = false;
-@addField(IronsightGameController) public let m_mask3Done: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_hedCornersDone: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_hedFillDone: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_mask1Done: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_mask2Done: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_mask3Done: Bool = false;
 
 @addField(DriveEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
@@ -42,12 +42,12 @@
 // @addField(DriverCombatEvents) public let m_masksOpacityMax: Float = 0.06;
 
 //Mounting/unmounting events---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> Bool {
   this.m_isVehicleMountedFGGF = true;
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) -> Bool {
   
   this.m_isVehicleMountedFGGF = false;
@@ -61,55 +61,55 @@ private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) 
 }
 
 //Global toggle for transtions, called in the main loop---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenFrameGenGhostingFixVehicleToggleEvent() -> Void {
   this.FrameGenGhostingFixVehicleToggle(true);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVehicleToggle(maskingInVehicles: Bool) -> Void {
   this.m_isMaskingInVehiclesEnabledFGGF = maskingInVehicles;
 }
 
 //Setting transformation for specific masks---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationHEDCorners(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetSimpleTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationHEDFill(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetSimpleTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationHEDTracker(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationMask1(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationMask2(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationMask3(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixTransformationMask4(setMaskPath: CName, setMaskMargin: Vector2, setMaskSize: Vector2, setMaskRotation: Float, setMaskShear: Vector2, setMaskAnchorPoint: Vector2, setMaskOpacity: Float, setMaskVisible: Bool) -> Bool {
   this.FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible);
 }
 
 //Setting masks when changing cameras in a car---------------------------------------------------------------------------------------
 //TPP Car---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhostingFixCameraTPPCarEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -155,7 +155,7 @@ private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhosting
 }
 
 //TPP Far Car---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -201,7 +201,7 @@ private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhost
 }
 
 //FPP Car---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhostingFixCameraFPPCarEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -248,7 +248,7 @@ private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhosting
 
 //Setting masks when changing cameras on a bike---------------------------------------------------------------------------------------
 //TPP Bike---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -294,7 +294,7 @@ private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostin
 }
 
 //TPP Far Bike---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -340,7 +340,7 @@ private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhos
 }
 
 //FPP Bike---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
@@ -386,7 +386,7 @@ private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostin
 }
 
 //Setting masks deactivation for vehicles---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func OnFrameGenGhostingFixDeactivationHEDVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>)  -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
@@ -399,7 +399,7 @@ protected cb func OnFrameGenGhostingFixDeactivationHEDVehicleEvent(evt: ref<Fram
   hedTracker.SetOpacity(0.0);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>)  -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
@@ -415,7 +415,7 @@ protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<Fr
 }
 
 //Setting masks for masks editor---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixMaskEditor1Event(evt: ref<FrameGenGhostingFixMaskEditor1Event>) -> Void {
 
   let maskEditorMargin: Vector2 = new Vector2(0.0, 0.0);
@@ -426,7 +426,7 @@ private cb func OnFrameGenGhostingFixMaskEditor1Event(evt: ref<FrameGenGhostingF
   this.OnFrameGenGhostingFixTransformationMask2(this.m_maskEditor1Path, maskEditorMargin, maskEditorSize, 0.0, maskEditorShear, maskEditorAnchorPoint, 0.0, false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixMaskEditor2Event(evt: ref<FrameGenGhostingFixMaskEditor2Event>) -> Void {
 
   let maskEditorMargin: Vector2 = new Vector2(0.0, 0.0);
