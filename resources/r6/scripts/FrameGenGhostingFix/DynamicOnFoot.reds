@@ -1,50 +1,49 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
-@addField(IronsightGameController) public let m_masksOnFootEnabled: Bool = false;
-@addField(IronsightGameController) public let m_vignetteOnFootEnabled: Bool = false;
-@addField(IronsightGameController) public let m_vignetteAimOnFootEnabled: Bool = false;
-@addField(IronsightGameController) public let m_blockerAimOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_masksOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootEnabled: Bool = false;
 
-@addField(IronsightGameController) public let m_isWeaponDrawn: Bool;
+@addField(gameuiCrosshairContainerController) public let m_isWeaponDrawn: Bool;
 
-@addField(IronsightGameController) public let m_isMaskingOnFootActivated: Bool = false;
-@addField(IronsightGameController) public let m_masksOnFootActivated: Bool = false;
-@addField(IronsightGameController) public let m_vignetteOnFootActivated: Bool = false;
-@addField(IronsightGameController) public let m_vignetteAimOnFootActivated: Bool = false;
-@addField(IronsightGameController) public let m_blockerAimOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_isMaskingOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_masksOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootActivated: Bool = false;
 
-@addField(IronsightGameController) public let m_masksOnFootChangeOpacityBy: Float;
-@addField(IronsightGameController) public let m_masksOnFootCurrentOpacity: Float;
-@addField(IronsightGameController) public let m_masksOnFootFinalOpacity: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootChangeOpacityBy: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootCurrentOpacity: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootFinalOpacity: Float;
-@addField(IronsightGameController) public let m_vignetteAimOnFootChangeOpacityBy: Float;
-@addField(IronsightGameController) public let m_vignetteAimOnFootCurrentOpacity: Float;
-@addField(IronsightGameController) public let m_vignetteAimOnFootFinalOpacity: Float;
-@addField(IronsightGameController) public let m_blockerAimOnFootChangeOpacityBy: Float;
-@addField(IronsightGameController) public let m_blockerAimOnFootCurrentOpacity: Float;
-@addField(IronsightGameController) public let m_blockerAimOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_masksOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_masksOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_masksOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootFinalOpacity: Float;
 
-@addField(IronsightGameController) public let m_vignetteOnFootMarginLeft: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootMarginTop: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootSizeX: Float;
-@addField(IronsightGameController) public let m_vignetteOnFootSizeY: Float;
-@addField(IronsightGameController) public let m_aimOnFootSizeX: Float;
-@addField(IronsightGameController) public let m_aimOnFootSizeY: Float;
-@addField(IronsightGameController) public let m_aimOnFootDimensionsSet: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginLeft: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginTop: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootSizeX: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootSizeY: Float;
+@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeX: Float;
+@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeY: Float;
 
-@addField(IronsightGameController) public let m_vignetteOnFootEditor: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEditor: Bool = false;
 
 //Corner masks transition functions---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownLeftOnFoot") as inkWidget;
-  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownRightOnFoot") as inkWidget;
+  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownLeftOnFoot") as inkWidget;
+  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownRightOnFoot") as inkWidget;
 
   this.m_masksOnFootCurrentOpacity = this.m_masksOnFootCurrentOpacity + this.m_masksOnFootChangeOpacityBy;
   cornerDownLeftOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
@@ -55,12 +54,12 @@ protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
 //   LogChannel(n"DEBUG", s"cornerDownRightOnFoot.GetOpacity() = \(cornerDownRightOnFoot.GetOpacity())");
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixMasksOnFootSetMargins(cornerDownLeftMargin: Float, cornerDownRightMargin: Float, cornerDownMarginTop: Float) -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownLeftOnFoot") as inkWidget;
-  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"cornerDownRightOnFoot") as inkWidget;
+  let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownLeftOnFoot") as inkWidget;
+  let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownRightOnFoot") as inkWidget;
 
   let cornerDownLeftOnFootMargin = cornerDownLeftOnFoot.GetMargin();
   cornerDownLeftOnFoot.SetMargin(cornerDownLeftMargin, cornerDownMarginTop, cornerDownLeftOnFootMargin.right, cornerDownLeftOnFootMargin.bottom);
@@ -71,18 +70,18 @@ protected cb func FrameGenGhostingFixMasksOnFootSetMargins(cornerDownLeftMargin:
   // LogChannel(n"DEBUG", s"Margins for corner masks set: \(cornerDownLeftMargin), \(cornerDownRightMargin), \(cornerDownMarginTop)");
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent() -> Void {
 
   this.FrameGenGhostingFixMasksOnFootSetMargins(0.0, 3840.0, 2160.0);
 }
 
 //Vignette dimensions transition functions---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootSetDimensions() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteOnFoot") as inkWidget;
+  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
 
   let vignetteOnFootMargin = vignetteOnFoot.GetMargin();
   vignetteOnFoot.SetMargin(this.m_vignetteOnFootMarginLeft, this.m_vignetteOnFootMarginTop, vignetteOnFootMargin.right, vignetteOnFootMargin.bottom);
@@ -91,7 +90,7 @@ protected cb func FrameGenGhostingFixVignetteOnFootSetDimensions() -> Bool {
   vignetteOnFoot.Reparent(root);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(vignetteOnFootMarginLeft: Float, vignetteOnFootMarginTop: Float, vignetteOnFootSizeX: Float, vignetteOnFootSizeY: Float) -> Bool {
 
   this.m_vignetteOnFootMarginLeft = vignetteOnFootMarginLeft;
@@ -100,18 +99,18 @@ protected cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(vignetteO
   this.m_vignetteOnFootSizeY = vignetteOnFootSizeY;
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent() -> Void {
 
   this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
 }
 
 //Vignette opacity transition functions---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteOnFoot") as inkWidget;
+  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
 
   this.m_vignetteOnFootCurrentOpacity = this.m_vignetteOnFootCurrentOpacity + this.m_vignetteOnFootChangeOpacityBy;
   vignetteOnFoot.SetOpacity(this.m_vignetteOnFootCurrentOpacity);
@@ -121,12 +120,12 @@ protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
 }
 
 //Aiming on foot dimension transition functions---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixAimOnFootSetDimensions() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let blockerAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"blockerAimOnFoot") as inkWidget;
-  let vignetteAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteAimOnFoot") as inkWidget;
+  let blockerAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/blockerAimOnFoot") as inkWidget;
+  let vignetteAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteAimOnFoot") as inkWidget;
 
   blockerAimOnFoot.SetSize(this.m_aimOnFootSizeX, this.m_aimOnFootSizeY);
   blockerAimOnFoot.Reparent(root);
@@ -137,25 +136,25 @@ protected cb func FrameGenGhostingFixAimOnFootSetDimensions() -> Bool {
 //   LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetSize())");
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixAimOnFootSetDimensionsToggle(aimOnFootSizeX: Float, aimOnFootSizeY: Float) -> Bool {
 
   this.m_aimOnFootSizeX = aimOnFootSizeX;
   this.m_aimOnFootSizeY = aimOnFootSizeY;
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent() -> Void {
 
   this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
 }
 
 //Aiming on foot transitions functions---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteAimOnFoot") as inkWidget;
+  let vignetteAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteAimOnFoot") as inkWidget;
 
   this.m_vignetteAimOnFootCurrentOpacity = this.m_vignetteAimOnFootCurrentOpacity + this.m_vignetteAimOnFootChangeOpacityBy;
   vignetteAimOnFoot.SetOpacity(this.m_vignetteAimOnFootCurrentOpacity);
@@ -164,11 +163,11 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootSetTransition() -> Bool {
 //   LogChannel(n"DEBUG", s"vignetteAimOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetOpacity())");
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixBlockerAimOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let blockerAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"blockerAimOnFoot") as inkWidget;
+  let blockerAimOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/blockerAimOnFoot") as inkWidget;
 
   this.m_blockerAimOnFootCurrentOpacity = this.m_blockerAimOnFootCurrentOpacity + this.m_blockerAimOnFootChangeOpacityBy;
   blockerAimOnFoot.SetOpacity(this.m_blockerAimOnFootCurrentOpacity);
@@ -179,11 +178,11 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootSetTransition() -> Bool {
 
 
 //Vignette editor context---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootEditor() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot_editor: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteOnFoot_editor") as inkWidget;
+  let vignetteOnFoot_editor: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot_editor") as inkWidget;
 
   vignetteOnFoot_editor.SetOpacity(0.5);
 
@@ -194,82 +193,82 @@ protected cb func FrameGenGhostingFixVignetteOnFootEditor() -> Bool {
   vignetteOnFoot_editor.Reparent(root);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootEditorTurnOff() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot_editor: ref<inkWidget> = root.GetWidgetByPathName(n"vignetteOnFoot_editor") as inkWidget;
+  let vignetteOnFoot_editor: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot_editor") as inkWidget;
 
   vignetteOnFoot_editor.SetOpacity(0.0);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixVignetteOnFootEditorContext(vignetteOnFootEditor: Bool) -> Void {
   this.m_vignetteOnFootEditor = vignetteOnFootEditor;
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 private cb func FrameGenGhostingFixVignetteOnFootEditorToggle() -> Void {
   this.FrameGenGhostingFixVignetteOnFootEditorContext(false);
 }
 
 //Activate masks on foot---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixOnFootToggle(false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixOnFootToggle(masksOnFoot: Bool) -> Void {
   this.m_masksOnFootEnabled = masksOnFoot;
 }
 
 //Activate main vignette---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteOnFootToggle(false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootToggle(vignetteOnFoot: Bool) -> Void {
   this.m_vignetteOnFootEnabled = vignetteOnFoot;
 }
 
 //Turn off deactivation of main vignette---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteOnFootDeActivationToggle(false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootDeActivationToggle(vignetteOnFootActivation: Bool) -> Void {
   this.m_vignetteOnFootActivated = vignetteOnFootActivation;
 }
 
 //Activate vignette for aiming---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteAimOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteAimOnFootToggle(vignetteAimOnFoot: Bool) -> Void {
   this.m_vignetteAimOnFootEnabled = vignetteAimOnFoot;
 }
 
 //Activate blocker for aiming---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixBlockerAimOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixBlockerAimOnFootToggle(false);
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixBlockerAimOnFootToggle(blockerAimOnFoot: Bool) -> Void {
   this.m_blockerAimOnFootEnabled = blockerAimOnFoot;
 }
 
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixOnFootActivationEvent() -> Bool {
   
   this.FrameGenGhostingFixOnFootToggleEvent();
@@ -291,7 +290,7 @@ protected cb func FrameGenGhostingFixOnFootActivationEvent() -> Bool {
   }
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixOnFootDeActivationEvent() -> Bool {
 
   if Equals(this.m_masksOnFootActivated,true) {
@@ -311,7 +310,7 @@ protected cb func FrameGenGhostingFixOnFootDeActivationEvent() -> Bool {
 }
 
 //Vignette aiming
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootActivationEvent() -> Bool {
 
   if Equals(this.m_vignetteAimOnFootEnabled,true) {
@@ -322,7 +321,7 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootActivationEvent() -> Bool 
   }
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootDeActivationEvent() -> Bool {
 
   if Equals(this.m_vignetteAimOnFootEnabled,true) {
@@ -335,7 +334,7 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootDeActivationEvent() -> Boo
 }
 
 //Blocker aiming
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
 
   if Equals(this.m_blockerAimOnFootEnabled,true) {
@@ -346,7 +345,7 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
   }
 }
 
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool {
   
   if Equals(this.m_blockerAimOnFootEnabled,true) {
@@ -359,7 +358,7 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool
 }
 
 //Weapon checks---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixHasWeapon() -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();
   let hasWeaponCheck = ScriptedPuppet.GetWeaponRight(player);

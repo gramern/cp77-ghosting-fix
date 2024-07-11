@@ -1,11 +1,16 @@
 //Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0, 2024 gramern (scz_g) 2024
+//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
-@addField(IronsightGameController) public let m_onFootLoopID: DelayID;
+@addField(gameuiCrosshairContainerController) public let m_onFootLoopID: DelayID;
+
+@addField(gameuiCrosshairContainerController) public let m_ADSAnimator: wref<AimDownSightController>;
+@addField(gameuiCrosshairContainerController) public let m_playerStateMachineBB: wref<IBlackboard>;
+@addField(gameuiCrosshairContainerController) public let m_playerStateMachineUpperBodyBBID: ref<CallbackHandle>;
+@addField(gameuiCrosshairContainerController) public let m_upperBodyState: gamePSMUpperBodyStates;
 
 //The main loop---------------------------------------------------------------------------------------
-@addMethod(IronsightGameController)
+@addMethod(gameuiCrosshairContainerController)
 public func FrameGenGhostingFixLoop() {
 
   let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
@@ -17,7 +22,7 @@ public func FrameGenGhostingFixLoop() {
 
 public class FrameGenGhostingFixLoopCallback extends DelayCallback {
 
-  public let masksController: wref<IronsightGameController>;
+  public let masksController: wref<gameuiCrosshairContainerController>;
 
   public func Call() -> Void {
 
@@ -89,13 +94,88 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
       if Equals(this.masksController.m_vignetteOnFootEditor,true) {
         this.masksController.FrameGenGhostingFixVignetteOnFootEditor();
       }
-    }  
+    }
 
     this.masksController.FrameGenGhostingFixLoop();
   }
 }
 
-@wrapMethod(IronsightGameController)
+//Add upper body state func---------------------------------------------------------------------------------------
+@addMethod(gameuiCrosshairContainerController)
+protected cb func OnUpperBodyChanged(state: Int32) -> Bool {
+  let isAiming: Bool = state == 6;
+  this.m_upperBodyState = IntEnum<gamePSMUpperBodyStates>(state);
+  if IsDefined(this.m_ADSAnimator) {
+    this.m_ADSAnimator.OnAim(isAiming);
+  };
+}
+
+//Spawn widgets---------------------------------------------------------------------------------------
+@wrapMethod(gameuiCrosshairContainerController)
+protected cb func OnInitialize() -> Bool {
+  wrappedMethod();
+  
+  if IsDefined(this.GetChildWidgetByPath(this.m_hedCornersPath)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_hedFillPath)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_hedTrackerPath)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_mask1Path)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_mask2Path)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_mask3Path)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_mask4Path)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor1Path)) {
+    return false;
+  }
+    if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor2Path)) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownLeftOnFoot")) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownRightOnFoot")) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/vignetteOnFoot")) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/blockerAimOnFoot")) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/vignetteAimOnFoot")) {
+    return false;
+  }
+  if IsDefined(this.GetChildWidgetByPath(n"fgfix/vignetteOnFoot_editor")) {
+    return false;
+  }
+
+  let root = this.GetRootCompoundWidget();
+  let fgfixcars = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfixcars\\fgfixcars.inkwidget", n"Root") as inkCompoundWidget;
+  fgfixcars.SetName(n"fgfixcars");
+
+  let fgfix = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root") as inkCompoundWidget;
+  fgfix.SetName(n"fgfix");
+
+  let hedDeactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(hedDeactivationEvent);
+
+  let masksDeactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(masksDeactivationEvent);
+}
+
+@wrapMethod(gameuiCrosshairContainerController)
 protected cb func OnUninitialize() -> Bool {
   wrappedMethod();
 
@@ -104,9 +184,14 @@ protected cb func OnUninitialize() -> Bool {
 }
 
 //The kick off---------------------------------------------------------------------------------------
-@wrapMethod(IronsightGameController)
+@wrapMethod(gameuiCrosshairContainerController)
 protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   wrappedMethod(playerGameObject);
+
+  this.m_playerStateMachineBB = this.GetBlackboardSystem().GetLocalInstanced(playerGameObject.GetEntityID(), GetAllBlackboardDefs().PlayerStateMachine);
+  if IsDefined(this.m_playerStateMachineBB) {
+    this.m_playerStateMachineUpperBodyBBID = this.m_playerStateMachineBB.RegisterDelayedListenerInt(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this, n"OnUpperBodyChanged");
+  };
 
   this.FrameGenGhostingFixLoop();
   this.FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent();
@@ -118,9 +203,11 @@ protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   // LogChannel(n"DEBUG", s"On Foot Loop initialized...");
 }
 
-@wrapMethod(IronsightGameController)
-protected cb func OnPlayerDetach(playerPuppet: ref<GameObject>) -> Bool {
-  wrappedMethod(playerPuppet);
+@wrapMethod(gameuiCrosshairContainerController)
+protected cb func OnPlayerDetach(playerGameObject: ref<GameObject>) -> Bool {
+  wrappedMethod(playerGameObject);
 
-  GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_onFootLoopID);
+  if IsDefined(this.m_playerStateMachineBB) {
+    this.m_playerStateMachineBB.UnregisterDelayedListener(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this.m_playerStateMachineUpperBodyBBID);
+  };
 }
