@@ -4,9 +4,9 @@ local Config = {
   __VERSION = "4.9.0",
   __VERSION_NUMBER = 490,
   __VERSION_SUFFIX = "xl",
-  __VERSION_STATUS = "beta",
+  __VERSION_STATUS = "rc",
   ModState = {
-    enabledDebug = false,
+    isDebug = false,
     keepWindow = false,
     openWindow = false,
     isFirstRun = false,
@@ -149,6 +149,14 @@ function Config.GetModVersion()
   Config.__VERSION = Config.__VERSION .. "-" .. Config.__VERSION_STATUS
 end
 
+function Config.SetDebug(boolean)
+  Config.ModState.isDebug = boolean
+end
+
+function Config.IsDebug()
+  return Config.ModState.isDebug
+end
+
 function Config.SetModReady(boolean)
   Config.ModState.isReady = boolean
 end
@@ -172,6 +180,10 @@ function Config.SetNewInstall(boolean)
   Config.ModState.isNewInstall = boolean
   if not boolean or Config.ModState.isFirstRun then return end
   Config.Print(LogText.config_newVersion,nil,nil,Config.__NAME)
+end
+
+function Config.IsNewInstall()
+  return Config.ModState.isNewInstall
 end
 
 function Config.KeepWindow(boolean)
@@ -349,9 +361,7 @@ function Config.GetScreenSpace()
 
   if screenType == 169 or screenType == 1610 or screenType == 43 then
     Config.Screen.Space.width = Config.Screen.Def.Space.width
-  elseif screenType == 219 then
-    Config.Screen.Space.width = screenResDef.width * screenFactor.width
-  elseif screenType == 319 then
+  elseif screenType == 219 or screenType == 329 then
     Config.Screen.Space.width = screenResDef.width * screenFactor.width
   end
 

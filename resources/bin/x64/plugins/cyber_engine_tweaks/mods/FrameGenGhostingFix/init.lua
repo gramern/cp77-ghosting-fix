@@ -129,7 +129,7 @@ function Benchmark()
 
     benchmarkSetSuggested = true
 
-    if not Config.ModState.isNewInstall then return end
+    if not Config.IsNewInstall() then return end
     Settings.SetSaved(false)
     Config.SetNewInstall(false)
 
@@ -282,7 +282,7 @@ registerForEvent("onInit", function()
   end
 
   if Debug then
-    Config.ModState.enabledDebug = true
+    Config.SetDebug(true)
     Config.KeepWindow(true)
   end
 end)
@@ -318,6 +318,8 @@ registerForEvent("onOverlayOpen", function()
     Diagnostics.OnOverlayOpen()
   end
 
+  if not Config.IsModReady() then return end
+
   if Presets then
     Presets.OnOverlayOpen()
   end
@@ -343,6 +345,8 @@ registerForEvent("onOverlayClose", function()
   end
 
   Config.OnOverlayClose()
+
+  if not Config.IsModReady() then return end
 
   if Calculate then
     Calculate.OnOverlayClose()
@@ -389,12 +393,12 @@ registerForEvent("onDraw", function()
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
         
         --debug interface starts------------------------------------------------------------------------------------------------------------------
-        if Debug and Config.ModState.enabledDebug then
+        if Debug and Config.IsDebug() then
             Debug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         
-        if Config.ModState.isNewInstall then
+        if Config.IsNewInstall() then
           if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
             if Config.ModState.isFirstRun then
@@ -431,7 +435,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if Config.Screen.isAspectRatioChange then
+        if Config.IsAspectRatioChange() then
           if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
             UI.Ext.TextWhite(UIText.Info.aspectRatioChange)
@@ -440,7 +444,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if openOverlay then --done on purpose to mitigate possible distress during gameplay caused by some methods
+        if openOverlay and Config.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
           if Presets then
             Presets.DrawUI()
           end
@@ -451,11 +455,11 @@ registerForEvent("onDraw", function()
         end
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
-        if not Config.ModState.isNewInstall then
+        if not Config.IsNewInstall() and Config.IsModReady() then
           if UI.Std.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
-              Config.ModState.enabledDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Config.ModState.enabledDebug)
+              Config.ModState.isDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Config.ModState.isDebug)
             end
 
             Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)

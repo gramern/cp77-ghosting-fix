@@ -105,10 +105,10 @@ function Debug.DrawUI()
       UI.Ext.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.y))
     end
 
-    UI.Ext.TextWhite("HED Fill/Tracker Toggle Value:")
-    if Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue then
+    UI.Ext.TextWhite("HED Fill Toggle Value:")
+    if Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue then
       UI.Std.SameLine()
-      UI.Ext.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.trackerToggleValue))
+      UI.Ext.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue))
     end
 
     UI.Std.Separator()
@@ -442,7 +442,7 @@ function Debug.DrawUI()
     end
 
     UI.Ext.TextWhite("HED Fill Toggle Value:")
-    if Vectors.VehMasks.HorizontalEdgeDown.fillToggleValue then
+    if Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue then
       UI.Std.SameLine()
       UI.Ext.TextWhite(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue))
     end

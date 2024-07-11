@@ -52,8 +52,8 @@ local function Translate(legacyUserSettings)
   userSettings.Calculate.Vignette.onWeapon = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignetteOnFoot or false
   userSettings.Calculate.Vignette.ScreenPosition.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginLeft or 100
   userSettings.Calculate.Vignette.ScreenPosition.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginTop or 80
-  userSettings.Calculate.Vignette.Scale.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeX or 100
-  userSettings.Calculate.Vignette.Scale.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeY or 100
+  userSettings.Calculate.Vignette.Scale.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeX or 120
+  userSettings.Calculate.Vignette.Scale.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeY or 120
 
   userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
   userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100

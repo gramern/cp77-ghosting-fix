@@ -192,7 +192,7 @@ function Calculate.ApplyBlockerSize()
 end
 
 function Calculate.ApplyVignetteSize()
-  local screenType = Calculate.type
+  local screenType = Calculate.Screen.type
 
   if screenType == 43 then
     Calculate.Vignette.Def.Size = {x = 4840, y = 3072}
@@ -493,7 +493,10 @@ function Calculate.DrawUI()
 
     Calculate.Blocker.onAim, blockerOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BlockerAim.name, Calculate.Blocker.onAim)
     if blockerOnAimToggle then
+      Config.SetStatusBar(UIText.General.settings_saved)
+
       if Calculate.Vignette.onAim then
+        
         Calculate.Vignette.onAim = false
 
         Config.SetStatusBar(UIText.General.info_aimOnFoot)
@@ -509,6 +512,8 @@ function Calculate.DrawUI()
 
     Calculate.Vignette.onAim, vignetteOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignetteAim.name, Calculate.Vignette.onAim)
     if vignetteOnAimToggle then
+      Config.SetStatusBar(UIText.General.settings_saved)
+
       if Calculate.Blocker.onAim then
         Calculate.Blocker.onAim = false
 
