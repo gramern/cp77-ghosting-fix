@@ -130,7 +130,7 @@ function Benchmark()
     benchmarkSetSuggested = true
 
     if not Config.ModState.isNewInstall then return end
-    Settings.SaveFile()
+    Settings.SetSaved(false)
     Config.SetNewInstall(false)
 
     if not Config.ModState.isFirstRun then return end
@@ -247,8 +247,7 @@ registerForEvent("onInit", function()
     Diagnostics = nil
   end
 
-  if not Config.ModState.isReady then return end
-  if Config.ModState.isFirstRun then SetBenchmark(true) end
+  if not Config.IsModReady() then return end
 
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     IsGameLoaded(true)
@@ -278,7 +277,7 @@ registerForEvent("onInit", function()
     end
   end
 
-  if Config.ModState.isFirstRun then
+  if Config.IsFirstRun() then
     SetBenchmark(true)
   end
 
@@ -409,9 +408,9 @@ registerForEvent("onDraw", function()
             UI.Std.Text("")
 
             Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
-            if keepWindowToggle then
-              Config.SetStatusBar(UIText.General.settings_saved)
-            end
+            -- if keepWindowToggle then
+            --   Config.SetStatusBar(UIText.General.settings_saved)
+            -- end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
             if not Config.ModState.isFirstRun and not isBenchmark then
@@ -425,7 +424,7 @@ registerForEvent("onDraw", function()
 
               if UI.Std.Button(UIText.General.no, 240, 40) then
                 Config.SetNewInstall(false)
-                Settings.SaveFile()
+                Settings.SetSaved(false)
               end
             end
             UI.Std.EndTabItem()
@@ -461,6 +460,7 @@ registerForEvent("onDraw", function()
 
             Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
+              Settings.SetSaved(false)
               Config.SetStatusBar(UIText.General.settings_saved)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)

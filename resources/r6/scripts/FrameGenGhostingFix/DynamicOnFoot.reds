@@ -37,8 +37,6 @@
 
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEditor: Bool = false;
 
-@addField(gameuiCrosshairContainerController) public let m_onFootSetNewDimensions: Bool = false;
-
 //Corner masks transition functions---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {

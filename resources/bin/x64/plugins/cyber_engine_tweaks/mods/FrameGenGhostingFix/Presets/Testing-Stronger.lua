@@ -66,7 +66,7 @@ local Preset = {
       HorizontalEdgeDown = {
         Opacity = {
           Def = {
-            max = 0.08,
+            max = 1,
           }
         },
         Size = {
@@ -80,28 +80,28 @@ local Preset = {
           Def = {
             corners = true,
             fill = true,
-            fillLock = false,
+            fillLock = true,
             tracker = true,
           }
         }
       },
       Opacity = {
         Def = {
-          delayDuration = 2,
-          delayThreshold = 0.9,
+          delayDuration = 1,
+          delayThreshold = 1,
           gain = 1,
-          max = 0.1,
-          speedFactor = 0.02,
+          max = 1,
+          speedFactor = 1,
           stepFactor = 0.1
         },
       }
     },
   },
   PresetInfo = {
-    name = "RenoDX HDR Test 2",
-    description = "A HDR preset exlusively for RenoDX's HDR.\nFor the in-game HDR PQ10 use the default preset.",
+    name = "Testing Stronger",
+    description = "Testing 'Storonger' preset, all masks visible. Opacity\nnormalization doesn't work in this one (Masks are visible\nall the time)",
     author = nil,
-    id = "a006"
+    id = "a010",
   }
 }
 

@@ -11,7 +11,7 @@ local Localization = require("Modules/Localization")
 
 local LogText = Localization.LogText
 
-local function SetSaved(boolean)
+function Settings.SetSaved(boolean)
   Settings.isSaved = boolean
 end
 
@@ -58,8 +58,6 @@ local function Translate(legacyUserSettings)
   userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
   userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100
 
-  userSettings.Presets.selectedPreset = legacyUserSettings.Vehicles and legacyUserSettings.Vehicles.selectedPreset or false
-
   userSettings.Config.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
 
   return userSettings
@@ -73,7 +71,7 @@ function Settings.WriteUserSettings(moduleName,contents)
 
   UserSettings[moduleName] = copiedContents
 
-  SetSaved(false)
+  Settings.SetSaved(false)
 end
 
 function Settings.GetUserSettings(moduleName)
@@ -130,14 +128,14 @@ function Settings.SaveFile()
     if file then
       file:close()
 
-      SetSaved(true)
+      Settings.SetSaved(true)
       Config.Print(LogText.settings_savedToFile,nil,nil,Settings.__NAME)
     else
-      SetSaved(false)
+      Settings.SetSaved(false)
       Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
     end
   else
-    SetSaved(false)
+    Settings.SetSaved(false)
     Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
   end
 end

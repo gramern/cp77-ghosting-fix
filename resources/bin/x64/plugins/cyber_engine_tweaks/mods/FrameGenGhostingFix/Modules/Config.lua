@@ -4,7 +4,7 @@ local Config = {
   __VERSION = "4.9.0",
   __VERSION_NUMBER = 490,
   __VERSION_SUFFIX = "xl",
-  __VERSION_STATUS = "alpha4",
+  __VERSION_STATUS = "beta",
   ModState = {
     enabledDebug = false,
     keepWindow = false,
@@ -161,10 +161,17 @@ function Config.SetFirstRun(boolean)
   Config.ModState.isFirstRun = boolean
   if not boolean then return end
   Config.SetNewInstall(true)
+  Config.Print(LogText.config_firstRun,nil,nil,Config.__NAME)
+end
+
+function Config.IsFirstRun()
+  return Config.ModState.isFirstRun
 end
 
 function Config.SetNewInstall(boolean)
   Config.ModState.isNewInstall = boolean
+  if not boolean or Config.ModState.isFirstRun then return end
+  Config.Print(LogText.config_newVersion,nil,nil,Config.__NAME)
 end
 
 function Config.KeepWindow(boolean)

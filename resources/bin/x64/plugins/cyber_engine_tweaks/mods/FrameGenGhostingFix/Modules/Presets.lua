@@ -275,6 +275,8 @@ function Presets.ApplySelectedPreset()
     if not VectorsCustomize then return end
     Presets.selectedPreset = Presets.List.ID[2]
   end
+
+  Presets.SaveUserSettings()
 end
 
 function Presets.LoadPreset()
@@ -324,8 +326,8 @@ function Presets.OnInitialize()
   Presets.GetDefaultPreset()
   Presets.GetPresets()
   Presets.GetSelectedPreset()
-  Presets.ApplySelectedPreset()
   Presets.LoadPreset()
+  Presets.ApplySelectedPreset()
 end
 
 function Presets.OnOverlayOpen()

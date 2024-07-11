@@ -40,6 +40,7 @@ function VectorsCustomize.GetUserSettings()
 end
 
 function VectorsCustomize.LoadUserSettings()
+  if UserSettings == nil then return end
   Vectors.VehMasks.Mask4.Scale = Config.SafeMergeTables(Vectors.VehMasks.Mask4.Scale,UserSettings.Bike.Windshield.Scale)
 end
 
@@ -52,10 +53,6 @@ function VectorsCustomize.OnInitialize()
   UserSettings = Config.MergeTables(UserSettings,Settings.GetUserSettings("VectorsCustomize"))
   VectorsCustomize.ApplyMasksController()
   VectorsCustomize.LoadUserSettings()
-
-  Observe('hudCarController', 'OnMountingEvent', function()
-    VectorsCustomize.LoadUserSettings()
-  end)
 
   Observe('hudCarController', 'OnMountingEvent', function()
     VectorsCustomize.LoadUserSettings()
