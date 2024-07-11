@@ -441,7 +441,7 @@ protected final func FrameGenGhostingFixMaskChange(scriptInterface: ref<StateGam
 
 @wrapMethod(DriveEvents)
 protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(stateContext,scriptInterface);
+  wrappedMethod(stateContext, scriptInterface);
 
   this.FrameGenGhostingFixMaskChange(scriptInterface);
 }
@@ -516,14 +516,14 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
 
 @wrapMethod(DriveEvents)
 public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(timeDelta,stateContext,scriptInterface);
+  wrappedMethod(timeDelta, stateContext, scriptInterface);
 
   let vehicleTypeRecord: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
   this.m_vehicleCurrentTypeFGGF = vehicleTypeRecord.Type();
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF, 1), 0.0) {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       } else {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
@@ -540,7 +540,7 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
 @wrapMethod(DriveEvents)
 public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(stateContext,scriptInterface);
+  wrappedMethod(stateContext, scriptInterface);
 
   this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
   // LogChannel(n"DEBUG", "Deactivating masks...");
@@ -585,7 +585,7 @@ protected final func FrameGenGhostingFixMaskChange(scriptInterface: ref<StateGam
 
 @wrapMethod(DriverCombatEvents)
 protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(stateContext,scriptInterface);
+  wrappedMethod(stateContext, scriptInterface);
 
   this.FrameGenGhostingFixMaskChange(scriptInterface);
 }
@@ -660,14 +660,14 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
 
 @wrapMethod(DriverCombatEvents)
 public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(timeDelta,stateContext,scriptInterface);
+  wrappedMethod(timeDelta, stateContext, scriptInterface);
 
   let vehicleTypeRecord: ref<VehicleType_Record> = TweakDBInterface.GetVehicleRecord((scriptInterface.owner as VehicleObject).GetRecordID()).Type();
   this.m_vehicleCurrentTypeFGGF = vehicleTypeRecord.Type();
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF,1),0.0) {
+      if NotEquals(RoundTo(this.m_vehicleCurrentSpeedFGGF, 1), 0.0) {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       } else {
         this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
@@ -684,7 +684,7 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
 @wrapMethod(DriverCombatEvents)
 public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
-  wrappedMethod(stateContext,scriptInterface);
+  wrappedMethod(stateContext, scriptInterface);
 
   this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
   // LogChannel(n"DEBUG", "Deactivating masks...");

@@ -29,69 +29,69 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
     this.masksController.FrameGenGhostingFixHasWeapon();
     // LogChannel(n"DEBUG", s"\(this.masksController.m_upperBodyState)");
 
-    if Equals(this.masksController.m_isWeaponDrawn,true) {
-      if Equals(this.masksController.m_isMaskingOnFootActivated,false) {
+    if Equals(this.masksController.m_isWeaponDrawn, true) {
+      if Equals(this.masksController.m_isMaskingOnFootActivated, false) {
         this.masksController.m_isMaskingOnFootActivated = true;
         this.masksController.FrameGenGhostingFixOnFootActivationEvent();
       }
-      if Equals(this.masksController.m_masksOnFootActivated,true) && this.masksController.m_masksOnFootCurrentOpacity < this.masksController.m_masksOnFootFinalOpacity {
+      if Equals(this.masksController.m_masksOnFootActivated, true) && this.masksController.m_masksOnFootCurrentOpacity < this.masksController.m_masksOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixMasksOnFootSetTransition();
       }
-      if Equals(this.masksController.m_vignetteOnFootActivated,true) && this.masksController.m_vignetteOnFootCurrentOpacity < this.masksController.m_vignetteOnFootFinalOpacity {
+      if Equals(this.masksController.m_vignetteOnFootActivated, true) && this.masksController.m_vignetteOnFootCurrentOpacity < this.masksController.m_vignetteOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixVignetteOnFootSetTransition();
       }
 
       this.masksController.FrameGenGhostingFixBlockerAimOnFootToggleEvent();
       this.masksController.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
 
-      if Equals(this.masksController.m_upperBodyState,IntEnum<gamePSMUpperBodyStates>(6)) {
-        if Equals(this.masksController.m_blockerAimOnFootEnabled,true) && NotEquals(this.masksController.m_blockerAimOnFootActivated,true) {
+      if Equals(this.masksController.m_upperBodyState, IntEnum<gamePSMUpperBodyStates>(6)) {
+        if Equals(this.masksController.m_blockerAimOnFootEnabled, true) && NotEquals(this.masksController.m_blockerAimOnFootActivated, true) {
           this.masksController.FrameGenGhostingFixBlockerAimOnFootActivationEvent();
         }
-        if Equals(this.masksController.m_vignetteAimOnFootEnabled,true) && NotEquals(this.masksController.m_vignetteAimOnFootActivated,true) {
+        if Equals(this.masksController.m_vignetteAimOnFootEnabled, true) && NotEquals(this.masksController.m_vignetteAimOnFootActivated, true) {
           this.masksController.FrameGenGhostingFixVignetteAimOnFootActivationEvent();
         }
       }
       
-      if NotEquals(this.masksController.m_upperBodyState,IntEnum<gamePSMUpperBodyStates>(6)) {
-        if Equals(this.masksController.m_blockerAimOnFootEnabled,true) && Equals(this.masksController.m_blockerAimOnFootActivated,true) {
+      if NotEquals(this.masksController.m_upperBodyState, IntEnum<gamePSMUpperBodyStates>(6)) {
+        if Equals(this.masksController.m_blockerAimOnFootEnabled, true) && Equals(this.masksController.m_blockerAimOnFootActivated, true) {
           this.masksController.FrameGenGhostingFixBlockerAimOnFootDeActivationEvent();
         }
-        if Equals(this.masksController.m_vignetteAimOnFootEnabled,true) && Equals(this.masksController.m_vignetteAimOnFootActivated,true) {
+        if Equals(this.masksController.m_vignetteAimOnFootEnabled, true) && Equals(this.masksController.m_vignetteAimOnFootActivated, true) {
           this.masksController.FrameGenGhostingFixVignetteAimOnFootDeActivationEvent();
         }
       }
 
-      if Equals(this.masksController.m_blockerAimOnFootActivated,true) && this.masksController.m_blockerAimOnFootCurrentOpacity < this.masksController.m_blockerAimOnFootFinalOpacity {
+      if Equals(this.masksController.m_blockerAimOnFootActivated, true) && this.masksController.m_blockerAimOnFootCurrentOpacity < this.masksController.m_blockerAimOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixBlockerAimOnFootSetTransition();
       }
-      if Equals(this.masksController.m_blockerAimOnFootActivated,false) && this.masksController.m_blockerAimOnFootCurrentOpacity > this.masksController.m_blockerAimOnFootFinalOpacity {
+      if Equals(this.masksController.m_blockerAimOnFootActivated, false) && this.masksController.m_blockerAimOnFootCurrentOpacity > this.masksController.m_blockerAimOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixBlockerAimOnFootSetTransition();
       }
 
-      if Equals(this.masksController.m_vignetteAimOnFootActivated,true) && this.masksController.m_vignetteAimOnFootCurrentOpacity < this.masksController.m_vignetteAimOnFootFinalOpacity {
+      if Equals(this.masksController.m_vignetteAimOnFootActivated, true) && this.masksController.m_vignetteAimOnFootCurrentOpacity < this.masksController.m_vignetteAimOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixVignetteAimOnFootSetTransition();
       }
-      if Equals(this.masksController.m_vignetteAimOnFootActivated,false) && this.masksController.m_vignetteAimOnFootCurrentOpacity > this.masksController.m_vignetteAimOnFootFinalOpacity {
+      if Equals(this.masksController.m_vignetteAimOnFootActivated, false) && this.masksController.m_vignetteAimOnFootCurrentOpacity > this.masksController.m_vignetteAimOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixVignetteAimOnFootSetTransition();
       }
 
     } else {
-      if Equals(this.masksController.m_isMaskingOnFootActivated,true) {
+      if Equals(this.masksController.m_isMaskingOnFootActivated, true) {
         this.masksController.m_isMaskingOnFootActivated = false;
         this.masksController.FrameGenGhostingFixOnFootDeActivationEvent();
       }
-      if Equals(this.masksController.m_masksOnFootActivated,false) && this.masksController.m_masksOnFootCurrentOpacity > this.masksController.m_masksOnFootFinalOpacity {
+      if Equals(this.masksController.m_masksOnFootActivated, false) && this.masksController.m_masksOnFootCurrentOpacity > this.masksController.m_masksOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixMasksOnFootSetTransition();
       }
-      if Equals(this.masksController.m_vignetteOnFootActivated,false) && this.masksController.m_vignetteOnFootCurrentOpacity > this.masksController.m_vignetteOnFootFinalOpacity {
+      if Equals(this.masksController.m_vignetteOnFootActivated, false) && this.masksController.m_vignetteOnFootCurrentOpacity > this.masksController.m_vignetteOnFootFinalOpacity {
         this.masksController.FrameGenGhostingFixVignetteOnFootSetTransition();
       }
     }
   
-    if NotEquals(this.masksController.m_isVehicleMountedFGGF,true) {
+    if NotEquals(this.masksController.m_isVehicleMountedFGGF, true) {
       this.masksController.FrameGenGhostingFixVignetteOnFootEditorToggle();
-      if Equals(this.masksController.m_vignetteOnFootEditor,true) {
+      if Equals(this.masksController.m_vignetteOnFootEditor, true) {
         this.masksController.FrameGenGhostingFixVignetteOnFootEditor();
       }
     }
@@ -115,6 +115,7 @@ protected cb func OnUpperBodyChanged(state: Int32) -> Bool {
 protected cb func OnInitialize() -> Bool {
   wrappedMethod();
   
+  // In case the widgets have been spawned already, then do nothing
   if IsDefined(this.GetChildWidgetByPath(this.m_hedCornersPath)) {
     return false;
   }
@@ -139,7 +140,7 @@ protected cb func OnInitialize() -> Bool {
   if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor1Path)) {
     return false;
   }
-    if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor2Path)) {
+  if IsDefined(this.GetChildWidgetByPath(this.m_maskEditor2Path)) {
     return false;
   }
   if IsDefined(this.GetChildWidgetByPath(n"fgfix/cornerDownLeftOnFoot")) {
