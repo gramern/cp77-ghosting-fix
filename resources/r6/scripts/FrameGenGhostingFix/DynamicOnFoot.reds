@@ -1,6 +1,6 @@
-//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+// Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
+// FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_masksOnFootEnabled: Bool = false;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEnabled: Bool = false;
@@ -37,7 +37,7 @@
 
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEditor: Bool = false;
 
-//Corner masks transition functions---------------------------------------------------------------------------------------
+// Corner masks transition functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
 
@@ -76,7 +76,7 @@ private cb func FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent() -> Void {
   this.FrameGenGhostingFixMasksOnFootSetMargins(0.0, 3840.0, 2160.0);
 }
 
-//Vignette dimensions transition functions---------------------------------------------------------------------------------------
+// Vignette dimensions transition functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootSetDimensions() -> Bool {
 
@@ -105,7 +105,7 @@ private cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent() -> V
   this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
 }
 
-//Vignette opacity transition functions---------------------------------------------------------------------------------------
+// Vignette opacity transition functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
 
@@ -119,7 +119,7 @@ protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
 //   LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteOnFoot.GetOpacity())");
 }
 
-//Aiming on foot dimension transition functions---------------------------------------------------------------------------------------
+// Aiming on foot dimension transition functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixAimOnFootSetDimensions() -> Bool {
 
@@ -149,7 +149,7 @@ private cb func FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent() -> Void {
   this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
 }
 
-//Aiming on foot transitions functions---------------------------------------------------------------------------------------
+// Aiming on foot transitions functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootSetTransition() -> Bool {
 
@@ -177,7 +177,7 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootSetTransition() -> Bool {
 }
 
 
-//Vignette editor context---------------------------------------------------------------------------------------
+// Vignette editor context ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootEditor() -> Bool {
 
@@ -212,7 +212,7 @@ private cb func FrameGenGhostingFixVignetteOnFootEditorToggle() -> Void {
   this.FrameGenGhostingFixVignetteOnFootEditorContext(false);
 }
 
-//Activate masks on foot---------------------------------------------------------------------------------------
+// Activate masks on foot ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixOnFootToggle(false);
@@ -223,7 +223,7 @@ protected final func FrameGenGhostingFixOnFootToggle(masksOnFoot: Bool) -> Void 
   this.m_masksOnFootEnabled = masksOnFoot;
 }
 
-//Activate main vignette---------------------------------------------------------------------------------------
+// Activate main vignette ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteOnFootToggle(false);
@@ -234,7 +234,7 @@ protected final func FrameGenGhostingFixVignetteOnFootToggle(vignetteOnFoot: Boo
   this.m_vignetteOnFootEnabled = vignetteOnFoot;
 }
 
-//Turn off deactivation of main vignette---------------------------------------------------------------------------------------
+// Turn off deactivation of main vignette ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteOnFootDeActivationToggle(false);
@@ -245,7 +245,7 @@ protected final func FrameGenGhostingFixVignetteOnFootDeActivationToggle(vignett
   this.m_vignetteOnFootActivated = vignetteOnFootActivation;
 }
 
-//Activate vignette for aiming---------------------------------------------------------------------------------------
+// Activate vignette for aiming ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixVignetteAimOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
@@ -256,7 +256,7 @@ protected final func FrameGenGhostingFixVignetteAimOnFootToggle(vignetteAimOnFoo
   this.m_vignetteAimOnFootEnabled = vignetteAimOnFoot;
 }
 
-//Activate blocker for aiming---------------------------------------------------------------------------------------
+// Activate blocker for aiming ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixBlockerAimOnFootToggleEvent() -> Void {
   this.FrameGenGhostingFixBlockerAimOnFootToggle(false);
@@ -309,7 +309,7 @@ protected cb func FrameGenGhostingFixOnFootDeActivationEvent() -> Bool {
   this.FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent();
 }
 
-//Vignette aiming
+// Vignette aiming
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootActivationEvent() -> Bool {
 
@@ -333,7 +333,7 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootDeActivationEvent() -> Boo
   this.m_vignetteAimOnFootActivated = false;
 }
 
-//Blocker aiming
+// Blocker aiming
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
 
@@ -357,7 +357,7 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool
   this.m_blockerAimOnFootActivated = false;
 }
 
-//Weapon checks---------------------------------------------------------------------------------------
+// Weapon checks ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected final func FrameGenGhostingFixHasWeapon() -> Void {
   let player: ref<GameObject> = this.GetPlayerControlledObject();

@@ -1,6 +1,6 @@
-//Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
+// Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-//FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
+// FrameGen Ghosting 'Fix' 4.9.0xl, 2024 gramern (scz_g) 2024
 
 @addField(gameuiCrosshairContainerController) public let m_onFootLoopID: DelayID;
 
@@ -9,7 +9,7 @@
 @addField(gameuiCrosshairContainerController) public let m_playerStateMachineUpperBodyBBID: ref<CallbackHandle>;
 @addField(gameuiCrosshairContainerController) public let m_upperBodyState: gamePSMUpperBodyStates;
 
-//The main loop---------------------------------------------------------------------------------------
+// The main loop ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 public func FrameGenGhostingFixLoop() {
 
@@ -100,7 +100,7 @@ public class FrameGenGhostingFixLoopCallback extends DelayCallback {
   }
 }
 
-//Add upper body state func---------------------------------------------------------------------------------------
+// Add upper body state func ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 protected cb func OnUpperBodyChanged(state: Int32) -> Bool {
   let isAiming: Bool = state == 6;
@@ -110,7 +110,7 @@ protected cb func OnUpperBodyChanged(state: Int32) -> Bool {
   };
 }
 
-//Spawn widgets---------------------------------------------------------------------------------------
+// Spawn widgets ---------------------------------------------------------------------------------------
 @wrapMethod(gameuiCrosshairContainerController)
 protected cb func OnInitialize() -> Bool {
   wrappedMethod();
@@ -183,7 +183,7 @@ protected cb func OnUninitialize() -> Bool {
   GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_onFootLoopID);
 }
 
-//The kick off---------------------------------------------------------------------------------------
+// The kick off ---------------------------------------------------------------------------------------
 @wrapMethod(gameuiCrosshairContainerController)
 protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   wrappedMethod(playerGameObject);
