@@ -1,165 +1,151 @@
-local Settings ={ 
-  __VERSION_NUMBER = 480,
-  appliedOnFoot = false,
-  appliedVeh = false,
-  enabledFPPOnFoot = false,
-  enabledFPPBlockerAimOnFoot = true,
-  enabledFPPVignetteAimOnFoot = false,
-  enabledFPPVignetteOnFoot = false,
-  enabledFPPVignettePermamentOnFoot = false,
-  masksController = nil,
+local Settings ={
+  __NAME = "Settings",
+  __VERSION_NUMBER = 490,
+  isSaved = nil,
 }
 
-local Calculate = require("Modules/Calculate")
+local UserSettings = {}
+
 local Config = require("Modules/Config")
-local UIText = require("Modules/UIText")
-local Vectors = require("Modules/Vectors")
+local Localization = require("Modules/Localization")
 
-function Settings.CheckCrossSetting()
-  if Settings.enabledFPPBlockerAimOnFoot then
-    Settings.enabledFPPVignetteAimOnFoot = false
-  end
+local LogText = Localization.LogText
 
-  if Settings.enabledFPPVignetteAimOnFoot then
-    Settings.enabledFPPBlockerAimOnFoot = false
+function Settings.SetSaved(boolean)
+  Settings.isSaved = boolean
+end
+
+function Settings.IsSaved()
+  return Settings.isSaved
+end
+
+local function Translate(legacyUserSettings)
+  local userSettings = {
+    Calculate = {
+      Blocker = {},
+      Corners = {},
+      Vignette = {
+        ScreenPosition = {},
+        Scale = {}
+      }
+    },
+    Config = {
+      version = nil,
+      keepWindow = nil,
+    },
+    VectorsCustomize = {
+      Bike = {
+        Windshield = {
+          Scale = {}
+        }
+      }
+    },
+    Presets = {
+      selectedPreset = nil,
+    }
+  }
+
+  userSettings.Calculate.Blocker.onAim = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledBlockerAimOnFoot or false
+  userSettings.Calculate.Corners.onWeapon = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledOnFoot or false
+  userSettings.Calculate.Vignette.onAim = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignetteAimOnFoot or false
+  userSettings.Calculate.Vignette.permament = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignettePermamentOnFoot or false
+  userSettings.Calculate.Vignette.onWeapon = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignetteOnFoot or false
+  userSettings.Calculate.Vignette.ScreenPosition.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginLeft or 100
+  userSettings.Calculate.Vignette.ScreenPosition.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginTop or 80
+  userSettings.Calculate.Vignette.Scale.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeX or 120
+  userSettings.Calculate.Vignette.Scale.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeY or 120
+
+  userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
+  userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100
+
+  userSettings.Config.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
+
+  return userSettings
+end
+
+function Settings.WriteUserSettings(moduleName,contents)
+  if not contents or not moduleName then Config.Print("Can't write to user settings",nil,nil,moduleName) end --debug
+  if contents == nil then return end
+
+  local copiedContents = Config.Deepcopy(contents)
+
+  UserSettings[moduleName] = copiedContents
+
+  Settings.SetSaved(false)
+end
+
+function Settings.GetUserSettings(moduleName)
+  -- if not moduleName or UserSettings[moduleName] == nil then Config.Print("Can't get user settings.",nil,nil,moduleName) return nil end --debug
+  if not moduleName or UserSettings[moduleName] == nil then return nil end
+
+  return UserSettings[moduleName]
+end
+
+function Settings.LoadFile()
+  local file = io.open("user_settings.json", "r")
+
+  if file then
+    local userSettingsContents = file:read("*a")
+    file:close()
+    UserSettings = json.decode(userSettingsContents)
+
+    local version = UserSettings.Config and UserSettings.Config.ModState and UserSettings.Config.ModState.version or false
+
+    if not version then
+      UserSettings = Translate(UserSettings)
+      Config.SetNewInstall(true)
+    end
+
+    Config.ModState.keepWindow = UserSettings.Config and UserSettings.Config.keepWindow or false
+
+    Config.Print(LogText.settings_loaded,nil,nil,Settings.__NAME)
+    return true
+  else
+    Config.SetFirstRun(true)
+    Config.Print(LogText.settings_fileNotFound,nil,nil,Settings.__NAME)
   end
 end
 
-function Settings.ApplySettings()
-  Settings.ApplyMaskingGlobal()
-  Settings.ApplyCornersOnFoot()
-  Settings.ApplyBlockerAimOnFoot()
-  Settings.ApplyVignetteAimOnFoot()
-  Settings.ApplyVignetteOnFoot()
-  Settings.TurnOffLiveViewWindshieldEditor()
-  Settings.TurnOffLiveViewVignetteOnFootEditor()
-end
+function Settings.SaveFile()
+  if Settings.isSaved or Settings.isSaved == nil then return end
+  if UserSettings == nil then Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME) return end
 
-function Settings.ApplyMaskingGlobal()
-  Vectors.VehMasks.enabled = Config.MaskingGlobal.enabled
+  Settings.WriteUserSettings("Config",{
+    ModState = {
+      keepWindow = Config.ModState.keepWindow,
+      version = Config.__VERSION_NUMBER,
+  }})
 
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
-      local originalFunction = wrappedMethod()
+  local userSettingsContents = json.encode(UserSettings)
+  local file = io.open("user_settings.json", "w+")
 
-      if Config.MaskingGlobal.enabled then return originalFunction end
-      self:FrameGenGhostingFixVehicleToggle(false)
-    end)
+  if file and userSettingsContents ~= nil then
+    file:write(userSettingsContents)
+    file:close()
+
+    file = io.open("user_settings.json", "r")
+
+    if file then
+      file:close()
+
+      Settings.SetSaved(true)
+      Config.Print(LogText.settings_savedToFile,nil,nil,Settings.__NAME)
+    else
+      Settings.SetSaved(false)
+      Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
+    end
+  else
+    Settings.SetSaved(false)
+    Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
   end
 end
 
-function Settings.TurnOnLiveViewWindshieldEditor()
-  if Settings.masksController then
-    Override(Settings.masksController, 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
-      local maskEditorPath = CName.new(Vectors.VehMasks.MaskEditor.maskPath)
-
-      self:FrameGenGhostingFixSetTransformation(maskEditorPath, Vector2.new({X = Vectors.VehMasks.MaskEditor.ScreenSpace.x, Y = Vectors.VehMasks.MaskEditor.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.MaskEditor.Size.x, Y = Vectors.VehMasks.MaskEditor.Size.y}), Vectors.VehMasks.MaskEditor.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 0.8, true)
-    end)
-  end
+function Settings.OnInitialize()
+  Settings.LoadFile()
 end
 
-function Settings.DefaultLiveViewWindshieldEditor()
-  if Settings.masksController then
-    Override(Settings.masksController, 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
-      local maskEditorPath = CName.new(Vectors.VehMasks.MaskEditor.maskPath)
-
-      self:FrameGenGhostingFixSetTransformation(maskEditorPath, Vector2.new({X = Vectors.VehMasks.MaskEditor.ScreenSpace.x, Y = Vectors.VehMasks.MaskEditor.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.MaskEditor.Size.x, Y = Vectors.VehMasks.MaskEditor.Size.y}), Vectors.VehMasks.MaskEditor.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 1, true)
-    end)
-  end
-end
-
-function Settings.TurnOffLiveViewWindshieldEditor()
-  if Settings.masksController then
-    Override(Settings.masksController, 'OnFrameGenGhostingFixFPPBikeWindshieldEditorEvent', function(self)
-      local maskEditorPath = CName.new(Vectors.VehMasks.MaskEditor.maskPath)
-      
-      self:FrameGenGhostingFixSetTransformation(maskEditorPath, Vector2.new({X = Vectors.VehMasks.MaskEditor.ScreenSpace.x, Y = Vectors.VehMasks.MaskEditor.ScreenSpace.y}), Vector2.new({X = Vectors.VehMasks.MaskEditor.Size.x, Y = Vectors.VehMasks.MaskEditor.Size.y}), Vectors.VehMasks.MaskEditor.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 0.0, false)
-    end)
-  end
-end
-
-function Settings.ApplyCornersOnFoot()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixOnFootToggleEvent', function(self, wrappedMethod)
-      local originalOnFoot = wrappedMethod()
-
-      if not Settings.enabledFPPOnFoot then return originalOnFoot end
-      self:FrameGenGhostingFixOnFootToggle(true)
-    end)
-    Override(Settings.masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent', function(self)
-      self:FrameGenGhostingFixMasksOnFootSetMargins(Calculate.FPPOnFoot.cornerDownLeftMargin, Calculate.FPPOnFoot.cornerDownRightMargin, Calculate.FPPOnFoot.cornerDownMarginTop)
-    end)
-  end
-end
-
-function Settings.ApplyBlockerAimOnFoot()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixBlockerAimOnFootToggleEvent', function(self, wrappedMethod)
-      local originalBlockerAim = wrappedMethod()
-
-      if not Settings.enabledFPPBlockerAimOnFoot then return originalBlockerAim end
-      self:FrameGenGhostingFixBlockerAimOnFootToggle(true)
-    end)
-    Override(Settings.masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
-      self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(Calculate.FPPOnFoot.aimFootSizeXPx, Calculate.FPPOnFoot.aimFootSizeYPx)
-    end)
-  end
-end
-
-function Settings.ApplyVignetteAimOnFoot()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteAimOnFootToggleEvent', function(self, wrappedMethod)
-      local originalVignetteAim = wrappedMethod()
-
-      if not Settings.enabledFPPVignetteAimOnFoot then return originalVignetteAim end
-      self:FrameGenGhostingFixVignetteAimOnFootToggle(true)
-    end)
-    Override(Settings.masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
-      self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(Calculate.FPPOnFoot.aimFootSizeXPx, Calculate.FPPOnFoot.aimFootSizeYPx)
-    end)
-  end
-end
-
-function Settings.ApplyVignetteOnFoot()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteOnFootToggleEvent', function(self, wrappedMethod)
-      local originalVignette = wrappedMethod()
-
-      if not Settings.enabledFPPVignetteOnFoot then return originalVignette end
-      self:FrameGenGhostingFixVignetteOnFootToggle(true)
-    end)
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent', function(self, wrappedMethod)
-      local originalVignetteDimensions = wrappedMethod()
-
-      if not Settings.enabledFPPVignetteOnFoot then return originalVignetteDimensions end
-      self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(Calculate.FPPOnFoot.newVignetteFootMarginLeftPx, Calculate.FPPOnFoot.newVignetteFootMarginTopPx, Calculate.FPPOnFoot.newVignetteFootSizeXPx, Calculate.FPPOnFoot.newVignetteFootSizeYPx)
-    end)
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent', function(self, wrappedMethod)
-      local originalFunction = wrappedMethod()
-
-      if not Settings.enabledFPPVignettePermamentOnFoot then return originalFunction end
-      self:FrameGenGhostingFixVignetteOnFootDeActivationToggle(true)
-    end)
-  end
-end
-
-function Settings.TurnOnLiveViewVignetteOnFootEditor()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
-      self:FrameGenGhostingFixVignetteOnFootEditorContext(true)
-      self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(Calculate.FPPOnFoot.newVignetteFootMarginLeftPx, Calculate.FPPOnFoot.newVignetteFootMarginTopPx, Calculate.FPPOnFoot.newVignetteFootSizeXPx, Calculate.FPPOnFoot.newVignetteFootSizeYPx)
-    end)
-  end
-end
-
-function Settings.TurnOffLiveViewVignetteOnFootEditor()
-  if Settings.masksController then
-    Override(Settings.masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
-      self:FrameGenGhostingFixVignetteOnFootEditorContext(false)
-      self:FrameGenGhostingFixVignetteOnFootEditorTurnOff()
-      self:FrameGenGhostingFixVignetteOnFootSetDimensions()
-    end)
-  end
+function Settings.OnOverlayClose()
+  Settings.SaveFile()
 end
 
 return Settings
