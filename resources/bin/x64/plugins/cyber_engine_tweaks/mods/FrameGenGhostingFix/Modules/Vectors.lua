@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 491,
   MaskingGlobal = {
     masksController = nil,
     vehicles = true,
@@ -1230,6 +1230,7 @@ local function TransformWidthCar()
   local activePerspective = Vectors.Camera.activePerspective
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
   local bumpersScreenDistance = Vectors.Vehicle.Bumper.ScreenSpace.distance
+  local currentSpeed = Vectors.Vehicle.currentSpeed
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
   local medianAngle = Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane
@@ -1268,7 +1269,11 @@ local function TransformWidthCar()
     Vectors.VehMasks.Mask3.Size.x = max(axisLength.back * 0.5, axisLength.right * (4 + dotVeh.forwardAbs))
   else
     --Mask1
-    Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x
+    if currentSpeed <= 50 then
+      Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x
+    else
+      Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x * (0.5 + (currentSpeed * 0.015))
+    end
 
     --Mask2
     Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.x
@@ -1277,7 +1282,11 @@ local function TransformWidthCar()
     Vectors.VehMasks.Mask3.Size.x = Vectors.VehMasks.Mask3.Def.Size.x
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x
+    if currentSpeed <= 50 then
+      Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x
+    else
+      Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x * (0.5 + (currentSpeed * 0.01))
+    end
   end
 end
 
@@ -1361,6 +1370,7 @@ local function TransformHeightCar()
   local activePerspective = Vectors.Camera.activePerspective
   local axisLength = Vectors.Vehicle.Axis.ScreenLength
   local bumpersScreenDistance = Vectors.Vehicle.Bumper.ScreenSpace.distance
+  local currentSpeed = Vectors.Vehicle.currentSpeed
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local wheelbase = Vectors.Vehicle.Wheel.wheelbase
 
@@ -1409,8 +1419,12 @@ local function TransformHeightCar()
     end
   else
     --Mask1
-    Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y
-
+    if currentSpeed <= 50 then
+      Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y
+    else
+      Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y * (0.5 + (currentSpeed * 0.025))
+    end
+    
     --Mask2
     Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.y
 
@@ -1418,7 +1432,11 @@ local function TransformHeightCar()
     Vectors.VehMasks.Mask3.Size.y = Vectors.VehMasks.Mask3.Def.Size.y
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y
+    if currentSpeed <= 50 then
+      Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y
+    else
+      Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y * (0.5 + (currentSpeed * 0.015))
+    end
   end
 end
 
