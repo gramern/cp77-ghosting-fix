@@ -15,7 +15,7 @@ local Presets = {
 local DefaultPresets = {
   Customize = {
     PresetInfo = {
-      file = "Customize.lua",
+      file = "Customize.json",
       name = "Customize",
       description = "Customize your preset.",
       author = nil,
@@ -121,7 +121,7 @@ local DefaultPresets = {
       }
     },
     PresetInfo = {
-      file = "Default.lua",
+      file = "Default.json",
       name = "Default",
       description = "Default preset.",
       author = nil,
@@ -144,8 +144,30 @@ local Translate = require("Modules/Translate")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
+function LoadJSON(fileName)
+  local content = {}
+
+  local file = io.open(fileName, "r")
+  if file ~= nil then
+      local configStr = file:read("*a")
+      content = json.decode(configStr)
+      file:close()
+  end
+
+  return content
+end
+
+function SaveJSON(fileName, content)
+  local file = io.open(fileName, "w")
+  if file ~= nil then
+      local jconfig = json.encode(content)
+      file:write(jconfig)
+      file:close()
+  end
+end
+
 function Presets.AddPreset(pos, presetFileName, presetInfoTable)
-  if Presets.List.File[pos] ~= nil then Config.Print(LogText.presets_skippedFilePos,nil,nil,Presets.__NAME) return end
+  if Presets.List.File[pos] ~= nil then Config.Print(LogText.presets_skippedFilePos, nil, nil, Presets.__NAME) return end
 
   table.insert(Presets.List.File, pos, presetFileName)
   table.insert(Presets.List.ID, pos, presetInfoTable['id'])
@@ -184,7 +206,7 @@ function Presets.GetPresets()
 
   --to prevent loading presets files named as default ones that are already in the table
   local existingLowerCase = {}
-  for _,presetFileName in ipairs(Presets.List.File) do
+  for _, presetFileName in ipairs(Presets.List.File) do
     existingLowerCase[string.lower(presetFileName)] = true
   end
 
@@ -192,10 +214,10 @@ function Presets.GetPresets()
   local existingName = {}
 
   for _, presetFile in ipairs(presetsDir) do
-    if string.find(presetFile.name, '%.lua$') then
-      local preset = string.gsub(presetFile.name, ".lua", "")
+    if string.find(presetFile.name, '%.json$') then
+      local preset = presetFile.name
       local presetPath = "Presets/" .. preset
-      local presetContents = require(presetPath)
+      local presetContents = LoadJSON(presetPath)
       
       if not existingLowerCase[string.lower(preset)] and
         not existingName[presetContents.PresetInfo.name] and
@@ -204,34 +226,34 @@ function Presets.GetPresets()
         presetContents.PresetInfo.name and
         Presets.PresetsInfo[presetContents.PresetInfo.id] == nil
         then
-          Presets.AddPreset(i,presetFile.name,presetContents.PresetInfo)
+          Presets.AddPreset(i, presetFile.name, presetContents.PresetInfo)
           i = i + 1
 
           existingLowerCase[string.lower(preset)] = true
           existingName[presetContents.PresetInfo.name] = true
       else
-        Config.Print(LogText.presets_skippedFile,presetFile.name,nil,Presets.__NAME)
+        Config.Print(LogText.presets_skippedFile, presetFile.name, nil, Presets.__NAME)
       end
     end
   end
 end
 
 function Presets.PrintPresets()
-  for i,_ in pairs(Presets.List.File) do
+  for i, _ in pairs(Presets.List.File) do
     local presetFileName = Presets.List.File[i]
     local presetId = Presets.List.ID[i]
     local displayedName = Presets.List.OnScreenName[i]
     local infoStack = Presets.PresetsInfo[presetId]
-    print("| Position:",i,"| OnScreen Name:",displayedName,"| File:",presetFileName,"| ID:",presetId,"| Name:",infoStack.name,"| Description:",infoStack.description,"| Author:",infoStack.author)
+    print("| Position:", i, "| OnScreen Name:", displayedName, "| File:", presetFileName, "| ID:", presetId, "| Name:", infoStack.name, "| Description:", infoStack.description, "| Author:", infoStack.author)
   end
 
   if Presets.selectedPreset then
-    Config.Print("Selected preset:",Presets.List.File[Presets.selectedPresetPosition], Presets.List.OnScreenName[Presets.selectedPresetPosition])
+    Config.Print("Selected preset:", Presets.List.File[Presets.selectedPresetPosition], Presets.List.OnScreenName[Presets.selectedPresetPosition])
   end
 end
 
 function Presets.GetOnScreenNamesList()
-  for i,_ in ipairs(Presets.List.ID) do
+  for i, _ in ipairs(Presets.List.ID) do
     local presetId = Presets.List.ID[i]
     local infoStack = Presets.PresetsInfo[presetId]
     Presets.List.OnScreenName[i] = infoStack.name
@@ -249,7 +271,7 @@ function Presets.SetSelectedPreset(selectedPresetPosition)
     presetPosition = selectedPresetPosition
   end
 
-  for i,preset in ipairs(Presets.List.OnScreenName) do
+  for i, preset in ipairs(Presets.List.OnScreenName) do
     if preset == presetPosition then
       Presets.selectedPresetPosition = i
       Presets.selectedPreset = Presets.List.ID[Presets.selectedPresetPosition]
@@ -260,7 +282,7 @@ function Presets.SetSelectedPreset(selectedPresetPosition)
 end
 
 function Presets.GetSelectedPreset()
-  for i,preset in ipairs(Presets.List.ID) do
+  for i, preset in ipairs(Presets.List.ID) do
     if preset == Presets.selectedPreset then
       Presets.selectedPresetPosition = i
       return Presets.selectedPreset, Presets.selectedPresetPosition
@@ -298,13 +320,12 @@ function Presets.LoadPreset()
       Presets.SetSelectedPreset(defaultPresetPosition)
     end
 
-    Config.WriteWhiteBoard("Presets",DefaultPresets.Default)
+    Config.WriteWhiteBoard("Presets", DefaultPresets.Default)
   else
-    presetPath = string.gsub(presetPath, ".lua", "")
-    local Preset = require(presetPath)
+    local Preset = LoadJSON(presetPath)
 
     if Preset then
-      Config.WriteWhiteBoard("Presets",Preset)
+      Config.WriteWhiteBoard("Presets", Preset)
     end
   end
 end
@@ -318,11 +339,11 @@ function Presets.GetUserSettings()
 end
 
 function Presets.SaveUserSettings()
-  Settings.WriteUserSettings("Presets",Presets.GetUserSettings())
+  Settings.WriteUserSettings("Presets", Presets.GetUserSettings())
 end
 
 function Presets.OnInitialize()
-  Config.MergeTables(Presets,Settings.GetUserSettings("Presets"))
+  Config.MergeTables(Presets, Settings.GetUserSettings("Presets"))
   Presets.GetDefaultPreset()
   Presets.GetPresets()
   Presets.GetSelectedPreset()
@@ -357,7 +378,7 @@ function Presets.DrawUI()
 
     -- displays list of onScreen presets' names and sets a preset
     if UI.Std.BeginCombo("##", Presets.List.OnScreenName[Presets.selectedPresetPosition]) then
-      for _,preset in ipairs(Presets.List.OnScreenName) do
+      for _, preset in ipairs(Presets.List.OnScreenName) do
         local presetSelected = (Presets.selectedPresetOnScreenName == preset)
         if UI.Std.Selectable(preset, presetSelected) then
           Presets.selectedPresetOnScreenName = preset
