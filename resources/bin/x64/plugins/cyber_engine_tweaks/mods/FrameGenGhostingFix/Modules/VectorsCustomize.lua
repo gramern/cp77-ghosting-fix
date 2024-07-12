@@ -1,6 +1,6 @@
 local VectorsCustomize = {
   __NAME = "VectorsCustomize",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 500,
   MaskingGlobal = {
     masksController = nil,
   },

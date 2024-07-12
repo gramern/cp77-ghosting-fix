@@ -1,6 +1,6 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 500,
   MaskingGlobal = {
     masksController = nil,
     onFoot = true -- not used for now

@@ -1,6 +1,6 @@
 local Localization = {
   __NAME = "Localization",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 500,
   UIText = {
     General = {
       title_general = "General Settings:",

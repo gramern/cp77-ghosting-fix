@@ -1,6 +1,6 @@
 local Settings ={
   __NAME = "Settings",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 500,
   isSaved = nil,
 }
 

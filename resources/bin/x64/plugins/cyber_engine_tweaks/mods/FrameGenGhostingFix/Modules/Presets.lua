@@ -1,6 +1,6 @@
 local Presets = {
   __NAME = "Presets",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 500,
   masksController = nil,
   selectedPreset = nil,
   selectedPresetPosition = nil,

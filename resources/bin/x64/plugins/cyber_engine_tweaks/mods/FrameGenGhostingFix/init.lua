@@ -1,11 +1,11 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
-  __VERSION_NUMBER = 491,
+  __VERSION_NUMBER = 500,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
 
-    Copyright (c) 2024 gramern (scz_g)
+    Copyright (c) 2024 gramern (scz_g), danyalzia (omniscient)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
