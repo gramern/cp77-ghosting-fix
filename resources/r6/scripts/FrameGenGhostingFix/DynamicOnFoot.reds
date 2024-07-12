@@ -49,9 +49,9 @@ protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
   cornerDownLeftOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
   cornerDownRightOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
 
-//   LogChannel(n"DEBUG", s"this.m_masksOnFootCurrentOpacity = \(this.m_masksOnFootCurrentOpacity)");
-//   LogChannel(n"DEBUG", s"cornerDownLeftOnFoot.GetOpacity() = \(cornerDownLeftOnFoot.GetOpacity())");
-//   LogChannel(n"DEBUG", s"cornerDownRightOnFoot.GetOpacity() = \(cornerDownRightOnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"this.m_masksOnFootCurrentOpacity = \(this.m_masksOnFootCurrentOpacity)");
+  // LogChannel(n"DEBUG", s"cornerDownLeftOnFoot.GetOpacity() = \(cornerDownLeftOnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"cornerDownRightOnFoot.GetOpacity() = \(cornerDownRightOnFoot.GetOpacity())");
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -115,8 +115,8 @@ protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
   this.m_vignetteOnFootCurrentOpacity = this.m_vignetteOnFootCurrentOpacity + this.m_vignetteOnFootChangeOpacityBy;
   vignetteOnFoot.SetOpacity(this.m_vignetteOnFootCurrentOpacity);
 
-//   LogChannel(n"DEBUG", s"this.m_vignetteOnFootCurrentOpacity = \(this.m_vignetteOnFootCurrentOpacity)");
-//   LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteOnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"this.m_vignetteOnFootCurrentOpacity = \(this.m_vignetteOnFootCurrentOpacity)");
+  // LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteOnFoot.GetOpacity())");
 }
 
 // Aiming on foot dimension transition functions ---------------------------------------------------------------------------------------
@@ -132,8 +132,8 @@ protected cb func FrameGenGhostingFixAimOnFootSetDimensions() -> Bool {
   vignetteAimOnFoot.SetSize(this.m_aimOnFootSizeX, this.m_aimOnFootSizeY);
   vignetteAimOnFoot.Reparent(root);
 
-//   LogChannel(n"DEBUG", s"this.m_aimOnFootSizeX, this.m_aimOnFootSizeY = \(this.m_aimOnFootSizeX) \(this.m_aimOnFootSizeY)");
-//   LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetSize())");
+  // LogChannel(n"DEBUG", s"this.m_aimOnFootSizeX, this.m_aimOnFootSizeY = \(this.m_aimOnFootSizeX) \(this.m_aimOnFootSizeY)");
+  // LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetSize())");
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -159,8 +159,8 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootSetTransition() -> Bool {
   this.m_vignetteAimOnFootCurrentOpacity = this.m_vignetteAimOnFootCurrentOpacity + this.m_vignetteAimOnFootChangeOpacityBy;
   vignetteAimOnFoot.SetOpacity(this.m_vignetteAimOnFootCurrentOpacity);
 
-//   LogChannel(n"DEBUG", s"this.m_vignetteAimOnFootCurrentOpacity = \(this.m_vignetteAimOnFootCurrentOpacity)");
-//   LogChannel(n"DEBUG", s"vignetteAimOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetOpacity())");
+  // LogChannel(n"DEBUG", s"this.m_vignetteAimOnFootCurrentOpacity = \(this.m_vignetteAimOnFootCurrentOpacity)");
+  // LogChannel(n"DEBUG", s"vignetteAimOnFoot.GetOpacity() = \(vignetteAimOnFoot.GetOpacity())");
 }
 
 @addMethod(gameuiCrosshairContainerController)
