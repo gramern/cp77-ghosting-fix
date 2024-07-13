@@ -95,7 +95,7 @@ function Diagnostics.DrawUI()
       UI.Ext.TextWhite(UIText.Diagnostics.textfield_4)
     end
 
-    for modfile,mod in pairs(Diagnostics.modfiles) do
+    for modfile, mod in pairs(Diagnostics.modfiles) do
       UI.Ext.TextWhite(mod)
     end
    

@@ -1,133 +1,17 @@
 local Presets = {
   __NAME = "Presets",
   __VERSION_NUMBER = 500,
-  masksController = nil,
   selectedPreset = nil,
-  selectedPresetPosition = nil,
   List = {
-    OnScreenName = {},
-    File = {},
-    ID = {},
-  },
-  PresetsInfo = {}
-}
-
-local DefaultPresets = {
-  Customize = {
-    PresetInfo = {
-      file = "Customize.json",
-      name = "Customize",
-      description = "Customize your preset.",
-      author = nil,
-      id = "a001"
-    },
-  },
-  Default = {
-    MaskingGlobal = {
-      vehicles = true,
-      onFoot = true --not used now
-    },
-    Vectors = {
-      VehElements = {
-        BikeSpeedometer = {
-          Offset = {x=0.0, y=0.45, z=0.8},
-          rotation = 180,
-          Size = {x = 6120, y = 1600},
-          visible = true,
-        },
-        BikeHandlebars = {
-          Left = {
-            Offset = {x=-0.6, y=0.48, z=0.7},
-            rotation = 0,
-            Size = {x = 3000, y = 1800},
-            visible = true,
-          },
-          Right = {
-            Offset = {x=0.6, y=0.48, z=0.7},
-            rotation = 0,
-            Size = {x = 3000, y = 1800},
-            visible = true,
-          }
-        },
-        BikeWindshield = {
-          Offset = {x=0.0, y=0.54, z=1},
-          rotation = 0,
-          Size = {x = 3600, y = 1200},
-          visible = true,
-        },
-        CarDoors = {
-          Left = {
-            Offset = {x=-1.2, y=0, z=0.55},
-            rotation = 140,
-            Size = {x = 3000, y = 2000},
-            visible = true,
-          },
-          Right = {
-            Offset = {x=1.2, y=0, z=0.55},
-            rotation = -160,
-            Size = {x = 2250, y = 1500},
-            visible = true,
-          },
-        },
-        CarSideMirrors = {
-          Left = {
-            Offset = {x=-1, y=0.65, z=0.45},
-            rotation = 40,
-            Size = {x = 1400, y = 1200},
-            visible = true,
-          },
-          Right = {
-            Offset = {x=1.05, y=0.65, z=0.45},
-            rotation = 145,
-            Size = {x = 800, y = 800},
-            visible = true,
-          },
-        },
-      },
-      VehMasks = {
-        AnchorPoint = {x = 0.5, y = 0.5},
-        HorizontalEdgeDown = {
-          Opacity = {
-            Def = {
-              max = 0.03,
-            }
-          },
-          Size = {
-            Def = {
-              lock = false,
-              x = 4240,
-              y = 1480
-            },
-          },
-          Visible = {
-            Def = {
-              corners = true,
-              fill = true,
-              fillLock = false,
-              tracker = true,
-            }
-          }
-        },
-        Opacity = {
-          Def = {
-            delayDuration = 1.5,
-            delayThreshold = 0.95,
-            gain = 1,
-            max = 0.05,
-            speedFactor = 0.01,
-            stepFactor = 0.1
-          },
-        }
+    a000 = {
+      PresetInfo = {
+        name = "Customize",
+        description = "Customize your preset.",
+        author = nil,
+        id = "a000"
       }
-    },
-    PresetInfo = {
-      file = "Default.json",
-      name = "Default",
-      description = "Default preset.",
-      author = nil,
-      id = "a000"
-    },
-  },
+    }
+  }
 }
 
 local UserSettings = {}
@@ -166,168 +50,72 @@ function SaveJSON(fileName, content)
   end
 end
 
-function Presets.AddPreset(pos, presetFileName, presetInfoTable)
-  if Presets.List.File[pos] ~= nil then Config.Print(LogText.presets_skippedFilePos, nil, nil, Presets.__NAME) return end
+function Presets.AddPreset(presetInfo, id, filename)
+  -- Skip if File is already populated with same preset
+  if Presets.List[id] ~= nil then Config.Print(LogText.presets_skippedFileDuplicate, nil, nil, Presets.__NAME) return end
 
-  table.insert(Presets.List.File, pos, presetFileName)
-  table.insert(Presets.List.ID, pos, presetInfoTable['id'])
+  Presets.List[id] = {PresetInfo = {}}
+  Presets.List[id].PresetInfo = presetInfo
+  Presets.List[id].PresetInfo.file = filename
 
-  Presets.PresetsInfo[presetInfoTable['id']] = {
-    name = presetInfoTable['name'],
-    description = presetInfoTable['description'],
-    author = presetInfoTable['author'],
-  }
-end
-
-function Presets.GetDefaultPreset()
-  local customizePresetPosition = 0
-  local defaultPresetPosition = 1
-
-  if VectorsCustomize then
-    customizePresetPosition = 1
-    defaultPresetPosition = 2
-
-    Presets.AddPreset(customizePresetPosition, DefaultPresets.Customize.PresetInfo.file, DefaultPresets.Customize.PresetInfo)
-    Presets.AddPreset(defaultPresetPosition, DefaultPresets.Default.PresetInfo.file, DefaultPresets.Default.PresetInfo)
-  else
-    Presets.AddPreset(defaultPresetPosition, DefaultPresets.Default.PresetInfo.file, DefaultPresets.Default.PresetInfo)
-  end
-
-  return Presets.List.ID[defaultPresetPosition]
+  Config.Print(LogText.presets_added, presetInfo['name'], nil, Presets.__NAME)
 end
 
 function Presets.GetPresets()
   local presetsDir = dir('Presets')
-  local i = 2
-
-  if VectorsCustomize then
-    i = 3
-  end
-
-  --to prevent loading presets files named as default ones that are already in the table
-  local existingLowerCase = {}
-  for _, presetFileName in ipairs(Presets.List.File) do
-    existingLowerCase[string.lower(presetFileName)] = true
-  end
-
-  --to prevent loading presets with the same name as ones that are already in the table
-  local existingName = {}
 
   for _, presetFile in ipairs(presetsDir) do
     if string.find(presetFile.name, '%.json$') then
-      local preset = presetFile.name
-      local presetPath = "Presets/" .. preset
+      local presetPath = "Presets/" .. presetFile.name
       local presetContents = LoadJSON(presetPath)
       
-      if not existingLowerCase[string.lower(preset)] and
-        not existingName[presetContents.PresetInfo.name] and
-        presetContents and
-        presetContents.PresetInfo.id and
-        presetContents.PresetInfo.name and
-        Presets.PresetsInfo[presetContents.PresetInfo.id] == nil
-        then
-          Presets.AddPreset(i, presetFile.name, presetContents.PresetInfo)
-          i = i + 1
-
-          existingLowerCase[string.lower(preset)] = true
-          existingName[presetContents.PresetInfo.name] = true
+      if presetContents and presetContents.PresetInfo.id and presetContents.PresetInfo.name and Presets.List[presetContents.PresetInfo.id] == nil then
+        Presets.AddPreset(presetContents.PresetInfo, presetContents.PresetInfo.id, presetFile.name)
       else
-        Config.Print(LogText.presets_skippedFile, presetFile.name, nil, Presets.__NAME)
+        Config.Print(LogText.presets_skippedFileData, presetFile.name, nil, Presets.__NAME)
       end
     end
   end
 end
 
 function Presets.PrintPresets()
-  for i, _ in pairs(Presets.List.File) do
-    local presetFileName = Presets.List.File[i]
-    local presetId = Presets.List.ID[i]
-    local displayedName = Presets.List.OnScreenName[i]
-    local infoStack = Presets.PresetsInfo[presetId]
-    print("| Position:", i, "| OnScreen Name:", displayedName, "| File:", presetFileName, "| ID:", presetId, "| Name:", infoStack.name, "| Description:", infoStack.description, "| Author:", infoStack.author)
+  for position, presetId in ipairs(Presets.List) do
+    local name = Presets.List[presetId].PresetInfo.name
+    local description = Presets.List[presetId].PresetInfo.description
+    local author = Presets.List[presetId].PresetInfo.author
+
+    print("| Position:", position, "| Name:", name, "| Description:", description, "| Author:", author, "| ID:", presetId)
   end
 
   if Presets.selectedPreset then
-    Config.Print("Selected preset:", Presets.List.File[Presets.selectedPresetPosition], Presets.List.OnScreenName[Presets.selectedPresetPosition])
+    Config.Print("Selected preset:", Presets.List[Presets.selectedPreset].PresetInfo.name)
   end
-end
-
-function Presets.GetOnScreenNamesList()
-  for i, _ in ipairs(Presets.List.ID) do
-    local presetId = Presets.List.ID[i]
-    local infoStack = Presets.PresetsInfo[presetId]
-    Presets.List.OnScreenName[i] = infoStack.name
-  end
-
-  return Presets.List.OnScreenName
-end
-
-function Presets.SetSelectedPreset(selectedPresetPosition)
-  local presetPosition
-
-  if selectedPresetPosition == nil then
-    presetPosition = Presets.selectedPresetOnScreenName
-  else
-    presetPosition = selectedPresetPosition
-  end
-
-  for i, preset in ipairs(Presets.List.OnScreenName) do
-    if preset == presetPosition then
-      Presets.selectedPresetPosition = i
-      Presets.selectedPreset = Presets.List.ID[Presets.selectedPresetPosition]
-      
-      return
-    end
-  end
-end
-
-function Presets.GetSelectedPreset()
-  for i, preset in ipairs(Presets.List.ID) do
-    if preset == Presets.selectedPreset then
-      Presets.selectedPresetPosition = i
-      return Presets.selectedPreset, Presets.selectedPresetPosition
-    end
-  end
-end
-
-function Presets.ApplySelectedPreset()
-  if Presets.selectedPreset == nil then
-    Presets.selectedPreset = Presets.List.ID[1]
-
-    if not VectorsCustomize then return end
-    Presets.selectedPreset = Presets.List.ID[2]
-  end
-
-  Presets.SaveUserSettings()
 end
 
 function Presets.LoadPreset()
+  -- Use Default if user has not selected any other preset yet
+  if Presets.selectedPreset == nil then
+    Presets.selectedPreset = "a001"
+  end
+
   local presetPath = nil
-  local customizePresetPosition = 0
-  local defaultPresetPosition = 1
 
-  if VectorsCustomize then
-    customizePresetPosition = 1
-    defaultPresetPosition = 2
-  end
-
-  if Presets.List.File[Presets.selectedPresetPosition] then
-    presetPath = "Presets/" .. Presets.List.File[Presets.selectedPresetPosition]
-  end
-
-  if Presets.selectedPresetPosition == defaultPresetPosition or Presets.selectedPresetPosition == customizePresetPosition or not presetPath then
-    if not presetPath then
-      Presets.SetSelectedPreset(defaultPresetPosition)
-    end
-
-    Config.WriteWhiteBoard("Presets", DefaultPresets.Default)
+  -- Load Default when Customize preset is selected
+  if Presets.selectedPreset == "a000" then
+    presetPath = "Presets/" .. "Default.json"
+    
   else
-    local Preset = LoadJSON(presetPath)
-
-    if Preset then
-      Config.WriteWhiteBoard("Presets", Preset)
-    end
+    presetPath = "Presets/" .. Presets.List[Presets.selectedPreset].PresetInfo.file
   end
+
+  local loadedPreset = LoadJSON(presetPath)
+
+  if loadedPreset then
+    Config.WriteWhiteBoard("Presets", loadedPreset)
+  end
+
+  Presets.SaveUserSettings()
+
 end
 
 function Presets.GetUserSettings()
@@ -344,79 +132,80 @@ end
 
 function Presets.OnInitialize()
   Config.MergeTables(Presets, Settings.GetUserSettings("Presets"))
-  Presets.GetDefaultPreset()
   Presets.GetPresets()
-  Presets.GetSelectedPreset()
   Presets.LoadPreset()
-  Presets.ApplySelectedPreset()
 end
 
 function Presets.OnOverlayOpen()
-  --refresh UIText
+  -- refresh UIText
   Localization = require("Modules/Localization")
   UIText = Localization.UIText
 
-  --translate and refresh presets info and list
+  -- translate and refresh presets info and list
   if Translate then
-    Translate.SetTranslation("Modules/Presets", "PresetsInfo")
-    Presets.GetOnScreenNamesList()
+    Translate.SetTranslation("Modules/Presets", "List")
   end
 end
 
---Local UI
+-- Local UI
 function Presets.DrawUI()
   if UI.Std.BeginTabItem(UIText.Vehicles.tabname) then
 
     UI.Ext.TextWhite(UIText.General.title_general)
-
     UI.Std.Separator()
-
     UI.Ext.TextWhite(UIText.Vehicles.MaskingPresets.name)
-    if Presets.selectedPresetPosition == nil then
-      Presets.GetSelectedPreset()
-    end
 
-    -- displays list of onScreen presets' names and sets a preset
-    if UI.Std.BeginCombo("##", Presets.List.OnScreenName[Presets.selectedPresetPosition]) then
-      for _, preset in ipairs(Presets.List.OnScreenName) do
-        local presetSelected = (Presets.selectedPresetOnScreenName == preset)
-        if UI.Std.Selectable(preset, presetSelected) then
-          Presets.selectedPresetOnScreenName = preset
-          Presets.SetSelectedPreset()
+    local selectedPresetName = Presets.List[Presets.selectedPreset].PresetInfo.name
+
+    -- displays list of presets' names and sets a preset
+    if UI.Std.BeginCombo("##", selectedPresetName) then
+
+      -- Need to sort the preset names alphabetically by their keys (preset ids)
+      local presetIds = {}
+      for k in pairs(Presets.List) do table.insert(presetIds, k) end
+      table.sort(presetIds)
+
+      for _, presetId in ipairs(presetIds) do
+        local name = Presets.List[presetId].PresetInfo.name
+        local isSelected = (selectedPresetName == name)
+        
+        if UI.Std.Selectable(name, isSelected) then
+          selectedPresetName = name
+          Presets.selectedPreset = Presets.List[presetId].PresetInfo.id
         end
-        if presetSelected then
+        if isSelected then
           UI.Std.SetItemDefaultFocus()
           Config.ResetStatusBar()
         end
       end
       UI.Std.EndCombo()
     end
+
     UI.Ext.OnItemHovered.SetTooltip(UIText.Vehicles.MaskingPresets.tooltip)
 
     UI.Std.SameLine()
     if UI.Std.Button("   " .. UIText.General.apply .. "   ") then
       Presets.LoadPreset()
-      Presets.SaveUserSettings()
       Vectors.ApplyPreset()
 
       Config.SetStatusBar(UIText.General.settings_applied_veh)
     end
 
     if Presets.selectedPreset then
-      if Presets.PresetsInfo[Presets.selectedPreset].description then
+      if Presets.List[Presets.selectedPreset].PresetInfo.description then
         UI.Ext.TextWhite(UIText.Presets.infotabname)
-        UI.Ext.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].description)
+        UI.Ext.TextWhite(Presets.List[Presets.selectedPreset].PresetInfo.description)
       end
 
-      if Presets.PresetsInfo[Presets.selectedPreset].author then
+      if Presets.List[Presets.selectedPreset].PresetInfo.author then
         UI.Ext.TextWhite(UIText.Presets.authtabname)
         UI.Std.SameLine()
-        UI.Ext.TextWhite(Presets.PresetsInfo[Presets.selectedPreset].author)
+        UI.Ext.TextWhite(Presets.List[Presets.selectedPreset].PresetInfo.author)
       end
     end
 
-    --VectorsCustomize interface starts------------------------------------------------------------------------------------------------------------------
-    if VectorsCustomize and Presets.selectedPreset == "a001" then
+    -- VectorsCustomize interface starts ------------------------------------------------------------------------------------------------------------------
+    if Presets.selectedPreset == "a000" then
       if Config.IsMounted() then
         UI.Std.Text("")
         VectorsCustomize.DrawUI()

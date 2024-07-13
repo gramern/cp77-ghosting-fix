@@ -121,7 +121,7 @@ function Benchmark()
 
     FrameGenGhostingFix.GameState.averageFps = averageFps
 
-    Config.Print(LogText.benchmark_avgFpsResult,averageFps)
+    Config.Print(LogText.benchmark_avgFpsResult, averageFps)
 
     if Calculate then
       Calculate.ApplySuggestedSettings(averageFps)

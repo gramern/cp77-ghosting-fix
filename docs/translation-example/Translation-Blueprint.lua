@@ -173,21 +173,21 @@ local translation = {
     To find the ID of a preset just ask the author or take a look at the website were it'S been published.
     --]=====]
     a000 = {
-      name = "Default",
-      description = "Default preset.",
-      author = nil,
-    },
-    a001 = {
       name = "Customize",
       description = "Customize your preset.",
       author = nil,
     },
-    a003 = {
+    a001 = {
+      name = "Default",
+      description = "Default preset.",
+      author = nil,
+    },
+    a002 = {
       name = "Stronger",
       description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
       author = nil,
     },
-    a004 = {
+    a005 = {
       name = "Turn off anti-ghosting masking",
       description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
       author = nil,
