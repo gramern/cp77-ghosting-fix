@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION_NUMBER = 491,
+  __VERSION_NUMBER = 492,
   MaskingGlobal = {
     masksController = nil,
     vehicles = true,

@@ -1,8 +1,8 @@
 local Config = {
   __NAME = "Config",
   __EDITION = "IV",
-  __VERSION = "4.9.1",
-  __VERSION_NUMBER = 491,
+  __VERSION = "4.9.2",
+  __VERSION_NUMBER = 492,
   __VERSION_SUFFIX = "xl",
   __VERSION_STATUS = nil,
   ModState = {

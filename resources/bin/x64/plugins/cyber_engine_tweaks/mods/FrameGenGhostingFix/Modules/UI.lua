@@ -1,4 +1,6 @@
 local UI = {
+  __NAME = "Translate",
+  __VERSION_NUMBER = 492,
   Std = ImGui,
   Col = ImGuiCol,
   Cond = ImGuiCond,

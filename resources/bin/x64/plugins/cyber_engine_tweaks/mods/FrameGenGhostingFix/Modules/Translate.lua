@@ -1,6 +1,6 @@
 Translate = {
   __NAME = "Translate",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 492,
   gameOnScreenLanguage = nil,
   modDefaultLanguage = "en-us",
 }

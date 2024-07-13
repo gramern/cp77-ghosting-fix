@@ -1,5 +1,5 @@
 local Preset = {
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 492,
   MaskingGlobal = {
     vehicles = false,
     onfoot = false

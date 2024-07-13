@@ -1,6 +1,6 @@
 local Debug = {
   __NAME = "Debug",
-  __VERSION_NUMBER = 490,
+  __VERSION_NUMBER = 492,
 }
 
 local Config = require("Modules/Config")
