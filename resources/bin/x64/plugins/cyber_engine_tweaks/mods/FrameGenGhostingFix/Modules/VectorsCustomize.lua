@@ -141,7 +141,7 @@ function VectorsCustomize.DrawUI()
   UI.Ext.TextWhite(UIText.General.title_fps90)
   UI.Std.Separator()
 
-  if Vectors and Vectors.__VERSION_NUMBER == VectorsCustomize.__VERSION_NUMBER then
+  if Vectors then
     if vehicle.currentSpeed ~= nil and vehicle.currentSpeed < 1 and vehicle.vehicleBaseObject == 0 and camera.activePerspective == vehicleCameraPerspective.FPP then
       UI.Std.Text("")
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.textfield_1)

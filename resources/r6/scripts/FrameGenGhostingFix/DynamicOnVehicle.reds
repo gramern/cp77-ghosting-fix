@@ -4,41 +4,29 @@
 
 @addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
 @addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_hedCornersPath: CName = n"fgfixcars/horizontaledgedowncorners";
-@addField(gameuiCrosshairContainerController) public let m_hedFillPath: CName = n"fgfixcars/horizontaledgedownfill";
-@addField(gameuiCrosshairContainerController) public let m_hedTrackerPath: CName = n"fgfixcars/horizontaledgedowntracker";
-@addField(gameuiCrosshairContainerController) public let m_mask1Path: CName = n"fgfixcars/mask1";
-@addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfixcars/mask2";
-@addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfixcars/mask3";
-@addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfixcars/mask4";
-@addField(gameuiCrosshairContainerController) public let m_maskEditor1Path: CName = n"fgfixcars/mask_editor1";
-@addField(gameuiCrosshairContainerController) public let m_maskEditor2Path: CName = n"fgfixcars/mask_editor2";
-
-@addField(gameuiCrosshairContainerController) public let m_hedCornersDone: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_hedFillDone: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_mask1Done: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_mask2Done: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_mask3Done: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_hedCornersPath: CName = n"fgfix/horizontaledgedowncorners";
+@addField(gameuiCrosshairContainerController) public let m_hedFillPath: CName = n"fgfix/horizontaledgedownfill";
+@addField(gameuiCrosshairContainerController) public let m_hedTrackerPath: CName = n"fgfix/horizontaledgedowntracker";
+@addField(gameuiCrosshairContainerController) public let m_hedCornersEditorPath: CName = n"fgfix/horizontaledgedowncorners_editor";
+@addField(gameuiCrosshairContainerController) public let m_hedFillEditorPath: CName = n"fgfix/horizontaledgedownfill_editor";
+@addField(gameuiCrosshairContainerController) public let m_mask1Path: CName = n"fgfix/mask1";
+@addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfix/mask2";
+@addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfix/mask3";
+@addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfix/mask4";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor1Path: CName = n"fgfix/mask_editor1";
+@addField(gameuiCrosshairContainerController) public let m_maskEditor2Path: CName = n"fgfix/mask_editor2";
 
 @addField(DriveEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_vehicleCurrentTypeFGGF: gamedataVehicleType;
 @addField(DriveEvents) public let m_vehicleCurrentSpeedFGGF: Float;
 @addField(DriveEvents) public let m_vehicleCurrentSpeedCallbackFGGF: ref<CallbackHandle>;
-// @addField(DriveEvents) public let m_hedOpacity: Float;
-// @addField(DriveEvents) public let m_hedOpacityMax: Float = 0.03;
-// @addField(DriveEvents) public let m_masksOpacity: Float;
-// @addField(DriveEvents) public let m_masksOpacityMax: Float = 0.06;
 
 @addField(DriverCombatEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriverCombatEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriverCombatEvents) public let m_vehicleCurrentTypeFGGF: gamedataVehicleType;
 @addField(DriverCombatEvents) public let m_vehicleCurrentSpeedFGGF: Float;
 @addField(DriverCombatEvents) public let m_vehicleCurrentSpeedCallbackFGGF: ref<CallbackHandle>;
-// @addField(DriverCombatEvents) public let m_hedOpacity: Float;
-// @addField(DriverCombatEvents) public let m_hedOpacityMax: Float = 0.03;
-// @addField(DriverCombatEvents) public let m_masksOpacity: Float;
-// @addField(DriverCombatEvents) public let m_masksOpacityMax: Float = 0.06;
 
 // Mounting/unmounting events ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
@@ -51,11 +39,11 @@ private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) 
   
   this.m_isVehicleMountedFGGF = false;
 
-  let deactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
-  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(deactivationEvent);
+  let hedDeactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(hedDeactivationEvent);
   
-  let deactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
-  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(deactivationEvent);
+  let masksDeactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
+  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(masksDeactivationEvent);
 
 }
 

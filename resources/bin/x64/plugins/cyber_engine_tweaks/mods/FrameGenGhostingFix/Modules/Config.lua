@@ -3,7 +3,7 @@ local Config = {
   __EDITION = "V",
   __VERSION = "5.0.0",
   __VERSION_NUMBER = 500,
-  __VERSION_SUFFIX = "xl",
+  __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   ModState = {
     isDebug = false,
@@ -18,9 +18,7 @@ local Config = {
     isMounted = nil,
   },
   MaskingGlobal = {
-    newController = "gameuiCrosshairContainerController",
-    legacyController = "IronsightGameController",
-    masksController = nil,
+    masksController = "gameuiCrosshairContainerController",
     Widgets = {
       hedCorners = "horizontaledgedowncorners",
       hedFill = "horizontaledgedownfill",
@@ -398,7 +396,6 @@ end
 
 function Config.OnInitialize()
   Config.GetModVersion()
-  Config.ApplyMasksController()
   Config.GetAspectRatio()
   Config.GetScreenType()
   Config.GetScreenTypeName()
@@ -428,21 +425,6 @@ function Config.OnOverlayClose()
   Config.GetScreenEdge()
   Config.GetScreenWidthFactor()
   Config.GetScreenSpace()
-end
-
-function Config.ApplyMasksController()
-  local newController = Config.MaskingGlobal.newController
-  local legacyController = Config.MaskingGlobal.legacyController
-
-  if newController and legacyController then
-    Config.MaskingGlobal.masksController = newController
-    if Config.__VERSION_SUFFIX then return end
-    if not legacyController then return Config.SetModReady(false) end
-    Config.MaskingGlobal.masksController = legacyController
-  else
-    Config.SetModReady(false)
-    Config.Print(LogText.config_controllerMissing,nil,nil,Config.__NAME)
-  end
 end
 
 --status bar logic

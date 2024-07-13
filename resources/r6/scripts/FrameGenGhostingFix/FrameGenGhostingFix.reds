@@ -189,9 +189,6 @@ protected cb func OnInitialize() -> Bool {
   }
 
   let root = this.GetRootCompoundWidget();
-  let fgfixcars = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfixcars\\fgfixcars.inkwidget", n"Root") as inkCompoundWidget;
-  fgfixcars.SetName(n"fgfixcars");
-
   let fgfix = this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root") as inkCompoundWidget;
   fgfix.SetName(n"fgfix");
 
