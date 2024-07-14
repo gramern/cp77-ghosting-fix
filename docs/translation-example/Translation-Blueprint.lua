@@ -151,9 +151,9 @@ local translation = {
       tabname = "Diagnostics",
       title_warning = "CONFLICTS WITH OTHER MODS DETECTED",
       title_info = "UPDATE AVAILABLE",
-      textfield_1 = "Seems like you have a conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems, please, visit FrameGen\nGhosting 'Fix's Nexus page to download and install\nthe 'Preem Compatibility Edition - ArchiveXL'\nversion of the mod instead.",
+      textfield_1 = "Seems like you have a conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems, please, visit FrameGen\nGhosting 'Fix's Nexus page to download and install the latest version of the mod.",
       textfield_2 = "Conflicting mods:",
-      textfield_3 = "Seems like you have a potentially conflicting mod\ninstalled.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems in the future, please visit\nFrameGenGhosting 'Fix's Nexus page to download and\ninstall the 'Preem Compatibility Edition - ArchiveXL'\nversion of the mod instead.\n\nWith the new version you no longer need any\ncompatibility tweaks.",
+      textfield_3 = "Seems like you have a potentially conflicting mod\ninstalled.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems in the future, please visit\nFrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any\ncompatibility tweaks.",
       textfield_4 = "Potentially conflicting mods:"
     },
     Presets = {
@@ -187,9 +187,19 @@ local translation = {
       description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
       author = nil,
     },
+    a003 = {
+      name = "Testing",
+      description = "Testing preset, all masks visible.",
+      author = nil,
+    },
+    a004 = {
+      name = "Testing Stronger",
+      description = "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time).",
+      author = nil,
+    },
     a005 = {
       name = "Turn off anti-ghosting masking",
-      description = "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+      description = "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
       author = nil,
     }
   },

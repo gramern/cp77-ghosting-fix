@@ -158,7 +158,7 @@
   },
   "PresetInfo": {
     "name": "Turn off anti-ghosting masking",
-    "description": "Turns off TPP and FPP anti-ghosting masks for all vehicles",
+    "description": "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
     "author": null,
     "id": "a005"
   }

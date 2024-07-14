@@ -158,7 +158,7 @@
   },
   "PresetInfo": {
     "name": "Testing Stronger",
-    "description": "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time)",
+    "description": "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time).",
     "author": null,
     "id": "a004"
   }
