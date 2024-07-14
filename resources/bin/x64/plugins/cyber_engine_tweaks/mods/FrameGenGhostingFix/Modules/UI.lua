@@ -1,4 +1,6 @@
 local UI = {
+  __NAME = "UI",
+  __VERSION_NUMBER = 500,
   Std = ImGui,
   Col = ImGuiCol,
   Cond = ImGuiCond,
@@ -33,25 +35,76 @@ local UI = {
       ImGui.PopStyleColor()
     end,
 
-    TextGreen = function(string)
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      ImGui.Text(string)
+    -- string: string; wrap: boolean
+    TextGreen = function(string, wrap)
+      ImGui.PushStyleColor(ImGuiCol.Text, 0.2, 1, 0.2, 1)
+
+      if wrap then
+        ImGui.TextWrapped(string)
+      else
+        ImGui.Text(string)
+      end
+
       ImGui.PopStyleColor()
     end,
     
-    TextRed = function(string)
-      ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      ImGui.Text(string)
+    -- string: string; wrap: boolean
+    TextRed = function(string, wrap)
+      ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
+
+      if wrap then
+        ImGui.TextWrapped(string)
+      else
+        ImGui.Text(string)
+      end
+
       ImGui.PopStyleColor()
     end,
     
-    TextWhite = function(string)
+    -- string: string; wrap: boolean
+    TextWhite = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
-      ImGui.Text(string)
+
+      if wrap then
+        ImGui.TextWrapped(string)
+      else
+        ImGui.Text(string)
+      end
+
       ImGui.PopStyleColor()
-    end
+    end,
   }
 }
+
+--[[
+Returns a wrapped string for a specified number of characters
+(the lineLength argument); doesn't draw text. Use for line
+length control; otherwise use UI.Std.TextWrapped or a "true"
+wrap boolean for a UI.Ext variant (e.g., UI.Ext.TextWhite).
+
+string: string; lineLength: integer
+]]
+function UI.WrapText(string, lineLength)
+  local wrappedString = ""
+  local line = ""
+
+  for word in string:gmatch("%S+") do
+    if #line + #word + 1 > lineLength then
+      wrappedString = wrappedString .. line .. "\n"
+      line = word
+    else
+      if #line > 0 then
+        line = line .. " "
+      end
+      
+      line = line .. word
+    end
+  end
+
+  wrappedString = wrappedString .. line
+
+  return wrappedString
+end
 
 function UI.PushStyle()
   UI.Std.PushStyleVar(UI.StyleVar.WindowMinSize, 300, 100)
