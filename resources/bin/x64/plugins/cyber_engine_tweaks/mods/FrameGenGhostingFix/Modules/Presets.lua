@@ -1,7 +1,8 @@
 local Presets = {
   __NAME = "Presets",
   __VERSION_NUMBER = 500,
-  selectedPreset = nil,
+  selectedPreset = nil, -- must be a unique identifier for the preset
+  sortedPresetIds = {},
   List = {
     a000 = {
       PresetInfo = {
@@ -28,63 +29,60 @@ local Translate = require("Modules/Translate")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
-function LoadJSON(fileName)
+function Presets.LoadJSON(filename)
   local content = {}
 
-  local file = io.open(fileName, "r")
+  local file = io.open(filename, "r")
   if file ~= nil then
-      local configStr = file:read("*a")
-      content = json.decode(configStr)
+      content = json.decode(file:read("*a"))
       file:close()
   end
 
   return content
 end
 
-function SaveJSON(fileName, content)
-  local file = io.open(fileName, "w")
-  if file ~= nil then
-      local jconfig = json.encode(content)
-      file:write(jconfig)
-      file:close()
-  end
-end
-
 function Presets.AddPreset(presetInfo, id, filename)
-  -- Skip if File is already populated with same preset
+  -- Skip if List is already populated with the same preset
   if Presets.List[id] ~= nil then Config.Print(LogText.presets_skippedFileDuplicate, nil, nil, Presets.__NAME) return end
 
-  Presets.List[id] = {PresetInfo = {}}
-  Presets.List[id].PresetInfo = presetInfo
-  Presets.List[id].PresetInfo.file = filename
-
-  Config.Print(LogText.presets_added, presetInfo['name'], nil, Presets.__NAME)
+  Presets.List[id] = {file = filename, PresetInfo = presetInfo}
 end
 
 function Presets.GetPresets()
   local presetsDir = dir('Presets')
-
+  local addedPresets = {}
+  
   for _, presetFile in ipairs(presetsDir) do
     if string.find(presetFile.name, '%.json$') then
       local presetPath = "Presets/" .. presetFile.name
-      local presetContents = LoadJSON(presetPath)
+      local presetContents = Presets.LoadJSON(presetPath)
       
       if presetContents and presetContents.PresetInfo.id and presetContents.PresetInfo.name and Presets.List[presetContents.PresetInfo.id] == nil then
         Presets.AddPreset(presetContents.PresetInfo, presetContents.PresetInfo.id, presetFile.name)
+        table.insert(addedPresets, presetFile.name)
       else
         Config.Print(LogText.presets_skippedFileData, presetFile.name, nil, Presets.__NAME)
       end
     end
   end
+
+  Config.Print(LogText.presets_loaded, table.concat(addedPresets, ","), nil, Presets.__NAME)
+
+  -- Sort the preset names by their keys (preset ids) so they appear alphabetically in UI 
+  for k in pairs(Presets.List) do
+    table.insert(Presets.sortedPresetIds, k)
+  end
+
+  table.sort(Presets.sortedPresetIds)
 end
 
 function Presets.PrintPresets()
-  for position, presetId in ipairs(Presets.List) do
+  for _, presetId in ipairs(Presets.List) do
     local name = Presets.List[presetId].PresetInfo.name
     local description = Presets.List[presetId].PresetInfo.description
     local author = Presets.List[presetId].PresetInfo.author
 
-    print("| Position:", position, "| Name:", name, "| Description:", description, "| Author:", author, "| ID:", presetId)
+    print("| Name:", name, "| Description:", description, "| Author:", author, "| ID:", presetId)
   end
 
   if Presets.selectedPreset then
@@ -98,17 +96,17 @@ function Presets.LoadPreset()
     Presets.selectedPreset = "a001"
   end
 
-  local presetPath = nil
+  local presetPath = "Presets/"
 
   -- Load Default when Customize preset is selected
   if Presets.selectedPreset == "a000" then
-    presetPath = "Presets/" .. "Default.json"
+    presetPath = presetPath .. "Default.json"
     
   else
-    presetPath = "Presets/" .. Presets.List[Presets.selectedPreset].PresetInfo.file
+    presetPath = presetPath .. Presets.List[Presets.selectedPreset].file
   end
 
-  local loadedPreset = LoadJSON(presetPath)
+  local loadedPreset = Presets.LoadJSON(presetPath)
 
   if loadedPreset then
     Config.WriteWhiteBoard("Presets", loadedPreset)
@@ -137,11 +135,11 @@ function Presets.OnInitialize()
 end
 
 function Presets.OnOverlayOpen()
-  -- refresh UIText
+  -- Refresh UIText
   Localization = require("Modules/Localization")
   UIText = Localization.UIText
 
-  -- translate and refresh presets info and list
+  -- Translate and refresh presets info and list
   if Translate then
     Translate.SetTranslation("Modules/Presets", "List")
   end
@@ -157,15 +155,9 @@ function Presets.DrawUI()
 
     local selectedPresetName = Presets.List[Presets.selectedPreset].PresetInfo.name
 
-    -- displays list of presets' names and sets a preset
+    -- Displays list of presets' names and sets a preset
     if UI.Std.BeginCombo("##", selectedPresetName) then
-
-      -- Need to sort the preset names alphabetically by their keys (preset ids)
-      local presetIds = {}
-      for k in pairs(Presets.List) do table.insert(presetIds, k) end
-      table.sort(presetIds)
-
-      for _, presetId in ipairs(presetIds) do
+      for _, presetId in ipairs(Presets.sortedPresetIds) do
         local name = Presets.List[presetId].PresetInfo.name
         local isSelected = (selectedPresetName == name)
         
@@ -204,7 +196,7 @@ function Presets.DrawUI()
       end
     end
 
-    -- VectorsCustomize interface starts ------------------------------------------------------------------------------------------------------------------
+    -- VectorsCustomize interface starts
     if Presets.selectedPreset == "a000" then
       if Config.IsMounted() then
         UI.Std.Text("")
