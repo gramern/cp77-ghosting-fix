@@ -605,12 +605,10 @@ function Vectors.GetActivePerspective()
   local currentSpeed = Vectors.Vehicle.currentSpeed
 
   if vehicle and Vectors.Vehicle.isMounted and currentSpeed ~= nil then
-    if currentSpeed > 0.1 or currentSpeed < -0.1 then
       Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
       Vectors.Camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
 
       return Vectors.Camera.activePerspective
-    end
   end
 end
 
