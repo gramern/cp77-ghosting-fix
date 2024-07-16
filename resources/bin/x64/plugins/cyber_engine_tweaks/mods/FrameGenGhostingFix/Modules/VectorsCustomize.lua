@@ -148,14 +148,14 @@ function VectorsCustomize.DrawUI()
       UI.Std.Text("")
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_1)
 
-      vehMasks.Mask4.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat(UIText.Vehicles.Windshield.comment_1, vehMasks.Mask4.Scale.x, 70, 150, "%.0f")
+      vehMasks.Mask4.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat("##ScaleX", vehMasks.Mask4.Scale.x, 70, 150, "%.0f")
       if windshieldScaleToggle.x then
         VectorsCustomize.TurnOnLiveView()
       end
 
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_2)
 
-      vehMasks.Mask4.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat(UIText.Vehicles.Windshield.comment_2, vehMasks.Mask4.Scale.y, 70, 300, "%.0f")
+      vehMasks.Mask4.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat("##ScaleY", vehMasks.Mask4.Scale.y, 70, 300, "%.0f")
       if windshieldScaleToggle.y then
         VectorsCustomize.TurnOnLiveView()
       end

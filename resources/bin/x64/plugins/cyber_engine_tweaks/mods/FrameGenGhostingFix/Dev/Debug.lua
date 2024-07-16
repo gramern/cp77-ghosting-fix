@@ -572,6 +572,15 @@ function Debug.DrawUI()
   end
 
   if UI.Std.BeginTabItem("Player Data") then
+    UI.Ext.TextWhite("Player's World Position:")
+    if Vectors.PlayerPuppet.Position then
+      UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.Position.x))
+      UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.Position.y))
+      UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.Position.z))
+    end
+
+    UI.Std.Separator()
+    
     UI.Ext.TextWhite("Is Moving:")
     UI.Std.SameLine()
     UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.isMoving))

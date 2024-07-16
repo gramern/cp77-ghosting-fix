@@ -605,10 +605,15 @@ function Vectors.GetActivePerspective()
   local currentSpeed = Vectors.Vehicle.currentSpeed
 
   if vehicle and Vectors.Vehicle.isMounted and currentSpeed ~= nil then
-      Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
-      Vectors.Camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
+    Vectors.Camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
 
-      return Vectors.Camera.activePerspective
+    -- if currentSpeed > 0.1 or currentSpeed < -0.1 then
+    --   Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
+    -- end
+
+    return Vectors.Camera.activePerspective
+  else
+    return false
   end
 end
 
@@ -682,6 +687,9 @@ local function GetDefaultCarWheelsPositions()
   Vectors.Vehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
 end
 
+--[[ 
+Components names 'WheelAudioEmitterBack' and 'WheelAudioEmitterFront' found in the 'Let There Be Flight' mod by Jack Humbert
+]]
 local function GetBikeWheelsPositions()
   local dist = Vector4.Distance
   local mtxTr = Matrix.GetTranslation
@@ -1178,7 +1186,11 @@ end
 
 local function TransformWidthBike()
   local max = math.max
+  local rad = math.rad
+  local tan = math.tan
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
+  local fov = Vectors.Camera.fov
+  local fovFactor = tan(rad(51 / 2)) / tan(rad(fov / 2))
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
   local wheelbaseScreen = Vectors.Vehicle.Wheel.wheelbaseScreen
   local wheelbaseScreenPerp = Vectors.Vehicle.Wheel.wheelbaseScreenPerp
@@ -1208,16 +1220,16 @@ local function TransformWidthBike()
     Vectors.VehMasks.Mask3.Size.x = Vectors.VehMasks.Mask2.Size.x
   else
     --Mask1
-    Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x
+    Vectors.VehMasks.Mask1.Size.x = Vectors.VehMasks.Mask1.Def.Size.x * fovFactor
 
     --Mask2
-    Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.x
+    Vectors.VehMasks.Mask2.Size.x = Vectors.VehMasks.Mask2.Def.Size.x * fovFactor
 
     --Mask3
-    Vectors.VehMasks.Mask3.Size.x = Vectors.VehMasks.Mask3.Def.Size.x
+    Vectors.VehMasks.Mask3.Size.x = Vectors.VehMasks.Mask3.Def.Size.x * fovFactor
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x * (Vectors.VehMasks.Mask4.Scale.x * 0.01)
+    Vectors.VehMasks.Mask4.Size.x = Vectors.VehMasks.Mask4.Def.Size.x * (Vectors.VehMasks.Mask4.Scale.x * 0.01) * fovFactor
   end
 end
 
@@ -1298,7 +1310,11 @@ end
 
 local function TransformHeightBike()
   local max = math.max
+  local rad = math.rad
+  local tan = math.tan
   local activePerspective = Vectors.Camera.activePerspective
+  local fov = Vectors.Camera.fov
+  local fovFactor = tan(rad(51 / 2)) / tan(rad(fov / 2))
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local hedTrackerSize = Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker
@@ -1350,16 +1366,16 @@ local function TransformHeightBike()
     end
   else
     --Mask1
-    Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y
+    Vectors.VehMasks.Mask1.Size.y = Vectors.VehMasks.Mask1.Def.Size.y * fovFactor
   
     --Mask2
-    Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.y
+    Vectors.VehMasks.Mask2.Size.y = Vectors.VehMasks.Mask2.Def.Size.y * fovFactor
 
     --Mask3
-    Vectors.VehMasks.Mask3.Size.y = Vectors.VehMasks.Mask3.Def.Size.y
+    Vectors.VehMasks.Mask3.Size.y = Vectors.VehMasks.Mask3.Def.Size.y * fovFactor
 
     --Mask4
-    Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y * (Vectors.VehMasks.Mask4.Scale.y * 0.01)
+    Vectors.VehMasks.Mask4.Size.y = Vectors.VehMasks.Mask4.Def.Size.y * (Vectors.VehMasks.Mask4.Scale.y * 0.01) * fovFactor
   end
 end
 
@@ -1786,6 +1802,7 @@ end
 
 function Vectors.TransformVisibility()
   local baseObject = Vectors.Vehicle.vehicleBaseObject
+  local vehForward = Vectors.Vehicle.Forward
   local dotVeh = Vectors.Camera.ForwardTable.DotProduct.Vehicle
   local maskingVeh = Vectors.MaskingGlobal.vehicles
   local hasWeapon = Vectors.PlayerPuppet.hasWeapon
@@ -1826,6 +1843,8 @@ function Vectors.TransformVisibility()
     if baseObject == 0 and medianAngle >= 0 then
       hedVisible.fill = hedVisible.Def.fill
     elseif baseObject == 0 and hasWeapon then
+      hedVisible.fill = hedVisible.Def.fill
+    elseif baseObject == 0 and dotVeh > 0.98 and vehForward.z < -0.12 then
       hedVisible.fill = hedVisible.Def.fill
     elseif baseObject == 1 and hasWeapon and dotVeh.right < -0.1 then
       hedVisible.fill = hedVisible.Def.fill

@@ -1,14 +1,21 @@
 local UI = {
   __NAME = "UI",
   __VERSION_NUMBER = 500,
+  -- Reference to the 'ImGui' class.
   Std = ImGui,
+  -- Reference to the 'ImGuiCol' class.
   Col = ImGuiCol,
+  -- Reference to the 'ImGuiCond' class.
   Cond = ImGuiCond,
+  -- Reference to the 'ImGuiStyleVar' class.
   StyleVar = ImGuiStyleVar,
+  -- Reference to the 'ImGuiWindowFlags' class.
   WindowFlags = ImGuiWindowFlags,
+  -- Local ImGui-based extension methods
   Ext = {
 
     Checkbox = {
+      -- string: string;
       TextWhite = function(string, setting, toggle)
         ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
         setting, toggle = ImGui.Checkbox(string, setting)
@@ -19,6 +26,7 @@ local UI = {
     },
 
     OnItemHovered = {
+      -- string: string
       SetTooltip = function(string)
         if ImGui.IsItemHovered() then
           ImGui.SetTooltip(string)
@@ -28,6 +36,7 @@ local UI = {
       end,
     },
 
+    -- string: string
     StatusBar = function(string)
       ImGui.Separator()
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
@@ -39,10 +48,10 @@ local UI = {
     TextGreen = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 0.2, 1, 0.2, 1)
 
-      if wrap then
-        ImGui.TextWrapped(string)
-      else
+      if not wrap then
         ImGui.Text(string)
+      else
+        ImGui.TextWrapped(string)
       end
 
       ImGui.PopStyleColor()
@@ -52,10 +61,10 @@ local UI = {
     TextRed = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
 
-      if wrap then
-        ImGui.TextWrapped(string)
-      else
+      if not wrap then
         ImGui.Text(string)
+      else
+        ImGui.TextWrapped(string)
       end
 
       ImGui.PopStyleColor()
@@ -65,10 +74,24 @@ local UI = {
     TextWhite = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 
-      if wrap then
-        ImGui.TextWrapped(string)
-      else
+      if not wrap then
         ImGui.Text(string)
+      else
+        ImGui.TextWrapped(string)
+      end
+
+      ImGui.PopStyleColor()
+    end,
+
+    -- string: string; red: integer; green: integer; blue: integer; alpha: integer; wrap: boolean
+    TextColor = function(string, red, green, blue, alpha, wrap)
+      if not red and not green and not blue and not alpha then ImGui.Text("ERROR: Text's color isn't defined.") return end
+      ImGui.PushStyleColor(ImGuiCol.Text, red, green, blue, alpha)
+
+      if not wrap then
+        ImGui.Text(string)
+      else
+        ImGui.TextWrapped(string)
       end
 
       ImGui.PopStyleColor()
