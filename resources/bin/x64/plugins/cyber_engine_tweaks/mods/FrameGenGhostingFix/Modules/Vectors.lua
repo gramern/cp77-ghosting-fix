@@ -30,8 +30,7 @@ local Vectors = {
       },
     },
     fov = nil,
-    fovFactor = nil,
-    lastPerspective = nil,
+    fovFactorFPP = nil,
     Right = nil,
     Up = nil,
   },
@@ -51,40 +50,40 @@ local Vectors = {
   },
   VehElements = {
     BikeSpeedometer = {
-      Offset = {x=0.0, y=0.45, z=0.8},
+      Offset = {x = 0.0, y = 0.8, z = 0.45},
       rotation = 180,
       Size = {x = 6120, y = 1600},
       visible = true,
     },
     BikeHandlebars = {
       Left = {
-        Offset = {x=-0.6, y=0.48, z=0.7},
+        Offset = {x = -0.6, y = 0.7, z = 0.48},
         rotation = 0,
         Size = {x = 3000, y = 1800},
         visible = true,
       },
       Right = {
-        Offset = {x=0.6, y=0.48, z=0.7},
+        Offset = {x = 0.6, y = 0.7, z = 0.48},
         rotation = 0,
         Size = {x = 3000, y = 1800},
         visible = true,
       }
     },
     BikeWindshield = {
-      Offset = {x=0.0, y=0.54, z=1},
+      Offset = {x = 0.0, y = 1, z = 0.54},
       rotation = 0,
       Size = {x = 3600, y = 1200},
       visible = true,
     },
     CarDoors = {
       Left = {
-        Offset = {x=-1.2, y=0, z=0.55},
+        Offset = {x = -1.2, y = 0.55, z = 0},
         rotation = 140,
         Size = {x = 3000, y = 2000},
         visible = true,
       },
       Right = {
-        Offset = {x=1.2, y=0, z=0.55},
+        Offset = {x = 1.2, y = 0.55, z = 0},
         rotation = -160,
         Size = {x = 2250, y = 1500},
         visible = true,
@@ -92,13 +91,13 @@ local Vectors = {
     },
     CarSideMirrors = {
       Left = {
-        Offset = {x=-1, y=0.65, z=0.45},
+        Offset = {x = -1, y = 0.45, z = 0.65},
         rotation = 40,
         Size = {x = 1400, y = 1200},
         visible = true,
       },
       Right = {
-        Offset = {x=1.05, y=0.65, z=0.45},
+        Offset = {x = 1.05, y = 0.45, z = 0.65},
         rotation = 145,
         Size = {x = 800, y = 800},
         visible = true,
@@ -171,22 +170,22 @@ local Vectors = {
       Offset = {
         Bike = {
           Back = {
-            Left = {x=0, y=0, z=-1.2},
-            Right = {x=0, y=0, z=-1.2}
+            Left = {x = 0, y = -1.2, z = 0},
+            Right = {x = 0, y = -1.2, z = 0}
           },
           Front = {
-            Left = {x=0, y=0, z=1.2},
-            Right = {x=0, y=0, z=1.2}
+            Left = {x = 0, y = 1.2, z = 0},
+            Right = {x = 0, y = 1.2, z = 0}
           },
         },
         Car = {
           Back = {
-            Left = {x=-1.3, y=0, z=-2},
-            Right = {x=1.3, y=0, z=-2}
+            Left = {x = -1.3, y = -2, z = 0},
+            Right = {x = 1.3, y = -2, z = 0}
           },
           Front = {
-            Left = {x=-1.3, y=0, z=2},
-            Right = {x=1.3, y=0, z=2}
+            Left = {x = -1.3, y = 2, z = 0},
+            Right = {x = 1.3, y = 2, z = 0}
           },
         }
       },
@@ -276,7 +275,7 @@ local Vectors = {
         visible = true,
       },
       maskPath = "fgfix/mask1",
-      Offset = {x=0, y=0, z=0},
+      Offset = {x = 0, y = 0, z = 0},
       opacity = 0,
       Position = nil,
       rotation = 0,
@@ -299,7 +298,7 @@ local Vectors = {
         visible = true,
       },
       maskPath = "fgfix/mask2",
-      Offset = {x=0, y=0, z=0},
+      Offset = {x = 0, y = 0, z = 0},
       opacity = 0,
       Position = nil,
       rotation = 0,
@@ -322,7 +321,7 @@ local Vectors = {
         visible = true,
       },
       maskPath = "fgfix/mask3",
-      Offset = {x=0, y=0, z=0},
+      Offset = {x = 0, y = 0, z = 0},
       opacity = 0,
       Position = nil,
       rotation = 0,
@@ -346,7 +345,7 @@ local Vectors = {
         visible = true,
       },
       maskPath = "fgfix/mask4",
-      Offset = {x=0, y=0, z=0},
+      Offset = {x = 0, y = 0, z = 0},
       opacity = 0,
       Position = nil,
       rotation = 0,
@@ -486,13 +485,13 @@ function Vectors.GetWorldPositionFromOffset(basePosition, offsetXYZ)
   local newPosition = new4()
   local vecVehicle = Vectors.Vehicle
 
-  local offsetX = vecVehicle.Right.x * offsetXYZ.x + vecVehicle.Forward.x * offsetXYZ.z
-  local offsetY = vecVehicle.Right.y * offsetXYZ.x + vecVehicle.Forward.y * offsetXYZ.z
-  local offsetZ = vecVehicle.Right.z * offsetXYZ.x + vecVehicle.Forward.z * offsetXYZ.z
+  local offsetX = vecVehicle.Right.x * offsetXYZ.x + vecVehicle.Forward.x * offsetXYZ.y
+  local offsetY = vecVehicle.Right.y * offsetXYZ.x + vecVehicle.Forward.y * offsetXYZ.y
+  local offsetZ = vecVehicle.Right.z * offsetXYZ.x + vecVehicle.Forward.z * offsetXYZ.y
 
   newPosition.x = basePosition.x + offsetX
-  newPosition.y = basePosition.y + offsetY + vecVehicle.Up.y * offsetXYZ.y
-  newPosition.z = basePosition.z + offsetZ + vecVehicle.Up.z * offsetXYZ.y
+  newPosition.y = basePosition.y + offsetY + vecVehicle.Up.y * offsetXYZ.z
+  newPosition.z = basePosition.z + offsetZ + vecVehicle.Up.z * offsetXYZ.z
   newPosition.w = basePosition.w
 
   return newPosition
@@ -588,7 +587,7 @@ local function GetCameraData()
   local camera = Vectors.Camera
 
   camera.fov = cameraSystem:GetActiveCameraFOV()
-  camera.fovFactor = tan(rad(51 / 2)) / tan(rad(camera.fov / 2))
+  camera.fovFactorFPP = tan(rad(51 / 2)) / tan(rad(camera.fov / 2))
 
   camera.Forward = cameraSystem:GetActiveCameraForward()
   camera.Right = cameraSystem:GetActiveCameraRight()
@@ -605,10 +604,6 @@ function Vectors.GetActivePerspective()
 
   if vehicle and vecVehicle.isMounted and vecVehicle.currentSpeed ~= nil then
     camera.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
-
-    -- if currentSpeed > 0.1 or currentSpeed < -0.1 then
-    --   Vectors.Camera.lastPerspective = Vectors.Camera.activePerspective
-    -- end
 
     return camera.activePerspective
   else
@@ -730,10 +725,10 @@ local function GetBikeWheelsPositions()
   -- local simVehPosZ = (BackPos.z + FrontPos.z) / 2
   -- local diffVehPosZ = simVehPosZ - vecVehicle.Position.z
 
-  -- vecVehicle.Wheel.Position.Back.Left = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = diffVehPosZ, z = 0})
-  -- vecVehicle.Wheel.Position.Front.Left = Vectors.GetWorldPositionFromOffset(FrontPos, {x = -0, y = diffVehPosZ, z = 0})
-  -- vecVehicle.Wheel.Position.Back.Right = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = diffVehPosZ, z = 0})
-  -- vecVehicle.Wheel.Position.Front.Right = Vectors.GetWorldPositionFromOffset(FrontPos, {x = 0, y = diffVehPosZ, z = 0})
+  -- vecVehicle.Wheel.Position.Back.Left = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = 0, z = diffVehPosZ})
+  -- vecVehicle.Wheel.Position.Front.Left = Vectors.GetWorldPositionFromOffset(FrontPos, {x = 0, y = 0, z = diffVehPosZ})
+  -- vecVehicle.Wheel.Position.Back.Right = Vectors.GetWorldPositionFromOffset(BackPos, {x = 0, y = 0, z = diffVehPosZ})
+  -- vecVehicle.Wheel.Position.Front.Right = Vectors.GetWorldPositionFromOffset(FrontPos, {x = 0, y = 0, z = diffVehPosZ})
 
   vecVehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
 end
@@ -801,12 +796,12 @@ local function GetVehBumpersPositions()
 
   if vecVehicle.vehicleBaseObject == 0 then
     bumperOffset = vecVehicle.Wheel.wheelbase
-    offsetBack = new4(0, 0, bumperOffset * -1, 1)
-    offsetFront = new4(0, 0, bumperOffset, 1)
+    offsetBack = new4(0, bumperOffset * -1, 0, 1)
+    offsetFront = new4(0, bumperOffset, 0, 1)
   else
     bumperOffset = vecVehicle.Wheel.wheelbase * 0.178
-    offsetBack = new4(0, 0, bumperOffset * -2, 1)
-    offsetFront = new4(0, 0, bumperOffset * 1.5, 1)
+    offsetBack = new4(0, bumperOffset * -2, 0, 1)
+    offsetFront = new4(0, bumperOffset * 1.5, 0, 1)
   end
 
   bumperPos.Back = Vectors.GetWorldPositionFromOffset(midpointPos.Back, offsetBack)
@@ -998,27 +993,27 @@ local function TransformPositionBike()
   --Mask1
   local mask1NewOffset = nil
   if dotVeh.forward >= 0 then
-    mask1NewOffset = new4(0, dotVeh.rightAbs * 0.5, 0.4)
+    mask1NewOffset = new4(0, 0.4, dotVeh.rightAbs * 0.5)
   else
-    mask1NewOffset = new4(0, 0.5 , 0.4)
+    mask1NewOffset = new4(0, 0.4, 0.5)
   end
   mask1.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Left, mask1NewOffset)
 
   --Mask4
   local mask4NewOffset = nil
   if dotVeh.forward >= 0 then
-    mask4NewOffset = new4(0, 0, wheelbase)
+    mask4NewOffset = new4(0, wheelbase, 0)
   else
-    mask4NewOffset = new4(0, 0, wheelbase * -1)
+    mask4NewOffset = new4(0, wheelbase * -1, 0)
   end
   mask4.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Left, mask4NewOffset)
 
   --Mask2
-  local mask2NewOffset = new4(dotVeh.rightAbs * -0.4, dotVeh.rightAbs * -0.5, dotVeh.forward * wheelbase * -0.6)
+  local mask2NewOffset = new4(dotVeh.rightAbs * -0.4, dotVeh.forward * wheelbase * -0.6, dotVeh.rightAbs * -0.5)
   mask2.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Left, mask2NewOffset)
 
   --Mask3
-  local mask3NewOffset = new4(dotVeh.rightAbs * 0.4, dotVeh.rightAbs * -0.5, dotVeh.forward * wheelbase * -0.6)
+  local mask3NewOffset = new4(dotVeh.rightAbs * 0.4, dotVeh.forward * wheelbase * -0.6, dotVeh.rightAbs * -0.5)
   mask3.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
@@ -1034,15 +1029,15 @@ local function TransformPositionCar()
   local bumper, midpointPos, wheelbase = vehVehicle.Bumper, vehVehicle.Midpoint.Position, vehVehicle.Wheel.wheelbase
 
   --Mask1
-  local mask1NewOffset = new4(0, 0, dotVeh.rightAbs * bumper.offset * -0.5)
+  local mask1NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * -0.5, 0)
   --Mask4
-  local mask4NewOffset = new4(0, 0, dotVeh.rightAbs * bumper.offset * 0.5)
+  local mask4NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * 0.5, 0)
 
   if medianPlane >= 0 then
     --Mask1
-    mask1NewOffset = new4(0, dotVeh.upAbs * -0.5, dotVeh.rightAbs * bumper.offset * -0.5)
+    mask1NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * -0.5, dotVeh.upAbs * -0.5)
     --Mask4
-    mask4NewOffset = new4(0, dotVeh.upAbs * -0.5, dotVeh.rightAbs * bumper.offset * 0.5)
+    mask4NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * 0.5, dotVeh.upAbs * -0.5)
   end
 
   --Mask1
@@ -1061,12 +1056,12 @@ local function TransformPositionCar()
 
   --Mask2
   local mask2NewOffset = nil
-  mask2NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor * -1, dotVeh.rightAbs * -0.5, dotVeh.forward * bumper.distance * -0.5)
+  mask2NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor * -1, dotVeh.forward * bumper.distance * -0.5, dotVeh.rightAbs * -0.5)
   mask2.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Left, mask2NewOffset)
 
   --Mask3
   local mask3NewOffset = nil
-  mask3NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor, dotVeh.rightAbs * -0.5, dotVeh.forward * bumper.distance * -0.5)
+  mask3NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor, dotVeh.forward * bumper.distance * -0.5, dotVeh.rightAbs * -0.5)
   mask3.Position = Vectors.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
@@ -1205,7 +1200,7 @@ end
 
 local function TransformWidthBike()
   local camera = Vectors.Camera
-  local dotVeh, fovFactor = camera.ForwardTable.DotProduct.Vehicle, camera.fovFactor
+  local dotVeh, fovFactorFPP = camera.ForwardTable.DotProduct.Vehicle, camera.fovFactorFPP
 
   local vehMasks = Vectors.VehMasks
   local hedSize, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Size, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
@@ -1238,16 +1233,16 @@ local function TransformWidthBike()
     mask3.Size.x = mask2.Size.x
   else
     --Mask1
-    mask1.Size.x = mask1.Def.Size.x * fovFactor
+    mask1.Size.x = mask1.Def.Size.x * fovFactorFPP
 
     --Mask2
-    mask2.Size.x = mask2.Def.Size.x * fovFactor
+    mask2.Size.x = mask2.Def.Size.x * fovFactorFPP
 
     --Mask3
-    mask3.Size.x = mask3.Def.Size.x * fovFactor
+    mask3.Size.x = mask3.Def.Size.x * fovFactorFPP
 
     --Mask4
-    mask4.Size.x = mask4.Def.Size.x * (mask4.Scale.x * 0.01) * fovFactor
+    mask4.Size.x = mask4.Def.Size.x * (mask4.Scale.x * 0.01) * fovFactorFPP
   end
 end
 
@@ -1327,10 +1322,10 @@ end
 
 local function TransformHeightBike()
   local camera = Vectors.Camera
-  local dotVeh, fovFactor = camera.ForwardTable.DotProduct.Vehicle, camera.fovFactor
+  local dotVeh, fovFactorFPP = camera.ForwardTable.DotProduct.Vehicle, camera.fovFactorFPP
 
   local vehMasks = Vectors.VehMasks
-  local hedSize, hedScreenSpace, mask1, mask2, mask3, mask4 = Vectors.VehMasks.HorizontalEdgeDown.Size, Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
+  local hedSize, hedScreenSpace, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Size, vehMasks.HorizontalEdgeDown.ScreenSpace, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
 
   local vecVehicle = Vectors.Vehicle
   local bumperScreen = Vectors.Vehicle.Bumper.ScreenSpace
@@ -1384,16 +1379,16 @@ local function TransformHeightBike()
     end
   else
     --Mask1
-    mask1.Size.y = mask1.Def.Size.y * fovFactor
+    mask1.Size.y = mask1.Def.Size.y * fovFactorFPP
   
     --Mask2
-    mask2.Size.y = mask2.Def.Size.y * fovFactor
+    mask2.Size.y = mask2.Def.Size.y * fovFactorFPP
 
     --Mask3
-    mask3.Size.y = mask3.Def.Size.y * fovFactor
+    mask3.Size.y = mask3.Def.Size.y * fovFactorFPP
 
     --Mask4
-    mask4.Size.y = mask4.Def.Size.y * (mask4.Scale.y * 0.01) * fovFactor
+    mask4.Size.y = mask4.Def.Size.y * (mask4.Scale.y * 0.01) * fovFactorFPP
   end
 end
 
@@ -1402,7 +1397,7 @@ local function TransformHeightCar()
   local activePerspective, dotVeh = camera.activePerspective, camera.ForwardTable.DotProduct.Vehicle
 
   local vehMasks = Vectors.VehMasks
-  local hedSizeTracker, mask1, mask2, mask3, mask4 = Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
+  local hedSizeTracker, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Size.Tracker, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
 
   local vecVehicle = Vectors.Vehicle
   local axisLength, bumpersScreenDistance, currentSpeed, wheelbase = vecVehicle.Axis.ScreenLength, vecVehicle.Bumper.ScreenSpace.distance, vecVehicle.currentSpeed, vecVehicle.Wheel.wheelbase
@@ -1833,7 +1828,8 @@ local function TransformOpacity()
 end
 
 function Vectors.TransformVisibility()
-  local cameraForwardTable = Vectors.Camera.ForwardTable
+  local camera = Vectors.Camera
+  local cameraForwardTable, fov = camera.ForwardTable, camera.fov
   local dotVeh, medianAngle = cameraForwardTable.DotProduct.Vehicle, cameraForwardTable.Angle.Vehicle.Forward.medianPlane
 
   local maskingVeh = Vectors.MaskingGlobal.vehicles
@@ -1876,16 +1872,24 @@ function Vectors.TransformVisibility()
       mask4.visible = mask4.Def.visible
     end
 
-    if baseObject == 0 and medianAngle >= 0 then
-      hedVisible.fill = hedVisible.Def.fill
-    elseif baseObject == 0 and hasWeapon then
-      hedVisible.fill = hedVisible.Def.fill
-    elseif baseObject == 0 and dotVeh.forward > 0.98 and vehForward.z < -0.12 then
-      hedVisible.fill = hedVisible.Def.fill
-    elseif baseObject == 1 and hasWeapon and dotVeh.right < -0.1 then
-      hedVisible.fill = hedVisible.Def.fill
+    if baseObject == 0 then
+      if medianAngle >= 0 then
+        hedVisible.fill = hedVisible.Def.fill
+      elseif hasWeapon then
+        hedVisible.fill = hedVisible.Def.fill
+      elseif dotVeh.forward > 0.98 and vehForward.z < -0.12 then
+        hedVisible.fill = hedVisible.Def.fill
+      elseif fov > 60 and dotVeh.forwardAbs > 0.65 then
+        hedVisible.fill = hedVisible.Def.fill
+      else
+        hedVisible.fill = hedVisible.Def.fillLock
+      end
     else
-      hedVisible.fill = hedVisible.Def.fillLock
+      if hasWeapon and dotVeh.right < -0.1 then
+        hedVisible.fill = hedVisible.Def.fill
+      else
+        hedVisible.fill = hedVisible.Def.fillLock
+      end
     end
 
     hedVisible.tracker = false
@@ -1951,12 +1955,13 @@ function Vectors.ApplyMasksController()
 end
 
 function Vectors.ApplyScreen()
-  local screen = Config.GetScreen()
+  local screenData = Config.GetScreen()
+  local screen = Vectors.Screen
 
-  Vectors.Screen.Edge = screen.Edge
-  Vectors.Screen.Factor = screen.Factor
-  Vectors.Screen.Space = screen.Space
-  Vectors.Screen.type = screen.type
+  screen.Edge = screenData.Edge
+  screen.Factor = screenData.Factor
+  screen.Space = screenData.Space
+  screen.type = screenData.type
 end
 
 function Vectors.ApplyScreenSpaceHed()
