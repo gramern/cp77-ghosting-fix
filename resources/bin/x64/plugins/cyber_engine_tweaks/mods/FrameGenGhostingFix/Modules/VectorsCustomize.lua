@@ -168,7 +168,7 @@ function VectorsCustomize.DrawUI()
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
 
-        Config.SetStatusBar(UIText.General.settings_default)
+        UI.SetStatusBar(UIText.General.settings_default)
       end
 
       UI.Std.Text("")
@@ -176,13 +176,13 @@ function VectorsCustomize.DrawUI()
       if UI.Std.Button(UIText.General.settings_load, 500, 40) then
         VectorsCustomize.LoadUserSettings()
 
-        Config.SetStatusBar(UIText.General.settings_loaded)
+        UI.SetStatusBar(UIText.General.settings_loaded)
       end
 
       if UI.Std.Button(UIText.General.settings_save, 500, 40) then
         VectorsCustomize.SaveUserSettings()
 
-        Config.SetStatusBar(UIText.General.settings_saved)
+        UI.SetStatusBar(UIText.General.settings_saved)
       end
 
     else

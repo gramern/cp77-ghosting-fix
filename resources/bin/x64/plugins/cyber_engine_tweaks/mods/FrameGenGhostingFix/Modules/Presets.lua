@@ -167,7 +167,7 @@ function Presets.DrawUI()
         end
         if isSelected then
           UI.Std.SetItemDefaultFocus()
-          Config.ResetStatusBar()
+          UI.ResetStatusBar()
         end
       end
       UI.Std.EndCombo()
@@ -180,13 +180,13 @@ function Presets.DrawUI()
       Presets.LoadPreset()
       Vectors.ApplyPreset()
 
-      Config.SetStatusBar(UIText.General.settings_applied_veh)
+      UI.SetStatusBar(UIText.General.settings_applied_veh)
     end
 
     if Presets.selectedPreset then
       if Presets.List[Presets.selectedPreset].PresetInfo.description then
         UI.Ext.TextWhite(UIText.Presets.infotabname)
-        UI.Ext.TextWhite(Presets.List[Presets.selectedPreset].PresetInfo.description)
+        UI.Ext.TextWhite(Presets.List[Presets.selectedPreset].PresetInfo.description, true)
       end
 
       if Presets.List[Presets.selectedPreset].PresetInfo.author then
@@ -202,11 +202,11 @@ function Presets.DrawUI()
         UI.Std.Text("")
         VectorsCustomize.DrawUI()
       else
-        Config.SetStatusBar(UIText.General.info_getIn)
+        UI.SetStatusBar(UIText.General.info_getIn)
       end
     end
 
-    UI.Ext.StatusBar(Config.GetStatusBar())
+    UI.Ext.StatusBar(UI.GetStatusBar())
 
     UI.Std.EndTabItem()
   end

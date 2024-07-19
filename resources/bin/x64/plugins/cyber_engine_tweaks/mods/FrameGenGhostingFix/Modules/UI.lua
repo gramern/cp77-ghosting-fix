@@ -11,11 +11,19 @@ local UI = {
   StyleVar = ImGuiStyleVar,
   -- Reference to the 'ImGuiWindowFlags' class.
   WindowFlags = ImGuiWindowFlags,
-  -- Local ImGui-based extension methods
+  -- Custom ImGui-based extension methods to draw items.
   Ext = {
 
+    -- Custom ImGui.Checkbox methods.
     Checkbox = {
-      -- string: string;
+      --- Renders a checkbox with white text.
+      --
+      -- @param string: string; The label text for the checkbox.
+      -- @param setting: boolean; The current state of the checkbox.
+      -- @param toggle: boolean; The current toggle state.
+      --
+      -- @return setting: boolean; The updated state of the checkbox after user interaction.
+      -- @return toggle: boolean; The toggle state (unchanged by this function).
       TextWhite = function(string, setting, toggle)
         ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
         setting, toggle = ImGui.Checkbox(string, setting)
@@ -25,8 +33,13 @@ local UI = {
       end,
     },
 
+    -- Custom methods to perform on a hovered ImGui/UI item.
     OnItemHovered = {
-      -- string: string
+      --- Sets a tooltip for the previously created ImGui/UI item.
+      --
+      -- @param string: string; The text to display in the tooltip.
+      --
+      -- @return None
       SetTooltip = function(string)
         if ImGui.IsItemHovered() then
           ImGui.SetTooltip(string)
@@ -36,7 +49,11 @@ local UI = {
       end,
     },
 
-    -- string: string
+    --- Displays a status bar with white text proceeded by a separator.
+    --
+    -- @param string: string; The text to display in the status bar.
+    --
+    -- @return None
     StatusBar = function(string)
       ImGui.Separator()
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
@@ -44,7 +61,12 @@ local UI = {
       ImGui.PopStyleColor()
     end,
 
-    -- string: string; wrap: boolean
+    --- Displays text in green color with an option for text wrapping.
+    --
+    -- @param string: string; The text to display in green.
+    -- @param wrap: boolean; If true, the text will be wrapped; if false or nil, the text will be on a single line.
+    --
+    -- @return None
     TextGreen = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 0.2, 1, 0.2, 1)
 
@@ -57,7 +79,12 @@ local UI = {
       ImGui.PopStyleColor()
     end,
     
-    -- string: string; wrap: boolean
+    --- Displays text in red color with an option for text wrapping.
+    --
+    -- @param string: string; The text to display in red.
+    -- @param wrap: boolean; If true, the text will be wrapped; if false or nil, the text will be on a single line.
+    --
+    -- @return None
     TextRed = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 0.2, 0.2, 1)
 
@@ -70,7 +97,12 @@ local UI = {
       ImGui.PopStyleColor()
     end,
     
-    -- string: string; wrap: boolean
+    --- Displays text in white color with an option for text wrapping.
+    --
+    -- @param string: string; The text to display in white.
+    -- @param wrap: boolean; If true, the text will be wrapped; if false or nil, the text will be on a single line.
+    --
+    -- @return None
     TextWhite = function(string, wrap)
       ImGui.PushStyleColor(ImGuiCol.Text, 1, 1, 1, 1)
 
@@ -83,7 +115,16 @@ local UI = {
       ImGui.PopStyleColor()
     end,
 
-    -- string: string; red: integer; green: integer; blue: integer; alpha: integer; wrap: boolean
+    --- Displays text in a custom color, with an option for text wrapping.
+    --
+    -- @param string: string; The text to display.
+    -- @param red: number; The red component of the text color (0.0 to 1.0).
+    -- @param green: number; The green component of the text color (0.0 to 1.0).
+    -- @param blue: number; The blue component of the text color (0.0 to 1.0).
+    -- @param alpha: number; The alpha (opacity) component of the text color (0.0 to 1.0).
+    -- @param wrap: boolean; If true, the text will be wrapped; if false or nil, the text will be on a single line.
+    --
+    -- @return None
     TextColor = function(string, red, green, blue, alpha, wrap)
       if not red and not green and not blue and not alpha then ImGui.Text("ERROR: Text's color isn't defined.") return end
       ImGui.PushStyleColor(ImGuiCol.Text, red, green, blue, alpha)
@@ -99,14 +140,22 @@ local UI = {
   }
 }
 
---[[
-Returns a wrapped string for a specified number of characters
-(the lineLength argument); doesn't draw text. Use for line
-length control; otherwise use UI.Std.TextWrapped or a "true"
-wrap boolean for a UI.Ext variant (e.g., UI.Ext.TextWhite).
+local Config = require("Modules/Config")
+local Localization = require("Modules/Localization")
 
-string: string; lineLength: integer
-]]
+local UIText = Localization.UIText
+
+
+-----------
+-- Unviersal methods
+-----------
+
+--- Wraps text to a specified line length. Doesn't draw text. Use for the line's length control only, otherwise use boolean wrap for UI.Ext methods.
+--
+-- @param string: string; The text to be wrapped.
+-- @param lineLength: string; The maximum number of characters allowed per line.
+--
+-- @return string; The input text wrapped to the specified line length.
 function UI.WrapText(string, lineLength)
   local wrappedString = ""
   local line = ""
@@ -129,6 +178,58 @@ function UI.WrapText(string, lineLength)
   return wrappedString
 end
 
+-----------
+-- Status bar logic
+-----------
+
+-- Table to store current text of the mod's status bar.
+local Status = {
+  bar = nil,
+  previousBar = nil,
+}
+
+--- Resets the status bar to display the default state: the mod's version information.
+--
+-- @param None
+--
+-- @return None
+function UI.ResetStatusBar()
+  local status = UIText.General.info_version .. " " .. Config.__VERSION
+
+  UI.SetStatusBar(status)
+end
+
+--- Sets the text of the mod's status bar, updating only if the new text is different from the previous.
+--
+-- @param string: string; The new text to display in the status bar.
+--
+-- @return None
+function UI.SetStatusBar(string)
+  if Status.previousBar == string then return end
+
+  Status.bar = string
+
+  Status.previousBar = Status.bar
+end
+
+--- Retrieves the current text displayed in the status bar.
+--
+-- @param None
+--
+-- @return string; The current text displayed in the status bar.
+function UI.GetStatusBar()
+  return Status.bar
+end
+
+-----------
+-- OnDraw methods
+-----------
+
+--- Pushes the mod's style to the UI elements.
+--
+-- @param None
+--
+-- @return None
 function UI.PushStyle()
   UI.Std.PushStyleVar(UI.StyleVar.WindowMinSize, 300, 100)
   UI.Std.PushStyleColor(UI.Col.Button, 1, 0.78, 0, 1)
@@ -159,9 +260,26 @@ function UI.PushStyle()
   UI.Std.PushStyleColor(UI.Col.WindowBg, 0, 0, 0, 0.75)
 end
 
+--- Pops the mod's style to the UI elements.
+--
+-- @param None
+--
+-- @return None
 function UI.PopStyle()
   UI.Std.PopStyleColor(26)
   UI.Std.PopStyleVar(1)
+end
+
+-----------
+-- On... handlers
+-----------
+
+function UI.OnOverlayOpen()
+  -- Refresh UIText reference
+  Localization = require("Modules/Localization")
+  UIText = Localization.UIText
+
+  UI.ResetStatusBar()
 end
 
 return UI

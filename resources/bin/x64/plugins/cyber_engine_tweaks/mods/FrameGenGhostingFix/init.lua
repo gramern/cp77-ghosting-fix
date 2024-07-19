@@ -146,7 +146,7 @@ function SetBenchmark(boolean)
     isBenchmarkFinished = false
 
     Config.Print(LogText.benchmark_starting)
-    Config.SetStatusBar(UIText.Options.Benchmark.benchmarkEnabled)
+    UI.SetStatusBar(UIText.Options.Benchmark.benchmarkEnabled)
     return
   end
 
@@ -157,7 +157,7 @@ function SetBenchmark(boolean)
   benchmarkTime = 0
   benchmarkRemainingTime = benchmarkDuration
 
-  Config.SetStatusBar(UIText.Options.Benchmark.benchmarkFinished)
+  UI.SetStatusBar(UIText.Options.Benchmark.benchmarkFinished)
 end
 
 function ResetBenchmarkResults()
@@ -302,6 +302,8 @@ registerForEvent("onOverlayOpen", function()
 
   Config.OnOverlayOpen()
 
+  UI.OnOverlayOpen()
+
   if Diagnostics then
     Diagnostics.OnOverlayOpen()
   end
@@ -395,7 +397,7 @@ registerForEvent("onDraw", function()
 
             Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             -- if keepWindowToggle then
-            --   Config.SetStatusBar(UIText.General.settings_saved)
+            --   UI.SetStatusBar(UIText.General.settings_saved)
             -- end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
@@ -447,7 +449,7 @@ registerForEvent("onDraw", function()
             Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
               Settings.SetSaved(false)
-              Config.SetStatusBar(UIText.General.settings_saved)
+              UI.SetStatusBar(UIText.General.settings_saved)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
@@ -456,12 +458,12 @@ registerForEvent("onDraw", function()
             Config.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.toggleFG, Config.ModState.isFGEnabled, fgToggle)
             if fgToggle then
               Settings.SetSaved(false)
-              Config.SetStatusBar(UIText.General.settings_saved)
+              UI.SetStatusBar(UIText.General.settings_saved)
               DLSSEnablerSetFrameGeneration(Config.ModState.isFGEnabled)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipToggleFG)
             
-            UI.Ext.TextWhite(UIText.Options.fgEnableInGameMenu)
+            UI.Ext.TextWhite(UIText.Options.fgEnableInGameMenu, true)
             UI.Std.Separator()
 
             if currentFps then
@@ -490,12 +492,12 @@ registerForEvent("onDraw", function()
                 if benchmarkSetSuggested and UI.Std.Button(UIText.Options.Benchmark.benchmarkRevertSettings, 480, 40) then
                   RestorePreviousSettings()
 
-                  Config.SetStatusBar(UIText.General.settings_restored)
+                  UI.SetStatusBar(UIText.General.settings_restored)
                   Config.Print(LogText.settings_restoredCache)
                 end
               end
 
-              UI.Ext.StatusBar(Config.GetStatusBar())
+              UI.Ext.StatusBar(UI.GetStatusBar())
 
             end
             UI.Std.EndTabItem()
