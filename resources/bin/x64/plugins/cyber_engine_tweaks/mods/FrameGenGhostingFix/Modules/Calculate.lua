@@ -487,19 +487,19 @@ function Calculate.DrawUI()
     if cornersOnWeaponToggle then
       Calculate.SaveUserSettings()
 
-      Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+      UI.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
     UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
 
     Calculate.Blocker.onAim, blockerOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BlockerAim.name, Calculate.Blocker.onAim)
     if blockerOnAimToggle then
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
 
       if Calculate.Vignette.onAim then
         
         Calculate.Vignette.onAim = false
 
-        Config.SetStatusBar(UIText.General.info_aimOnFoot)
+        UI.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
       Calculate.SaveUserSettings()
@@ -512,12 +512,12 @@ function Calculate.DrawUI()
 
     Calculate.Vignette.onAim, vignetteOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignetteAim.name, Calculate.Vignette.onAim)
     if vignetteOnAimToggle then
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
 
       if Calculate.Blocker.onAim then
         Calculate.Blocker.onAim = false
 
-        Config.SetStatusBar(UIText.General.info_aimOnFoot)
+        UI.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
       Calculate.SaveUserSettings()
@@ -528,7 +528,7 @@ function Calculate.DrawUI()
     if vignetteOnWeaponToggle then
       Calculate.SaveUserSettings()
 
-      Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+      UI.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
     UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.Vignette.tooltip)
 
@@ -538,7 +538,7 @@ function Calculate.DrawUI()
         if vignettePermamentToggle then
           Calculate.SaveUserSettings()
 
-          Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+          UI.SetStatusBar(UIText.General.settings_applied_onfoot)
         end
         UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
 
@@ -589,7 +589,7 @@ function Calculate.DrawUI()
           Calculate.SetVignetteDefault('y')
           Calculate.TurnOnLiveView()
 
-          Config.SetStatusBar(UIText.General.settings_default)
+          UI.SetStatusBar(UIText.General.settings_default)
         end
       
         UI.Std.SameLine()
@@ -597,10 +597,10 @@ function Calculate.DrawUI()
         if UI.Std.Button(UIText.General.settings_save, 240, 40) then
           Calculate.SaveUserSettings()
 
-          Config.SetStatusBar(UIText.General.settings_saved)
+          UI.SetStatusBar(UIText.General.settings_saved)
         end
       else
-        Config.SetStatusBar(UIText.General.info_getOut)
+        UI.SetStatusBar(UIText.General.info_getOut)
       end
     else
       if Calculate.Vignette.permament then
@@ -608,7 +608,7 @@ function Calculate.DrawUI()
       end
     end
 
-    UI.Ext.StatusBar(Config.GetStatusBar())
+    UI.Ext.StatusBar(UI.GetStatusBar())
 
     UI.Std.EndTabItem()
   end
