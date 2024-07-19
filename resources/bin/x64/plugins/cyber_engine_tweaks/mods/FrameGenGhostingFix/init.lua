@@ -287,6 +287,14 @@ if Debug then
 
     Presets.PrintPresets()
   end)
+
+  registerInput('toggleMaskingVehicles', 'Toggle masking state for vehicles', function(keypress)
+    if not keypress then
+        return
+    end
+
+    Vectors.ToggleMaskingState()
+  end)
 end
 
 registerForEvent("onOverlayOpen", function()

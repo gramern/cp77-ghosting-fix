@@ -505,28 +505,10 @@ function Vectors.GetWorldToScreenSpace(pos)
   return screenPos
 end
 
-function Vectors.ResizeHED(baseDimension, multiplier, isX)
-  local newDimension = baseDimension
-  local screenFactor = Vectors.Screen.Factor
-
-  if isX and screenFactor.width ~= 1 then
-    newDimension = baseDimension * screenFactor.width
-  end
-
-  newDimension = newDimension * multiplier
-  newDimension = floor(newDimension)
-
-  if isX then
-    newDimension = max(newDimension, 3888)
-  end
-
-  return newDimension
-end
-
 --Universal methods end here----------------------------------------------------------------------------------------------------------------------
 --Data gathering methods start here----------------------------------------------------------------------------------------------------------------------
 
-function Vectors.IsMounted()
+local function IsMounted()
   local isMounted = Game['GetMountedVehicle;GameObject'](Game.GetPlayer())
   local print
 
@@ -541,7 +523,7 @@ function Vectors.IsMounted()
   return print
 end
 
-function Vectors.IsMoving()
+local function IsMoving()
   local isMoving = Game.GetPlayer():IsMoving()
 
   Vectors.PlayerPuppet.isMoving = isMoving
@@ -549,7 +531,7 @@ function Vectors.IsMoving()
   return isMoving
 end
 
-function Vectors.HasWeapon()
+local function HasWeapon()
   local hasWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
   local print
 
@@ -569,9 +551,9 @@ local function GetPlayerData()
 
   if player then
     Vectors.PlayerPuppet.Position = player:GetWorldPosition()
-    Vectors.IsMounted()
-    Vectors.IsMoving()
-    Vectors.HasWeapon()
+    IsMounted()
+    IsMoving()
+    HasWeapon()
   end
 end
 
@@ -589,7 +571,7 @@ local function GetCameraData()
   camera.ForwardTable.Abs.z = abs(camera.Forward.z)
 end
 
-function Vectors.GetActivePerspective()
+local function GetActivePerspective()
   local player = Game.GetPlayer()
   local vehicle = Game.GetMountedVehicle(player) or false
   local camera = Vectors.Camera
@@ -604,7 +586,7 @@ function Vectors.GetActivePerspective()
   end
 end
 
-function Vectors.GetVehicleBaseObject()
+local function GetVehicleBaseObject()
   local vecVehicle = Vectors.Vehicle
 
   if not vecVehicle.isMounted then return end
@@ -622,7 +604,7 @@ function Vectors.GetVehicleBaseObject()
   return vecVehicle.vehicleBaseObject
 end
 
-function Vectors.GetVehicleRecord()
+local function GetVehicleRecord()
   local vecVehicle = Vectors.Vehicle
 
   if not vecVehicle.isMounted then return end
@@ -633,23 +615,18 @@ function Vectors.GetVehicleRecord()
   return vecVehicle.vehicleRecord
 end
 
-function Vectors.IsVehicleKnown()
+local function IsVehicleKnown()
   local vecVehicle = Vectors.Vehicle
 
   if not vecVehicle.isMounted then return end
 
   local baseObject = vecVehicle.vehicleBaseObject
-  local print
 
   if baseObject == 0 or baseObject == 1 then
     vecVehicle.vehicleTypeKnown = true
-    print = true
   else
     vecVehicle.vehicleTypeKnown = false
-    print = false
   end
-
-  return print
 end
 
 local function GetDefaultBikeWheelsPositions()
@@ -678,9 +655,8 @@ local function GetDefaultCarWheelsPositions()
   vecVehicle.Wheel.wheelbase = dist(wheelPos.Back.Left, wheelPos.Front.Left)
 end
 
---[[ 
-Components names 'WheelAudioEmitterBack' and 'WheelAudioEmitterFront' found in the 'Let There Be Flight' mod by Jack Humbert
-]]
+
+--Components names 'WheelAudioEmitterBack' and 'WheelAudioEmitterFront' found in the 'Let There Be Flight' mod by Jack Humbert
 local function GetBikeWheelsPositions()
   local dist = Vector4.Distance
   local mtxTr = Matrix.GetTranslation
@@ -866,9 +842,9 @@ local function GetVehicleData()
     vecVehicle.Up = vehicle:GetWorldUp()
     vecVehicle.vehicleType = vehicle
     vecVehicle.currentSpeed = vehicle:GetCurrentSpeed()
-    Vectors.GetVehicleBaseObject()
-    Vectors.GetVehicleRecord()
-    Vectors.IsVehicleKnown()
+    GetVehicleBaseObject()
+    GetVehicleRecord()
+    IsVehicleKnown()
   end
 end
 
@@ -928,6 +904,24 @@ end
 --Data gathering methods end here----------------------------------------------------------------------------------------------------------------------
 --Transformation methods start here----------------------------------------------------------------------------------------------------------------------
 
+local function ResizeHED(baseDimension, multiplier, isX)
+  local newDimension = baseDimension
+  local screenFactor = Vectors.Screen.Factor
+
+  if isX and screenFactor.width ~= 1 then
+    newDimension = baseDimension * screenFactor.width
+  end
+
+  newDimension = newDimension * multiplier
+  newDimension = floor(newDimension)
+
+  if isX then
+    newDimension = max(newDimension, 3888)
+  end
+
+  return newDimension
+end
+
 --Transform By
 
 local function TransformByFPS()
@@ -942,8 +936,8 @@ local function TransformByPerspective()
     hedSize.x = hedSize.Def.x
     hedSize.y = hedSize.Def.y
   else
-    hedSize.x = Vectors.ResizeHED(hedSize.Def.x, 0.92, true)
-    hedSize.y = Vectors.ResizeHED(hedSize.Def.y, 1.2)
+    hedSize.x = ResizeHED(hedSize.Def.x, 0.92, true)
+    hedSize.y = ResizeHED(hedSize.Def.y, 1.2)
   end
 end
 
@@ -1204,7 +1198,7 @@ local function TransformWidthBike()
   if camera.activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-    hedSize.x = Vectors.ResizeHED(hedSize.Def.x, newHEDx, true)
+    hedSize.x = ResizeHED(hedSize.Def.x, newHEDx, true)
 
     --HEDTracker
     hedSize.Tracker.x = max(wheelbaseScreen * 4, wheelbaseScreenPerp * 4)
@@ -1254,7 +1248,7 @@ local function TransformWidthCar()
     --HED
     if not hedSize.Def.lock then
       local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-      hedSize.x = Vectors.ResizeHED(hedSize.Def.x, newHEDx, true)
+      hedSize.x = ResizeHED(hedSize.Def.x, newHEDx, true)
     end
   
     --HEDTracker
@@ -1820,7 +1814,7 @@ local function TransformOpacity()
   end
 end
 
-function Vectors.TransformVisibility()
+local function TransformVisibility()
   local camera = Vectors.Camera
   local cameraForwardTable, fov = camera.ForwardTable, camera.fov
   local dotVeh, medianAngle = cameraForwardTable.DotProduct.Vehicle, cameraForwardTable.Angle.Vehicle.Forward.medianPlane
@@ -1898,8 +1892,8 @@ function Vectors.TransformVisibility()
   mask4.visible = false
 end
 
-function Vectors.TransformVehMasks()
-  Vectors.TransformVisibility()
+local function TransformVehMasks()
+  TransformVisibility()
   if not Vectors.MaskingGlobal.vehicles then return end
   TransformByFPS()
   TransformByPerspective()
@@ -1915,38 +1909,11 @@ end
 
 --Transformation methods end here----------------------------------------------------------------------------------------------------------------------
 
-function Vectors.OnUpdate()
-  GetPlayerData()
-  GetCameraData()
-  if not Vectors.Vehicle.isMounted then return end
-  Vectors.GetActivePerspective()
-  GetVehicleData()
-  GetDotProducts()
-  GetCameraAnglesVehicle()
-  GetDerivativeVehicleData()
-  Vectors.TransformVehMasks()
-end
-
-function Vectors.OnInitialize()
-  Vectors.ApplyMasksController()
-  Vectors.ApplyScreen()
-  Vectors.ApplyScreenSpaceHed()
-  Vectors.ApplySizeHed()
-  Vectors.ApplyPreset()
-end
-
-function Vectors.OnOverlayOpen()
-  Vectors.ApplyMasksController()
-  Vectors.ApplyScreen()
-  Vectors.ApplyScreenSpaceHed()
-  Vectors.ApplySizeHed()
-end
-
-function Vectors.ApplyMasksController()
+local function ApplyMasksController()
   Vectors.MaskingGlobal.masksController = Config.GetMasksController()
 end
 
-function Vectors.ApplyScreen()
+local function ApplyScreen()
   local screenData = Config.GetScreen()
   local screen = Vectors.Screen
 
@@ -1956,7 +1923,7 @@ function Vectors.ApplyScreen()
   screen.type = screenData.type
 end
 
-function Vectors.ApplyScreenSpaceHed()
+local function ApplyScreenSpaceHed()
   local hedScreenSpace = Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace
   local screenType = Vectors.Screen.type
 
@@ -1972,14 +1939,75 @@ function Vectors.ApplyScreenSpaceHed()
   end
 end
 
-function Vectors.ApplySizeHed()
+local function ApplySizeHed()
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
 
-  hedSize.x = Vectors.ResizeHED(hedSize.Def.x, 1, true)
+  hedSize.x = ResizeHED(hedSize.Def.x, 1, true)
 end
 
---self:FrameGenGhostingFixSetTransformation(setMaskPath, setMaskMargin, setMaskSize, setMaskRotation, setMaskShear, setMaskAnchorPoint, setMaskOpacity, setMaskVisible)
+--- Sets the masking state (on/off) for vehicles and enables/disables Vectors.OnUpdate() (enables it to/prevents it from gathering data and transforming masks). 
+--
+-- @param isMasking: boolean; The new masking state to set for vehicles.
+--
+-- @return maskingGlobalVehicles; The updated masking state for vehicles.
+function Vectors.SetMaskingState(isMasking)
+  Vectors.MaskingGlobal.vehicles = isMasking
 
+  TransformVisibility()
+
+  return Vectors.MaskingGlobal.vehicles
+end
+
+--- Toggles the masking state (on/off) for vehicles and enables/disables Vectors.OnUpdate() (enables it to/prevents it from gathering data and transforming masks). 
+--
+-- @param None
+--
+-- @return maskingGlobalVehicles; The updated masking state for vehicles.
+function Vectors.ToggleMaskingState()
+  if Vectors.MaskingGlobal.vehicles then
+    Vectors.MaskingGlobal.vehicles = false
+  else
+    Vectors.MaskingGlobal.vehicles = true
+  end
+
+  TransformVisibility()
+
+  return Vectors.MaskingGlobal.vehicles
+end
+
+function Vectors.OnUpdate()
+  if not Vectors.MaskingGlobal.vehicles then return end
+  GetPlayerData()
+  GetCameraData()
+  if not Vectors.Vehicle.isMounted then return end
+  GetActivePerspective()
+  GetVehicleData()
+  GetDotProducts()
+  GetCameraAnglesVehicle()
+  GetDerivativeVehicleData()
+  TransformVehMasks()
+end
+
+function Vectors.OnInitialize()
+  ApplyMasksController()
+  ApplyScreen()
+  ApplyScreenSpaceHed()
+  ApplySizeHed()
+  Vectors.ApplyPreset()
+end
+
+function Vectors.OnOverlayOpen()
+  ApplyMasksController()
+  ApplyScreen()
+  ApplyScreenSpaceHed()
+  ApplySizeHed()
+end
+
+--- Applies new preset loaded from the Presets module. 
+--
+-- @param None
+--
+-- @return None
 function Vectors.ApplyPreset()
   local cname = CName.new
   local new2 = Vector2.new
@@ -2000,7 +2028,7 @@ function Vectors.ApplyPreset()
   local Preset = Config.GetWhiteBoard("Presets")
 
   if not Preset or Preset == nil then Config.Print("No preset found in the Whiteboard table", nil, nil, Vectors.__NAME) return end
-  
+
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
 
   Config.SafeMergeTables(Vectors,Preset.Vectors)

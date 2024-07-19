@@ -556,18 +556,6 @@ function Debug.DrawUI()
       UI.Ext.TextWhite(tostring(Vectors.VehMasks.Mask4.Size.y))
     end
 
-    UI.Ext.TextWhite("Cached Masks Sizes:")
-    if Vectors.VehMasks.Mask2.Cache.Size.y then
-      UI.Ext.TextWhite("Mask1 (y)")
-      UI.Ext.TextWhite(tostring(Vectors.VehMasks.Mask1.Cache.Size.y))
-      UI.Ext.TextWhite("Mask2 (y)")
-      UI.Ext.TextWhite(tostring(Vectors.VehMasks.Mask2.Cache.Size.y))
-      UI.Ext.TextWhite("Mask3 (y)")
-      UI.Ext.TextWhite(tostring(Vectors.VehMasks.Mask3.Cache.Size.y))
-      UI.Ext.TextWhite("Mask4 (y)")
-      UI.Ext.TextWhite(tostring(Vectors.VehMasks.Mask4.Cache.Size.y))
-    end
-
     UI.Std.EndTabItem()
   end
 
