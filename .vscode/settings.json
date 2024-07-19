@@ -16,6 +16,11 @@
   },
   "Lua.diagnostics.globals": [
     "json",
+    "ImGui",
+    "ImGuiCol",
+    "ImGuiCond",
+    "ImGuiStyleVar",
+    "ImGuiWindowFlags",
     "DLSSEnablerSetFrameGeneration",
     "DLSSEnablerGetFrameGenerationState"
   ],
