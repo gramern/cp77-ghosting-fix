@@ -904,7 +904,7 @@ end
 --Data gathering methods end here----------------------------------------------------------------------------------------------------------------------
 --Transformation methods start here----------------------------------------------------------------------------------------------------------------------
 
-local function ResizeHED(baseDimension, multiplier, isX)
+local function SetSizeHED(baseDimension, multiplier, isX)
   local newDimension = baseDimension
   local screenFactor = Vectors.Screen.Factor
 
@@ -922,6 +922,19 @@ local function ResizeHED(baseDimension, multiplier, isX)
   return newDimension
 end
 
+local function SetVisibility(isVisible)
+  local vehMasks = Vectors.VehMasks
+  local hedVisible, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Visible, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
+
+  hedVisible.corners = isVisible
+  hedVisible.fill = isVisible
+  hedVisible.tracker = isVisible
+  mask1.visible = isVisible
+  mask2.visible = isVisible
+  mask3.visible = isVisible
+  mask4.visible = isVisible
+end
+
 --Transform By
 
 local function TransformByFPS()
@@ -936,8 +949,8 @@ local function TransformByPerspective()
     hedSize.x = hedSize.Def.x
     hedSize.y = hedSize.Def.y
   else
-    hedSize.x = ResizeHED(hedSize.Def.x, 0.92, true)
-    hedSize.y = ResizeHED(hedSize.Def.y, 1.2)
+    hedSize.x = SetSizeHED(hedSize.Def.x, 0.92, true)
+    hedSize.y = SetSizeHED(hedSize.Def.y, 1.2)
   end
 end
 
@@ -1198,7 +1211,7 @@ local function TransformWidthBike()
   if camera.activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-    hedSize.x = ResizeHED(hedSize.Def.x, newHEDx, true)
+    hedSize.x = SetSizeHED(hedSize.Def.x, newHEDx, true)
 
     --HEDTracker
     hedSize.Tracker.x = max(wheelbaseScreen * 4, wheelbaseScreenPerp * 4)
@@ -1248,7 +1261,7 @@ local function TransformWidthCar()
     --HED
     if not hedSize.Def.lock then
       local newHEDx = max(0.92, dotVeh.forwardAbs ^ 0.5)
-      hedSize.x = ResizeHED(hedSize.Def.x, newHEDx, true)
+      hedSize.x = SetSizeHED(hedSize.Def.x, newHEDx, true)
     end
   
     --HEDTracker
@@ -1819,7 +1832,6 @@ local function TransformVisibility()
   local cameraForwardTable, fov = camera.ForwardTable, camera.fov
   local dotVeh, medianAngle = cameraForwardTable.DotProduct.Vehicle, cameraForwardTable.Angle.Vehicle.Forward.medianPlane
 
-  local maskingVeh = Vectors.MaskingGlobal.vehicles
   local hasWeapon = Vectors.PlayerPuppet.hasWeapon
 
   local vehMasks = Vectors.VehMasks
@@ -1881,20 +1893,10 @@ local function TransformVisibility()
 
     hedVisible.tracker = false
   end
-
-  if maskingVeh then return end
-  hedVisible.corners = false
-  hedVisible.fill = false
-  hedVisible.tracker = false
-  mask1.visible = false
-  mask2.visible = false
-  mask3.visible = false
-  mask4.visible = false
 end
 
 local function TransformVehMasks()
   TransformVisibility()
-  if not Vectors.MaskingGlobal.vehicles then return end
   TransformByFPS()
   TransformByPerspective()
   TransformByVehBaseObject()
@@ -1942,7 +1944,7 @@ end
 local function ApplySizeHed()
   local hedSize = Vectors.VehMasks.HorizontalEdgeDown.Size
 
-  hedSize.x = ResizeHED(hedSize.Def.x, 1, true)
+  hedSize.x = SetSizeHED(hedSize.Def.x, 1, true)
 end
 
 --- Sets the masking state (on/off) for vehicles and enables/disables Vectors.OnUpdate() (enables it to/prevents it from gathering data and transforming masks). 
@@ -1953,7 +1955,7 @@ end
 function Vectors.SetMaskingState(isMasking)
   Vectors.MaskingGlobal.vehicles = isMasking
 
-  TransformVisibility()
+  SetVisibility(isMasking)
 
   return Vectors.MaskingGlobal.vehicles
 end
@@ -1966,11 +1968,11 @@ end
 function Vectors.ToggleMaskingState()
   if Vectors.MaskingGlobal.vehicles then
     Vectors.MaskingGlobal.vehicles = false
+    SetVisibility(false)
   else
     Vectors.MaskingGlobal.vehicles = true
+    SetVisibility(true)
   end
-
-  TransformVisibility()
 
   return Vectors.MaskingGlobal.vehicles
 end
@@ -2030,6 +2032,8 @@ function Vectors.ApplyPreset()
   if not Preset or Preset == nil then Config.Print("No preset found in the Whiteboard table", nil, nil, Vectors.__NAME) return end
 
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
+
+  if not Vectors.MaskingGlobal.vehicles then SetVisibility(false) return end
 
   Config.SafeMergeTables(Vectors,Preset.Vectors)
 
