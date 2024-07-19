@@ -77,6 +77,16 @@ function Contextual.IsInCombat()
 	return combatState == 1
 end
 
+function Contextual.IsInMenu()
+  local ui_System = Game.GetAllBlackboardDefs().UI_System
+  return Game.GetBlackboardSystem():Get(ui_System):GetBool(ui_System.IsInMenu)
+end
+
+function Contextual.IsInPhotoMode()
+  local photoMode = Game.GetAllBlackboardDefs().PhotoMode
+  return Game.GetBlackboardSystem():Get(photoMode):GetBool(photoMode.IsActive)
+end
+
 function Contextual.IsInCutscene()
 	local sceneTier = Game.GetPlayer().GetSceneTier(Game.GetPlayer())
 
@@ -324,7 +334,7 @@ function Contextual.OnInitialize()
   Observe('gameuiPhotoModeMenuController', 'OnShow', function()
     Contextual.CurrentStates.isPhotoMode = true
 
-    if Contextual.Toggles.isPhotoMode == true then
+    if Contextual.Toggles.Photomode == true then
       Contextual.TurnOffFrameGen()
       Config.Print("Photo mode detected" .. ". Frame Gen is disabled (gameuiPhotoModeMenuController->OnShow)", nil, nil, Contextual.__NAME)
     end
@@ -333,7 +343,7 @@ function Contextual.OnInitialize()
   Observe('gameuiPhotoModeMenuController', 'OnHide', function()
     Contextual.CurrentStates.isPhotoMode = false
 
-    if Contextual.Toggles.isPhotoMode == true then
+    if Contextual.Toggles.Photomode == true then
       Contextual.TurnOnFrameGen()
       Config.Print("Photo mode no longer preset" .. ". Frame Gen is enabled (gameuiPhotoModeMenuController->OnHide)", nil, nil, Contextual.__NAME)
     end
@@ -347,10 +357,8 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isMenu = true
 
     if Contextual.Toggles.Menu == true then
-      if Contextual.Toggles.Menu == true then
-        Contextual.TurnOffFrameGen()
-        Config.Print("Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)", nil, nil, Contextual.__NAME)
-      end
+      Contextual.TurnOffFrameGen()
+      Config.Print("Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)", nil, nil, Contextual.__NAME)
     end
 
   end)
@@ -359,12 +367,12 @@ function Contextual.OnInitialize()
   Observe('gameuiPopupsManager', 'OnMenuUpdate', function(_, IsInMenu)
     Contextual.CurrentStates.isMenu = IsInMenu
 
-    if Contextual.Toggles.isCutscene == true then
-      if Contextual.CurrentStates.isMenu then
+    if Contextual.Toggles.Menu == true then
+      if Contextual.CurrentStates.isMenu or Contextual.IsInMenu() then
         Contextual.TurnOffFrameGen()
         Config.Print("Menu detected" .. ". Frame Gen is disabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
-      if not Contextual.CurrentStates.isMenu then
+      if not Contextual.CurrentStates.isMenu or not Contextual.IsInMenu() then
         Contextual.TurnOnFrameGen()
         Config.Print("Menu no longer present" .. ". Frame Gen is enabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
@@ -487,7 +495,7 @@ end
 
 
 function Contextual.SetPhotoMode(feature)
-  if Contextual.CurrentStates.isPhotoMode then
+  if Contextual.CurrentStates.isPhotoMode or Contextual.IsInPhotoMode()  then
     if feature == true then
 
       if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
@@ -514,7 +522,7 @@ function Contextual.SetPhotoMode(feature)
 end
 
 function Contextual.SetMenu(feature)
-  if Contextual.CurrentStates.isMenu then
+  if Contextual.CurrentStates.isMenu or Contextual.IsInMenu() then
     if feature == true then
 
       if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
@@ -529,7 +537,7 @@ function Contextual.SetMenu(feature)
       if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
         return
       end
-      if Contextual.Toggles.isPhotoMode and Contextual.CurrentStates.isPhotoMode then
+      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
         return
       end
 
