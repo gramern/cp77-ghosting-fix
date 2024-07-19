@@ -560,8 +560,8 @@ function Contextual.DrawUI()
       UI.Std.Text("")
       UI.Ext.TextRed(UIText.Contextual.requirement)
       UI.Std.Text("")
-      Config.ResetStatusBar()
-      UI.Ext.StatusBar(Config.GetStatusBar())
+      UI.ResetStatusBar()
+      UI.Ext.StatusBar(UI.GetStatusBar())
       UI.Std.EndTabItem()
       return
     end
@@ -573,42 +573,42 @@ function Contextual.DrawUI()
     Contextual.Toggles.Vehicle, vehicleToggle = UI.Ext.Checkbox.TextWhite("Vehicle", Contextual.Toggles.Vehicle, vehicleToggle)
     if vehicleToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetVehicle(Contextual.Toggles.Vehicle)
     end
 
     Contextual.Toggles.VehicleCombat, vehicleCombatToggle = UI.Ext.Checkbox.TextWhite("Vehicle Combat", Contextual.Toggles.VehicleCombat, vehicleCombatToggle)
     if vehicleCombatToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetVehicleCombat(Contextual.Toggles.VehicleCombat)
     end
 
     Contextual.Toggles.Combat, combatToggle = UI.Ext.Checkbox.TextWhite("Combat", Contextual.Toggles.Combat, combatToggle)
     if combatToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetCombat(Contextual.Toggles.Combat)
     end
 
     Contextual.Toggles.Cutscenes, cutscenesToggle = UI.Ext.Checkbox.TextWhite("Cutscenes", Contextual.Toggles.Cutscenes, cutscenesToggle)
     if cutscenesToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetCutscenes(Contextual.Toggles.Cutscenes)
     end
 
     Contextual.Toggles.Photomode, photoModeToggle = UI.Ext.Checkbox.TextWhite("Photo Mode", Contextual.Toggles.Photomode, photoModeToggle)
     if photoModeToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetPhotoMode(Contextual.Toggles.Photomode)
     end
 
     Contextual.Toggles.Menu, menuToggle = UI.Ext.Checkbox.TextWhite("Menus", Contextual.Toggles.Menu, menuToggle)
     if menuToggle then
       Settings.SetSaved(false)
-      Config.SetStatusBar(UIText.General.settings_saved)
+      UI.SetStatusBar(UIText.General.settings_saved)
       Contextual.SetMenu(Contextual.Toggles.Menu)
     end
 
@@ -616,7 +616,7 @@ function Contextual.DrawUI()
     UI.Ext.TextWhite("Current Event States: ")
     UI.Ext.TextWhite(Contextual.StringifyStates())
 
-    UI.Ext.StatusBar(Config.GetStatusBar())
+    UI.Ext.StatusBar(UI.GetStatusBar())
     UI.Std.EndTabItem()
   end
 
