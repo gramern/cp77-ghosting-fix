@@ -8,6 +8,7 @@ local Config = {
   ModState = {
     isDebug = false,
     keepWindow = false,
+    isFGEnabled = true,
     openWindow = false,
     isFirstRun = false,
     isNewInstall = false,

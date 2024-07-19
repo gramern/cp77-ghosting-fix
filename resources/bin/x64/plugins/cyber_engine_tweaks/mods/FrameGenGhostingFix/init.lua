@@ -44,13 +44,15 @@ local UI = require("Modules/UI")
 local LogText = Localization.LogText
 local UIText = Localization.UIText
 
---optional modules
 local Calculate = require("Modules/Calculate")
+local Contextual = require("Modules/Contextual")
+local Presets = require("Modules/Presets")
+local Vectors = require("Modules/Vectors")
+
+--optional modules
 local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Translate = require("Modules/Translate")
-local Presets = require("Modules/Presets")
-local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
 --game performance
@@ -77,6 +79,7 @@ local countFps = 0
 local windowTitle
 local openOverlay
 local keepWindowToggle
+local fgToggle
 
 function GetGameState()
   local GameState = FrameGenGhostingFix.GameState
@@ -123,9 +126,7 @@ function Benchmark()
 
     Config.Print(LogText.benchmark_avgFpsResult, averageFps)
 
-    if Calculate then
-      Calculate.ApplySuggestedSettings(averageFps)
-    end
+    Calculate.ApplySuggestedSettings(averageFps)
 
     benchmarkSetSuggested = true
 
@@ -257,34 +258,25 @@ registerForEvent("onInit", function()
     IsGameLoaded(false)
   end)
 
-  if Settings then
-    Settings.OnInitialize()
-  end
+  Settings.OnInitialize()
+  Presets.OnInitialize()
+  Calculate.OnInitialize()
+  Contextual.OnInitialize()
+  Vectors.OnInitialize()
 
-  if Presets then
-    Presets.OnInitialize()
-  end
-
-  if Calculate then
-    Calculate.OnInitialize()
-  end
-
-  if Vectors then
-    Vectors.OnInitialize()
-
-    if VectorsCustomize then
-      VectorsCustomize.OnInitialize()
-    end
+  if VectorsCustomize then
+    VectorsCustomize.OnInitialize()
   end
 
   if Config.IsFirstRun() then
     SetBenchmark(true)
   end
 
-  if Debug then
-    Config.SetDebug(true)
-    Config.KeepWindow(true)
-  end
+  -- danyalzia: I am commenting it during development since I don't want to close these windows everytime I launch the game for testing :/
+  -- if Debug then
+  --   Config.SetDebug(true)
+  --   Config.KeepWindow(true)
+  -- end
 end)
 
 if Debug then
@@ -293,11 +285,7 @@ if Debug then
         return
     end
 
-    if Presets then
-      Presets.PrintPresets()
-    else
-      Config.Print("No 'Presets' module available.")
-    end
+    Presets.PrintPresets()
   end)
 end
 
@@ -320,21 +308,18 @@ registerForEvent("onOverlayOpen", function()
 
   if not Config.IsModReady() then return end
 
-  if Presets then
-    Presets.OnOverlayOpen()
+  Presets.OnOverlayOpen()
+
+  Calculate.OnOverlayOpen()
+
+  Contextual.OnOverlayOpen()
+
+  Vectors.OnOverlayOpen()
+
+  if VectorsCustomize then
+    VectorsCustomize.OnOverlayOpen()
   end
 
-  if Calculate then
-    Calculate.OnOverlayOpen()
-  end
-
-  if Vectors then
-    Vectors.OnOverlayOpen()
-
-    if VectorsCustomize then
-      VectorsCustomize.OnOverlayOpen()
-    end
-  end
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -348,17 +333,14 @@ registerForEvent("onOverlayClose", function()
 
   if not Config.IsModReady() then return end
 
-  if Calculate then
-    Calculate.OnOverlayClose()
-  end
+  Calculate.OnOverlayClose()
 
-  if Vectors and VectorsCustomize then
+  if VectorsCustomize then
     VectorsCustomize.OnOverlayClose()
   end
 
-  if Settings then
-    Settings.OnOverlayClose()
-  end
+  Settings.OnOverlayClose()
+
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
@@ -445,13 +427,13 @@ registerForEvent("onDraw", function()
         end
 
         if openOverlay and Config.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
-          if Presets then
-            Presets.DrawUI()
-          end
 
-          if Calculate then
-            Calculate.DrawUI()
-          end
+          Presets.DrawUI()
+
+          Calculate.DrawUI()
+
+          Contextual.DrawUI()
+
         end
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
@@ -469,6 +451,17 @@ registerForEvent("onDraw", function()
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
+            UI.Std.Separator()
+
+            Config.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite("Toggle Frame Generation", Config.ModState.isFGEnabled, fgToggle)
+            if fgToggle then
+              Settings.SetSaved(false)
+              Config.SetStatusBar(UIText.General.settings_saved)
+              DLSSEnablerSetFrameGeneration(Config.ModState.isFGEnabled)
+            end
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipFGToggle)
+            
+            UI.Ext.TextWhite(UIText.Options.fgEnableInGameMenu)
             UI.Std.Separator()
 
             if currentFps then

@@ -124,11 +124,17 @@ local translation = {
         tooltip = "Enables contextual blocking of frame generation\nfor a whole screen when V is aiming/blocking with a weapon. This\nmay turn out to be helpful in higher framerates as crosshairs/\nsights tend to ghost heavily with frame generation turned on."
       }
     },
+    Contextual = {
+      tabname = "Contextual",
+      info = "Turn off frame generation during these events."
+    },
     Options = {
       tabname = "Additional Options",
       enabledDebug = "Enable debug view",
       enabledWindow = "Keep this window open",
       tooltipWindow = "Keeps this window opened after closing CET's overlay.",
+      tooltipFGToggle = "Turn on/off Frame Generation, so you don't have to do it from game menu.",
+      fgEnableInGameMenu = "[ ! ] Please make sure frame generation is always enabled in game menu for this to function correctly.",
       Benchmark = {
         currentFps = "Current FPS without Frame Gen:",
         currentFrametime = "Current Frame-Time without Frame Gen (ms):",

@@ -29,9 +29,20 @@ local function Translate(legacyUserSettings)
         Scale = {}
       }
     },
+    Contextual = {
+      Toggles = {
+        Vehicle = nil,
+        VehicleCombat = nil,
+        Combat = nil,
+        Cutscenes = nil,
+        Photomode = nil,
+        Menu = nil,
+      }
+    },
     Config = {
       version = nil,
       keepWindow = nil,
+      isFGEnabled = nil,
     },
     VectorsCustomize = {
       Bike = {
@@ -113,6 +124,7 @@ function Settings.SaveFile()
   Settings.WriteUserSettings("Config",{
     ModState = {
       keepWindow = Config.ModState.keepWindow,
+      isFGEnabled = Config.ModState.isFGEnabled,
       version = Config.__VERSION_NUMBER,
   }})
 

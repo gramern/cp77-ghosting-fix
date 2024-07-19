@@ -15,6 +15,10 @@
     "editor.tabSize": 2
   },
   "Lua.diagnostics.globals": [
-    "json"
+    "json",
+    "DLSSEnablerSetFrameGeneration"
+  ],
+  "Lua.diagnostics.disable": [
+    "redundant-parameter"
   ]
 }
