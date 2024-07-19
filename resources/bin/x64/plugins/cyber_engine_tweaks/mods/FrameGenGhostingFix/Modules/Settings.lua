@@ -109,6 +109,8 @@ function Settings.LoadFile()
 
     Config.ModState.keepWindow = UserSettings.Config and UserSettings.Config.keepWindow or false
 
+    Config.ModState.isFGEnabled = UserSettings.Config and UserSettings.Config.isFGEnabled or true
+
     Config.Print(LogText.settings_loaded,nil,nil,Settings.__NAME)
     return true
   else
@@ -123,9 +125,9 @@ function Settings.SaveFile()
 
   Settings.WriteUserSettings("Config",{
     ModState = {
+      version = Config.__VERSION_NUMBER,
       keepWindow = Config.ModState.keepWindow,
       isFGEnabled = Config.ModState.isFGEnabled,
-      version = Config.__VERSION_NUMBER,
   }})
 
   local userSettingsContents = json.encode(UserSettings)

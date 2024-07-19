@@ -453,13 +453,13 @@ registerForEvent("onDraw", function()
 
             UI.Std.Separator()
 
-            Config.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite("Toggle Frame Generation", Config.ModState.isFGEnabled, fgToggle)
+            Config.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.toggleFG, Config.ModState.isFGEnabled, fgToggle)
             if fgToggle then
               Settings.SetSaved(false)
               Config.SetStatusBar(UIText.General.settings_saved)
               DLSSEnablerSetFrameGeneration(Config.ModState.isFGEnabled)
             end
-            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipFGToggle)
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipToggleFG)
             
             UI.Ext.TextWhite(UIText.Options.fgEnableInGameMenu)
             UI.Std.Separator()

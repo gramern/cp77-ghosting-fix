@@ -126,6 +126,7 @@ local translation = {
     },
     Contextual = {
       tabname = "Contextual",
+      requirement = 'Please check "Toggle Frame Generation" from "Additional Options" if you want to use these features.',
       info = "Turn off frame generation during these events."
     },
     Options = {
@@ -133,7 +134,8 @@ local translation = {
       enabledDebug = "Enable debug view",
       enabledWindow = "Keep this window open",
       tooltipWindow = "Keeps this window opened after closing CET's overlay.",
-      tooltipFGToggle = "Turn on/off Frame Generation, so you don't have to do it from game menu.",
+      toggleFG = "Toggle Frame Generation",
+      tooltipToggleFG = "Turn on/off Frame Generation, so you don't have to do it from the game menu.",
       fgEnableInGameMenu = "[ ! ] Please make sure frame generation is always enabled in game menu for this to function correctly.",
       Benchmark = {
         currentFps = "Current FPS without Frame Gen:",

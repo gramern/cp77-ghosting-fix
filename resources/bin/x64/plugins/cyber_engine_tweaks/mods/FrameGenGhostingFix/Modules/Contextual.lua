@@ -556,6 +556,16 @@ function Contextual.DrawUI()
 
   if UI.Std.BeginTabItem(UIText.Contextual.tabname) then
 
+    if not Config.ModState.isFGEnabled then
+      UI.Std.Text("")
+      UI.Ext.TextRed(UIText.Contextual.requirement)
+      UI.Std.Text("")
+      Config.ResetStatusBar()
+      UI.Ext.StatusBar(Config.GetStatusBar())
+      UI.Std.EndTabItem()
+      return
+    end
+
     UI.Ext.TextWhite(UIText.General.title_general)
     UI.Std.Separator()
     UI.Ext.TextWhite(UIText.Contextual.info)
@@ -603,11 +613,10 @@ function Contextual.DrawUI()
     end
 
     UI.Std.Separator()
-    UI.Ext.TextWhite("Current Events States: ")
+    UI.Ext.TextWhite("Current Event States: ")
     UI.Ext.TextWhite(Contextual.StringifyStates())
 
     UI.Ext.StatusBar(Config.GetStatusBar())
-
     UI.Std.EndTabItem()
   end
 

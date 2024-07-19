@@ -16,7 +16,8 @@
   },
   "Lua.diagnostics.globals": [
     "json",
-    "DLSSEnablerSetFrameGeneration"
+    "DLSSEnablerSetFrameGeneration",
+    "DLSSEnablerGetFrameGenerationState"
   ],
   "Lua.diagnostics.disable": [
     "redundant-parameter"
