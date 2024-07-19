@@ -17,6 +17,7 @@ local Localization = {
       settings_loaded_preset = "Preset loaded",
       settings_applied_veh = "[ ! ] Selected preset applied.",
       settings_restored = "Restored your previous settings.",
+      settings_load = "Load settings",
       settings_save = "Save settings",
       settings_saved = "[ ! ] Your settings will be saved.",
       settings_applied_onfoot = "[ ! ] Redraw your weapon to accept changes.",

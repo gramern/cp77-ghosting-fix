@@ -23,15 +23,15 @@ function VectorsCustomize.SetDefault()
 end
 
 function VectorsCustomize.SetWindshieldDefault()
-  Vectors.VehMasks.Mask4.Scale.x = 100
-  Vectors.VehMasks.Mask4.Scale.y = 100
+  Vectors.VehMasks.Mask4.Def.Scale.x = 100
+  Vectors.VehMasks.Mask4.Def.Scale.y = 100
 end
 
 function VectorsCustomize.GetUserSettings()
   UserSettings = {
     Bike = {
       Windshield = {
-        Scale = Vectors.VehMasks.Mask4.Scale,
+        Scale = Vectors.VehMasks.Mask4.Def.Scale,
       }
     }
   }
@@ -41,12 +41,12 @@ end
 
 function VectorsCustomize.LoadUserSettings()
   if UserSettings == nil then return end
-  Vectors.VehMasks.Mask4.Scale = Config.SafeMergeTables(Vectors.VehMasks.Mask4.Scale, UserSettings.Bike.Windshield.Scale)
+  Vectors.VehMasks.Mask4.Def.Scale = Config.SafeMergeTables(Vectors.VehMasks.Mask4.Def.Scale, UserSettings.Bike.Windshield.Scale)
 end
 
 function VectorsCustomize.SaveUserSettings()
-  Vectors.ApplyPreset()
   Settings.WriteUserSettings("VectorsCustomize", VectorsCustomize.GetUserSettings())
+  VectorsCustomize.LoadUserSettings()
 end
 
 function VectorsCustomize.OnInitialize()
@@ -61,6 +61,7 @@ end
 
 function VectorsCustomize.OnOverlayOpen()
   VectorsCustomize.ApplyMasksController()
+  VectorsCustomize.LoadUserSettings()
 
   Localization = require("Modules/Localization")
   UIText = Localization.UIText
@@ -68,6 +69,7 @@ end
 
 function VectorsCustomize.OnOverlayClose()
   VectorsCustomize.TurnOffLiveView()
+  VectorsCustomize.LoadUserSettings()
 end
 
 function VectorsCustomize.ApplyMasksController()
@@ -148,34 +150,41 @@ function VectorsCustomize.DrawUI()
       UI.Std.Text("")
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_1)
 
-      vehMasks.Mask4.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat("##ScaleX", vehMasks.Mask4.Scale.x, 70, 150, "%.0f")
+      vehMasks.Mask4.Def.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat("##ScaleX", vehMasks.Mask4.Def.Scale.x, 70, 150, "%.0f")
       if windshieldScaleToggle.x then
         VectorsCustomize.TurnOnLiveView()
       end
 
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_2)
 
-      vehMasks.Mask4.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat("##ScaleY", vehMasks.Mask4.Scale.y, 70, 300, "%.0f")
+      vehMasks.Mask4.Def.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat("##ScaleY", vehMasks.Mask4.Def.Scale.y, 70, 300, "%.0f")
       if windshieldScaleToggle.y then
         VectorsCustomize.TurnOnLiveView()
       end
 
       UI.Std.Text("")
 
-      if UI.Std.Button(UIText.General.default, 240, 40) then
+      if UI.Std.Button(UIText.General.default, 500, 40) then
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
 
         Config.SetStatusBar(UIText.General.settings_default)
       end
 
-      UI.Std.SameLine()
+      UI.Std.Text("")
 
-      if UI.Std.Button(UIText.General.settings_save, 240, 40) then
+      if UI.Std.Button(UIText.General.settings_load, 500, 40) then
+        VectorsCustomize.LoadUserSettings()
+
+        Config.SetStatusBar(UIText.General.settings_loaded)
+      end
+
+      if UI.Std.Button(UIText.General.settings_save, 500, 40) then
         VectorsCustomize.SaveUserSettings()
 
         Config.SetStatusBar(UIText.General.settings_saved)
       end
+
     else
       UI.Ext.TextWhite(UIText.Vehicles.Windshield.warning)
     end

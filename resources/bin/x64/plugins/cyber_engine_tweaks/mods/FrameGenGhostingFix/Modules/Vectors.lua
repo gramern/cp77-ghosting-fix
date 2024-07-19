@@ -52,6 +52,7 @@ local Vectors = {
     BikeSpeedometer = {
       Offset = {x = 0.0, y = 0.8, z = 0.45},
       rotation = 180,
+      Scale = {x = 100, y = 100},
       Size = {x = 6120, y = 1600},
       visible = true,
     },
@@ -59,12 +60,14 @@ local Vectors = {
       Left = {
         Offset = {x = -0.6, y = 0.7, z = 0.48},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 3000, y = 1800},
         visible = true,
       },
       Right = {
         Offset = {x = 0.6, y = 0.7, z = 0.48},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 3000, y = 1800},
         visible = true,
       }
@@ -72,6 +75,7 @@ local Vectors = {
     BikeWindshield = {
       Offset = {x = 0.0, y = 1, z = 0.54},
       rotation = 0,
+      Scale = {x = 100, y = 100},
       Size = {x = 3600, y = 1200},
       visible = true,
     },
@@ -79,12 +83,14 @@ local Vectors = {
       Left = {
         Offset = {x = -1.2, y = 0.55, z = 0},
         rotation = 140,
+        Scale = {x = 100, y = 100},
         Size = {x = 3000, y = 2000},
         visible = true,
       },
       Right = {
         Offset = {x = 1.2, y = 0.55, z = 0},
         rotation = -160,
+        Scale = {x = 100, y = 100},
         Size = {x = 2250, y = 1500},
         visible = true,
       },
@@ -93,12 +99,14 @@ local Vectors = {
       Left = {
         Offset = {x = -1, y = 0.45, z = 0.65},
         rotation = 40,
+        Scale = {x = 100, y = 100},
         Size = {x = 1400, y = 1200},
         visible = true,
       },
       Right = {
         Offset = {x = 1.05, y = 0.45, z = 0.65},
         rotation = 145,
+        Scale = {x = 100, y = 100},
         Size = {x = 800, y = 800},
         visible = true,
       },
@@ -263,14 +271,10 @@ local Vectors = {
     },
     Mask1 = {
       AnchorPoint = {x = 0.5, y = 0.5},
-      Cache = {
-        Scale = {x = 100, y = 100},
-        Shear = {x = 0, y = 0},
-        Size = {x = 0, y = 0},
-      },
       Def = {
         Offset = {x = 0, y = 0, z = 0},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 0, y = 0},
         visible = true,
       },
@@ -279,7 +283,6 @@ local Vectors = {
       opacity = 0,
       Position = nil,
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Shear = {x = 0, y = 0},
       Size = {x = 0, y = 0},
       ScreenSpace = {x = 0, y = 0},
@@ -287,13 +290,10 @@ local Vectors = {
     },
     Mask2 = {
       AnchorPoint = {x = 0.5, y = 0.5},
-      Cache = {
-        Scale = {x = 100, y = 100},
-        Size = {x = 0, y = 0},
-      },
       Def = {
         Offset = {x = 0, y = 0, z = 0},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 0, y = 0},
         visible = true,
       },
@@ -302,7 +302,6 @@ local Vectors = {
       opacity = 0,
       Position = nil,
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Shear = {x = 0, y = 0},
       Size = {x = 0, y = 0},
       ScreenSpace = {x = 0, y = 0},
@@ -310,13 +309,10 @@ local Vectors = {
     },
     Mask3 = {
       AnchorPoint = {x = 0.5, y = 0.5},
-      Cache = {
-        Scale = {x = 100, y = 100},
-        Size = {x = 0, y = 0},
-      },
       Def = {
         Offset = {x = 0, y = 0, z = 0},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 0, y = 0},
         visible = true,
       },
@@ -325,7 +321,6 @@ local Vectors = {
       opacity = 0,
       Position = nil,
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Shear = {x = 0, y = 0},
       Size = {x = 0, y = 0},
       ScreenSpace = {x = 0, y = 0},
@@ -334,13 +329,12 @@ local Vectors = {
     Mask4 = {
       AnchorPoint = {x = 0.5, y = 0.5},
       Cache = {
-        Scale = {x = 100, y = 100},
         Shear = {x = 0, y = 0},
-        Size = {x = 0, y = 0},
       },
       Def = {
         Offset = {x = 0, y = 0, z = 0},
         rotation = 0,
+        Scale = {x = 100, y = 100},
         Size = {x = 0, y = 0},
         visible = true,
       },
@@ -349,7 +343,6 @@ local Vectors = {
       opacity = 0,
       Position = nil,
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Shear = {x = 0, y = 0},
       Size = {x = 0, y = 0},
       ScreenSpace = {x = 0, y = 0},
@@ -1242,7 +1235,7 @@ local function TransformWidthBike()
     mask3.Size.x = mask3.Def.Size.x * fovFactorFPP
 
     --Mask4
-    mask4.Size.x = mask4.Def.Size.x * (mask4.Scale.x * 0.01) * fovFactorFPP
+    mask4.Size.x = mask4.Def.Size.x * (mask4.Def.Scale.x * 0.01) * fovFactorFPP
   end
 end
 
@@ -1388,7 +1381,7 @@ local function TransformHeightBike()
     mask3.Size.y = mask3.Def.Size.y * fovFactorFPP
 
     --Mask4
-    mask4.Size.y = mask4.Def.Size.y * (mask4.Scale.y * 0.01) * fovFactorFPP
+    mask4.Size.y = mask4.Def.Size.y * (mask4.Def.Scale.y * 0.01) * fovFactorFPP
   end
 end
 
@@ -1947,7 +1940,6 @@ function Vectors.OnOverlayOpen()
   Vectors.ApplyScreen()
   Vectors.ApplyScreenSpaceHed()
   Vectors.ApplySizeHed()
-  Vectors.ApplyPreset()
 end
 
 function Vectors.ApplyMasksController()
@@ -2006,6 +1998,8 @@ function Vectors.ApplyPreset()
   local mask4Path = cname(mask4.maskPath)
 
   local Preset = Config.GetWhiteBoard("Presets")
+
+  if not Preset or Preset == nil then Config.Print("No preset found in the Whiteboard table", nil, nil, Vectors.__NAME) return end
   
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
 
