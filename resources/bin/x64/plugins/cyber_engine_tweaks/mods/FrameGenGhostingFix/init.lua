@@ -282,7 +282,7 @@ end)
 if Debug then
   registerInput('printPresets', 'Print the presets list', function(keypress)
     if not keypress then
-        return
+      return
     end
 
     Presets.PrintPresets()
@@ -290,10 +290,24 @@ if Debug then
 
   registerInput('toggleMaskingVehicles', 'Toggle masking state for vehicles', function(keypress)
     if not keypress then
-        return
+      return
     end
 
     Vectors.ToggleMaskingState()
+  end)
+
+  registerInput('printFrameGenState', 'Print frame generation state', function(keypress)
+    if not keypress then
+      return
+    end
+
+    local isFrameGen = DLSSEnablerGetFrameGenerationState()
+    
+    if isFrameGen then
+      Config.Print("Frame Generation is enabled.")
+    else
+      Config.Print("Frame Generation is disabled.")
+    end
   end)
 end
 
