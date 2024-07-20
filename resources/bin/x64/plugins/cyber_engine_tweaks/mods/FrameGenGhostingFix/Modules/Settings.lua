@@ -34,7 +34,7 @@ local function Translate(legacyUserSettings)
         Vehicle = nil,
         VehicleCombat = nil,
         Combat = nil,
-        Cutscenes = nil,
+        Cinematic = nil,
         Photomode = nil,
         Menu = nil,
       }

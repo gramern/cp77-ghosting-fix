@@ -5,7 +5,7 @@ local Contextual = {
     Vehicle = false,
     VehicleCombat = false,
     Combat = false,
-    Cutscenes = false,
+    Cinematic = false,
     Photomode = false,
     Menu = false,
   },
@@ -13,7 +13,7 @@ local Contextual = {
     isVehicle = false,
     isVehicleCombat = false,
     isCombat = false,
-    isCutscene = false,
+    isCinematic = false,
     isPhotoMode = false,
     isMenu = false,
   }
@@ -58,7 +58,7 @@ function Contextual.StringifyStates()
   return "isVehicle: " .. tostring(Contextual.CurrentStates.isVehicle) ..
   "\n" .. "isVehicleCombat: " ..tostring(Contextual.CurrentStates.isVehicleCombat) ..
   "\n" .. "isCombat: " ..tostring(Contextual.CurrentStates.isCombat) ..
-  "\n" .. "isCutscene: " ..tostring(Contextual.CurrentStates.isCutscene) ..
+  "\n" .. "isCinematic: " ..tostring(Contextual.CurrentStates.isCinematic) ..
   "\n" .. "isPhotoMode: " ..tostring(Contextual.CurrentStates.isPhotoMode) ..
   "\n" .. "isMenu: " ..tostring(Contextual.CurrentStates.isMenu)
 end
@@ -87,11 +87,10 @@ function Contextual.IsInPhotoMode()
   return Game.GetBlackboardSystem():Get(photoMode):GetBool(photoMode.IsActive)
 end
 
-function Contextual.IsInCutscene()
+function Contextual.IsInCinematic()
 	local sceneTier = Game.GetPlayer().GetSceneTier(Game.GetPlayer())
-
-  -- Tier4_FPPCinematic and Tier5_Cinematic
-	return sceneTier == 4 or sceneTier == 5
+  -- Tier5_Cinematic
+	return sceneTier == 5
 end
 
 -- Not used currently but may be helpful in the future
@@ -310,20 +309,20 @@ function Contextual.OnInitialize()
 	end)
 
   -------------
-  -- Cutscenes
+  -- Cinematic
   -------------
   Observe("PlayerPuppet", "OnSceneTierChange", function (sceneTier)
 
-		Contextual.CurrentStates.isCutscene = Contextual.IsInCutscene()
+		Contextual.CurrentStates.isCinematic = Contextual.IsInCinematic()
 
-    if Contextual.Toggles.isCutscene == true then
-      if Contextual.CurrentStates.isCutscene then
+    if Contextual.Toggles.isCinematic == true then
+      if Contextual.CurrentStates.isCinematic then
         Contextual.TurnOffFrameGen()
-        Config.Print("Cinematics detected: " .. tostring(sceneTier) .. ". Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        Config.Print("Cinematic detected: " .. tostring(sceneTier) .. ". Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
-      if not Contextual.CurrentStates.isCutscene then
+      if not Contextual.CurrentStates.isCinematic then
         Contextual.TurnOnFrameGen()
-        Config.Print("Cinematics no longer present: " .. tostring(sceneTier) .. ". Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        Config.Print("Cinematic no longer present: " .. tostring(sceneTier) .. ". Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
     end
 	end)
@@ -395,7 +394,7 @@ function Contextual.SetVehicle(feature)
       if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
         return
       end
-      if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
+      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
         return
       end
       if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
@@ -422,7 +421,7 @@ function Contextual.SetVehicleCombat(feature)
       if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
         return
       end
-      if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
+      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
         return
       end
       if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
@@ -449,7 +448,7 @@ function Contextual.SetCombat(feature)
       if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
         return
       end
-      if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
+      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
         return
       end
       if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
@@ -466,8 +465,8 @@ function Contextual.SetCombat(feature)
   end
 end
 
-function Contextual.SetCutscenes(feature)
-  if Contextual.CurrentStates.isCutscene or Contextual.IsInCutscene() then
+function Contextual.SetCinematic(feature)
+  if Contextual.CurrentStates.isCinematic or Contextual.IsInCinematic() then
     if feature == true then
 
       if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
@@ -507,7 +506,7 @@ function Contextual.SetPhotoMode(feature)
       if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
         return
       end
-      if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
+      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
         return
       end
       if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
@@ -534,7 +533,7 @@ function Contextual.SetMenu(feature)
       if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
         return
       end
-      if Contextual.Toggles.Cutscenes and Contextual.CurrentStates.isCutscene then
+      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
         return
       end
       if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
@@ -560,7 +559,7 @@ function Contextual.OnOverlayOpen()
 end
 
 function Contextual.DrawUI()
-  local vehicleToggle, combatToggle, vehicleCombatToggle, cutscenesToggle, photoModeToggle, menuToggle
+  local vehicleToggle, combatToggle, vehicleCombatToggle, cinematicToggle, photoModeToggle, menuToggle
 
   if UI.Std.BeginTabItem(UIText.Contextual.tabname) then
 
@@ -599,11 +598,11 @@ function Contextual.DrawUI()
       Contextual.SetCombat(Contextual.Toggles.Combat)
     end
 
-    Contextual.Toggles.Cutscenes, cutscenesToggle = UI.Ext.Checkbox.TextWhite("Cutscenes", Contextual.Toggles.Cutscenes, cutscenesToggle)
-    if cutscenesToggle then
+    Contextual.Toggles.Cinematic, cinematicToggle = UI.Ext.Checkbox.TextWhite("Cinematic", Contextual.Toggles.Cinematic, cinematicToggle)
+    if cinematicToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetCutscenes(Contextual.Toggles.Cutscenes)
+      Contextual.SetCinematic(Contextual.Toggles.Cinematic)
     end
 
     Contextual.Toggles.Photomode, photoModeToggle = UI.Ext.Checkbox.TextWhite("Photo Mode", Contextual.Toggles.Photomode, photoModeToggle)
