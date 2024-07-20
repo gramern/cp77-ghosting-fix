@@ -268,9 +268,10 @@ registerForEvent("onInit", function()
     VectorsCustomize.OnInitialize()
   end
 
-  if Config.IsFirstRun() then
-    SetBenchmark(true)
-  end
+  -- danyalzia: remove forced benchmarking upon new install during development
+  -- if Config.IsFirstRun() then
+  --   SetBenchmark(true)
+  -- end
 
   -- danyalzia: I am commenting it during development since I don't want to close these windows everytime I launch the game for testing :/
   -- if Debug then
@@ -404,42 +405,43 @@ registerForEvent("onDraw", function()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         
-        if Config.IsNewInstall() then
-          if UI.Std.BeginTabItem(UIText.Info.tabname) then
+        -- danyalzia: remove forced benchmarking upon new install during development
+        -- if Config.IsNewInstall() then
+        --   if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
-            if Config.ModState.isFirstRun then
-              UI.Ext.TextWhite(UIText.Info.benchmark)
-            else
-              UI.Ext.TextWhite(UIText.Info.benchmarkAsk)
-            end
+        --     if Config.ModState.isFirstRun then
+        --       UI.Ext.TextWhite(UIText.Info.benchmark)
+        --     else
+        --       UI.Ext.TextWhite(UIText.Info.benchmarkAsk)
+        --     end
 
-            UI.Std.Text("")
-            BenchmarkUI()
-            UI.Std.Text("")
+        --     UI.Std.Text("")
+        --     BenchmarkUI()
+        --     UI.Std.Text("")
 
-            Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
-            -- if keepWindowToggle then
-            --   UI.SetStatusBar(UIText.General.settings_saved)
-            -- end
-            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
+        --     Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+        --     -- if keepWindowToggle then
+        --     --   UI.SetStatusBar(UIText.General.settings_saved)
+        --     -- end
+        --     UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
-            if not Config.ModState.isFirstRun and not isBenchmark then
-              UI.Std.Text("")
+        --     if not Config.ModState.isFirstRun and not isBenchmark then
+        --       UI.Std.Text("")
 
-              if UI.Std.Button(UIText.General.yes, 240, 40) then
-                SetBenchmark(true)
-              end
+        --       if UI.Std.Button(UIText.General.yes, 240, 40) then
+        --         SetBenchmark(true)
+        --       end
 
-              UI.Std.SameLine()
+        --       UI.Std.SameLine()
 
-              if UI.Std.Button(UIText.General.no, 240, 40) then
-                Config.SetNewInstall(false)
-                Settings.SetSaved(false)
-              end
-            end
-            UI.Std.EndTabItem()
-          end
-        end
+        --       if UI.Std.Button(UIText.General.no, 240, 40) then
+        --         Config.SetNewInstall(false)
+        --         Settings.SetSaved(false)
+        --       end
+        --     end
+        --     UI.Std.EndTabItem()
+        --   end
+        -- end
 
         if Config.IsAspectRatioChange() then
           if UI.Std.BeginTabItem(UIText.Info.tabname) then
@@ -461,7 +463,9 @@ registerForEvent("onDraw", function()
         end
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
-        if not Config.IsNewInstall() and Config.IsModReady() then
+        -- danyalzia: remove forced benchmarking upon new install during development
+        -- if not Config.IsNewInstall() and Config.IsModReady() then
+        if Config.IsModReady() then
           if UI.Std.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
