@@ -16,7 +16,8 @@ local Contextual = {
     isCinematic = false,
     isPhotoMode = false,
     isMenu = false,
-  }
+  },
+  FGEnabled = false,
 }
 
 local UserSettings = {}
@@ -30,7 +31,7 @@ local UIText = Localization.UIText
 
 -- local Translate = require("Modules/Translate")
 
-function Contextual.GetUserSettings()
+local function GetUserSettings()
   UserSettings = {
     Toggles = Contextual.Toggles
   }
@@ -38,32 +39,49 @@ function Contextual.GetUserSettings()
   return UserSettings
 end
 
-function Contextual.LoadUserSettings()
+local function LoadUserSettings()
   Config.MergeTables(Contextual, Settings.GetUserSettings("Contextual"))
 end
 
-function Contextual.SaveUserSettings()
-  Settings.WriteUserSettings("Contextual", Contextual.GetUserSettings())
+local function SaveUserSettings()
+  Settings.WriteUserSettings("Contextual", GetUserSettings())
 end
 
-function Contextual.TurnOnFrameGen()
-  DLSSEnablerSetFrameGeneration(true)
+local function TurnOnFrameGen()
+  -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
+  if Contextual.FGEnabled == false then
+    DLSSEnablerSetFrameGeneration(true)
+    Contextual.FGEnabled = true
+  end
 end
 
-function Contextual.TurnOffFrameGen()
-  DLSSEnablerSetFrameGeneration(false)
+local function TurnOffFrameGen()
+  -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
+  if Contextual.FGEnabled == true then
+    DLSSEnablerSetFrameGeneration(false)
+    Contextual.FGEnabled = false
+  end
 end
 
-function Contextual.StringifyStates()
-  return "isVehicle: " .. tostring(Contextual.CurrentStates.isVehicle) ..
-  "\n" .. "isVehicleCombat: " ..tostring(Contextual.CurrentStates.isVehicleCombat) ..
-  "\n" .. "isCombat: " ..tostring(Contextual.CurrentStates.isCombat) ..
-  "\n" .. "isCinematic: " ..tostring(Contextual.CurrentStates.isCinematic) ..
-  "\n" .. "isPhotoMode: " ..tostring(Contextual.CurrentStates.isPhotoMode) ..
-  "\n" .. "isMenu: " ..tostring(Contextual.CurrentStates.isMenu)
+local function GetFrameGenState()
+  return DLSSEnablerGetFrameGenerationState()
 end
 
-function Contextual.IsPlayerDrivingVehicle()
+-- Make the first letter capital
+local function Capitalize(str)
+  return (str:gsub("^%l", string.upper))
+end
+
+local function StringifyStates()
+  return "Vehicle: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicle)) ..
+  "\n" .. "VehicleCombat: " ..Capitalize(tostring(Contextual.CurrentStates.isVehicleCombat)) ..
+  "\n" .. "Combat: " ..Capitalize(tostring(Contextual.CurrentStates.isCombat)) ..
+  "\n" .. "Cinematic: " ..Capitalize(tostring(Contextual.CurrentStates.isCinematic)) ..
+  "\n" .. "PhotoMode: " ..Capitalize(tostring(Contextual.CurrentStates.isPhotoMode)) ..
+  "\n" .. "Menu: " ..Capitalize(tostring(Contextual.CurrentStates.isMenu))
+end
+
+local function IsPlayerDrivingVehicle()
   local playerVehicle = GetMountedVehicle(GetPlayer())
   if not playerVehicle then return false end
   if playerVehicle:IsA('vehicleAVBaseObject') then return false end
@@ -71,45 +89,205 @@ function Contextual.IsPlayerDrivingVehicle()
   return playerVehicle:IsPlayerDriver()
 end
 
-function Contextual.IsInCombat()
+local function IsInCombat()
 	local combatState = tonumber(EnumInt(Game.GetPlayer().GetCurrentCombatState(Game.GetPlayer())))
   -- InCombat
 	return combatState == 1
 end
 
-function Contextual.IsInMenu()
+local function IsInMenu()
   local ui_System = Game.GetAllBlackboardDefs().UI_System
   return Game.GetBlackboardSystem():Get(ui_System):GetBool(ui_System.IsInMenu)
 end
 
-function Contextual.IsInPhotoMode()
+local function IsInPhotoMode()
   local photoMode = Game.GetAllBlackboardDefs().PhotoMode
   return Game.GetBlackboardSystem():Get(photoMode):GetBool(photoMode.IsActive)
 end
 
-function Contextual.IsInCinematic()
+local function IsInCinematic()
 	local sceneTier = Game.GetPlayer().GetSceneTier(Game.GetPlayer())
   -- Tier5_Cinematic
 	return sceneTier == 5
 end
 
 -- Not used currently but may be helpful in the future
-function Contextual.IsInHostileZone()
+local function IsInHostileZone()
 	local zoneType = tonumber(EnumInt(Game.GetPlayer():GetCurrentSecurityZoneType(Game.GetPlayer())))
 	return zoneType == 3 or zoneType == 4
 end
 
 -- Not used currently but may be helpful in the future
-function Contextual.IsWeaponDrawn()
+local function IsWeaponDrawn()
 	return Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), "AttachmentSlots.WeaponRight") ~= nil
+end
+
+local function SetVehicle(feature)
+  if Contextual.CurrentStates.isVehicle and IsPlayerDrivingVehicle() then
+    if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetVehicleCombat(feature)
+  if Contextual.CurrentStates.isVehicleCombat and IsPlayerDrivingVehicle() then
+    if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetCombat(feature)
+  if Contextual.CurrentStates.isCombat or (IsInCombat() and not IsPlayerDrivingVehicle()) then
+    if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
+      return
+    end
+    if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetCinematic(feature)
+  if Contextual.CurrentStates.isCinematic or IsInCinematic() then
+    if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
+      return
+    end
+    if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+
+local function SetPhotoMode(feature)
+  if Contextual.CurrentStates.isPhotoMode or IsInPhotoMode()  then
+    if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
+      return
+    end
+    if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetMenu(feature)
+  if Contextual.CurrentStates.isMenu or IsInMenu() then
+    if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
+      return
+    end
+    if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
 end
 
 function Contextual.OnInitialize()
 
-  Contextual.LoadUserSettings()
+  LoadUserSettings()
+
+  -- Get the current FG state whenever mod is loaded or reloaded from CET
+  Contextual.FGEnabled = GetFrameGenState()
 
   Observe('PlayerPuppet', 'OnGameAttached', function()
-    Contextual.TurnOnFrameGen()
+    TurnOnFrameGen()
+    Config.Print("Game started. Frame Gen is enabled (PlayerPuppet->OnGameAttached)", nil, nil, Contextual.__NAME)
     Contextual.CurrentStates.isMenu = false
   end)
 
@@ -118,40 +296,39 @@ function Contextual.OnInitialize()
   -----------
   Observe('DriveEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicle = true
-    if Contextual.Toggles.Vehicle == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOffFrameGen()
+    if Contextual.Toggles.Vehicle == true and IsPlayerDrivingVehicle() then
+      TurnOffFrameGen()
       Config.Print("Player is in vehicle. Frame Gen is disabled (DriveEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
-  -- These two events are triggered when players gets into vehicle combat, so we don't want to make isVehicle false
-  
-  -- Observe('DriveEvents', 'OnExit', function()
-  --   Contextual.CurrentStates.isVehicle = false
-  --   if Contextual.Toggles.Vehicle == true then
-  --     Contextual.TurnOnFrameGen()
-  --     Config.Print("Player is no longer in vehicle. Frame Gen is enabled (DriveEvents->OnExit)", nil, nil, Contextual.__NAME)
-  --   end
-  -- end)
-  -- Observe('DriveEvents', 'OnForcedExit', function()
-  --   Contextual.CurrentStates.isVehicle = false
-  --   if Contextual.Toggles.Vehicle == true then
-  --     Contextual.TurnOnFrameGen()
-  --     Config.Print("Player is no longer in vehicle. Frame Gen is enabled (DriveEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
-  --   end
-  -- end)
+  -- These methods are essential to make sure frame gen is turned on when weapon is drawn (so transitioning to combat)
+  Observe('DriveEvents', 'OnExit', function()
+    Contextual.CurrentStates.isVehicle = false
+    if Contextual.Toggles.Vehicle == true then
+      TurnOnFrameGen()
+      Config.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnExit)", nil, nil, Contextual.__NAME)
+    end
+  end)
+  Observe('DriveEvents', 'OnForcedExit', function()
+    Contextual.CurrentStates.isVehicle = false
+    if Contextual.Toggles.Vehicle == true then
+      TurnOnFrameGen()
+      Config.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+    end
+  end)
 
   -- in case the above events don't trigger (need more testing to rule out redundant events)
   Observe('EnteringEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicle = true
-    if Contextual.Toggles.Vehicle == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOffFrameGen()
+    if Contextual.Toggles.Vehicle == true and IsPlayerDrivingVehicle() then
+      TurnOffFrameGen()
       Config.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicle = true
     if Contextual.Toggles.Vehicle == true then
-      Contextual.TurnOffFrameGen()
+      TurnOffFrameGen()
       Config.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -160,21 +337,21 @@ function Contextual.OnInitialize()
   Observe('ExitingEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle == true then
-      Contextual.TurnOnFrameGen()
+      TurnOnFrameGen()
       Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicle = false
-    if Contextual.Toggles.Vehicle == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Vehicle == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicle = false
-    if Contextual.Toggles.Vehicle == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Vehicle == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -185,22 +362,22 @@ function Contextual.OnInitialize()
   -- These events are fired the moment weapon is drawn or holster inside the vehicle (even if the alert status is not yet combat)
   Observe('DriverCombatEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicleCombat = true
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOffFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOffFrameGen()
       Config.Print("Vehicle combat detected. Frame Gen is disabled (DriverCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriverCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriverCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -208,22 +385,22 @@ function Contextual.OnInitialize()
   -- in case the above events don't trigger (need more testing to rule out redundant events)
   Observe('EnteringCombatEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicleCombat = true
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOffFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOffFrameGen()
       Config.Print("Vehicle combat detected. Frame Gen is disabled (EnteringCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = true
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = true
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -231,22 +408,22 @@ function Contextual.OnInitialize()
   -- These have reverse operations
   Observe('ExitingCombatEvents', 'OnEnter', function()
     Contextual.CurrentStates.isVehicleCombat = false
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
-    if Contextual.Toggles.VehicleCombat == true and Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.VehicleCombat == true and IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -256,15 +433,15 @@ function Contextual.OnInitialize()
   ----------
   Observe('CombatEvents', 'OnEnter', function()
     Contextual.CurrentStates.isCombat = true
-    if Contextual.Toggles.Combat == true and not Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOffFrameGen()
+    if Contextual.Toggles.Combat == true and not IsPlayerDrivingVehicle() then
+      TurnOffFrameGen()
       Config.Print("Combat mode detected. Frame Gen is disabled (CombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true and not Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Combat == true and not IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -273,36 +450,36 @@ function Contextual.OnInitialize()
   -- These have reverse operations
   Observe('CombatExitingEvents', 'OnEnter', function()
     Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true and not Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Combat == true and not IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatExitingEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true and not Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Combat == true and not IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatExitingEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true and not Contextual.IsPlayerDrivingVehicle() then
-      Contextual.TurnOnFrameGen()
+    if Contextual.Toggles.Combat == true and not IsPlayerDrivingVehicle() then
+      TurnOnFrameGen()
       Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
   Observe("PlayerPuppet", "OnCombatStateChanged", function ()
-		Contextual.CurrentStates.isCombat = Contextual.IsInCombat()
+		Contextual.CurrentStates.isCombat = IsInCombat()
 
     if Contextual.Toggles.Combat == true then
-      if Contextual.CurrentStates.isCombat and not Contextual.IsPlayerDrivingVehicle() then
-        Contextual.TurnOffFrameGen()
+      if Contextual.CurrentStates.isCombat and not IsPlayerDrivingVehicle() then
+        TurnOffFrameGen()
         Config.Print("Combat mode detected. Frame Gen is disabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
       end
-      if not Contextual.CurrentStates.isCombat and not Contextual.IsPlayerDrivingVehicle() then
-        Contextual.TurnOnFrameGen()
+      if not Contextual.CurrentStates.isCombat and not IsPlayerDrivingVehicle() then
+        TurnOnFrameGen()
         Config.Print("Combat mode is no longer present. Frame Gen is enabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
       end
     end
@@ -313,16 +490,16 @@ function Contextual.OnInitialize()
   -------------
   Observe("PlayerPuppet", "OnSceneTierChange", function (sceneTier)
 
-		Contextual.CurrentStates.isCinematic = Contextual.IsInCinematic()
+		Contextual.CurrentStates.isCinematic = sceneTier == 5 or IsInCinematic()
 
     if Contextual.Toggles.isCinematic == true then
       if Contextual.CurrentStates.isCinematic then
-        Contextual.TurnOffFrameGen()
-        Config.Print("Cinematic detected: " .. tostring(sceneTier) .. ". Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        TurnOffFrameGen()
+        Config.Print("Cinematic detected. Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
       if not Contextual.CurrentStates.isCinematic then
-        Contextual.TurnOnFrameGen()
-        Config.Print("Cinematic no longer present: " .. tostring(sceneTier) .. ". Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        TurnOnFrameGen()
+        Config.Print("Cinematic no longer present. Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
     end
 	end)
@@ -334,7 +511,7 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isPhotoMode = true
 
     if Contextual.Toggles.Photomode == true then
-      Contextual.TurnOffFrameGen()
+      TurnOffFrameGen()
       Config.Print("Photo mode detected" .. ". Frame Gen is disabled (gameuiPhotoModeMenuController->OnShow)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -343,7 +520,7 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isPhotoMode = false
 
     if Contextual.Toggles.Photomode == true then
-      Contextual.TurnOnFrameGen()
+      TurnOnFrameGen()
       Config.Print("Photo mode no longer preset" .. ". Frame Gen is enabled (gameuiPhotoModeMenuController->OnHide)", nil, nil, Contextual.__NAME)
     end
   end)
@@ -356,7 +533,7 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isMenu = true
 
     if Contextual.Toggles.Menu == true then
-      Contextual.TurnOffFrameGen()
+      TurnOffFrameGen()
       Config.Print("Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)", nil, nil, Contextual.__NAME)
     end
 
@@ -367,184 +544,18 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isMenu = IsInMenu
 
     if Contextual.Toggles.Menu == true then
-      if Contextual.CurrentStates.isMenu or Contextual.IsInMenu() then
-        Contextual.TurnOffFrameGen()
+      if Contextual.CurrentStates.isMenu or IsInMenu() then
+        TurnOffFrameGen()
         Config.Print("Menu detected" .. ". Frame Gen is disabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
-      if not Contextual.CurrentStates.isMenu or not Contextual.IsInMenu() then
-        Contextual.TurnOnFrameGen()
+      if not Contextual.CurrentStates.isMenu or not IsInMenu() then
+        TurnOnFrameGen()
         Config.Print("Menu no longer present" .. ". Frame Gen is enabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
     end
   end)
 
-  -- just in case the game doesn't trigger OnExit/OnForcedExit events for some reason
-  Observe('PlayerPuppet', 'OnWeaponEquipEvent', function()
-    Contextual.TurnOnFrameGen()
-  end)
-end
-
-function Contextual.SetVehicle(feature)
-  if Contextual.CurrentStates.isVehicle or (Contextual.IsPlayerDrivingVehicle() and Contextual.IsInCombat()) then
-    if feature == true then
-
-      if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
-        return
-      end
-      if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
-        return
-      end
-      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
-        return
-      end
-      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
-        return
-      end
-      if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
-end
-
-function Contextual.SetVehicleCombat(feature)
-  if Contextual.CurrentStates.isVehicleCombat or (Contextual.IsPlayerDrivingVehicle() and Contextual.IsInCombat()) then
-    if feature == true then
-
-      if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
-        return
-      end
-      if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
-        return
-      end
-      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
-        return
-      end
-      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
-        return
-      end
-      if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
-end
-
-function Contextual.SetCombat(feature)
-  if Contextual.CurrentStates.isCombat or (Contextual.IsInCombat() and not Contextual.IsPlayerDrivingVehicle()) then
-    if feature == true then
-
-      if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
-        return
-      end
-      if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
-        return
-      end
-      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
-        return
-      end
-      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
-        return
-      end
-      if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
-end
-
-function Contextual.SetCinematic(feature)
-  if Contextual.CurrentStates.isCinematic or Contextual.IsInCinematic() then
-    if feature == true then
-
-      if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
-        return
-      end
-      if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
-        return
-      end
-      if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
-        return
-      end
-      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
-        return
-      end
-      if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
-end
-
-
-function Contextual.SetPhotoMode(feature)
-  if Contextual.CurrentStates.isPhotoMode or Contextual.IsInPhotoMode()  then
-    if feature == true then
-
-      if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
-        return
-      end
-      if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
-        return
-      end
-      if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
-        return
-      end
-      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
-        return
-      end
-      if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
-end
-
-function Contextual.SetMenu(feature)
-  if Contextual.CurrentStates.isMenu or Contextual.IsInMenu() then
-    if feature == true then
-
-      if Contextual.Toggles.Vehicle and Contextual.CurrentStates.isVehicle then
-        return
-      end
-      if Contextual.Toggles.VehicleCombat and Contextual.CurrentStates.isVehicleCombat then
-        return
-      end
-      if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
-        return
-      end
-      if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
-        return
-      end
-      if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
-        return
-      end
-
-      Contextual.TurnOffFrameGen()
-    else
-      Contextual.TurnOnFrameGen()
-    end
-  end
+  SaveUserSettings()
 end
 
 function Contextual.OnOverlayOpen()
@@ -581,47 +592,58 @@ function Contextual.DrawUI()
     if vehicleToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetVehicle(Contextual.Toggles.Vehicle)
+      SetVehicle(Contextual.Toggles.Vehicle)
     end
 
     Contextual.Toggles.VehicleCombat, vehicleCombatToggle = UI.Ext.Checkbox.TextWhite("Vehicle Combat", Contextual.Toggles.VehicleCombat, vehicleCombatToggle)
     if vehicleCombatToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetVehicleCombat(Contextual.Toggles.VehicleCombat)
+      SetVehicleCombat(Contextual.Toggles.VehicleCombat)
     end
 
     Contextual.Toggles.Combat, combatToggle = UI.Ext.Checkbox.TextWhite("Combat", Contextual.Toggles.Combat, combatToggle)
     if combatToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetCombat(Contextual.Toggles.Combat)
+      SetCombat(Contextual.Toggles.Combat)
     end
 
     Contextual.Toggles.Cinematic, cinematicToggle = UI.Ext.Checkbox.TextWhite("Cinematic", Contextual.Toggles.Cinematic, cinematicToggle)
     if cinematicToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetCinematic(Contextual.Toggles.Cinematic)
+      SetCinematic(Contextual.Toggles.Cinematic)
     end
 
     Contextual.Toggles.Photomode, photoModeToggle = UI.Ext.Checkbox.TextWhite("Photo Mode", Contextual.Toggles.Photomode, photoModeToggle)
     if photoModeToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetPhotoMode(Contextual.Toggles.Photomode)
+      SetPhotoMode(Contextual.Toggles.Photomode)
     end
 
     Contextual.Toggles.Menu, menuToggle = UI.Ext.Checkbox.TextWhite("Menus", Contextual.Toggles.Menu, menuToggle)
     if menuToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
-      Contextual.SetMenu(Contextual.Toggles.Menu)
+      SetMenu(Contextual.Toggles.Menu)
     end
 
     UI.Std.Separator()
-    UI.Ext.TextWhite("Current Event States: ")
-    UI.Ext.TextWhite(Contextual.StringifyStates())
+    UI.Ext.TextWhite("Current States: ")
+    UI.Ext.TextWhite(StringifyStates())
+
+    UI.Std.Separator()
+
+    local fgStatus = "Enabled"
+    if Contextual.FGEnabled == true then
+      fgStatus = "Enabled"
+    else
+      fgStatus = "Disabled"
+    end
+
+    UI.Ext.TextWhite("Frame Gen: " .. fgStatus)
 
     UI.Ext.StatusBar(UI.GetStatusBar())
     UI.Std.EndTabItem()

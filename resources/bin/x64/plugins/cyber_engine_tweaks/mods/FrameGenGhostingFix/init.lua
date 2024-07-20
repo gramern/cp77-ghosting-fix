@@ -324,7 +324,6 @@ registerForEvent("onOverlayOpen", function()
   end
 
   Config.OnOverlayOpen()
-
   UI.OnOverlayOpen()
 
   if Diagnostics then
@@ -334,11 +333,8 @@ registerForEvent("onOverlayOpen", function()
   if not Config.IsModReady() then return end
 
   Presets.OnOverlayOpen()
-
   Calculate.OnOverlayOpen()
-
   Contextual.OnOverlayOpen()
-
   Vectors.OnOverlayOpen()
 
   if VectorsCustomize then
@@ -455,9 +451,7 @@ registerForEvent("onDraw", function()
         if openOverlay and Config.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
 
           Presets.DrawUI()
-
           Calculate.DrawUI()
-
           Contextual.DrawUI()
 
         end
