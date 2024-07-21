@@ -31,8 +31,7 @@ local function Translate(legacyUserSettings)
     },
     Contextual = {
       Toggles = {
-        Vehicle = nil,
-        VehicleCombat = nil,
+        Vehicle = {},
         Combat = nil,
         Cinematic = nil,
         Photomode = nil,
