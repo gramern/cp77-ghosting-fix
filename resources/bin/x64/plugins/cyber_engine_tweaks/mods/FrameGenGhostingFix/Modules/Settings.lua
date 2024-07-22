@@ -1,12 +1,12 @@
 local Settings ={
   __NAME = "Settings",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   isSaved = nil,
 }
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 
 local LogText = Localization.LogText
@@ -38,7 +38,7 @@ local function Translate(legacyUserSettings)
         Menu = nil,
       }
     },
-    Config = {
+    Globals = {
       version = nil,
       keepWindow = nil,
       isFGEnabled = nil,
@@ -68,16 +68,16 @@ local function Translate(legacyUserSettings)
   userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
   userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100
 
-  userSettings.Config.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
+  userSettings.Globals.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
 
   return userSettings
 end
 
 function Settings.WriteUserSettings(moduleName,contents)
-  if not contents or not moduleName then Config.Print("Can't write to user settings",nil,nil,moduleName) end --debug
+  if not contents or not moduleName then Globals.Print(moduleName,"Can't write to user settings") end --debug
   if contents == nil then return end
 
-  local copiedContents = Config.Deepcopy(contents)
+  local copiedContents = Globals.Deepcopy(contents)
 
   UserSettings[moduleName] = copiedContents
 
@@ -85,7 +85,7 @@ function Settings.WriteUserSettings(moduleName,contents)
 end
 
 function Settings.GetUserSettings(moduleName)
-  -- if not moduleName or UserSettings[moduleName] == nil then Config.Print("Can't get user settings.",nil,nil,moduleName) return nil end --debug
+  -- if not moduleName or UserSettings[moduleName] == nil then Globals.Print(moduleName,"Can't get user settings.") return nil end --debug
   if not moduleName or UserSettings[moduleName] == nil then return nil end
 
   return UserSettings[moduleName]
@@ -99,34 +99,34 @@ function Settings.LoadFile()
     file:close()
     UserSettings = json.decode(userSettingsContents)
 
-    local version = UserSettings.Config and UserSettings.Config.ModState and UserSettings.Config.ModState.version or false
+    local version = UserSettings.Globals and UserSettings.Globals.ModState and UserSettings.Globals.ModState.version or false
 
-    if not version then
+    if not version or not Globals.VersionCompare(Globals.VersionStringToTable(version)) then
       UserSettings = Translate(UserSettings)
-      Config.SetNewInstall(true)
+      Globals.SetNewInstall(true)
     end
 
-    Config.ModState.keepWindow = UserSettings.Config and UserSettings.Config.keepWindow or false
+    Globals.ModState.keepWindow = UserSettings.Globals and UserSettings.Globals.keepWindow or false
 
-    Config.ModState.isFGEnabled = UserSettings.Config and UserSettings.Config.isFGEnabled or true
+    Globals.ModState.isFGEnabled = UserSettings.Globals and UserSettings.Globals.isFGEnabled or true
 
-    Config.Print(LogText.settings_loaded,nil,nil,Settings.__NAME)
+    Globals.Print(Settings.__NAME,LogText.settings_loaded)
     return true
   else
-    Config.SetFirstRun(true)
-    Config.Print(LogText.settings_fileNotFound,nil,nil,Settings.__NAME)
+    Globals.SetFirstRun(true)
+    Globals.Print(Settings.__NAME,LogText.settings_fileNotFound)
   end
 end
 
 function Settings.SaveFile()
   if Settings.isSaved or Settings.isSaved == nil then return end
-  if UserSettings == nil then Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME) return end
+  if UserSettings == nil then Globals.Print(Settings.__NAME,LogText.settings_notSavedToFile) return end
 
-  Settings.WriteUserSettings("Config",{
+  Settings.WriteUserSettings("Globals",{
     ModState = {
-      version = Config.__VERSION_NUMBER,
-      keepWindow = Config.ModState.keepWindow,
-      isFGEnabled = Config.ModState.isFGEnabled,
+      version = FrameGenGhostingFix.GetVersion(true),
+      keepWindow = Globals.ModState.keepWindow,
+      isFGEnabled = Globals.ModState.isFGEnabled,
   }})
 
   local userSettingsContents = json.encode(UserSettings)
@@ -142,14 +142,14 @@ function Settings.SaveFile()
       file:close()
 
       Settings.SetSaved(true)
-      Config.Print(LogText.settings_savedToFile,nil,nil,Settings.__NAME)
+      Globals.Print(Settings.__NAME,LogText.settings_savedToFile)
     else
       Settings.SetSaved(false)
-      Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
+      Globals.Print(Settings.__NAME,LogText.settings_notSavedToFile)
     end
   else
     Settings.SetSaved(false)
-    Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
+    Globals.Print(Settings.__NAME,LogText.settings_notSavedToFile)
   end
 end
 

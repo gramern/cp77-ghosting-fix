@@ -1,6 +1,6 @@
 local VectorsCustomize = {
   __NAME = "VectorsCustomize",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   MaskingGlobal = {
     masksController = nil,
   },
@@ -8,7 +8,7 @@ local VectorsCustomize = {
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -41,7 +41,7 @@ end
 
 function VectorsCustomize.LoadUserSettings()
   if UserSettings == nil then return end
-  Vectors.VehMasks.Mask4.Def.Scale = Config.SafeMergeTables(Vectors.VehMasks.Mask4.Def.Scale, UserSettings.Bike.Windshield.Scale)
+  Vectors.VehMasks.Mask4.Def.Scale = Globals.SafeMergeTables(Vectors.VehMasks.Mask4.Def.Scale, UserSettings.Bike.Windshield.Scale)
 end
 
 function VectorsCustomize.SaveUserSettings()
@@ -50,7 +50,7 @@ function VectorsCustomize.SaveUserSettings()
 end
 
 function VectorsCustomize.OnInitialize()
-  UserSettings = Config.MergeTables(UserSettings, Settings.GetUserSettings("VectorsCustomize"))
+  UserSettings = Globals.MergeTables(UserSettings, Settings.GetUserSettings("VectorsCustomize"))
   VectorsCustomize.ApplyMasksController()
   VectorsCustomize.LoadUserSettings()
 
@@ -73,7 +73,7 @@ function VectorsCustomize.OnOverlayClose()
 end
 
 function VectorsCustomize.ApplyMasksController()
-  VectorsCustomize.MaskingGlobal.masksController = Config.GetMasksController()
+  VectorsCustomize.MaskingGlobal.masksController = Globals.GetMasksController()
 end
 
 function VectorsCustomize.UpdateLiveView()

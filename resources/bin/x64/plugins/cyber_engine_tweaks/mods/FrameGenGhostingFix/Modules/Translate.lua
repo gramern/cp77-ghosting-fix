@@ -1,11 +1,11 @@
 Translate = {
   __NAME = "Translate",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   gameOnScreenLanguage = nil,
   modDefaultLanguage = "en-us",
 }
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local LogText = Localization.LogText
 
@@ -27,7 +27,7 @@ local translatedLocalization
 local function MergeLanguages(default, selected)
   local merged = {}
 
-  if selected == nil then Config.Print(LogText.translate_keyNotFound, selected, Translate.gameOnScreenLanguage, Translate.__NAME) return end
+  if selected == nil then Globals.Print(Translate.__NAME, LogText.translate_keyNotFound, selected, Translate.gameOnScreenLanguage) return end
 
   -- Add all used keys into merged with either translated values or the default values
   for key, defaultValue in pairs(default) do
@@ -53,12 +53,12 @@ local function ApplyTranslation(key)
     translatedLocalization = MergeLanguages(defaultLocalization, translation[key])
 
     if LastGameOnScreenLanguage.__module == Translate.gameOnScreenLanguage then return end
-    Config.Print(LogText.translate_translationFound, Translate.gameOnScreenLanguage, nil, Translate.__NAME)
+    Globals.Print(Translate.__NAME, LogText.translate_translationFound, Translate.gameOnScreenLanguage)
   else
     translatedLocalization = MergeLanguages(defaultLocalization, {})
 
     if LastGameOnScreenLanguage.__module == Translate.gameOnScreenLanguage then return end
-    Config.Print(LogText.translate_translationNotFound, Translate.gameOnScreenLanguage, nil, Translate.__NAME)
+    Globals.Print(Translate.__NAME, LogText.translate_translationNotFound, Translate.gameOnScreenLanguage)
   end
 end
 
@@ -82,7 +82,7 @@ function Translate.SetTranslation(sourceTablePath, key)
     -- defines defaultLocalization table for sake of further steps
     defaultLocalization = LocalizationFallback[key]
   else
-    Config.Print(LogText.translate_keyNotFound, key, sourceTablePath, Translate.__NAME)
+    Globals.Print(Translate.__NAME, LogText.translate_keyNotFound, key, sourceTablePath)
   end
 
   --get current language
@@ -96,7 +96,7 @@ function Translate.SetTranslation(sourceTablePath, key)
       translatedLocalization = MergeLanguages(defaultLocalization, {})
 
       if LastGameOnScreenLanguage.__module == Translate.gameOnScreenLanguage then return end
-      Config.Print(LogText.translate_baseLocalization, Translate.modDefaultLanguage, nil, Translate.__NAME)
+      Globals.Print(Translate.__NAME, LogText.translate_baseLocalization, Translate.modDefaultLanguage)
     end
 
     sourceTable[key] = translatedLocalization

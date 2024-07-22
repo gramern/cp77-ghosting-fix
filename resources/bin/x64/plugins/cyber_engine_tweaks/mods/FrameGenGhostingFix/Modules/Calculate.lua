@@ -1,6 +1,6 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   MaskingGlobal = {
     masksController = nil,
     onFoot = true -- not used for now
@@ -67,7 +67,7 @@ local Calculate = {
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -215,11 +215,11 @@ function Calculate.ApplyExceptions()
 end
 
 function Calculate.ApplyMasksController()
-  Calculate.MaskingGlobal.masksController = Config.GetMasksController()
+  Calculate.MaskingGlobal.masksController = Globals.GetMasksController()
 end
 
 function Calculate.ApplyScreen()
-  local screen = Config.GetScreen()
+  local screen = Globals.GetScreen()
 
   Calculate.Screen.Edge = screen.Edge
   Calculate.Screen.type = screen.type
@@ -242,7 +242,7 @@ function Calculate.GetUserSettings()
 end
 
 function Calculate.ApplySuggestedSettings(averageFps)
-  Config.SetFallback("Calculate",Calculate.GetUserSettings())
+  Globals.SetFallback("Calculate",Calculate.GetUserSettings())
 
   if averageFps >= 38 then
     Calculate.Corners.onWeapon = true
@@ -274,7 +274,7 @@ function Calculate.ApplySuggestedSettings(averageFps)
 
   Calculate.SaveUserSettings()
 
-  Config.Print(LogText.calculate_applySettings,nil,nil,Calculate.__NAME)
+  Globals.Print(Calculate.__NAME,LogText.calculate_applySettings)
 end
 
 function Calculate.SaveUserSettings()
@@ -282,14 +282,14 @@ function Calculate.SaveUserSettings()
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Config.SafeMergeTables(Calculate,Config.GetFallback("Calculate"))
+  Calculate = Globals.SafeMergeTables(Calculate,Globals.GetFallback("Calculate"))
 
-  if Calculate == nil then Config.Print("The 'Calculate' table is empty...",nil,nil,"Calculate") end
+  if Calculate == nil then Globals.Print(Calculate.__NAME,"Can't restore user settings.") end
   Calculate.SaveUserSettings()
 end
 
 function Calculate.OnInitialize()
-  Config.SafeMergeTables(Calculate,Settings.GetUserSettings("Calculate"))
+  Globals.SafeMergeTables(Calculate,Settings.GetUserSettings("Calculate"))
   Calculate.ApplyMasksController()
   Calculate.ApplyScreen()
   Calculate.ApplyCornersScreenSpace()
@@ -304,7 +304,7 @@ function Calculate.OnInitialize()
 end
 
 function Calculate.OnOverlayOpen()
-  Config = require("Modules/Config")
+  Globals = require("Modules/Globals")
 
   --refresh UIText in case of translation
   Localization = require("Modules/Localization")
@@ -350,7 +350,7 @@ function Calculate.ToggleCornersOnWeapon()
       self:FrameGenGhostingFixMasksOnFootSetMargins(edge.left, edge.right, edge.down)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -371,7 +371,7 @@ function Calculate.ToggleBlockerOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -392,7 +392,7 @@ function Calculate.ToggleVignetteOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -417,7 +417,7 @@ function Calculate.ToggleVignetteOnWeapon()
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -432,7 +432,7 @@ function Calculate.ToggleVignettePermament()
       self:FrameGenGhostingFixVignetteOnFootDeActivationToggle(true)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -448,7 +448,7 @@ function Calculate.TurnOnLiveView()
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -462,7 +462,7 @@ function Calculate.TurnOffLiveView()
       self:FrameGenGhostingFixVignetteOnFootSetDimensions()
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
   end
 end
 
@@ -533,7 +533,7 @@ function Calculate.DrawUI()
     UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.Vignette.tooltip)
 
     if Calculate.Vignette.onWeapon then
-      if not Config.IsMounted() then
+      if not Globals.IsMounted() then
         Calculate.Vignette.permament, vignettePermamentToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
         if vignettePermamentToggle then
           Calculate.SaveUserSettings()

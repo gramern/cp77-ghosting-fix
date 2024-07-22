@@ -1,5 +1,5 @@
 {
-  "__VERSION_NUMBER": 500,
+  "__VERSION": "5.0.0",
   "MaskingGlobal": {
     "vehicles": false,
     "onfoot": false

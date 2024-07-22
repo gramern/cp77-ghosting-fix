@@ -1,6 +1,10 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
-  __VERSION_NUMBER = 500,
+  __EDITION = "V",
+  __VERSION = { 5, 0, 0 },
+  __VERSION_SUFFIX = nil,
+  __VERSION_STATUS = nil,
+  __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -32,11 +36,11 @@ FrameGenGhostingFix = {
     isGameLoaded = false,
     isGamePaused = false,
     isPreGame = false,
-  }
+  },
 }
 
 --necessary modules
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -81,6 +85,29 @@ local openOverlay
 local keepWindowToggle
 local fgToggle
 
+--- Returns the version of FrameGen Ghosting 'Fix'.
+--
+-- @param asString: boolean; Whether to return the version as a string.
+-- 
+-- @return string | table; Version information, updates FrameGenGhostingFix.__VERSION_STRING internally.
+function FrameGenGhostingFix.GetVersion(asString)
+  FrameGenGhostingFix.__VERSION_STRING = table.concat(FrameGenGhostingFix.__VERSION, ".")
+
+  if FrameGenGhostingFix.__VERSION_SUFFIX ~= nil then
+    FrameGenGhostingFix.__VERSION_STRING = FrameGenGhostingFix.__VERSION_STRING .. FrameGenGhostingFix.__VERSION_SUFFIX
+  end
+
+  if FrameGenGhostingFix.__VERSION_STATUS then
+    FrameGenGhostingFix.__VERSION_STRING = FrameGenGhostingFix.__VERSION_STRING .. "-" .. FrameGenGhostingFix.__VERSION_STATUS
+  end
+
+  if asString then
+    return FrameGenGhostingFix.__VERSION_STRING
+  else
+    return FrameGenGhostingFix.__VERSION
+  end
+end
+
 function GetGameState()
   local GameState = FrameGenGhostingFix.GameState
 
@@ -124,18 +151,18 @@ function Benchmark()
 
     FrameGenGhostingFix.GameState.averageFps = averageFps
 
-    Config.Print(LogText.benchmark_avgFpsResult, averageFps)
+    Globals.Print(LogText.benchmark_avgFpsResult, averageFps)
 
     Calculate.ApplySuggestedSettings(averageFps)
 
     benchmarkSetSuggested = true
 
-    if not Config.IsNewInstall() then return end
+    if not Globals.IsNewInstall() then return end
     Settings.SetSaved(false)
-    Config.SetNewInstall(false)
+    Globals.SetNewInstall(false)
 
-    if not Config.ModState.isFirstRun then return end
-    Config.SetFirstRun(false)
+    if not Globals.ModState.isFirstRun then return end
+    Globals.SetFirstRun(false)
   end
 end
 
@@ -145,7 +172,7 @@ function SetBenchmark(boolean)
   if isBenchmark then
     isBenchmarkFinished = false
 
-    Config.Print(LogText.benchmark_starting)
+    Globals.Print(LogText.benchmark_starting)
     UI.SetStatusBar(UIText.Options.Benchmark.benchmarkEnabled)
     return
   end
@@ -234,21 +261,29 @@ end
 
 --initialize all stuff etc
 registerForEvent("onInit", function()
-  if not Config then
-    Config.Print(LogText.config_missing)
-  return end
+  if not Globals then Globals.Print(LogText.globals_missing) return end
+  if not Localization then Globals.Print(LogText.localization_missing) return end
+  if not Settings then Globals.Print(LogText.settings_missing) return end
+  if not UI then Globals.Print(LogText.ui_missing) return end
+  if not Calculate then Globals.Print(LogText.calculate_missing) end
+  if not Contextual then Globals.Print(LogText.contextual_missing) end
+  if not Presets then Globals.Print(LogText.presets_missing) end
+  if not Vectors then Globals.Print(LogText.vectors_missing_missing) end
+  if not Translate then Globals.Print(LogText.translate_missing) end
 
-  windowTitle = Config and FrameGenGhostingFix.__NAME .. " " .. Config.__EDITION or FrameGenGhostingFix.__NAME
+  FrameGenGhostingFix.GetVersion()
 
-  Config.OnInitialize()
+  windowTitle = FrameGenGhostingFix.__NAME .. " " .. FrameGenGhostingFix.__EDITION or FrameGenGhostingFix.__NAME
 
-  if not Config.__VERSION_SUFFIX then
+  Globals.OnInitialize()
+
+  if not FrameGenGhostingFix.__VERSION_SUFFIX then
     Diagnostics.OnInitialize()
   else
     Diagnostics = nil
   end
 
-  if not Config.IsModReady() then return end
+  if not Globals.IsModReady() then return end
 
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     IsGameLoaded(true)
@@ -269,14 +304,14 @@ registerForEvent("onInit", function()
   end
 
   -- danyalzia: remove forced benchmarking upon new install during development
-  -- if Config.IsFirstRun() then
+  -- if Globals.IsFirstRun() then
   --   SetBenchmark(true)
   -- end
 
   -- danyalzia: I am commenting it during development since I don't want to close these windows everytime I launch the game for testing :/
   -- if Debug then
-  --   Config.SetDebug(true)
-  --   Config.KeepWindow(true)
+  --   Globals.SetDebug(true)
+  --   Globals.KeepWindow(true)
   -- end
 end)
 
@@ -302,19 +337,19 @@ if Debug then
       return
     end
 
-    local isFrameGen = DLSSEnablerGetFrameGenerationState()
+    local isFrameGen = DLSSEnabler_GetFrameGenerationState()
     
     if isFrameGen then
-      Config.Print("Frame Generation is enabled.")
+      Globals.Print("Frame Generation is enabled.")
     else
-      Config.Print("Frame Generation is disabled.")
+      Globals.Print("Frame Generation is disabled.")
     end
   end)
 end
 
 registerForEvent("onOverlayOpen", function()
   openOverlay = true
-  Config.OpenWindow(true)
+  Globals.OpenWindow(true)
 
   --translate UIText before other modules access it
   if Translate then
@@ -323,14 +358,14 @@ registerForEvent("onOverlayOpen", function()
     UIText = Localization.UIText
   end
 
-  Config.OnOverlayOpen()
+  Globals.OnOverlayOpen()
   UI.OnOverlayOpen()
 
   if Diagnostics then
     Diagnostics.OnOverlayOpen()
   end
 
-  if not Config.IsModReady() then return end
+  if not Globals.IsModReady() then return end
 
   Presets.OnOverlayOpen()
   Calculate.OnOverlayOpen()
@@ -346,13 +381,13 @@ end)
 registerForEvent("onOverlayClose", function()
   openOverlay = false
 
-  if not Config.ModState.keepWindow then
-    Config.OpenWindow(false)
+  if not Globals.ModState.keepWindow then
+    Globals.OpenWindow(false)
   end
 
-  Config.OnOverlayClose()
+  Globals.OnOverlayClose()
 
-  if not Config.IsModReady() then return end
+  if not Globals.IsModReady() then return end
 
   Calculate.OnOverlayClose()
 
@@ -376,12 +411,13 @@ registerForEvent("onUpdate", function(deltaTime)
 
   if FrameGenGhostingFix.GameState.isGamePaused then return end
 
+  Globals.UpdateDelays()
   Vectors.OnUpdate()
 end)
 
 -- draw the mod's window
 registerForEvent("onDraw", function()
-  if Config.ModState.openWindow then
+  if Globals.ModState.openWindow then
     UI.Std.SetNextWindowPos(400, 200, UI.Cond.FirstUseEver)
 
     UI.PushStyle()
@@ -396,16 +432,29 @@ registerForEvent("onDraw", function()
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
         
         --debug interface starts------------------------------------------------------------------------------------------------------------------
-        if Debug and Config.IsDebug() then
+        if Debug and Globals.IsDebug() then
             Debug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
-        
-        -- danyalzia: remove forced benchmarking upon new install during development
-        -- if Config.IsNewInstall() then
+        --timer testing purposes------------------------------------------------------------------------------------------------------------------
+        if UI.Std.BeginTabItem("Delay Callback Test") then
+          if UI.Std.Button("Game's Delay Callback Test (whoknows)", 500, 40) then
+            local delay = Game.GetDelaySystem():DelayCallback(Globals.Print(Debug.__NAME, "Time is up!", UIText.General.info_version, FrameGenGhostingFix.GetVersion(true), ", Is 'Globals' compatible:", tostring(Globals.VersionCompare(Globals.__VERSION))), 5000, false)
+          end
+
+          if UI.Std.Button("Delay Callback Test (5s)", 500, 40) then
+            Globals.SetDelay(5, "DelayCallbackTest", Globals.Print, Debug.__NAME, "Time is up!", UIText.General.info_version, FrameGenGhostingFix.GetVersion(true), ", Is 'Globals' compatible:", tostring(Globals.VersionCompare(Globals.__VERSION)))
+          end
+
+          UI.Std.EndTabItem()
+        end
+        --timer testing purposes------------------------------------------------------------------------------------------------------------------
+
+        -- danyalzia: remove forced benchmarking upon new install dur ing development
+        -- if Globals.IsNewInstall() then
         --   if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
-        --     if Config.ModState.isFirstRun then
+        --     if Globals.ModState.isFirstRun then
         --       UI.Ext.TextWhite(UIText.Info.benchmark)
         --     else
         --       UI.Ext.TextWhite(UIText.Info.benchmarkAsk)
@@ -415,13 +464,13 @@ registerForEvent("onDraw", function()
         --     BenchmarkUI()
         --     UI.Std.Text("")
 
-        --     Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+        --     Globals.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Globals.ModState.keepWindow, keepWindowToggle)
         --     -- if keepWindowToggle then
         --     --   UI.SetStatusBar(UIText.General.settings_saved)
         --     -- end
         --     UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
-        --     if not Config.ModState.isFirstRun and not isBenchmark then
+        --     if not Globals.ModState.isFirstRun and not isBenchmark then
         --       UI.Std.Text("")
 
         --       if UI.Std.Button(UIText.General.yes, 240, 40) then
@@ -431,7 +480,7 @@ registerForEvent("onDraw", function()
         --       UI.Std.SameLine()
 
         --       if UI.Std.Button(UIText.General.no, 240, 40) then
-        --         Config.SetNewInstall(false)
+        --         Globals.SetNewInstall(false)
         --         Settings.SetSaved(false)
         --       end
         --     end
@@ -439,7 +488,7 @@ registerForEvent("onDraw", function()
         --   end
         -- end
 
-        if Config.IsAspectRatioChange() then
+        if Globals.IsAspectRatioChange() then
           if UI.Std.BeginTabItem(UIText.Info.tabname) then
 
             UI.Ext.TextWhite(UIText.Info.aspectRatioChange)
@@ -448,7 +497,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if openOverlay and Config.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
+        if openOverlay and Globals.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
 
           Presets.DrawUI()
           Calculate.DrawUI()
@@ -458,15 +507,15 @@ registerForEvent("onDraw", function()
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install during development
-        -- if not Config.IsNewInstall() and Config.IsModReady() then
-        if Config.IsModReady() then
+        -- if not Globals.IsNewInstall() and Globals.IsModReady() then
+        if Globals.IsModReady() then
           if UI.Std.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
-              Config.ModState.isDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Config.ModState.isDebug)
+              Globals.ModState.isDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Globals.ModState.isDebug)
             end
 
-            Config.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Config.ModState.keepWindow, keepWindowToggle)
+            Globals.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Globals.ModState.keepWindow, keepWindowToggle)
             if keepWindowToggle then
               Settings.SetSaved(false)
               UI.SetStatusBar(UIText.General.settings_saved)
@@ -475,11 +524,11 @@ registerForEvent("onDraw", function()
 
             UI.Std.Separator()
 
-            Config.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.toggleFG, Config.ModState.isFGEnabled, fgToggle)
+            Globals.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.toggleFG, Globals.ModState.isFGEnabled, fgToggle)
             if fgToggle then
               Settings.SetSaved(false)
               UI.SetStatusBar(UIText.General.settings_saved)
-              DLSSEnablerSetFrameGeneration(Config.ModState.isFGEnabled)
+              DLSSEnabler_SetFrameGeneration(Globals.ModState.isFGEnabled)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipToggleFG)
             
@@ -494,7 +543,7 @@ registerForEvent("onDraw", function()
                 if UI.Std.Button(UIText.Options.Benchmark.benchmarkRun, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(true)
-                  Config.KeepWindow(true)
+                  Globals.KeepWindow(true)
                 end
                 UI.Ext.OnItemHovered.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)
               else
@@ -513,7 +562,7 @@ registerForEvent("onDraw", function()
                   RestorePreviousSettings()
 
                   UI.SetStatusBar(UIText.General.settings_restored)
-                  Config.Print(LogText.settings_restoredCache)
+                  Globals.Print(LogText.settings_restoredCache)
                 end
               end
 

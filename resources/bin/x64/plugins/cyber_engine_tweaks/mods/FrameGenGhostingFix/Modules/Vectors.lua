@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   MaskingGlobal = {
     masksController = nil,
     vehicles = true,
@@ -380,7 +380,7 @@ local Vectors = {
   },
 }
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 
 local abs, atan, deg, floor, max, min, pi, rad, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.tan
 
@@ -1912,11 +1912,11 @@ end
 --Transformation methods end here----------------------------------------------------------------------------------------------------------------------
 
 local function ApplyMasksController()
-  Vectors.MaskingGlobal.masksController = Config.GetMasksController()
+  Vectors.MaskingGlobal.masksController = Globals.GetMasksController()
 end
 
 local function ApplyScreen()
-  local screenData = Config.GetScreen()
+  local screenData = Globals.GetScreen()
   local screen = Vectors.Screen
 
   screen.Edge = screenData.Edge
@@ -2027,15 +2027,15 @@ function Vectors.ApplyPreset()
   local mask3Path = cname(mask3.maskPath)
   local mask4Path = cname(mask4.maskPath)
 
-  local Preset = Config.GetWhiteBoard("Presets")
+  local Preset = Globals.GetWhiteBoard("Presets")
 
-  if not Preset or Preset == nil then Config.Print("No preset found in the Whiteboard table", nil, nil, Vectors.__NAME) return end
+  if not Preset or Preset == nil then Globals.Print(Vectors.__NAME,"No preset found.") return end
 
   Vectors.MaskingGlobal.vehicles = Preset.MaskingGlobal.vehicles
 
   if not Vectors.MaskingGlobal.vehicles then SetVisibility(false) return end
 
-  Config.SafeMergeTables(Vectors,Preset.Vectors)
+  Globals.SafeMergeTables(Vectors,Preset.Vectors)
 
   if masksController then
     --TPP Car

@@ -1,6 +1,6 @@
 local Presets = {
   __NAME = "Presets",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   selectedPreset = nil, -- must be a unique identifier for the preset
   sortedPresetIds = {},
   List = {
@@ -17,7 +17,7 @@ local Presets = {
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -43,7 +43,7 @@ end
 
 function Presets.AddPreset(presetInfo, id, filename)
   -- Skip if List is already populated with the same preset
-  if Presets.List[id] ~= nil then Config.Print(LogText.presets_skippedFileDuplicate, nil, nil, Presets.__NAME) return end
+  if Presets.List[id] ~= nil then Globals.Print(Presets.__NAME, LogText.presets_skippedFileDuplicate) return end
 
   Presets.List[id] = {file = filename, PresetInfo = presetInfo}
 end
@@ -61,12 +61,12 @@ function Presets.GetPresets()
         Presets.AddPreset(presetContents.PresetInfo, presetContents.PresetInfo.id, presetFile.name)
         table.insert(addedPresets, presetFile.name)
       else
-        Config.Print(LogText.presets_skippedFileData, presetFile.name, nil, Presets.__NAME)
+        Globals.Print(Presets.__NAME, LogText.presets_skippedFileData, presetFile.name)
       end
     end
   end
 
-  Config.Print(LogText.presets_loaded, table.concat(addedPresets, ","), nil, Presets.__NAME)
+  Globals.Print(Presets.__NAME, LogText.presets_loaded, table.concat(addedPresets, ", "))
 
   -- Sort the preset names by their keys (preset ids) so they appear alphabetically in UI 
   for k in pairs(Presets.List) do
@@ -86,7 +86,7 @@ function Presets.PrintPresets()
   end
 
   if Presets.selectedPreset then
-    Config.Print("Selected preset:", Presets.List[Presets.selectedPreset].PresetInfo.name)
+    Globals.Print(Presets.__NAME, "Selected preset:", Presets.List[Presets.selectedPreset].PresetInfo.name)
   end
 end
 
@@ -109,7 +109,7 @@ function Presets.LoadPreset()
   local loadedPreset = Presets.LoadJSON(presetPath)
 
   if loadedPreset then
-    Config.WriteWhiteBoard("Presets", loadedPreset)
+    Globals.WriteWhiteBoard("Presets", loadedPreset)
   end
 
   Presets.SaveUserSettings()
@@ -129,7 +129,7 @@ function Presets.SaveUserSettings()
 end
 
 function Presets.OnInitialize()
-  Config.MergeTables(Presets, Settings.GetUserSettings("Presets"))
+  Globals.MergeTables(Presets, Settings.GetUserSettings("Presets"))
   Presets.GetPresets()
   Presets.LoadPreset()
 end
@@ -198,7 +198,7 @@ function Presets.DrawUI()
 
     -- VectorsCustomize interface starts
     if Presets.selectedPreset == "a000" then
-      if Config.IsMounted() then
+      if Globals.IsMounted() then
         UI.Std.Text("")
         VectorsCustomize.DrawUI()
       else

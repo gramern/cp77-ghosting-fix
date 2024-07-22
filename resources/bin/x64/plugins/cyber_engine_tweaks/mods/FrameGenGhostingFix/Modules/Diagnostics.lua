@@ -1,12 +1,12 @@
 local Diagnostics = {
   __NAME = "Diagnostics",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   isModsCompatibility = true,
   modfiles = {},
   isUpdateRecommended = false
 }
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local UI = require("Modules/UI")
 
@@ -19,7 +19,7 @@ end
 function Diagnostics.OnInitialize()
   Diagnostics.CheckModsCompatibility()
   if Diagnostics.isModsCompatibility then return end
-  Config.SetModReady(false)
+  Globals.SetModReady(false)
 end
 
 function Diagnostics.OnOverlayOpen()

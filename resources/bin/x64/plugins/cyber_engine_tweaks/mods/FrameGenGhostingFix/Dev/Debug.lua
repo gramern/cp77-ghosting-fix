@@ -1,9 +1,9 @@
 local Debug = {
   __NAME = "Debug",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
 }
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local UI = require("Modules/UI")
 
 local Calculate = require("Modules/Calculate")
@@ -11,8 +11,11 @@ local Diagnostics = require("Modules/Diagnostics")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
+local Presets = require("Modules/Presets")
+
 function Debug.DrawUI()
   if UI.Std.BeginTabItem("General Data") then
+    UI.Std.Separator()
     if Diagnostics and Diagnostics.modscompatibility then
       UI.Ext.TextWhite("Diagnostics:")
       UI.Ext.TextWhite("Mods Compatibility")
@@ -27,25 +30,25 @@ function Debug.DrawUI()
     UI.Std.Separator()
     UI.Ext.TextWhite("Screen Resolution:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.Resolution.width))
+    UI.Ext.TextWhite(tostring(Globals.Screen.Resolution.width))
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.Resolution.height))
+    UI.Ext.TextWhite(tostring(Globals.Screen.Resolution.height))
     UI.Ext.TextWhite("Screen Aspect Ratio:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.aspectRatio))
+    UI.Ext.TextWhite(tostring(Globals.Screen.aspectRatio))
     UI.Ext.TextWhite("Screen Type:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.typeName))
+    UI.Ext.TextWhite(tostring(Globals.Screen.typeName))
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.type))
+    UI.Ext.TextWhite(tostring(Globals.Screen.type))
     UI.Ext.TextWhite("Screen Width Factor:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.Factor.width))
+    UI.Ext.TextWhite(tostring(Globals.Screen.Factor.width))
     UI.Ext.TextWhite("Screen Space:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.Space.width))
+    UI.Ext.TextWhite(tostring(Globals.Screen.Space.width))
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.Screen.Space.height))
+    UI.Ext.TextWhite(tostring(Globals.Screen.Space.height))
     UI.Std.Separator()
     UI.Ext.TextWhite("Active Camera FOV:")
     UI.Std.SameLine()
@@ -87,7 +90,7 @@ function Debug.DrawUI()
     UI.Std.Separator()
     UI.Ext.TextWhite("Is Mod Ready:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Config.ModState.isReady))
+    UI.Ext.TextWhite(tostring(Globals.ModState.isReady))
 
     UI.Std.Separator()
 

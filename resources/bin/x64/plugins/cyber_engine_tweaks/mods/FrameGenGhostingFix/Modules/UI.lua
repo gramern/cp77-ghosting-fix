@@ -1,6 +1,6 @@
 local UI = {
   __NAME = "UI",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   -- Reference to the 'ImGui' class.
   Std = ImGui,
   -- Reference to the 'ImGuiCol' class.
@@ -140,7 +140,7 @@ local UI = {
   }
 }
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 
 local UIText = Localization.UIText
@@ -194,7 +194,7 @@ local Status = {
 --
 -- @return None
 function UI.ResetStatusBar()
-  local status = UIText.General.info_version .. " " .. Config.__VERSION
+  local status = UIText.General.info_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
 
   UI.SetStatusBar(status)
 end

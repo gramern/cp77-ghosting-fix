@@ -27,7 +27,7 @@ local Contextual = {
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -45,7 +45,7 @@ local function GetUserSettings()
 end
 
 local function LoadUserSettings()
-  Config.MergeTables(Contextual, Settings.GetUserSettings("Contextual"))
+  Globals.MergeTables(Contextual, Settings.GetUserSettings("Contextual"))
 end
 
 local function SaveUserSettings()
@@ -55,7 +55,7 @@ end
 local function TurnOnFrameGen()
   -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
   if Contextual.FGEnabled == false then
-    DLSSEnablerSetFrameGeneration(true)
+    DLSSEnabler_SetFrameGeneration(true)
     Contextual.FGEnabled = true
   end
 end
@@ -63,13 +63,13 @@ end
 local function TurnOffFrameGen()
   -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
   if Contextual.FGEnabled == true then
-    DLSSEnablerSetFrameGeneration(false)
+    DLSSEnabler_SetFrameGeneration(false)
     Contextual.FGEnabled = false
   end
 end
 
 local function GetFrameGenState()
-  return DLSSEnablerGetFrameGenerationState()
+  return DLSSEnabler_GetFrameGenerationState()
 end
 
 -- Make the first letter capital
@@ -91,7 +91,7 @@ end
 local function GetPlayerVehicle()
   local playerVehicle = GetMountedVehicle(GetPlayer())
   if not playerVehicle then
-    Config.Print("Player vehicle cannot be retreived. Subsequent vehicle operations won't work", nil, nil, Contextual.__NAME)
+    Globals.Print("Player vehicle cannot be retreived. Subsequent vehicle operations won't work", nil, nil, Contextual.__NAME)
   end
 
   return playerVehicle
@@ -408,7 +408,7 @@ function Contextual.OnInitialize()
 
   Observe('PlayerPuppet', 'OnGameAttached', function()
     TurnOnFrameGen()
-    Config.Print("Game started. Frame Gen is enabled (PlayerPuppet->OnGameAttached)", nil, nil, Contextual.__NAME)
+    Globals.Print("Game started. Frame Gen is enabled (PlayerPuppet->OnGameAttached)", nil, nil, Contextual.__NAME)
     Contextual.CurrentStates.isMenu = false
   end)
 
@@ -422,7 +422,7 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicle = true
     if Contextual.Toggles.Vehicle.Static == true and IsInVehicle() then
       TurnOffFrameGen()
-      Config.Print("Player is in vehicle. Frame Gen is disabled (DriveEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is in vehicle. Frame Gen is disabled (DriveEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   -- These methods are essential to make sure frame gen is turned on when weapon is drawn (so transitioning to combat)
@@ -430,14 +430,14 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle.Static == true then
       TurnOnFrameGen()
-      Config.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriveEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle.Static == true then
       TurnOnFrameGen()
-      Config.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is in vehicle but switching to combat. Frame Gen is enabled (DriveEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -446,14 +446,14 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicle = true
     if Contextual.Toggles.Vehicle.Static == true and IsInVehicle() then
       TurnOffFrameGen()
-      Config.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicle = true
     if Contextual.Toggles.Vehicle.Static == true then
       TurnOffFrameGen()
-      Config.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is in vehicle. Frame Gen is disabled (EnteringEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -462,21 +462,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle.Static == true then
       TurnOnFrameGen()
-      Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle.Static == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicle = false
     if Contextual.Toggles.Vehicle.Static == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Player is no longer in vehicle. Frame Gen is enabled (ExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -498,21 +498,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicleCombat = true
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOffFrameGen()
-      Config.Print("Vehicle combat detected. Frame Gen is disabled (DriverCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle combat detected. Frame Gen is disabled (DriverCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriverCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriverCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (DriverCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('DriverCombatEvents', 'OnUpdate', function()
@@ -524,21 +524,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicleCombat = true
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOffFrameGen()
-      Config.Print("Vehicle combat detected. Frame Gen is disabled (EnteringCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle combat detected. Frame Gen is disabled (EnteringCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = true
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('EnteringCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = true
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (EnteringCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -547,21 +547,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isVehicleCombat = false
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingCombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('ExitingCombatEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isVehicleCombat = false
     if Contextual.Toggles.Vehicle.Combat == true and IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Vehicle no longer in combat. Frame Gen is enabled (ExitingCombatEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -574,14 +574,14 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isCombat = true
     if Contextual.Toggles.Combat == true and not IsInVehicle() then
       TurnOffFrameGen()
-      Config.Print("Combat mode detected. Frame Gen is disabled (CombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Combat mode detected. Frame Gen is disabled (CombatEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true and not IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Combat mode is no longer present. Frame Gen is enabled (CombatEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -591,21 +591,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true and not IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
+      Globals.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnEnter)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatExitingEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true and not IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnExit)", nil, nil, Contextual.__NAME)
     end
   end)
   Observe('CombatExitingEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true and not IsInVehicle() then
       TurnOnFrameGen()
-      Config.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
+      Globals.Print("Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnForcedExit)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -615,11 +615,11 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.Combat == true then
       if Contextual.CurrentStates.isCombat and not IsInVehicle() then
         TurnOffFrameGen()
-        Config.Print("Combat mode detected. Frame Gen is disabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
+        Globals.Print("Combat mode detected. Frame Gen is disabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
       end
       if not Contextual.CurrentStates.isCombat and not IsInVehicle() then
         TurnOnFrameGen()
-        Config.Print("Combat mode is no longer present. Frame Gen is enabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
+        Globals.Print("Combat mode is no longer present. Frame Gen is enabled (PlayerPuppet->OnCombatStateChanged)", nil, nil, Contextual.__NAME)
       end
     end
 	end)
@@ -634,11 +634,11 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.isCinematic == true then
       if Contextual.CurrentStates.isCinematic then
         TurnOffFrameGen()
-        Config.Print("Cinematic detected. Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        Globals.Print("Cinematic detected. Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
       if not Contextual.CurrentStates.isCinematic then
         TurnOnFrameGen()
-        Config.Print("Cinematic no longer present. Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
+        Globals.Print("Cinematic no longer present. Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)", nil, nil, Contextual.__NAME)
       end
     end
 	end)
@@ -651,7 +651,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Photomode == true then
       TurnOffFrameGen()
-      Config.Print("Photo mode detected" .. ". Frame Gen is disabled (gameuiPhotoModeMenuController->OnShow)", nil, nil, Contextual.__NAME)
+      Globals.Print("Photo mode detected" .. ". Frame Gen is disabled (gameuiPhotoModeMenuController->OnShow)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -660,7 +660,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Photomode == true then
       TurnOnFrameGen()
-      Config.Print("Photo mode no longer preset" .. ". Frame Gen is enabled (gameuiPhotoModeMenuController->OnHide)", nil, nil, Contextual.__NAME)
+      Globals.Print("Photo mode no longer preset" .. ". Frame Gen is enabled (gameuiPhotoModeMenuController->OnHide)", nil, nil, Contextual.__NAME)
     end
   end)
 
@@ -673,7 +673,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Menu == true then
       TurnOffFrameGen()
-      Config.Print("Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)", nil, nil, Contextual.__NAME)
+      Globals.Print("Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)", nil, nil, Contextual.__NAME)
     end
 
   end)
@@ -685,11 +685,11 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.Menu == true then
       if Contextual.CurrentStates.isMenu or IsInMenu() then
         TurnOffFrameGen()
-        Config.Print("Menu detected" .. ". Frame Gen is disabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
+        Globals.Print("Menu detected" .. ". Frame Gen is disabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
       if not Contextual.CurrentStates.isMenu or not IsInMenu() then
         TurnOnFrameGen()
-        Config.Print("Menu no longer present" .. ". Frame Gen is enabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
+        Globals.Print("Menu no longer present" .. ". Frame Gen is enabled (gameuiPopupsManager->OnMenuUpdate)", nil, nil, Contextual.__NAME)
       end
     end
   end)
@@ -713,7 +713,7 @@ function Contextual.DrawUI()
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleCombatToggled, combatToggle, cinematicToggle, photoModeToggle, menuToggle
 
   if UI.Std.BeginTabItem(UIText.Contextual.tabname) then
-    if not Config.ModState.isFGEnabled then
+    if not Globals.ModState.isFGEnabled then
       UI.Std.Text("")
       UI.Ext.TextRed(UIText.Contextual.requirement)
       UI.Std.Text("")
