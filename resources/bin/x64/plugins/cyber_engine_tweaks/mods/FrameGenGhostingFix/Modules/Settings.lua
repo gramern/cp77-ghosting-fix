@@ -32,7 +32,10 @@ local function Translate(legacyUserSettings)
     Contextual = {
       Toggles = {
         Vehicle = {},
+        Sprinting = nil,
+        Swimming = nil,
         Combat = nil,
+        Braindance = nil,
         Cinematic = nil,
         Photomode = nil,
         Menu = nil,

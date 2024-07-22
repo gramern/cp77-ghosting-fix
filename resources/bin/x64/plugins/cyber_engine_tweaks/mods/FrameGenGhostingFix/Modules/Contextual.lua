@@ -7,7 +7,10 @@ local Contextual = {
       Driving = false,
       Combat = false,
     },
+    Sprinting = false,
+    Swimming = false,
     Combat = false,
+    Braindance = false,
     Cinematic = false,
     Photomode = false,
     Menu = false,
@@ -17,7 +20,10 @@ local Contextual = {
     isVehicleStatic = false,
     isVehicleDriving = false,
     isVehicleCombat = false,
+    isSprinting = false,
+    isSwimming = false,
     isCombat = false,
+    isBraindance = false,
     isCinematic = false,
     isPhotoMode = false,
     isMenu = false,
@@ -53,7 +59,7 @@ local function SaveUserSettings()
 end
 
 local function TurnOnFrameGen()
-  -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
+  -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
   if Contextual.FGEnabled == false then
     DLSSEnabler_SetFrameGeneration(true)
     Contextual.FGEnabled = true
@@ -61,7 +67,7 @@ local function TurnOnFrameGen()
 end
 
 local function TurnOffFrameGen()
-  -- Only call external DLSSEnablerSetFrameGeneration method once to avoid overhead
+  -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
   if Contextual.FGEnabled == true then
     DLSSEnabler_SetFrameGeneration(false)
     Contextual.FGEnabled = false
@@ -82,7 +88,10 @@ local function StringifyStates()
   "\n" .. "VehicleStatic: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleStatic)) ..
   "\n" .. "VehicleDriving: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleDriving)) ..
   "\n" .. "VehicleCombat: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleCombat)) ..
+  "\n" .. "Sprinting: " .. Capitalize(tostring(Contextual.CurrentStates.isSprinting)) ..
+  "\n" .. "Swimming: " .. Capitalize(tostring(Contextual.CurrentStates.isSwimming)) ..
   "\n" .. "Combat: " .. Capitalize(tostring(Contextual.CurrentStates.isCombat)) ..
+  "\n" .. "Braindance: " .. Capitalize(tostring(Contextual.CurrentStates.isBraindance)) ..
   "\n" .. "Cinematic: " .. Capitalize(tostring(Contextual.CurrentStates.isCinematic)) ..
   "\n" .. "PhotoMode: " .. Capitalize(tostring(Contextual.CurrentStates.isPhotoMode)) ..
   "\n" .. "Menu: " .. Capitalize(tostring(Contextual.CurrentStates.isMenu))
@@ -125,6 +134,26 @@ local function IsPlayerVehicleDriving(playerVehicle)
   
 end
 
+local function IsPlayerSwimming()
+  local player = Game.GetPlayer()
+  if player == nil then return false end
+  return player:IsSwimming()
+end
+
+local function IsPlayerSprinting()
+  local player = Game.GetPlayer()
+  if player == nil then return false end
+
+  return player:GetCurrentLocomotionState() == gamePSMLocomotionStates.Sprint
+end
+
+local function IsPlayerInBraindance()
+  local blackboardDefs = Game.GetAllBlackboardDefs()
+  local blackboardBD = Game.GetBlackboardSystem():Get(blackboardDefs.Braindance)
+
+  return blackboardBD:GetBool(blackboardDefs.Braindance.IsActive)
+end
+
 local function IsInCombat()
 	local combatState = tonumber(EnumInt(Game.GetPlayer().GetCurrentCombatState(Game.GetPlayer())))
   -- InCombat
@@ -142,9 +171,16 @@ local function IsInPhotoMode()
 end
 
 local function IsInCinematic()
-	local sceneTier = Game.GetPlayer().GetSceneTier(Game.GetPlayer())
+  local player = Game.GetPlayer()
+
+  -- This one shows inaccurate results (i.e., the last scene tier when player was active)
+	-- local sceneTier = Game.GetPlayer().GetSceneTier(player)
+
+  local blackboardDefs = Game.GetAllBlackboardDefs()
+  local blackboardPSM = Game.GetBlackboardSystem():GetLocalInstanced(player:GetEntityID(), blackboardDefs.PlayerStateMachine)
+
   -- Tier5_Cinematic
-	return sceneTier == 5
+	return blackboardPSM:GetInt(blackboardDefs.PlayerStateMachine.SceneTier) == 5
 end
 
 -- Not used currently but may be helpful in the future
@@ -166,6 +202,15 @@ local function SetVehicleStatic(feature)
       return
     end
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
       return
     end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
@@ -199,6 +244,15 @@ local function SetVehicleDriving(feature)
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
       return
     end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
+      return
+    end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
       return
     end
@@ -228,6 +282,88 @@ local function SetVehicleCombat(feature)
       return
     end
     if Contextual.Toggles.Vehicle.Driving and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleDriving then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetSprinting(feature)
+  if Contextual.CurrentStates.isSprinting or IsPlayerSprinting() then
+    if Contextual.Toggles.Vehicle.Static and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleStatic then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Driving and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleDriving then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetSwimming(feature)
+  if Contextual.CurrentStates.isSwimming or IsPlayerSwimming() then
+    if Contextual.Toggles.Vehicle.Static and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleStatic then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Driving and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleDriving then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
       return
     end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
@@ -262,6 +398,53 @@ local function SetCombat(feature)
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
       return
     end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
+      return
+    end
+    if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
+      return
+    end
+    if Contextual.Toggles.Photomode and Contextual.CurrentStates.isPhotoMode then
+      return
+    end
+    if Contextual.Toggles.Menu and Contextual.CurrentStates.isMenu then
+      return
+    end
+
+    if feature == true then
+      TurnOffFrameGen()
+    else
+      TurnOnFrameGen()
+    end
+  end
+end
+
+local function SetBraindance(feature)
+  if Contextual.CurrentStates.isBraindance or IsPlayerInBraindance() then
+    if Contextual.Toggles.Vehicle.Static and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleStatic then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Driving and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleDriving then
+      return
+    end
+    if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
+      return
+    end
     if Contextual.Toggles.Cinematic and Contextual.CurrentStates.isCinematic then
       return
     end
@@ -289,6 +472,15 @@ local function SetCinematic(feature)
       return
     end
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
       return
     end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
@@ -321,6 +513,15 @@ local function SetPhotoMode(feature)
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
       return
     end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
+      return
+    end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
       return
     end
@@ -348,6 +549,15 @@ local function SetMenu(feature)
       return
     end
     if Contextual.Toggles.Vehicle.Combat and Contextual.CurrentStates.isVehicle and Contextual.CurrentStates.isVehicleCombat then
+      return
+    end
+    if Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprinting then
+      return
+    end
+    if Contextual.Toggles.Swimming and Contextual.CurrentStates.isSwimming then
+      return
+    end
+    if Contextual.Toggles.Braindance and Contextual.CurrentStates.isBraindance then
       return
     end
     if Contextual.Toggles.Combat and Contextual.CurrentStates.isCombat then
@@ -625,11 +835,75 @@ function Contextual.OnInitialize()
 	end)
 
   -------------
+  -- Sprinting
+  -------------
+  Observe('SprintEvents', 'OnEnter', function()
+    Contextual.CurrentStates.isSprinting = true
+    
+    if Contextual.Toggles.Sprinting == true then
+      TurnOffFrameGen()
+      Globals.Print("Player is sprinting. Frame Gen is disabled (SprintEvents->OnEnter)", nil, nil, Contextual.__NAME)
+    end
+  end)
+  Observe('SprintEvents', 'OnExit', function()
+    Contextual.CurrentStates.isSprinting = false
+    if Contextual.Toggles.Sprinting == true then
+      TurnOnFrameGen()
+      Globals.Print("Player is no longer sprinting. Frame Gen is enabled (SprintEvents->OnExit)", nil, nil, Contextual.__NAME)
+    end
+  end)
+
+  ------------
+  -- Swimming
+  ------------
+  Observe('SwimmingEvents', 'OnEnter', function()
+    Contextual.CurrentStates.isSwimming = true
+    if Contextual.Toggles.Swimming == true then
+      TurnOffFrameGen()
+      Globals.Print("Player is swimming. Frame Gen is disabled (SwimmingEvents->OnEnter)", nil, nil, Contextual.__NAME)
+    end
+  end)
+  Observe('SwimmingEvents', 'OnExit', function()
+    Contextual.CurrentStates.isSwimming = false
+    if Contextual.Toggles.Swimming == true then
+      TurnOnFrameGen()
+      Globals.Print("Player is no longer swimming. Frame Gen is enabled (SwimmingEvents->OnExit)", nil, nil, Contextual.__NAME)
+    end
+  end)
+
+  --------------
+  -- Braindance
+  --------------
+  Observe('BraindanceGameController', 'OnIsActiveUpdated', function(_, isActive)
+
+    if type(isActive) ~= 'boolean' then
+      isActive = _
+    end
+
+    Contextual.CurrentStates.isBraindance = isActive
+
+    if Contextual.Toggles.Braindance == true then
+      if Contextual.CurrentStates.isBraindance then
+        TurnOffFrameGen()
+        Globals.Print("Player is braindance. Frame Gen is disabled (BraindanceGameController->OnIsActiveUpdated)", nil, nil, Contextual.__NAME)
+      else
+        TurnOnFrameGen()
+        Globals.Print("Player is no longer in braindance. Frame Gen is enabled (BraindanceGameController->OnIsActiveUpdated)", nil, nil, Contextual.__NAME)
+      end
+    end
+  end)
+
+  -------------
   -- Cinematic
   -------------
-  Observe("PlayerPuppet", "OnSceneTierChange", function (sceneTier)
+  Observe("PlayerPuppet", "OnSceneTierChange", function (_, sceneTier)
+    Globals.Print("Scene Tier change detected: " .. tostring(sceneTier), nil, nil, Contextual.__NAME)
 
-		Contextual.CurrentStates.isCinematic = sceneTier == 5 or IsInCinematic()
+    Contextual.CurrentStates.isCinematic = false
+
+    if sceneTier == 5 or IsInCinematic() then
+		  Contextual.CurrentStates.isCinematic = true
+    end
 
     if Contextual.Toggles.isCinematic == true then
       if Contextual.CurrentStates.isCinematic then
@@ -710,7 +984,7 @@ end
 
 function Contextual.DrawUI()
 
-  local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleCombatToggled, combatToggle, cinematicToggle, photoModeToggle, menuToggle
+  local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleCombatToggled, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle, menuToggle
 
   if UI.Std.BeginTabItem(UIText.Contextual.tabname) then
     if not Globals.ModState.isFGEnabled then
@@ -758,11 +1032,32 @@ function Contextual.DrawUI()
     UI.Std.Text("")
     UI.Ext.TextWhite("General:")
 
-    Contextual.Toggles.Combat, combatToggle = UI.Ext.Checkbox.TextWhite("Combat (Status)", Contextual.Toggles.Combat, combatToggle)
+    Contextual.Toggles.Sprinting, sprintingToggle = UI.Ext.Checkbox.TextWhite("Sprinting", Contextual.Toggles.Sprinting, sprintingToggle)
+    if sprintingToggle then
+      Settings.SetSaved(false)
+      UI.SetStatusBar(UIText.General.settings_saved)
+      SetSprinting(Contextual.Toggles.Sprinting)
+    end
+
+    Contextual.Toggles.Swimming, swimmingToggle = UI.Ext.Checkbox.TextWhite("Swimming", Contextual.Toggles.Swimming, swimmingToggle)
+    if swimmingToggle then
+      Settings.SetSaved(false)
+      UI.SetStatusBar(UIText.General.settings_saved)
+      SetSwimming(Contextual.Toggles.Swimming)
+    end
+    
+    Contextual.Toggles.Combat, combatToggle = UI.Ext.Checkbox.TextWhite("Combat (Alert Status)", Contextual.Toggles.Combat, combatToggle)
     if combatToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
       SetCombat(Contextual.Toggles.Combat)
+    end
+
+    Contextual.Toggles.Braindance, braindanceToggle = UI.Ext.Checkbox.TextWhite("Braindance", Contextual.Toggles.Braindance, braindanceToggle)
+    if braindanceToggle then
+      Settings.SetSaved(false)
+      UI.SetStatusBar(UIText.General.settings_saved)
+      SetBraindance(Contextual.Toggles.Braindance)
     end
 
     Contextual.Toggles.Cinematic, cinematicToggle = UI.Ext.Checkbox.TextWhite("Cinematic", Contextual.Toggles.Cinematic, cinematicToggle)
