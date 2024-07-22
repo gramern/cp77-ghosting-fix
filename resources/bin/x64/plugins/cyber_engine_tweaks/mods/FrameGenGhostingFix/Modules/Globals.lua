@@ -355,14 +355,13 @@ end
 -- @param None
 --
 -- @return None
-function Globals.UpdateDelays()
-  local delays = next(DelayBoard)
-  if not delays then return end
+function Globals.UpdateDelays(gameDeltaTime)
+  if not next(DelayBoard) then return end
 
   local delaysToRemove = {}
 
   for key, delay in pairs(DelayBoard) do
-    delay.remainingTime = delay.remainingTime - FrameGenGhostingFix.GameState.gameDeltaTime
+    delay.remainingTime = delay.remainingTime - gameDeltaTime
     
     if delay.remainingTime <= 0 then
       if delay.parameters then

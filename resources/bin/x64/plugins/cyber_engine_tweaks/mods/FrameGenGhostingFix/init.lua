@@ -411,7 +411,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
   if FrameGenGhostingFix.GameState.isGamePaused then return end
 
-  Globals.UpdateDelays()
+  Globals.UpdateDelays(gameDeltaTime)
   Vectors.OnUpdate()
 end)
 
