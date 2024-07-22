@@ -375,7 +375,7 @@ function Globals.UpdateDelays(gameDeltaTime)
   end
 
   for _, key in ipairs(delaysToRemove) do
-    Globals.CancelDelay(key)
+    DelayBoard[key] = nil
   end
 end
 

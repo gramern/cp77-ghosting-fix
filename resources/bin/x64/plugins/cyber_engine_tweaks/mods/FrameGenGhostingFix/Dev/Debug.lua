@@ -243,6 +243,10 @@ function Debug.DrawUI()
         UI.Ext.TextWhite(tostring(Vectors.Vehicle.currentSpeed))
       end
 
+      UI.Ext.TextWhite("Is Vehicle Moving:")
+      UI.Std.SameLine()
+      UI.Ext.TextWhite(tostring(Vectors.Vehicle.isMoving))
+
       UI.Std.Separator()
 
       UI.Ext.TextWhite("Active Camera Perspective:")
@@ -577,10 +581,29 @@ function Debug.DrawUI()
     UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.isMoving))
     UI.Ext.TextWhite("Has a Weapon in Hand:")
     UI.Std.SameLine()
-    UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.hasWeapon))
+    UI.Ext.TextWhite(tostring(Vectors.PlayerPuppet.isWeapon))
     UI.Ext.TextWhite("Is Mounted:")
     UI.Std.SameLine()
     UI.Ext.TextWhite(tostring(Vectors.Vehicle.isMounted))
+
+    UI.Std.Separator()
+    -- temporary to check Vectors Shared Data
+    UI.Ext.TextWhite("Vectors Shared Data:")
+    UI.Ext.TextWhite("Is Moving Player:")
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(Vectors.Shared.isMovingPlayer))
+    UI.Ext.TextWhite("Has a Weapon in Hand:")
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(Vectors.Shared.isWeaponDrawn))
+    UI.Ext.TextWhite("Is Mounted:")
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(Vectors.Shared.isMounted))
+    UI.Ext.TextWhite("Is Moving Vehicle:")
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(Vectors.Shared.isMovingVehicle))
+    UI.Ext.TextWhite("Vehicle' Current Speed:")
+    UI.Std.SameLine()
+    UI.Ext.TextWhite(tostring(Vectors.Shared.currentSpeed))
 
     UI.Std.EndTabItem()
   end
