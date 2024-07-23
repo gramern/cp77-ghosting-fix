@@ -391,6 +391,9 @@ registerForEvent("onOverlayClose", function()
 
   Calculate.OnOverlayClose()
 
+  Contextual.OnOverlayClose()
+
+  Vectors.OnOverlayClose()
   if VectorsCustomize then
     VectorsCustomize.OnOverlayClose()
   end
