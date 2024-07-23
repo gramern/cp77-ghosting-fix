@@ -41,7 +41,7 @@ local UI = {
       --
       -- @return None
       SetTooltip = function(string)
-        if ImGui.IsItemHovered() then
+        if ImGui.IsItemHovered() and Globals.ModState.isHelp then
           ImGui.SetTooltip(string)
         else
           ImGui.SetTooltip(nil)
@@ -140,7 +140,6 @@ local UI = {
   }
 }
 
-local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 
 local UIText = Localization.UIText

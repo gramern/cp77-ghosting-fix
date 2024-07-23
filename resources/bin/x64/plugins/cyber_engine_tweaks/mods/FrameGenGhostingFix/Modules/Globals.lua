@@ -1,8 +1,9 @@
-local Globals = {
+Globals = {
   __NAME = "Globals",
   __VERSION = { 5, 0, 0 },
   ModState = {
     isDebug = false,
+    isHelp = true,
     keepWindow = false,
     isFGEnabled = true,
     openWindow = false,

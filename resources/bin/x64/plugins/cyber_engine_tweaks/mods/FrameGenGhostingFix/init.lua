@@ -522,6 +522,9 @@ registerForEvent("onDraw", function()
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
+            Globals.ModState.isHelp = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledHelp, Globals.ModState.isHelp)
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipHelp)
+
             UI.Std.Separator()
 
             Globals.ModState.isFGEnabled, fgToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.toggleFG, Globals.ModState.isFGEnabled, fgToggle)
