@@ -411,7 +411,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
   if FrameGenGhostingFix.GameState.isGamePaused then return end
 
-  Globals.UpdateDelays()
+  Globals.UpdateDelays(gameDeltaTime)
   Vectors.OnUpdate()
 end)
 
@@ -521,6 +521,9 @@ registerForEvent("onDraw", function()
               UI.SetStatusBar(UIText.General.settings_saved)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
+
+            Globals.ModState.isHelp = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledHelp, Globals.ModState.isHelp)
+            UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipHelp)
 
             UI.Std.Separator()
 

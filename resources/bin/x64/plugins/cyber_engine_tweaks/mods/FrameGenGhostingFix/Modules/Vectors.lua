@@ -1,6 +1,13 @@
 local Vectors = {
   __NAME = "Vectors",
   __VERSION = { 5, 0, 0 },
+  Shared = {
+    currentSpeed = 0,
+    isMounted = false,
+    isMovingPlayer = false,
+    isMovingVehicle = false,
+    isWeaponDrawn = false,
+  },
   MaskingGlobal = {
     masksController = nil,
     vehicles = true,
@@ -43,7 +50,7 @@ local Vectors = {
         Right = nil,
       }
     },
-    hasWeapon = nil,
+    isWeapon = nil,
     isMoving = nil,
     Forward = nil,
     Position = nil
@@ -154,6 +161,7 @@ local Vectors = {
     },
     Forward =  nil,
     isMounted = nil,
+    isMoving = false,
     Midpoint = {
       Position = {
         Back = nil,
@@ -510,40 +518,22 @@ end
 
 local function IsMounted()
   local isMounted = Game['GetMountedVehicle;GameObject'](Game.GetPlayer())
-  local print
-
-  if isMounted then
-    Vectors.Vehicle.isMounted = true
-    print = true
-  else
-    Vectors.Vehicle.isMounted = nil
-    print = false
-  end
-
-  return print
+  Vectors.Vehicle.isMounted = isMounted and true or false
+  return isMounted
 end
 
 local function IsMoving()
   local isMoving = Game.GetPlayer():IsMoving()
 
   Vectors.PlayerPuppet.isMoving = isMoving
-
-  return isMoving
 end
 
-local function HasWeapon()
-  local hasWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
-  local print
+local function IsWeapon()
+  local isWeapon = Game.GetTransactionSystem():GetItemInSlot(Game.GetPlayer(), TweakDBID.new("AttachmentSlots.WeaponRight"))
 
-  if hasWeapon then
-    Vectors.PlayerPuppet.hasWeapon = true
-    print = true
-  else
-    Vectors.PlayerPuppet.hasWeapon = false
-    print = false
-  end
+  if not isWeapon then Vectors.PlayerPuppet.isWeapon = false return end
 
-  return print
+  Vectors.PlayerPuppet.isWeapon = true
 end
 
 local function GetPlayerData()
@@ -551,9 +541,8 @@ local function GetPlayerData()
 
   if player then
     Vectors.PlayerPuppet.Position = player:GetWorldPosition()
-    IsMounted()
     IsMoving()
-    HasWeapon()
+    IsWeapon()
   end
 end
 
@@ -615,10 +604,10 @@ local function GetVehicleRecord()
   return vecVehicle.vehicleRecord
 end
 
-local function IsVehicleKnown()
+local function IsKnownVehicle()
   local vecVehicle = Vectors.Vehicle
 
-  if not vecVehicle.isMounted then return end
+  if not vecVehicle.isMounted then vecVehicle.vehicleTypeKnown = false return end
 
   local baseObject = vecVehicle.vehicleBaseObject
 
@@ -627,6 +616,19 @@ local function IsVehicleKnown()
   else
     vecVehicle.vehicleTypeKnown = false
   end
+end
+
+local function IsMovingVehicle()
+  local vecVehicle = Vectors.Vehicle
+
+  if not vecVehicle.isMounted then vecVehicle.isMoving = false return end
+  local filteredSpeed = 0
+  local alpha = 0.1
+  local speedThreshold = 0.1
+
+  filteredSpeed = alpha * vecVehicle.currentSpeed + (1 - alpha) * filteredSpeed
+
+  vecVehicle.isMoving = abs(filteredSpeed) > speedThreshold
 end
 
 local function GetDefaultBikeWheelsPositions()
@@ -844,7 +846,8 @@ local function GetVehicleData()
     vecVehicle.currentSpeed = vehicle:GetCurrentSpeed()
     GetVehicleBaseObject()
     GetVehicleRecord()
-    IsVehicleKnown()
+    IsKnownVehicle()
+    IsMovingVehicle()
   end
 end
 
@@ -899,6 +902,18 @@ local function GetDotProducts()
   dotVeh.forwardAbs = abs(dotVeh.forward)
   dotVeh.rightAbs = abs(dotVeh.right)
   dotVeh.upAbs = abs(dotVeh.up)
+end
+
+local function UpdateShared()
+  local shared = Vectors.Shared
+  local vehicle = Vectors.Vehicle
+  local player = Vectors.PlayerPuppet
+
+  shared.currentSpeed = vehicle.currentSpeed
+  shared.isMounted = vehicle.isMounted
+  shared.isMovingVehicle = vehicle.isMoving
+  shared.isMovingPlayer = player.isMoving
+  shared.isWeaponDrawn = player.isWeapon
 end
 
 --Data gathering methods end here----------------------------------------------------------------------------------------------------------------------
@@ -1832,7 +1847,7 @@ local function TransformVisibility()
   local cameraForwardTable, fov = camera.ForwardTable, camera.fov
   local dotVeh, medianAngle = cameraForwardTable.DotProduct.Vehicle, cameraForwardTable.Angle.Vehicle.Forward.medianPlane
 
-  local hasWeapon = Vectors.PlayerPuppet.hasWeapon
+  local isWeapon = Vectors.PlayerPuppet.isWeapon
 
   local vehMasks = Vectors.VehMasks
   local hedVisible, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Visible, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
@@ -1874,7 +1889,7 @@ local function TransformVisibility()
     if baseObject == 0 then
       if medianAngle >= 0 then
         hedVisible.fill = hedVisible.Def.fill
-      elseif hasWeapon then
+      elseif isWeapon then
         hedVisible.fill = hedVisible.Def.fill
       elseif dotVeh.forward > 0.98 and vehForward.z < -0.12 then
         hedVisible.fill = hedVisible.Def.fill
@@ -1884,7 +1899,7 @@ local function TransformVisibility()
         hedVisible.fill = hedVisible.Def.fillLock
       end
     else
-      if hasWeapon and dotVeh.right < -0.1 then
+      if isWeapon and dotVeh.right < -0.1 then
         hedVisible.fill = hedVisible.Def.fill
       else
         hedVisible.fill = hedVisible.Def.fillLock
@@ -1977,21 +1992,17 @@ function Vectors.ToggleMaskingState()
   return Vectors.MaskingGlobal.vehicles
 end
 
-function Vectors.OnUpdate()
-  if not Vectors.MaskingGlobal.vehicles then return end
-  GetPlayerData()
-  GetCameraData()
-  if not Vectors.Vehicle.isMounted then return end
-  GetActivePerspective()
-  GetVehicleData()
-  GetDotProducts()
-  GetCameraAnglesVehicle()
-  GetDerivativeVehicleData()
-  TransformVehMasks()
-end
-
 function Vectors.OnInitialize()
   ApplyMasksController()
+
+  Observe('hudCarController', 'OnMountingEvent', function()
+    Vectors.Vehicle.isMounted = true
+  end)
+
+  Observe('hudCarController', 'OnUnmountingEvent', function()
+    Vectors.Vehicle.isMounted = false
+  end)
+
   ApplyScreen()
   ApplyScreenSpaceHed()
   ApplySizeHed()
@@ -2003,6 +2014,28 @@ function Vectors.OnOverlayOpen()
   ApplyScreen()
   ApplyScreenSpaceHed()
   ApplySizeHed()
+end
+
+function Vectors.OnUpdate()
+  GetPlayerData()
+  UpdateShared()
+
+  if not Vectors.MaskingGlobal.vehicles then return end
+
+  GetCameraData()
+
+  if Vectors.Vehicle.isMounted == nil then
+    if not IsMounted() then return end
+  elseif not Vectors.Vehicle.isMounted then
+    return
+  end
+
+  GetActivePerspective()
+  GetVehicleData()
+  GetDotProducts()
+  GetCameraAnglesVehicle()
+  GetDerivativeVehicleData()
+  TransformVehMasks()
 end
 
 --- Applies new preset loaded from the Presets module. 

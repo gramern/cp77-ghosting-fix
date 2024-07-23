@@ -1,8 +1,9 @@
-local Globals = {
+Globals = {
   __NAME = "Globals",
   __VERSION = { 5, 0, 0 },
   ModState = {
     isDebug = false,
+    isHelp = true,
     keepWindow = false,
     isFGEnabled = true,
     openWindow = false,
@@ -152,11 +153,12 @@ end
 
 --- Prints a formatted message with an optional module name and variable number of content items.
 --
--- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed.
--- @param ...: any; Variable number of items to be printed as the content of the message.
+-- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param ...: any; Variable number of items to be printed as the content of the message. 
 --
 -- @return nil
 function Globals.Print(moduleName, ...)
+  local mod = "[" .. FrameGenGhostingFix.__NAME .. "]"
   local module = ""
   local contents
 
@@ -166,12 +168,51 @@ function Globals.Print(moduleName, ...)
     module = "[" .. tostring(moduleName) .. "]"
     contents = {...}
   end
-  
+
   if #contents == 0 and module == "" then
-      return print("No contents to print.")
+      return print(mod, Globals.__NAME, "No contents to print.")
   end
 
-  print("[FrameGen Ghosting 'Fix']", module, table.concat(contents, " "))
+  for i, value in ipairs(contents) do
+    contents[i] = tostring(value)
+  end
+
+  local concatenatedContents = table.concat(contents, " ")
+
+  print(mod, module, concatenatedContents)
+end
+
+--- Prints a formatted message with an optional module name and variable number of content items. Prints to the mod's exlusive log file.
+--
+-- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param ...: any; Variable number of items to be printed as the content of the message. 
+--
+-- @return nil
+function Globals.PrintError(moduleName, ...)
+  local modError = "[" .. FrameGenGhostingFix.__NAME .. "]" .. " [ERROR]"
+  local module = ""
+  local contents
+
+  if select('#', ...) == 0 then
+    contents = {moduleName}
+  else
+    module = "[" .. tostring(moduleName) .. "]"
+    contents = {...}
+  end
+
+  if #contents == 0 and module == "" then
+      return print(modError, Globals.__NAME, "No error contents to print.")
+  end
+
+  for i, value in ipairs(contents) do
+    contents[i] = tostring(value)
+  end
+
+  local concatenatedContents = table.concat(contents, " ")
+  local printContents = modError .. " " .. module .. " " .. concatenatedContents
+
+  print(printContents)
+  spdlog.error(printContents)
 end
 
 --- Converts a version string to a table of numbers.
@@ -315,14 +356,13 @@ end
 -- @param None
 --
 -- @return None
-function Globals.UpdateDelays()
-  local delays = next(DelayBoard)
-  if not delays then return end
+function Globals.UpdateDelays(gameDeltaTime)
+  if not next(DelayBoard) then return end
 
   local delaysToRemove = {}
 
   for key, delay in pairs(DelayBoard) do
-    delay.remainingTime = delay.remainingTime - FrameGenGhostingFix.GameState.gameDeltaTime
+    delay.remainingTime = delay.remainingTime - gameDeltaTime
     
     if delay.remainingTime <= 0 then
       if delay.parameters then
@@ -336,7 +376,7 @@ function Globals.UpdateDelays()
   end
 
   for _, key in ipairs(delaysToRemove) do
-    Globals.CancelDelay(key)
+    DelayBoard[key] = nil
   end
 end
 
