@@ -41,6 +41,7 @@ local Contextual = {
 local UserSettings = {}
 
 local Globals = require("Modules/Globals")
+local Vectors = require("Modules/Vectors")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local UI = require("Modules/UI")
@@ -332,7 +333,7 @@ end
 
 local function SetVehicleStaticCombat(feature)
   local playerVehicle = GetPlayerVehicle()
-  if Contextual.CurrentStates.isVehicleStaticCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle)) then
+  if Contextual.CurrentStates.isVehicleStaticCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and not Vectors.Shared.isMovingVehicle) then
     if not ShouldAffectFGState("Vehicle.StaticCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -344,7 +345,7 @@ end
 
 local function SetVehicleDrivingCombat(feature)
   local playerVehicle = GetPlayerVehicle()
-  if Contextual.CurrentStates.isDrivingCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle)) then
+  if Contextual.CurrentStates.isDrivingCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and Vectors.Shared.isMovingVehicle) then
     if not ShouldAffectFGState("Vehicle.DrivingCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -468,14 +469,13 @@ local function SetMenu(feature)
 end
 
 function HandleStaticAndDrivingStates()
-  local playerVehicle = GetPlayerVehicle()
 
-  if IsPlayerVehicleStatic(playerVehicle) then
-    Contextual.CurrentStates.isVehicleStatic = true
-    Contextual.CurrentStates.isVehicleDriving = false
-  else
+  if Vectors.Shared.isMovingVehicle then
     Contextual.CurrentStates.isVehicleStatic = false
     Contextual.CurrentStates.isVehicleDriving = true
+  else
+    Contextual.CurrentStates.isVehicleStatic = true
+    Contextual.CurrentStates.isVehicleDriving = false
   end
 
   -- Drive events are also present during photo mode and menu
@@ -522,12 +522,15 @@ function Contextual.OnInitialize()
 
   LoadUserSettings()
 
+  -- Turn on debug mode during development
+  Globals.ModState.isDebug = true
+
   -- Get the current FG state whenever mod is loaded or reloaded from CET
   Contextual.FGEnabled = GetFrameGenState()
 
   Observe('PlayerPuppet', 'OnGameAttached', function()
     TurnOnFrameGen()
-    Globals.PrintDebug(Contextual.__NAME, "Game started. Frame Gen is enabled (PlayerPuppet->OnGameAttached)")
+    Globals.PrintDebug(Contextual.__NAME, "Game started. FG Enabled (PlayerPuppet->OnGameAttached)")
     Contextual.CurrentStates.isMenu = false
   end)
 
@@ -537,18 +540,36 @@ function Contextual.OnInitialize()
   ------------------------------
   -- Vehicle Static and Driving
   ------------------------------
-  -- This is not triggered when weapon is drawn (so essentially vehicle combat mode)
-  -- So it won't set static and driving states during it
-  -- DriverCombatEvents->OnUpdate will handle vehicle combat static and driving events
+  -- DriveEvents events are not triggered when weapon is drawn (so essentially vehicle combat mode)
+  -- So it won't update static combat and driving combat states (which will be handled by DriverCombatEvents->OnUpdate)
   Observe('DriveEvents', 'OnUpdate', function()
+    -- When DriveEvents->OnUpdate is triggered, it means vehicle is no longer in combat mode (so it's equivalent to DriverCombatEvents->OnExit state)
+    -- We need to make sure vehicle combat states are reverted
+    if Contextual.CurrentStates.isVehicleStaticCombat == true then
+      if Contextual.Toggles.Vehicle.StaticCombat then
+        TurnOnFrameGen()
+      end
+      Contextual.CurrentStates.isVehicleStaticCombat = false
+    end
+    if Contextual.CurrentStates.isVehicleDrivingCombat == true then
+      if Contextual.Toggles.Vehicle.DrivingCombat then
+        TurnOnFrameGen()
+      end
+      Contextual.CurrentStates.isVehicleDrivingCombat = false
+    end
+
     HandleStaticAndDrivingStates()
   end)
 
   ------------------
   -- Vehicle Combat
   ------------------
-  -- These events are fired the moment weapon is drawn or holster inside the vehicle (even if the alert status is not yet combat)
-  Observe('DriverCombatEvents', 'OnEnter', function()
+  -- These events are fired the moment weapon is drawn when player is in vehicle (even if the alert status is not yet combat)
+  -- We need to track static and driving states here because DriveEvents->OnUpdate is not triggered during vehicle combat
+  Observe('DriverCombatEvents', 'OnUpdate', function()
+    HandleStaticAndDrivingStates()
+
+    -- Vehicle static combat and driving combat states are mutually exclusive, so they can't be true at once
     if Contextual.CurrentStates.isVehicleStatic then
       Contextual.CurrentStates.isVehicleStaticCombat = true
       Contextual.CurrentStates.isVehicleDrivingCombat = false
@@ -559,42 +580,38 @@ function Contextual.OnInitialize()
       Contextual.CurrentStates.isVehicleStaticCombat = false
     end
 
-    if Contextual.Toggles.Vehicle.StaticCombat == true and Contextual.CurrentStates.isVehicleStaticCombat then
-      TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle combat detected (static). Frame Gen is disabled (DriverCombatEvents->OnEnter)")
-    end
-
-    if Contextual.Toggles.Vehicle.DrivingCombat == true and Contextual.CurrentStates.isVehicleDrivingCombat then
-      TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle combat detected (driving). Frame Gen is disabled (DriverCombatEvents->OnEnter)")
-    end
-  end)
-  Observe('DriverCombatEvents', 'OnExit', function()
-    Contextual.CurrentStates.isVehicleStaticCombat = false
-    Contextual.CurrentStates.isVehicleDrivingCombat = false
-
     if Contextual.Toggles.Vehicle.StaticCombat == true then
-      TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle no longer in combat (static). Frame Gen is enabled (DriverCombatEvents->OnExit)")
+      if Contextual.CurrentStates.isVehicleStaticCombat then
+        TurnOffFrameGen()
+        Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) detected. FG Disabled (DriverCombatEvents->OnUpdate)")
+      else
+        -- Make sure the vehice static combat state is not overlapped with vehicle driving combat state
+        if not Contextual.CurrentStates.isVehicleDrivingCombat then
+          TurnOnFrameGen()
+          Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
+        end
+        if not Contextual.Toggles.Vehicle.DrivingCombat and Contextual.CurrentStates.isVehicleDrivingCombat then
+          TurnOnFrameGen()
+          Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
+        end
+      end
     end
 
     if Contextual.Toggles.Vehicle.DrivingCombat == true then
-      TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle no longer in combat (driving). Frame Gen is enabled (DriverCombatEvents->OnExit)")
-    end
-  end)
-  Observe('DriverCombatEvents', 'OnForcedExit', function()
-    Contextual.CurrentStates.isVehicleStaticCombat = false
-    Contextual.CurrentStates.isVehicleDrivingCombat = false
-
-    if Contextual.Toggles.Vehicle.StaticCombat == true then
-      TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle no longer in combat (static). Frame Gen is enabled (DriverCombatEvents->OnForcedExit)")
-    end
-
-    if Contextual.Toggles.Vehicle.DrivingCombat == true then
-      TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Vehicle no longer in combat (driving). Frame Gen is enabled (DriverCombatEvents->OnForcedExit)")
+      if Contextual.CurrentStates.isVehicleDrivingCombat then
+        TurnOffFrameGen()
+        Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) detected. FG Disabled (DriverCombatEvents->OnUpdate)")
+      else
+        -- Make sure the vehice driving combat state is not overlapped with vehicle static combat state
+        if not Contextual.CurrentStates.isVehicleStaticCombat then
+          TurnOnFrameGen()
+          Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
+        end
+        if not Contextual.Toggles.Vehicle.StaticCombat and Contextual.CurrentStates.isVehicleStaticCombat then
+          TurnOnFrameGen()
+          Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
+        end
+      end
     end
   end)
 
@@ -607,14 +624,14 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isCombat = true
     if Contextual.Toggles.Combat == true then
       TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. Frame Gen is disabled (CombatEvents->OnEnter)")
+      Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. FG Disabled (CombatEvents->OnEnter)")
     end
   end)
   Observe('CombatEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. Frame Gen is enabled (CombatEvents->OnExit)")
+      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatEvents->OnExit)")
     end
   end)
 
@@ -624,21 +641,21 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnEnter)")
+      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnEnter)")
     end
   end)
   Observe('CombatExitingEvents', 'OnExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnExit)")
+      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnExit)")
     end
   end)
   Observe('CombatExitingEvents', 'OnForcedExit', function()
     Contextual.CurrentStates.isCombat = false
     if Contextual.Toggles.Combat == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. Frame Gen is enabled (CombatExitingEvents->OnForcedExit)")
+      Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnForcedExit)")
     end
   end)
 
@@ -647,11 +664,11 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.Combat == true then
       if Contextual.CurrentStates.isCombat then
         TurnOffFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. Frame Gen is disabled (PlayerPuppet->OnCombatStateChanged)")
+        Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. FG Disabled (PlayerPuppet->OnCombatStateChanged)")
       end
       if not Contextual.CurrentStates.isCombat then
         TurnOnFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. Frame Gen is enabled (PlayerPuppet->OnCombatStateChanged)")
+        Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (PlayerPuppet->OnCombatStateChanged)")
       end
     end
 	end)
@@ -738,14 +755,14 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isSwimming = true
     if Contextual.Toggles.Swimming == true then
       TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Player is swimming. Frame Gen is disabled (SwimmingEvents->OnEnter)")
+      Globals.PrintDebug(Contextual.__NAME, "Player is swimming. FG Disabled (SwimmingEvents->OnEnter)")
     end
   end)
   Observe('SwimmingEvents', 'OnExit', function()
     Contextual.CurrentStates.isSwimming = false
     if Contextual.Toggles.Swimming == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Player is no longer swimming. Frame Gen is enabled (SwimmingEvents->OnExit)")
+      Globals.PrintDebug(Contextual.__NAME, "Player is no longer swimming. FG Enabled (SwimmingEvents->OnExit)")
     end
   end)
 
@@ -763,10 +780,10 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.Braindance == true then
       if Contextual.CurrentStates.isBraindance then
         TurnOffFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Player is braindance. Frame Gen is disabled (BraindanceGameController->OnIsActiveUpdated)")
+        Globals.PrintDebug(Contextual.__NAME, "Player is braindance. FG Disabled (BraindanceGameController->OnIsActiveUpdated)")
       else
         TurnOnFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Player is no longer in braindance. Frame Gen is enabled (BraindanceGameController->OnIsActiveUpdated)")
+        Globals.PrintDebug(Contextual.__NAME, "Player is no longer in braindance. FG Enabled (BraindanceGameController->OnIsActiveUpdated)")
       end
     end
   end)
@@ -786,11 +803,11 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.isCinematic == true then
       if Contextual.CurrentStates.isCinematic then
         TurnOffFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Cinematic detected. Frame Gen is disabled (PlayerPuppet->OnSceneTierChange)")
+        Globals.PrintDebug(Contextual.__NAME, "Cinematic detected. FG Disabled (PlayerPuppet->OnSceneTierChange)")
       end
       if not Contextual.CurrentStates.isCinematic then
         TurnOnFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Cinematic no longer present. Frame Gen is enabled (PlayerPuppet->OnSceneTierChange)")
+        Globals.PrintDebug(Contextual.__NAME, "Cinematic no longer present. FG Enabled (PlayerPuppet->OnSceneTierChange)")
       end
     end
 	end)
@@ -803,7 +820,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Photomode == true then
       TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Photo mode detected" .. ". Frame Gen is disabled (gameuiPhotoModeMenuController->OnShow)")
+      Globals.PrintDebug(Contextual.__NAME, "Photo mode detected" .. ". FG Disabled (gameuiPhotoModeMenuController->OnShow)")
     end
   end)
 
@@ -812,7 +829,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Photomode == true then
       TurnOnFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Photo mode no longer preset" .. ". Frame Gen is enabled (gameuiPhotoModeMenuController->OnHide)")
+      Globals.PrintDebug(Contextual.__NAME, "Photo mode no longer preset" .. ". FG Enabled (gameuiPhotoModeMenuController->OnHide)")
     end
   end)
 
@@ -825,7 +842,7 @@ function Contextual.OnInitialize()
 
     if Contextual.Toggles.Menu == true then
       TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". Frame Gen is disabled (SingleplayerMenuGameController->OnInitialize)")
+      Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". FG Disabled (SingleplayerMenuGameController->OnInitialize)")
     end
 
   end)
@@ -837,15 +854,15 @@ function Contextual.OnInitialize()
     if Contextual.Toggles.Menu == true then
       if Contextual.CurrentStates.isMenu then
         TurnOffFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". Frame Gen is disabled (gameuiPopupsManager->OnMenuUpdate)")
+        Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". FG Disabled (gameuiPopupsManager->OnMenuUpdate)")
       end
       if not Contextual.CurrentStates.isMenu then
         -- Don't turn it back on if there are existing states with toggle features enabled
         if not ShouldAffectFGState("Menu") then
           TurnOnFrameGen()
-          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present" .. ". Frame Gen is enabled (gameuiPopupsManager->OnMenuUpdate)")
+          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present" .. ". FG Enabled (gameuiPopupsManager->OnMenuUpdate)")
         else
-          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present but other states and toggles are present, so frame gen state won't change")
+          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present but other states and toggles are present, so FG state won't change")
         end
       end
     end
@@ -931,7 +948,7 @@ function Contextual.DrawUI()
       SetStanding(Contextual.Toggles.Standing)
     end
 
-    Contextual.Toggles.Walking, walkingToggle = UI.Ext.Checkbox.TextWhite("Walking (Normal)", Contextual.Toggles.Walking, walkingToggle)
+    Contextual.Toggles.Walking, walkingToggle = UI.Ext.Checkbox.TextWhite("Walking (Default)", Contextual.Toggles.Walking, walkingToggle)
     if walkingToggle then
       Settings.SetSaved(false)
       UI.SetStatusBar(UIText.General.settings_saved)
