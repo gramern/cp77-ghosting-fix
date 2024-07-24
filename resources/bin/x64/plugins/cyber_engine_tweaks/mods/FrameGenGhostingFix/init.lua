@@ -315,7 +315,7 @@ registerForEvent("onInit", function()
   -- end
 end)
 
-if Debug then
+if Globals.IsDebug() then
   registerInput('printPresets', 'Print the presets list', function(keypress)
     if not keypress then
       return
@@ -343,6 +343,20 @@ if Debug then
       Globals.Print("Frame Generation is enabled.")
     else
       Globals.Print("Frame Generation is disabled.")
+    end
+  end)
+
+  registerInput('printDynFrameGenState', 'Print dynamic frame generation state', function(keypress)
+    if not keypress then
+      return
+    end
+
+    local isDynFrameGen = DLSSEnabler_GetDynamicFrameGenerationState()
+    
+    if isDynFrameGen then
+      Globals.Print("Dynamic Frame Generation is enabled.")
+    else
+      Globals.Print("Dynamic Frame Generation is disabled.")
     end
   end)
 end
@@ -534,7 +548,7 @@ registerForEvent("onDraw", function()
             if fgToggle then
               Settings.SetSaved(false)
               UI.SetStatusBar(UIText.General.settings_saved)
-              DLSSEnabler_SetFrameGeneration(Globals.ModState.isFGEnabled)
+              DLSSEnabler_SetFrameGenerationState(Globals.ModState.isFGEnabled)
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipToggleFG)
             

@@ -182,7 +182,42 @@ function Globals.Print(moduleName, ...)
   print(mod, module, concatenatedContents)
 end
 
---- Prints a formatted message with an optional module name and variable number of content items. Prints to the mod's exlusive log file.
+--- Prints a formatted debug message ONLY if debug mode is enabled. Offers an optional module name and variable number of content items. Prints to the mod's exlusive log file.
+--
+-- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param ...: any; Variable number of items to be printed as the content of the message. 
+--
+-- @return nil
+function Globals.PrintDebug(moduleName, ...)
+  if not Globals.ModState.isDebug then return end
+
+  local modError = "[" .. FrameGenGhostingFix.__NAME .. "]" .. " [Debug]"
+  local module = ""
+  local contents
+
+  if select('#', ...) == 0 then
+    contents = {moduleName}
+  else
+    module = "[" .. tostring(moduleName) .. "]"
+    contents = {...}
+  end
+
+  if #contents == 0 and module == "" then
+      return print(modError, Globals.__NAME, "No debug contents to print.")
+  end
+
+  for i, value in ipairs(contents) do
+    contents[i] = tostring(value)
+  end
+
+  local concatenatedContents = table.concat(contents, " ")
+  local printContents = modError .. " " .. module .. " " .. concatenatedContents
+
+  print(printContents)
+  spdlog.error(printContents)
+end
+
+--- Prints a formatted error message with an optional module name and variable number of content items. Prints to the mod's exlusive log file.
 --
 -- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
 -- @param ...: any; Variable number of items to be printed as the content of the message. 

@@ -21,8 +21,12 @@
     "ImGuiCond",
     "ImGuiStyleVar",
     "ImGuiWindowFlags",
-    "DLSSEnabler_SetFrameGeneration",
-    "DLSSEnabler_GetFrameGenerationState"
+    "DLSSEnabler_SetFrameGenerationMode",
+    "DLSSEnabler_GetFrameGenerationMode",
+    "DLSSEnabler_SetFrameGenerationState",
+    "DLSSEnabler_GetFrameGenerationState",
+    "DLSSEnabler_SetDynamicFrameGenerationState",
+    "DLSSEnabler_GetDynamicFrameGenerationState",
   ],
   "Lua.diagnostics.disable": [
     "redundant-parameter"

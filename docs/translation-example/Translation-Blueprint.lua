@@ -42,7 +42,7 @@
 --]=====]
 
 local translation = {
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   UIText = {
     General = {
       title_general = "General Settings:",
