@@ -90,7 +90,8 @@ local Localization = {
     },
     Options = {
       tabname = "Additional Options",
-      enabledDebug = "Enable debug view",
+      enabledDebug = "Enable debug mode",
+      enabledDebugUI = "Enable debug view in the window",
       enabledHelp = "Enable tooltips",
       tooltipHelp = "Enable tooltips on mouse hover for certain settings.",
       enabledWindow = "Keep this window open",

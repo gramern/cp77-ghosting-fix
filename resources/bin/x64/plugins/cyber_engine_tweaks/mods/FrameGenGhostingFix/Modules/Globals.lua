@@ -3,6 +3,7 @@ Globals = {
   __VERSION = { 5, 0, 0 },
   ModState = {
     isDebug = false,
+    isDebugUI = false,
     isHelp = true,
     keepWindow = false,
     isFGEnabled = true,
@@ -10,7 +11,6 @@ Globals = {
     isFirstRun = false,
     isNewInstall = false,
     isReady = true,
-    statusBar = nil,
   },
   PlayerState = {
     isMounted = nil,
@@ -431,6 +431,24 @@ end
 -- @return isDebug: boolean;
 function Globals.IsDebug()
   return Globals.ModState.isDebug
+end
+
+--- Sets the debug state for the global configuration.
+--
+-- @param boolean: boolean; The debug state to set (true for debug mode, false for normal mode).
+--
+-- @return None
+function Globals.SetDebugUI(boolean)
+  Globals.ModState.isDebugUI = boolean
+end
+
+--- Checks if the mod is currently in debug mode.
+--
+-- @param None
+--
+-- @return isDebug: boolean;
+function Globals.IsDebugUI()
+  return Globals.ModState.isDebugUI
 end
 
 --- Sets the ready state for the global configuration.

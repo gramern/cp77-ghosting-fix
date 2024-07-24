@@ -82,6 +82,9 @@ local countFps = 0
 --ui
 local windowTitle
 local openOverlay
+local debugToggle
+local debugUIToggle
+local helpToggle
 local keepWindowToggle
 local fgToggle
 
@@ -407,7 +410,6 @@ registerForEvent("onOverlayClose", function()
 
   Contextual.OnOverlayClose()
 
-  Vectors.OnOverlayClose()
   if VectorsCustomize then
     VectorsCustomize.OnOverlayClose()
   end
@@ -449,12 +451,12 @@ registerForEvent("onDraw", function()
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
         
         --debug interface starts------------------------------------------------------------------------------------------------------------------
-        if Debug and Globals.IsDebug() then
+        if Debug and Globals.IsDebug() and Globals.IsDebugUI() then
             Debug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         --timer testing purposes------------------------------------------------------------------------------------------------------------------
-        if UI.Std.BeginTabItem("Delay Callback Test") then
+        if Globals.IsDebug() and UI.Std.BeginTabItem("Delay Callback Test") then
           if UI.Std.Button("Game's Delay Callback Test (whoknows)", 500, 40) then
             local delay = Game.GetDelaySystem():DelayCallback(Globals.Print(Debug.__NAME, "Time is up!", UIText.General.info_version, FrameGenGhostingFix.GetVersion(true), ", Is 'Globals' compatible:", tostring(Globals.VersionCompare(Globals.__VERSION))), 5000, false)
           end
@@ -529,7 +531,19 @@ registerForEvent("onDraw", function()
           if UI.Std.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
-              Globals.ModState.isDebug = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Globals.ModState.isDebug)
+              Globals.ModState.isDebug, debugToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebug, Globals.ModState.isDebug, debugToggle)
+            end
+            if debugToggle then
+              Settings.SetSaved(false)
+              UI.SetStatusBar(UIText.General.settings_saved)
+            end
+
+            if Debug and Globals.IsDebug() then
+              Globals.ModState.isDebugUI, debugUIToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledDebugUI, Globals.ModState.isDebugUI, debugUIToggle)
+            end
+            if debugUIToggle then
+              Settings.SetSaved(false)
+              UI.SetStatusBar(UIText.General.settings_saved)
             end
 
             Globals.ModState.keepWindow, keepWindowToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledWindow, Globals.ModState.keepWindow, keepWindowToggle)
@@ -539,7 +553,11 @@ registerForEvent("onDraw", function()
             end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipWindow)
 
-            Globals.ModState.isHelp = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledHelp, Globals.ModState.isHelp)
+            Globals.ModState.isHelp, helpToggle = UI.Ext.Checkbox.TextWhite(UIText.Options.enabledHelp, Globals.ModState.isHelp, helpToggle)
+            if helpToggle then
+              Settings.SetSaved(false)
+              UI.SetStatusBar(UIText.General.settings_saved)
+            end
             UI.Ext.OnItemHovered.SetTooltip(UIText.Options.tooltipHelp)
 
             UI.Std.Separator()

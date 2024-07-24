@@ -47,7 +47,10 @@ local function Translate(legacyUserSettings)
     Globals = {
       version = nil,
       keepWindow = nil,
+      isDebug = nil,
+      isDebugUI = nil,
       isFGEnabled = nil,
+      isHelp = nil,
     },
     VectorsCustomize = {
       Bike = {
@@ -74,7 +77,7 @@ local function Translate(legacyUserSettings)
   userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
   userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100
 
-  userSettings.Globals.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
+  userSettings.Globals.ModState.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
 
   return userSettings
 end
@@ -116,6 +119,12 @@ function Settings.LoadFile()
 
     Globals.ModState.isFGEnabled = UserSettings.Globals and UserSettings.Globals.isFGEnabled or true
 
+    Globals.ModState.isHelp = UserSettings.Globals and UserSettings.Globals.isHelp or true
+
+    Globals.ModState.isDebug = UserSettings.Globals and UserSettings.Globals.isDebug or false
+
+    Globals.ModState.isDebugUI = UserSettings.Globals and UserSettings.Globals.isDebugUI or false
+
     Globals.Print(Settings.__NAME,LogText.settings_loaded)
     return true
   else
@@ -132,7 +141,10 @@ function Settings.SaveFile()
     ModState = {
       version = FrameGenGhostingFix.GetVersion(true),
       keepWindow = Globals.ModState.keepWindow,
+      isDebug = Globals.ModState.isDebug,
+      isDebugUI = Globals.ModState.isDebugUI,
       isFGEnabled = Globals.ModState.isFGEnabled,
+      isHelp = Globals.ModState.isHelp
   }})
 
   local userSettingsContents = json.encode(UserSettings)
