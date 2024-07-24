@@ -9,9 +9,9 @@ local VectorsCustomize = {
 local UserSettings = {}
 
 local Globals = require("Modules/Globals")
+local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
-local UI = require("Modules/UI")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -140,56 +140,56 @@ local windshieldScaleToggle = {}
 function VectorsCustomize.DrawUI()
   VectorsCustomize.UpdateLiveView()
 
-  UI.Ext.TextWhite(UIText.General.title_fps90)
-  UI.Std.Separator()
+  ImGuiExt.Text(UIText.General.title_fps90)
+  ImGui.Separator()
 
   if Vectors then
     if not vehicle.isMoving and vehicle.vehicleBaseObject == 0 and camera.activePerspective == vehicleCameraPerspective.FPP then
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Vehicles.Windshield.textfield_1)
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_1)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Vehicles.Windshield.textfield_1)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Vehicles.Windshield.setting_1)
 
-      vehMasks.Mask4.Def.Scale.x, windshieldScaleToggle.x = UI.Std.SliderFloat("##ScaleX", vehMasks.Mask4.Def.Scale.x, 70, 150, "%.0f")
+      vehMasks.Mask4.Def.Scale.x, windshieldScaleToggle.x = ImGui.SliderFloat("##ScaleX", vehMasks.Mask4.Def.Scale.x, 70, 150, "%.0f")
       if windshieldScaleToggle.x then
         VectorsCustomize.TurnOnLiveView()
       end
 
-      UI.Ext.TextWhite(UIText.Vehicles.Windshield.setting_2)
+      ImGuiExt.Text(UIText.Vehicles.Windshield.setting_2)
 
-      vehMasks.Mask4.Def.Scale.y, windshieldScaleToggle.y = UI.Std.SliderFloat("##ScaleY", vehMasks.Mask4.Def.Scale.y, 70, 300, "%.0f")
+      vehMasks.Mask4.Def.Scale.y, windshieldScaleToggle.y = ImGui.SliderFloat("##ScaleY", vehMasks.Mask4.Def.Scale.y, 70, 300, "%.0f")
       if windshieldScaleToggle.y then
         VectorsCustomize.TurnOnLiveView()
       end
 
-      UI.Std.Text("")
+      ImGui.Text("")
 
-      if UI.Std.Button(UIText.General.default, 500, 40) then
+      if ImGui.Button(UIText.General.default, 500, 40) then
         VectorsCustomize.SetWindshieldDefault()
         VectorsCustomize.DefaultLiveView()
 
-        UI.SetStatusBar(UIText.General.settings_default)
+        ImGuiExt.SetStatusBar(UIText.General.settings_default)
       end
 
-      UI.Std.Text("")
+      ImGui.Text("")
 
-      if UI.Std.Button(UIText.General.settings_load, 500, 40) then
+      if ImGui.Button(UIText.General.settings_load, 500, 40) then
         VectorsCustomize.LoadUserSettings()
 
-        UI.SetStatusBar(UIText.General.settings_loaded)
+        ImGuiExt.SetStatusBar(UIText.General.settings_loaded)
       end
 
-      if UI.Std.Button(UIText.General.settings_save, 500, 40) then
+      if ImGui.Button(UIText.General.settings_save, 500, 40) then
         VectorsCustomize.SaveUserSettings()
 
-        UI.SetStatusBar(UIText.General.settings_saved)
+        ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       end
 
     else
-      UI.Ext.TextWhite(UIText.Vehicles.Windshield.warning)
+      ImGuiExt.Text(UIText.Vehicles.Windshield.warning)
     end
   else
-    UI.Ext.TextWhite(UIText.General.info_vectorsMissing)
+    ImGuiExt.Text(UIText.General.info_vectorsMissing)
   end
 end
 

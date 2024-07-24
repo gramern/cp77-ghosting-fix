@@ -68,9 +68,9 @@ local Calculate = {
 local UserSettings = {}
 
 local Globals = require("Modules/Globals")
+local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
-local UI = require("Modules/UI")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -479,128 +479,128 @@ local vignetteScale = Calculate.Vignette.Scale
 local vignettePosition = Calculate.Vignette.ScreenPosition
 
 function Calculate.DrawUI()
-  if UI.Std.BeginTabItem(UIText.OnFoot.tabname) then
-    UI.Ext.TextWhite(UIText.General.title_general)
-    UI.Std.Separator()
+  if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
+    ImGuiExt.Text(UIText.General.title_general)
+    ImGui.Separator()
 
-    Calculate.Corners.onWeapon, cornersOnWeaponToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BottomCornersMasks.name, Calculate.Corners.onWeapon)
+    Calculate.Corners.onWeapon, cornersOnWeaponToggle = ImGuiExt.Checkbox(UIText.OnFoot.BottomCornersMasks.name, Calculate.Corners.onWeapon)
     if cornersOnWeaponToggle then
       Calculate.SaveUserSettings()
 
-      UI.SetStatusBar(UIText.General.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
+    ImGuiExt.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
 
-    Calculate.Blocker.onAim, blockerOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BlockerAim.name, Calculate.Blocker.onAim)
+    Calculate.Blocker.onAim, blockerOnAimToggle = ImGuiExt.Checkbox(UIText.OnFoot.BlockerAim.name, Calculate.Blocker.onAim)
     if blockerOnAimToggle then
-      UI.SetStatusBar(UIText.General.settings_saved)
+      ImGuiExt.SetStatusBar(UIText.General.settings_saved)
 
       if Calculate.Vignette.onAim then
         
         Calculate.Vignette.onAim = false
 
-        UI.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
       Calculate.SaveUserSettings()
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
+    ImGuiExt.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
 
-    UI.Std.Text("")
-    UI.Ext.TextWhite(UIText.General.title_fps120)
-    UI.Std.Separator()
+    ImGui.Text("")
+    ImGuiExt.Text(UIText.General.title_fps120)
+    ImGui.Separator()
 
-    Calculate.Vignette.onAim, vignetteOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignetteAim.name, Calculate.Vignette.onAim)
+    Calculate.Vignette.onAim, vignetteOnAimToggle = ImGuiExt.Checkbox(UIText.OnFoot.VignetteAim.name, Calculate.Vignette.onAim)
     if vignetteOnAimToggle then
-      UI.SetStatusBar(UIText.General.settings_saved)
+      ImGuiExt.SetStatusBar(UIText.General.settings_saved)
 
       if Calculate.Blocker.onAim then
         Calculate.Blocker.onAim = false
 
-        UI.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(UIText.General.info_aimOnFoot)
       end
 
       Calculate.SaveUserSettings()
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
+    ImGuiExt.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
 
-    Calculate.Vignette.onWeapon, vignetteOnWeaponToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.Vignette.name, Calculate.Vignette.onWeapon)
+    Calculate.Vignette.onWeapon, vignetteOnWeaponToggle = ImGuiExt.Checkbox(UIText.OnFoot.Vignette.name, Calculate.Vignette.onWeapon)
     if vignetteOnWeaponToggle then
       Calculate.SaveUserSettings()
 
-      UI.SetStatusBar(UIText.General.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.Vignette.tooltip)
+    ImGuiExt.SetTooltip(UIText.OnFoot.Vignette.tooltip)
 
     if Calculate.Vignette.onWeapon then
       if not Globals.IsMounted() then
-        Calculate.Vignette.permament, vignettePermamentToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
+        Calculate.Vignette.permament, vignettePermamentToggle = ImGuiExt.Checkbox(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
         if vignettePermamentToggle then
           Calculate.SaveUserSettings()
 
-          UI.SetStatusBar(UIText.General.settings_applied_onfoot)
+          ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
         end
-        UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
+        ImGuiExt.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
 
         if Calculate.Vignette.onAim and Calculate.Vignette.onWeapon then
-          UI.Std.Text("")
-          UI.Ext.TextWhite(UIText.OnFoot.VignetteAim.textfield_1)
+          ImGui.Text("")
+          ImGuiExt.Text(UIText.OnFoot.VignetteAim.textfield_1)
         end
         --customize vignette interface starts------------------------------------------------------------------------------------------------------------------
-        UI.Std.Text("")
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.textfield_1)
-        UI.Std.Text("")
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_1)
+        ImGui.Text("")
+        ImGuiExt.Text(UIText.OnFoot.Vignette.textfield_1)
+        ImGui.Text("")
+        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_1)
       
-        vignetteScale.x, vignetteScaleToggle.x = UI.Std.SliderFloat("Scale X",vignetteScale.x, vignetteScale.Min.x, vignetteScale.Max.x, "%.0f")
+        vignetteScale.x, vignetteScaleToggle.x = ImGui.SliderFloat("##Scale X", vignetteScale.x, vignetteScale.Min.x, vignetteScale.Max.x, "%.0f")
         if vignetteScaleToggle.x then
           Calculate.OnVignetteChange('x')
           Calculate.TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_2)
+        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_2)
       
-        vignetteScale.y, vignetteScaleToggle.y = UI.Std.SliderFloat("Scale Y",vignetteScale.y, vignetteScale.Min.y, vignetteScale.Max.y, "%.0f")
+        vignetteScale.y, vignetteScaleToggle.y = ImGui.SliderFloat("##Scale Y", vignetteScale.y, vignetteScale.Min.y, vignetteScale.Max.y, "%.0f")
         if vignetteScaleToggle.y then
           Calculate.OnVignetteChange('y')
           Calculate.TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_3)
+        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_3)
       
-        vignettePosition.x, vignettePositionToggle.x = UI.Std.SliderFloat("Pos. X",vignettePosition.x, vignettePosition.Min.x, vignettePosition.Max.y, "%.0f")
+        vignettePosition.x, vignettePositionToggle.x = ImGui.SliderFloat("##Pos. X", vignettePosition.x, vignettePosition.Min.x, vignettePosition.Max.y, "%.0f")
         if vignettePositionToggle.x then
           Calculate.OnVignetteChange('x')
           Calculate.TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_4)
+        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_4)
       
-        vignettePosition.y, vignettePositionToggle.y = UI.Std.SliderFloat("Pos. Y",vignettePosition.y, vignettePosition.Min.y, vignettePosition.Max.y, "%.0f")
+        vignettePosition.y, vignettePositionToggle.y = ImGui.SliderFloat("##Pos. Y", vignettePosition.y, vignettePosition.Min.y, vignettePosition.Max.y, "%.0f")
         if vignettePositionToggle.y then
           Calculate.OnVignetteChange('y')
           Calculate.TurnOnLiveView()
         end
       
-        UI.Std.Text("")
+        ImGui.Text("")
       
-        if UI.Std.Button(UIText.General.default, 240, 40) then
+        if ImGui.Button(UIText.General.default, 240, 40) then
           Calculate.SetVignetteDefault('x')
           Calculate.SetVignetteDefault('y')
           Calculate.TurnOnLiveView()
 
-          UI.SetStatusBar(UIText.General.settings_default)
+          ImGuiExt.SetStatusBar(UIText.General.settings_default)
         end
       
-        UI.Std.SameLine()
+        ImGui.SameLine()
       
-        if UI.Std.Button(UIText.General.settings_save, 240, 40) then
+        if ImGui.Button(UIText.General.settings_save, 240, 40) then
           Calculate.SaveUserSettings()
 
-          UI.SetStatusBar(UIText.General.settings_saved)
+          ImGuiExt.SetStatusBar(UIText.General.settings_saved)
         end
       else
-        UI.SetStatusBar(UIText.General.info_getOut)
+        ImGuiExt.SetStatusBar(UIText.General.info_getOut)
       end
     else
       if Calculate.Vignette.permament then
@@ -608,9 +608,9 @@ function Calculate.DrawUI()
       end
     end
 
-    UI.Ext.StatusBar(UI.GetStatusBar())
+    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
 
-    UI.Std.EndTabItem()
+    ImGui.EndTabItem()
   end
 end
 

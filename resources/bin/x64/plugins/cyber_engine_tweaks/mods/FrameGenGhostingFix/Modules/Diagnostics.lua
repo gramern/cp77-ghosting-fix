@@ -7,8 +7,8 @@ local Diagnostics = {
 }
 
 local Globals = require("Modules/Globals")
+local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
-local UI = require("Modules/UI")
 
 local UIText = Localization.UIText
 
@@ -29,26 +29,26 @@ end
 
 --Local UI
 function Diagnostics.DrawUI()
-  if UI.Std.BeginTabItem(UIText.Diagnostics.tabname) then
+  if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
     if not Diagnostics.isModsCompatibility then
-      UI.Ext.TextRed(UIText.Diagnostics.title_warning)
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Diagnostics.textfield_1)
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Diagnostics.textfield_2)
+      ImGuiExt.TextRed(UIText.Diagnostics.title_warning)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Diagnostics.textfield_1)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Diagnostics.textfield_2)
     else
-      UI.Ext.TextGreen(UIText.Diagnostics.title_info)
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Diagnostics.textfield_3)
-      UI.Std.Text("")
-      UI.Ext.TextWhite(UIText.Diagnostics.textfield_4)
+      ImGuiExt.TextGreen(UIText.Diagnostics.title_info)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Diagnostics.textfield_3)
+      ImGui.Text("")
+      ImGuiExt.Text(UIText.Diagnostics.textfield_4)
     end
 
     for _, mod in pairs(Diagnostics.modfiles) do
-      UI.Ext.TextWhite(mod)
+      ImGuiExt.Text(mod)
     end
    
-    UI.Std.EndTabItem()
+    ImGui.EndTabItem()
   end
 end
 

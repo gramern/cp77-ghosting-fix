@@ -161,7 +161,7 @@ local Localization = {
     settings_notSavedToFile = "Error: Couldn't save user settings to a file.",
     settings_savedToCache = "Your current settings have been saved to memory.",
     settings_restoredCache = "Your previous settings have been restored.",
-    ui_missing = "Can't find the 'UI' module. The mod won't work...",
+    imguiext_missing = "Can't find the 'ImGuiExt' module. The mod won't work...",
     vectors_missing = "Can't find the 'Vectors' module. The mod's anti-ghosting feature for vehicles won't work.",
   },
 }
