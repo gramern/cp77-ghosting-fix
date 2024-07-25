@@ -389,6 +389,12 @@ local Vectors = {
 }
 
 local Globals = require("Modules/Globals")
+local Tracker = require("Modules/Tracker")
+
+local trackedGameState = Tracker.GetGameStateTable()
+local trackedGamePerf = Tracker.GetGamePerfTable()
+local trackedPlayer = Tracker.GetPlayerTable()
+local trackedVehicle = Tracker.GetVehicleTable()
 
 local abs, atan, deg, floor, max, min, pi, rad, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.tan
 
@@ -516,6 +522,8 @@ end
 --Universal methods end here----------------------------------------------------------------------------------------------------------------------
 --Data gathering methods start here----------------------------------------------------------------------------------------------------------------------
 
+--to be commented out/replaced with tracker data
+
 local function IsMounted()
   local isMounted = Game['GetMountedVehicle;GameObject'](Game.GetPlayer())
   Vectors.Vehicle.isMounted = isMounted and true or false
@@ -546,6 +554,8 @@ local function GetPlayerData()
   end
 end
 
+--to be commented out/replaced with tracker data
+
 local function GetCameraData()
   local cameraSystem = Game.GetCameraSystem()
   local camera = Vectors.Camera
@@ -575,6 +585,8 @@ local function GetActivePerspective()
   end
 end
 
+--to be commented out/replaced with tracker data
+
 local function GetVehicleBaseObject()
   local vecVehicle = Vectors.Vehicle
 
@@ -592,6 +604,8 @@ local function GetVehicleBaseObject()
 
   return vecVehicle.vehicleBaseObject
 end
+
+--to be commented out/replaced with tracker data
 
 local function GetVehicleRecord()
   local vecVehicle = Vectors.Vehicle
@@ -618,6 +632,8 @@ local function IsKnownVehicle()
   end
 end
 
+--to be commented out/replaced with tracker data
+
 local function IsMovingVehicle()
   local vecVehicle = Vectors.Vehicle
 
@@ -630,6 +646,8 @@ local function IsMovingVehicle()
 
   vecVehicle.isMoving = abs(filteredSpeed) > speedThreshold
 end
+
+--to be commented out/replaced with tracker data
 
 local function GetDefaultBikeWheelsPositions()
   local dist = Vector4.Distance
@@ -953,7 +971,7 @@ end
 --Transform By
 
 local function TransformByFPS()
-  local fillToggleValue = (FrameGenGhostingFix.GameState.currentFps - 30) * 0.01
+  local fillToggleValue = (trackedGamePerf.currentFps - 30) * 0.01
   Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue = min(0.1, fillToggleValue)
 end
 
@@ -1803,7 +1821,7 @@ local function DelayTransformOpacity()
   end
 
   opacity.value = opacity.delayedValue
-  opacity.delayTime = opacity.delayTime + FrameGenGhostingFix.GameState.gameDeltaTime
+  opacity.delayTime = opacity.delayTime + trackedGamePerf.gameDeltaTime
 
   if opacity.delayTime <= opacity.Def.delayDuration then return end
   ResetDelayTransformOpacity()

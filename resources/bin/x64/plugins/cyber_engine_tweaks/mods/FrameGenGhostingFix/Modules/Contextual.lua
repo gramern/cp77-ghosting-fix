@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION_NUMBER = 500,
+  __VERSION = { 5, 0, 0 },
   Toggles = {
     Vehicle = {
       Static = false,
@@ -138,6 +138,8 @@ local function IsPlayerVehicleDriving(playerVehicle)
   end
 end
 
+-- gramern: this doesn't work with weaponized vehicles as I tested, so to get general Vehicle Combat would be: 
+-- Tracker.IsPlayerWeapon() and Tracker.IsVehicleMounted() (for hand weapons drawn while in vehicle) or Tracker.IsVehicleWeapon (for vehicle weapons drawn)
 local function IsPlayerInVehicleCombat(playerVehicle)
   local player = Game.GetPlayer()
   if IsInVehicle(playerVehicle) and player:GetActiveWeapon() ~= nil then return true end

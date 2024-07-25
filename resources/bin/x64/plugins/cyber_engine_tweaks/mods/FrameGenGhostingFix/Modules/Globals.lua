@@ -1,19 +1,16 @@
-Globals = {
+local Globals = {
   __NAME = "Globals",
   __VERSION = { 5, 0, 0 },
   ModState = {
-    isDebug = false,
-    isDebugUI = false,
-    isHelp = true,
-    keepWindow = false,
-    isFGEnabled = true,
-    openWindow = false,
+    isDebug = false, -- mostly a setting, but also a global variable, to be considered
+    isDebugUI = false, -- a setting, not global variable
+    isHelp = true, -- a setting, not global variable
+    keepWindow = false, -- a setting, not global variable
+    isFGEnabled = true, -- a setting, not global variable
+    openWindow = false, -- a setting, not global variable
     isFirstRun = false,
     isNewInstall = false,
     isReady = true,
-  },
-  PlayerState = {
-    isMounted = nil,
   },
   MaskingGlobal = {
     masksController = "gameuiCrosshairContainerController",
@@ -555,23 +552,6 @@ function Globals.GetScreen()
   return Globals.Screen
 end
 
---- Checks if the player is currently mounted on a vehicle and updates the player isMounted state.
---
--- @param None
---
--- @return isMounted: boolean; True if the player is mounted on a vehicle, false otherwise.
-function Globals.IsMounted()
-  local isMounted = Game['GetMountedVehicle;GameObject'](Game.GetPlayer())
-
-  if isMounted then
-    Globals.PlayerState.isMounted  = true
-  else
-    Globals.PlayerState.isMounted  = false
-  end
-
-  return Globals.PlayerState.isMounted
-end
-
 -----------
 -- Screen Configuration
 -----------
@@ -744,7 +724,6 @@ function Globals.OnOverlayOpen()
   Globals.GetScreenEdge()
   Globals.GetScreenWidthFactor()
   Globals.GetScreenSpace()
-  Globals.IsMounted()
 end
 
 function Globals.OnOverlayClose()

@@ -21,6 +21,7 @@ local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
+local Tracker = require("Modules/Tracker")
 
 local UIText = Localization.UIText
 local LogText = Localization.LogText
@@ -198,7 +199,7 @@ function Presets.DrawUI()
 
     -- VectorsCustomize interface starts
     if Presets.selectedPreset == "a000" then
-      if Globals.IsMounted() then
+      if Tracker.IsVehicleMounted() then
         ImGui.Text("")
         VectorsCustomize.DrawUI()
       else

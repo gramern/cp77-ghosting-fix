@@ -29,35 +29,35 @@ FrameGenGhostingFix = {
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
   ]],
-  GameState = {
-    averageFps = 0,
-    currentFps = 0,
-    gameDeltaTime = 0,
-    isGameLoaded = false,
-    isGamePaused = false,
-    isPreGame = false,
-  },
 }
 
 --necessary modules
 local Globals = require("Modules/Globals")
+local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
-local ImGuiExt = require("Modules/ImGuiExt")
+local Tracker = require("Modules/Tracker")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
+local GamePerf = Tracker.GetGamePerfTable()
+local GameState = Tracker.GetGameStateTable()
+local Vehicle = Tracker.GetVehicleTable()
 
+--functional modules
 local Calculate = require("Modules/Calculate")
 local Contextual = require("Modules/Contextual")
 local Presets = require("Modules/Presets")
 local Vectors = require("Modules/Vectors")
 
 --optional modules
-local Debug = require("Dev/Debug")
 local Diagnostics = require("Modules/Diagnostics")
 local Translate = require("Modules/Translate")
 local VectorsCustomize = require("Modules/VectorsCustomize")
+
+--debug
+local Debug = require("Dev/Debug")
+local TrackerDebug = require("Dev/TrackerDebug")
 
 --game performance
 local gameDeltaTime = 0
@@ -111,27 +111,14 @@ function FrameGenGhostingFix.GetVersion(asString)
   end
 end
 
-function GetGameState()
-  local GameState = FrameGenGhostingFix.GameState
-
-  GameState.isGamePaused = Game.GetSystemRequestsHandler():IsGamePaused()
-  GameState.isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
-end
-
-function IsGameLoaded(isLoaded)
-  FrameGenGhostingFix.GameState.isGameLoaded = isLoaded
-end
-
 function GetFps(deltaTime)
   local floor = math.floor
-  local GameState = FrameGenGhostingFix.GameState
 
   currentFpsInt = floor(currentFps)
   currentFrametime = floor((deltaTime * 1000) + 0.5)
   gameDeltaTime = deltaTime
 
-  GameState.currentFps = currentFps
-  GameState.gameDeltaTime = gameDeltaTime
+  Tracker.SetGamePerfCurrent(currentFps, gameDeltaTime)
 
   if openOverlay or GameState.isGamePaused then RestartBenchmark() return end
   if benchmarkRestart then RestartBenchmark() return end
@@ -140,7 +127,7 @@ end
 
 function Benchmark()
   if not isBenchmark then return end
-  if not FrameGenGhostingFix.GameState.isGameLoaded then return end
+  if not GameState.isGameLoaded then return end
 
   local floor = math.floor
 
@@ -152,7 +139,7 @@ function Benchmark()
   if benchmarkTime >= benchmarkDuration then
     SetBenchmark(false)
 
-    FrameGenGhostingFix.GameState.averageFps = averageFps
+    Tracker.SetGamePerfAverage(averageFps)
 
     Globals.Print(LogText.benchmark_avgFpsResult, averageFps)
 
@@ -213,7 +200,7 @@ function RestartBenchmark()
   if not isBenchmark then return end
   benchmarkRestart = true
 
-  if openOverlay or FrameGenGhostingFix.GameState.isGamePaused then benchmarkRestartTime = 0 return end
+  if openOverlay or GameState.isGamePaused then benchmarkRestartTime = 0 return end
 
   benchmarkRestartTime = benchmarkRestartTime + gameDeltaTime
   benchmarkRestartRemaining = benchmarkRestartDuration - benchmarkRestartTime
@@ -246,7 +233,7 @@ function BenchmarkUI()
     ImGuiExt.Text(tostring(averageFps))
   end
 
-  if FrameGenGhostingFix.GameState.isGamePaused then
+  if GameState.isGamePaused then
     ImGui.Text("")
     ImGuiExt.Text(UIText.Options.Benchmark.benchmarkPause)
   elseif openOverlay then
@@ -288,14 +275,7 @@ registerForEvent("onInit", function()
 
   if not Globals.IsModReady() then return end
 
-  Observe('QuestTrackerGameController', 'OnInitialize', function()
-    IsGameLoaded(true)
-  end)
-
-  Observe('QuestTrackerGameController', 'OnUninitialize', function()
-    IsGameLoaded(false)
-  end)
-
+  Tracker.OnInitialize()
   Settings.OnInitialize()
   Presets.OnInitialize()
   Calculate.OnInitialize()
@@ -335,31 +315,17 @@ if Debug then
     Vectors.ToggleMaskingState()
   end)
 
-  registerInput('printFrameGenState', 'Print frame generation state', function(keypress)
+  registerInput('printFrameGenMode', 'Print frame generation mode', function(keypress)
     if not keypress then
       return
     end
 
-    local isFrameGen = DLSSEnabler_GetFrameGenerationState()
+    local mode = DLSSEnabler_GetFrameGenerationMode()
     
-    if isFrameGen then
-      Globals.Print("Frame Generation is enabled.")
+    if mode then
+      Globals.Print("Retrieved current Frame Generation Mode:", mode)
     else
-      Globals.Print("Frame Generation is disabled.")
-    end
-  end)
-
-  registerInput('printDynFrameGenState', 'Print dynamic frame generation state', function(keypress)
-    if not keypress then
-      return
-    end
-
-    local isDynFrameGen = DLSSEnabler_GetDynamicFrameGenerationState()
-    
-    if isDynFrameGen then
-      Globals.Print("Dynamic Frame Generation is enabled.")
-    else
-      Globals.Print("Dynamic Frame Generation is disabled.")
+      Globals.Print("Failed to retrieve current Frame Generation Mode:", mode)
     end
   end)
 end
@@ -419,16 +385,16 @@ registerForEvent("onOverlayClose", function()
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
-  GetGameState()
+  Tracker.OnUpdate()
 
-  if FrameGenGhostingFix.GameState.isPreGame then return end
-  if not FrameGenGhostingFix.GameState.isGameLoaded then return end
+  if GameState.isPreGame then return end
+  if not GameState.isGameLoaded then return end
 
   if deltaTime == 0 then return end
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
 
-  if FrameGenGhostingFix.GameState.isGamePaused then return end
+  if GameState.isGamePaused then return end
 
   Globals.UpdateDelays(gameDeltaTime)
   Vectors.OnUpdate()
@@ -453,22 +419,9 @@ registerForEvent("onDraw", function()
         --debug interface starts------------------------------------------------------------------------------------------------------------------
         if Debug and Globals.IsDebug() and Globals.IsDebugUI() then
             Debug.DrawUI()
+            TrackerDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
-        --timer testing purposes------------------------------------------------------------------------------------------------------------------
-        if Globals.IsDebug() and ImGui.BeginTabItem("Delay Callback Test") then
-          if ImGui.Button("Game's Delay Callback Test (whoknows)", 500, 40) then
-            local delay = Game.GetDelaySystem():DelayCallback(Globals.Print(Debug.__NAME, "Time is up!", UIText.General.info_version, FrameGenGhostingFix.GetVersion(true), ", Is 'Globals' compatible:", tostring(Globals.VersionCompare(Globals.__VERSION))), 5000, false)
-          end
-
-          if ImGui.Button("Delay Callback Test (5s)", 500, 40) then
-            Globals.SetDelay(5, "DelayCallbackTest", Globals.Print, Debug.__NAME, "Time is up!", UIText.General.info_version, FrameGenGhostingFix.GetVersion(true), ", Is 'Globals' compatible:", tostring(Globals.VersionCompare(Globals.__VERSION)))
-          end
-
-          ImGui.EndTabItem()
-        end
-        --timer testing purposes------------------------------------------------------------------------------------------------------------------
-
         -- danyalzia: remove forced benchmarking upon new install dur ing development
         -- if Globals.IsNewInstall() then
         --   if ImGui.BeginTabItem(UIText.Info.tabname) then

@@ -71,6 +71,7 @@ local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
+local Tracker = require("Modules/Tracker")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
@@ -533,7 +534,7 @@ function Calculate.DrawUI()
     ImGuiExt.SetTooltip(UIText.OnFoot.Vignette.tooltip)
 
     if Calculate.Vignette.onWeapon then
-      if not Globals.IsMounted() then
+      if not Tracker.IsVehicleMounted() then
         Calculate.Vignette.permament, vignettePermamentToggle = ImGuiExt.Checkbox(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
         if vignettePermamentToggle then
           Calculate.SaveUserSettings()

@@ -225,8 +225,10 @@ function Debug.DrawUI()
         ImGuiExt.Text("car")
       elseif Vectors.Vehicle.vehicleBaseObject == 2 then
         ImGuiExt.Text("tank")
+      elseif Vectors.Vehicle.vehicleBaseObject == 3 then
+        ImGuiExt.Text("AV")
       else
-        ImGuiExt.Text("vehicle")
+        ImGuiExt.Text("unknown")
       end
 
       ImGuiExt.Text("Current Vehicle's ID")
