@@ -2,12 +2,7 @@ local Globals = {
   __NAME = "Globals",
   __VERSION = { 5, 0, 0 },
   ModState = {
-    isDebug = false, -- mostly a setting, but also a global variable, to be considered
-    isDebugUI = false, -- a setting, not global variable
-    isHelp = true, -- a setting, not global variable
-    keepWindow = false, -- a setting, not global variable
-    isFGEnabled = true, -- a setting, not global variable
-    openWindow = false, -- a setting, not global variable
+    isOpenWindow = false,
     isFirstRun = false,
     isNewInstall = false,
     isReady = true,
@@ -74,9 +69,9 @@ local LogText = Localization.LogText
 
 --- Creates a deep copy of the given contents. For non-table values, it returns the original value.
 --
--- @param contents: any type; The value to be deep copied.
+-- @param `contents`: any; The value to be deep copied.
 --
--- @return copy: table or contents; A deep copy of the input if it's a table, otherwise the input itself.
+-- @return table | contents; A deep copy of the input if it's a table, otherwise the input itself.
 function Globals.Deepcopy(contents)
   if contents == nil then return contents end
   
@@ -100,10 +95,10 @@ end
 
 --- Safely merges two tables, updating only existing keys in the destination table.
 --
--- @param mergeTo: table; The destination table to merge into.
--- @param mergeA: table; The source table to merge from.
+-- @param `mergeTo`: table; The destination table to merge into.
+-- @param `mergeA`: table; The source table to merge from.
 --
--- @return mergeTo: table; The updated destination table after merging.
+-- @return table; The updated destination `mergeTo` table after merging.
 function Globals.SafeMergeTables(mergeTo, mergeA)
   if type(mergeTo) ~= "table" then Globals.Print("Can't merge. The mergeTo is not a table:", mergeTo) return mergeTo end
   if mergeA == nil then return mergeTo end
@@ -124,10 +119,10 @@ end
 
 --- Merges two tables, combining their contents recursively.
 --
--- @param mergeTo: table; The destination table to merge into.
--- @param mergeA: table; The source table to merge from.
+-- @param `mergeTo`: table; The destination table to merge into.
+-- @param `mergeA`: table; The source table to merge from.
 --
--- @return mergeTo: table; The updated destination table after merging.
+-- @return table; The updated destination `mergeTo` table after merging.
 function Globals.MergeTables(mergeTo, mergeA)
   if type(mergeTo) ~= "table" then Globals.Print("Can't merge. The mergeTo is not a table:", mergeTo) end
   if mergeA == nil then return end
@@ -150,10 +145,10 @@ end
 
 --- Prints a formatted message with an optional module name and variable number of content items.
 --
--- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
--- @param ...: any; Variable number of items to be printed as the content of the message. 
+-- @param `moduleName`: string | nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param `...`: any; Variable number of items to be printed as the content of the message. 
 --
--- @return nil
+-- @return None
 function Globals.Print(moduleName, ...)
   local mod = "[" .. FrameGenGhostingFix.__NAME .. "]"
   local module = ""
@@ -181,10 +176,10 @@ end
 
 --- Prints a formatted debug message ONLY if debug mode is enabled. Offers an optional module name and variable number of content items. Prints to the mod's exlusive log file.
 --
--- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
--- @param ...: any; Variable number of items to be printed as the content of the message. 
+-- @param `moduleName`: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param `...`: any; Variable number of items to be printed as the content of the message. 
 --
--- @return nil
+-- @return None
 function Globals.PrintDebug(moduleName, ...)
   if not Globals.ModState.isDebug then return end
 
@@ -216,10 +211,10 @@ end
 
 --- Prints a formatted error message with an optional module name and variable number of content items. Prints to the mod's exlusive log file.
 --
--- @param moduleName: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
--- @param ...: any; Variable number of items to be printed as the content of the message. 
+-- @param `moduleName`: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param `...`: any; Variable number of items to be printed as the content of the message. 
 --
--- @return nil
+-- @return None
 function Globals.PrintError(moduleName, ...)
   local modError = "[" .. FrameGenGhostingFix.__NAME .. "]" .. " [ERROR]"
   local module = ""
@@ -247,9 +242,8 @@ function Globals.PrintError(moduleName, ...)
   spdlog.error(printContents)
 end
 
---- Converts a version string to a table of numbers.
---
--- @param versionString: string; The version string to convert (e.g., "5.0.0").
+
+-- @param `versionString`: string; The version string  (e.g. "5.0.0") to convert to a table of numbers.
 --
 -- @return table: A table containing the version numbers.
 function Globals.VersionStringToTable(versionString)
@@ -262,9 +256,9 @@ function Globals.VersionStringToTable(versionString)
   return versionTable
 end
 
---- Compares a given version table with the mod's current version (FrameGenGhostingFix.__VERSION) to check compatibility.
+--- Compares a given version table with the mod's current version (`FrameGenGhostingFix.__VERSION`) to check compatibility.
 --
--- @param versionTable: table; The version table (must be 3 integers: {major, minor, patch}) to compare against FrameGenGhostingFix.__VERSION.
+-- @param `versionTable`: table; The version table (must be 3 integers: `{ major, minor, patch }`) to compare against `FrameGenGhostingFix.__VERSION`.
 --
 -- @return boolean: Returns true if the given version table is newer or equal, false otherwise.
 function Globals.VersionCompare(versionTable)
@@ -314,9 +308,9 @@ end-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
 -- This function stores a deep copy of the provided contents in the FallbackBoard,
 -- either directly under the owner or nested under a specific key for that owner.
 --
--- @param owner: string; The identifier for the fallback owner.
--- @param contents: any; The content to be stored as a fallback.
--- @param key: string; Optional. If provided, the contents are stored under this key for the owner.
+-- @param `owner`: string; The identifier for the fallback owner.
+-- @param `contents`: any; The content to be stored as a fallback.
+-- @param `key`: string; Optional. If provided, the contents are stored under this `key` for the `owner`.
 --
 -- @return None
 function Globals.SetFallback(owner,contents,key)
@@ -336,10 +330,10 @@ end
 -- This function returns the fallback content stored in the FallbackBoard for a given owner,
 -- either directly or from a specific key associated with that owner.
 --
--- @param owner: string; The identifier for the fallback owner.
--- @param key: astring; Optional. If provided, retrieves the fallback content associated with this key for the owner.
+-- @param `owner`: string; The identifier for the fallback owner.
+-- @param `key`: astring; Optional. If provided, retrieves the fallback content associated with this `key` for the `owner`.
 --
--- @return fallback: any; The fallback content for the specified owner (and key, if provided). 
+-- @return any: The fallback content for the specified `owner` (and `key`, if provided). 
 --                        Returns nil if no fallback is found.
 function Globals.GetFallback(owner,key)
   if FallbackBoard[owner] == nil then Globals.Print("There are no fallbacks for the owner:", owner) end --debug
@@ -352,18 +346,35 @@ function Globals.GetFallback(owner,key)
   end
 end
 
---- Sets a delay with a specified duration and callback function.
+-- @param `key`: string; A unique identifier for the delay to be cancelled.
 --
--- @param duration: number; The duration of the delay in seconds.
--- @param key: string; A unique identifier for the delay.
--- @param callback: function; The function to be called when the delay expires.
--- @param ...: any; Optional parameters to be passed to the callback function.
+-- @return None
+function Globals.CancelDelay(key)
+  if not key then Globals.PrintDebug(Globals.__NAME, "Cannot find a delay:", key) return end
+
+  DelayBoard[key] = nil
+end
+
+-- @param `key`: string; A unique identifier for the delay to be found.
+--
+-- @return boolean: `true` if the delay exists in the moment
+function Globals.IsDelay(key)
+  if not key then Globals.PrintDebug(Globals.__NAME, "Cannot find a delay:", key) return false end
+
+  if DelayBoard[key] == nil then return false end
+  return true
+end
+
+-- @param `duration`: number; The duration of the delay in seconds.
+-- @param `key`: string; A unique identifier for the delay.
+-- @param `callback`: function; The function to be called when the delay expires.
+-- @param `...`: any; Optional parameters to be passed to the callback function.
 --
 -- @return None
 function Globals.SetDelay(duration, key, callback, ...)
   local parameters = {...}
 
-  if not duration or not key or not callback then Globals.Print("Cannot set the delay. Check parameters.") return end
+  if not duration or not key or not callback then Globals.PrintDebug(Globals.__NAME, "Cannot set the delay. Check parameters.") return end
 
   DelayBoard[key] = {
     remainingTime = duration,
@@ -372,20 +383,7 @@ function Globals.SetDelay(duration, key, callback, ...)
   }
 end
 
---- Cancel a delay.
---
--- @param key: string; A unique identifier for the delay.
---
--- @return None
-function Globals.CancelDelay(key)
-  if not key then Globals.Print("Cannot find a delay:", key) return end
-
-  DelayBoard[key] = nil
-end
-
---- Updates all active delays, decreasing their remaining time and executing callbacks for expired delays.
---
--- @param None
+-- @param `gameDeltaTime`: number;
 --
 -- @return None
 function Globals.UpdateDelays(gameDeltaTime)
@@ -412,142 +410,72 @@ function Globals.UpdateDelays(gameDeltaTime)
   end
 end
 
---- Sets the debug state for the global configuration.
---
--- @param boolean: boolean; The debug state to set (true for debug mode, false for normal mode).
+-- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
 --
 -- @return None
-function Globals.SetDebug(boolean)
-  Globals.ModState.isDebug = boolean
+function Globals.SetModReady(isReady)
+  Globals.ModState.isReady = isReady
 end
 
---- Checks if the mod is currently in debug mode.
---
--- @param None
---
--- @return isDebug: boolean;
-function Globals.IsDebug()
-  return Globals.ModState.isDebug
-end
-
---- Sets the debug state for the global configuration.
---
--- @param boolean: boolean; The debug state to set (true for debug mode, false for normal mode).
---
--- @return None
-function Globals.SetDebugUI(boolean)
-  Globals.ModState.isDebugUI = boolean
-end
-
---- Checks if the mod is currently in debug mode.
---
--- @param None
---
--- @return isDebug: boolean;
-function Globals.IsDebugUI()
-  return Globals.ModState.isDebugUI
-end
-
---- Sets the ready state for the global configuration.
---
--- @param boolean: boolean; The ready state to set (true if the mod is ready, false otherwise).
---
--- @return None
-function Globals.SetModReady(boolean)
-  Globals.ModState.isReady = boolean
-end
-
---- Checks if the mod is ready for operation.
---
--- @param None
---
--- @return isReady: boolean;
+-- @return boolean: `true` if the mod is ready for operation
 function Globals.IsModReady()
   return Globals.ModState.isReady
 end
 
---- Sets the first run state for the mod and performs related actions.
---
--- @param boolean: boolean; The first run state to set (true if it's the first run, false otherwise).
+-- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
 --
 -- @return None
-function Globals.SetFirstRun(boolean)
-  Globals.ModState.isFirstRun = boolean
-  if not boolean then return end
+function Globals.SetFirstRun(isFirstRun)
+  Globals.ModState.isFirstRun = isFirstRun
+  if not isFirstRun then return end
   Globals.SetNewInstall(true)
   Globals.Print(LogText.globals_firstRun)
 end
 
---- Checks if this is the first run of the mod.
---
--- @param None
---
--- @return isFirstRun: boolean;
+-- @return boolean: `true` if this is the first run of the mod
 function Globals.IsFirstRun()
   return Globals.ModState.isFirstRun
 end
 
---- Sets the new install state for the mod and logs a message if appropriate.
---
--- @param boolean: boolean; The new install state to set (true if it's a new install, false otherwise).
+-- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
 --
 -- @return None
-function Globals.SetNewInstall(boolean)
-  Globals.ModState.isNewInstall = boolean
-  if not boolean or Globals.ModState.isFirstRun then return end
+function Globals.SetNewInstall(isNewInstall)
+  Globals.ModState.isNewInstall = isNewInstall
+  if not isNewInstall or Globals.ModState.isFirstRun then return end
   Globals.Print(LogText.globals_newVersion)
 end
 
---- Checks if the current installation of the mod is new.
---
--- @param None
---
--- @return isNewInstall: boolean;
+-- @return boolean: `true` if the current installation of the mod is new
 function Globals.IsNewInstall()
   return Globals.ModState.isNewInstall
 end
 
---- Sets the state for keeping a window open or closed.
---
--- @param boolean: boolean; The keep window state to set (true to keep the window open, false to allow it to close).
---
--- @return None
-function Globals.KeepWindow(boolean)
-  Globals.ModState.keepWindow = boolean
+-- @return boolean: `true` is the mod's window is opened
+function Globals.IsOpenWindow()
+  return Globals.ModState.isOpenWindow
 end
 
---- Sets the state for opening or closing a window.
---
--- @param boolean: boolean; The open window state to set (true to open the window, false to close it).
+
+-- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
 --
 -- @return None
-function Globals.OpenWindow(boolean)
-  Globals.ModState.openWindow = boolean
+function Globals.SetOpenWindow(isOpenWindow)
+  Globals.ModState.isOpenWindow = isOpenWindow
 end
 
---- Retrieves the masks controller from the global configuration.
---
--- @param None
---
--- @return masksController: string; The masks controller name.
+
+-- @return string: the masks controller name
 function Globals.GetMasksController()
   return Globals.MaskingGlobal.masksController
 end
 
---- Retrieves the Widgets table containing masks' widgets names from the global configuration.
---
--- @param None
---
--- @return Widgets: table; The Widgets table from the global masking configuration.
+-- @return Widgets: table; The Widgets table containing masks' widgets names from the mod's global masking configuration
 function Globals.GetWidgets()
   return Globals.MaskingGlobal.Widgets
 end
 
---- Retrieves the Screen table containg current screen data from the global configuration.
---
--- @param None
---
--- @return Screen: table; The Screen table from the global configuration.
+-- @return Screen: table; The Screen table containg current screen info and configuration
 function Globals.GetScreen()
   return Globals.Screen
 end
@@ -560,7 +488,7 @@ end
 --
 -- @param None
 --
--- @return aspectRatio: number; The current aspect ratio of the screen. Updates Globals.Screen.isAspectRatioChange internally.
+-- @return number; The current aspect ratio of the screen. Updates `Globals.Screen.aspectRatio`, `Globals.Screen.isAspectRatioChange` and `Globals.Screen.Resolution` internally.
 function Globals.GetAspectRatio()
   local previousAspectRatio = Globals.Screen.aspectRatio
 
@@ -590,7 +518,7 @@ end
 --
 -- @param None
 --
--- @return screenType: enum; Updates Globals.Screen.type internally.
+-- @return enum; Updates `Globals.Screen.type` internally.
 function Globals.GetScreenType()
   local screenAspectRatio = Globals.Screen.aspectRatio
 
@@ -613,7 +541,7 @@ end
 --
 -- @param None
 --
--- @return screenTypeName: string; Updates Globals.Screen.typeName internally.
+-- @return string; Updates `Globals.Screen.typeName` internally.
 function Globals.GetScreenTypeName()
   local screenType = Globals.Screen.type
 
@@ -636,7 +564,7 @@ end
 --
 -- @param None
 --
--- @return widthFactor: number; Updates Globals.Screen.Factor.width internally.
+-- @return number; Updates `Globals.Screen.Factor.width` internally.
 function Globals.GetScreenWidthFactor()
   local screenType = Globals.Screen.type
 
@@ -655,7 +583,7 @@ end
 --
 -- @param None
 --
--- @return screenSpace: table; Updates Globals.Screen.Space internally.
+-- @return table; Updates `Globals.Screen.Space` internally.
 function Globals.GetScreenSpace()
   local screenType = Globals.Screen.type
   local screenResDef = Globals.Screen.Def.Resolution
@@ -675,7 +603,7 @@ end
 --
 -- @param None
 --
--- @return screenEdge: table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates Globals.Screen.Edge internally.
+-- @return table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates `Globals.Screen.Edge` internally.
 function Globals.GetScreenEdge()
   local screenType = Globals.Screen.type
 

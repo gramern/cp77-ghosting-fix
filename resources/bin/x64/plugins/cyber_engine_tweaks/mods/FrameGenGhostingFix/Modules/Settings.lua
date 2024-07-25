@@ -1,20 +1,93 @@
-local Settings ={
+local Settings = {
   __NAME = "Settings",
   __VERSION = { 5, 0, 0 },
   isSaved = nil,
 }
 
+local ModSettings = {
+  isDebug = false,
+  isDebugUI = false,
+  isHelp = true,
+  isFGEnabled = true,
+  isKeepWindow = false,
+}
+
 local UserSettings = {}
 
+local Debug = require("Modules/Debug")
 local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 
 local LogText = Localization.LogText
 
-function Settings.SetSaved(boolean)
-  Settings.isSaved = boolean
+-- @param `isDebug`: boolean; The debug setting to set (`true` for debug mode, `false` for normal mode).
+--
+-- @return None
+function Settings.SetDebug(isDebug)
+  ModSettings.isDebug = isDebug
 end
 
+-- @return boolean `true` if the mod is currently in debug mode
+function Settings.IsDebug()
+  return ModSettings.isDebug
+end
+
+-- @param `isDebugUI`: boolean; The debug UI state to set (`true` for debug UI visble, `false` for invisble).
+--
+-- @return None
+function Settings.SetDebugUI(isDebugUI)
+  ModSettings.isDebugUI = isDebugUI
+end
+
+-- @return boolean: `true` if the mod is currently in debug UI visible mode
+function Settings.IsDebugUI()
+  return ModSettings.isDebugUI
+end
+
+-- @param `isHelp`: boolean; The help setting to set (`true` for help mode, `false` for normal mode).
+--
+-- @return None
+function Settings.SetHelp(isHelp)
+  ModSettings.isHelp = isHelp
+end
+
+-- @return boolean `true` if the mod is currently in help mode
+function Settings.IsHelp()
+  return ModSettings.isHelp
+end
+
+-- @param `isFGEnabled`: boolean; The DLSS Enabler's FG state to set (`true` for FG enabled, `false` for otherwise).
+--
+-- @return None
+function Settings.SetFGEnabled(isFGEnabled)
+  ModSettings.isFGEnabled = isFGEnabled
+end
+
+-- @return boolean: `true` for DLSS Enabler's FG enabled
+function Settings.IsFGEnabled()
+  return ModSettings.isFGEnabled
+end
+
+-- @param `isKeepWindow`: boolean; The keep window state to set (`true` to keep the window open, `false` to allow it to close, prioritized over isOpenWindow).
+--
+-- @return None
+function Settings.SetKeepWindow(isKeepWindow)
+  ModSettings.isKeepWindow = isKeepWindow
+end
+
+-- @return boolean: `true` for keep the window open
+function Settings.IsKeepWindow()
+  return ModSettings.isKeepWindow
+end
+
+-- @param `isSaved`: boolean; Tells the mod is settings should be saved OnOverlayClose (`false` to not save, `true` to save).
+--
+-- @return None
+function Settings.SetSaved(isSaved)
+  Settings.isSaved = isSaved
+end
+
+-- @return boolean: `true` if Settings are set to save user_settings.json OnOverlayClose
 function Settings.IsSaved()
   return Settings.isSaved
 end
@@ -108,22 +181,22 @@ function Settings.LoadFile()
     file:close()
     UserSettings = json.decode(userSettingsContents)
 
-    local version = UserSettings.Globals and UserSettings.Globals.ModState and UserSettings.Globals.ModState.version or false
+    local version = UserSettings.Version or false
 
     if not version or not Globals.VersionCompare(Globals.VersionStringToTable(version)) then
       UserSettings = Translate(UserSettings)
       Globals.SetNewInstall(true)
     end
 
-    Globals.ModState.keepWindow = UserSettings.Globals and UserSettings.Globals.keepWindow or false
+    ModSettings.iskeepWindow = UserSettings.Globals and UserSettings.Globals.keepWindow or false
 
-    Globals.ModState.isFGEnabled = UserSettings.Globals and UserSettings.Globals.isFGEnabled or true
+    ModSettings.isFGEnabled = UserSettings.Globals and UserSettings.Globals.isFGEnabled or true
 
-    Globals.ModState.isHelp = UserSettings.Globals and UserSettings.Globals.isHelp or true
+    ModSettings.isHelp = UserSettings.Globals and UserSettings.Globals.isHelp or true
 
-    Globals.ModState.isDebug = UserSettings.Globals and UserSettings.Globals.isDebug or false
+    ModSettings.isDebug = UserSettings.Globals and UserSettings.Globals.isDebug or false
 
-    Globals.ModState.isDebugUI = UserSettings.Globals and UserSettings.Globals.isDebugUI or false
+    ModSettings.isDebugUI = UserSettings.Globals and UserSettings.Globals.isDebugUI or false
 
     Globals.Print(Settings.__NAME,LogText.settings_loaded)
     return true
@@ -137,15 +210,9 @@ function Settings.SaveFile()
   if Settings.isSaved or Settings.isSaved == nil then return end
   if UserSettings == nil then Globals.Print(Settings.__NAME,LogText.settings_notSavedToFile) return end
 
-  Settings.WriteUserSettings("Globals",{
-    ModState = {
-      version = FrameGenGhostingFix.GetVersion(true),
-      keepWindow = Globals.ModState.keepWindow,
-      isDebug = Globals.ModState.isDebug,
-      isDebugUI = Globals.ModState.isDebugUI,
-      isFGEnabled = Globals.ModState.isFGEnabled,
-      isHelp = Globals.ModState.isHelp
-  }})
+  Settings.WriteUserSettings("ModSettings", ModSettings)
+
+  Settings.WriteUserSettings("Version", FrameGenGhostingFix.GetVersion(true))
 
   local userSettingsContents = json.encode(UserSettings)
   local file = io.open("user_settings.json", "w+")

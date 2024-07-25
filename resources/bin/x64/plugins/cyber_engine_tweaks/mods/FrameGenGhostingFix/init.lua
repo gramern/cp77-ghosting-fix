@@ -40,9 +40,6 @@ local Tracker = require("Modules/Tracker")
 
 local LogText = Localization.LogText
 local UIText = Localization.UIText
-local GamePerf = Tracker.GetGamePerfTable()
-local GameState = Tracker.GetGameStateTable()
-local Vehicle = Tracker.GetVehicleTable()
 
 --functional modules
 local Calculate = require("Modules/Calculate")
@@ -82,17 +79,17 @@ local countFps = 0
 --ui
 local windowTitle
 local openOverlay
-local debugToggle
-local debugUIToggle
-local helpToggle
-local keepWindowToggle
-local fgToggle
+local debugBool, debugToggle
+local debugUIBool, debugUIToggle
+local helpBool, helpToggle
+local keepWindowBool, keepWindowToggle
+local fgBool, fgToggle
 
 --- Returns the version of FrameGen Ghosting 'Fix'.
 --
--- @param asString: boolean; Whether to return the version as a string.
+-- @param `asString`: boolean; Whether to return the version as a string.
 -- 
--- @return string | table; Version information, updates FrameGenGhostingFix.__VERSION_STRING internally.
+-- @return string | table; Version information, updates `FrameGenGhostingFix.__VERSION_STRING` internally.
 function FrameGenGhostingFix.GetVersion(asString)
   FrameGenGhostingFix.__VERSION_STRING = table.concat(FrameGenGhostingFix.__VERSION, ".")
 
@@ -120,14 +117,14 @@ function GetFps(deltaTime)
 
   Tracker.SetGamePerfCurrent(currentFps, gameDeltaTime)
 
-  if openOverlay or GameState.isGamePaused then RestartBenchmark() return end
+  if openOverlay or Tracker.IsGamePaused() then RestartBenchmark() return end
   if benchmarkRestart then RestartBenchmark() return end
   Benchmark()
 end
 
 function Benchmark()
   if not isBenchmark then return end
-  if not GameState.isGameLoaded then return end
+  if not Tracker.IsGameLoaded() then return end
 
   local floor = math.floor
 
@@ -151,7 +148,7 @@ function Benchmark()
     Settings.SetSaved(false)
     Globals.SetNewInstall(false)
 
-    if not Globals.ModState.isFirstRun then return end
+    if not Globals.IsFirstRun() then return end
     Globals.SetFirstRun(false)
   end
 end
@@ -200,7 +197,7 @@ function RestartBenchmark()
   if not isBenchmark then return end
   benchmarkRestart = true
 
-  if openOverlay or GameState.isGamePaused then benchmarkRestartTime = 0 return end
+  if openOverlay or Tracker.IsGamePaused() then benchmarkRestartTime = 0 return end
 
   benchmarkRestartTime = benchmarkRestartTime + gameDeltaTime
   benchmarkRestartRemaining = benchmarkRestartDuration - benchmarkRestartTime
@@ -233,7 +230,7 @@ function BenchmarkUI()
     ImGuiExt.Text(tostring(averageFps))
   end
 
-  if GameState.isGamePaused then
+  if Tracker.IsGamePaused() then
     ImGui.Text("")
     ImGuiExt.Text(UIText.Options.Benchmark.benchmarkPause)
   elseif openOverlay then
@@ -332,7 +329,7 @@ end
 
 registerForEvent("onOverlayOpen", function()
   openOverlay = true
-  Globals.OpenWindow(true)
+  Globals.SetOpenWindow(true)
 
   --translate UIText before other modules access it
   if Translate then
@@ -364,8 +361,8 @@ end)
 registerForEvent("onOverlayClose", function()
   openOverlay = false
 
-  if not Globals.ModState.keepWindow then
-    Globals.OpenWindow(false)
+  if not Settings.IsKeepWindow() then
+    Globals.SetOpenWindow(false)
   end
 
   Globals.OnOverlayClose()
@@ -387,14 +384,14 @@ end)
 registerForEvent("onUpdate", function(deltaTime)
   Tracker.OnUpdate()
 
-  if GameState.isPreGame then return end
-  if not GameState.isGameLoaded then return end
+  if Tracker.IsGamePreGame() then return end
+  if not Tracker.IsGameLoaded() then return end
 
   if deltaTime == 0 then return end
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
 
-  if GameState.isGamePaused then return end
+  if not Tracker.IsGameLoaded() then return end
 
   Globals.UpdateDelays(gameDeltaTime)
   Vectors.OnUpdate()
@@ -402,7 +399,7 @@ end)
 
 -- draw the mod's window
 registerForEvent("onDraw", function()
-  if Globals.ModState.openWindow then
+  if Globals.IsOpenWindow() then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
 
     ImGuiExt.PushStyle()
@@ -417,7 +414,7 @@ registerForEvent("onDraw", function()
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
         
         --debug interface starts------------------------------------------------------------------------------------------------------------------
-        if Debug and Globals.IsDebug() and Globals.IsDebugUI() then
+        if Debug and Settings.IsDebug() and Settings.IsDebugUI() then
             Debug.DrawUI()
             TrackerDebug.DrawUI()
         end
@@ -484,30 +481,34 @@ registerForEvent("onDraw", function()
           if ImGui.BeginTabItem(UIText.Options.tabname) then
 
             if Debug then
-              Globals.ModState.isDebug, debugToggle = ImGuiExt.Checkbox(UIText.Options.enabledDebug, Globals.ModState.isDebug, debugToggle)
+              debugBool, debugToggle = ImGuiExt.Checkbox(UIText.Options.enabledDebug, Settings.IsDebug(), debugToggle)
             end
             if debugToggle then
+              Settings.SetDebug(debugBool)
               Settings.SetSaved(false)
               ImGuiExt.SetStatusBar(UIText.General.settings_saved)
             end
 
-            if Debug and Globals.IsDebug() then
-              Globals.ModState.isDebugUI, debugUIToggle = ImGuiExt.Checkbox(UIText.Options.enabledDebugUI, Globals.ModState.isDebugUI, debugUIToggle)
+            if Debug and Settings.IsDebug() then
+              debugUIBool, debugUIToggle = ImGuiExt.Checkbox(UIText.Options.enabledDebugUI, Settings.IsDebugUI(), debugUIToggle)
             end
             if debugUIToggle then
+              Settings.SetDebugUI(debugUIBool)
               Settings.SetSaved(false)
               ImGuiExt.SetStatusBar(UIText.General.settings_saved)
             end
 
-            Globals.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox(UIText.Options.enabledWindow, Globals.ModState.keepWindow, keepWindowToggle)
+            keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(UIText.Options.enabledWindow, Settings.IsKeepWindow(), keepWindowToggle)
             if keepWindowToggle then
+              Settings.SetKeepWindow(keepWindowBool)
               Settings.SetSaved(false)
               ImGuiExt.SetStatusBar(UIText.General.settings_saved)
             end
             ImGuiExt.SetTooltip(UIText.Options.tooltipWindow)
 
-            Globals.ModState.isHelp, helpToggle = ImGuiExt.Checkbox(UIText.Options.enabledHelp, Globals.ModState.isHelp, helpToggle)
+            helpBool, helpToggle = ImGuiExt.Checkbox(UIText.Options.enabledHelp, Settings.IsHelp(), helpToggle)
             if helpToggle then
+              Settings.SetHelp(helpBool)
               Settings.SetSaved(false)
               ImGuiExt.SetStatusBar(UIText.General.settings_saved)
             end
@@ -515,11 +516,12 @@ registerForEvent("onDraw", function()
 
             ImGui.Separator()
 
-            Globals.ModState.isFGEnabled, fgToggle = ImGuiExt.Checkbox(UIText.Options.toggleFG, Globals.ModState.isFGEnabled, fgToggle)
+            fgBool, fgToggle = ImGuiExt.Checkbox(UIText.Options.toggleFG, Settings.IsFGEnabled(), fgToggle)
             if fgToggle then
+              Settings.SetFGEnabled(fgBool)
               Settings.SetSaved(false)
               ImGuiExt.SetStatusBar(UIText.General.settings_saved)
-              DLSSEnabler_SetFrameGenerationState(Globals.ModState.isFGEnabled)
+              DLSSEnabler_SetFrameGenerationState(Settings.IsFGEnabled())
             end
             ImGuiExt.SetTooltip(UIText.Options.tooltipToggleFG)
             
@@ -534,7 +536,7 @@ registerForEvent("onDraw", function()
                 if ImGui.Button(UIText.Options.Benchmark.benchmarkRun, 480, 40) then
                   ResetBenchmarkResults()
                   SetBenchmark(true)
-                  Globals.KeepWindow(true)
+                  Settings.SetKeepWindow(true)
                 end
 
                 ImGuiExt.SetTooltip(UIText.Options.Benchmark.tooltipRunBench)

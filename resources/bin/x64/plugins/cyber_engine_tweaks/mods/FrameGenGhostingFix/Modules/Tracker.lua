@@ -12,7 +12,6 @@ local GamePerf = {
 local GameState = {
   isGameLoaded = nil,
   isGamePaused = nil,
-  isFrameGen = nil, -- a setting, doesn't need to btracked in real time
   isPreGame = nil,
 }
 
@@ -49,8 +48,8 @@ function Tracker.GetGamePerfTable()
   return GamePerf
 end
 
--- @param currentFps
--- @param gamedeltaTime
+-- @param `currentFps`: number;
+-- @param `gamedeltaTime`: number;
 --
 -- @return None
 function Tracker.SetGamePerfCurrent(currentFps, gameDeltaTime)
@@ -58,7 +57,7 @@ function Tracker.SetGamePerfCurrent(currentFps, gameDeltaTime)
   GamePerf.gameDeltaTime = gameDeltaTime
 end
 
--- @param averageFps
+-- @param `averageFps`: number;
 --
 -- @return None
 function Tracker.SetGamePerfAverage(averageFps)
@@ -84,10 +83,32 @@ end
 -- Global Specific Getters
 ------------------
 
--- a setting, doesn't need to tracked in real time - should be moved
--- @return boolean: `true` if frame generation is enabled in the game's settings
+function Tracker.IsTracking()
+  if GameState.isGameLoaded and not GameState.isGamePaused and not GameState.isPreGame then
+    return true
+  else
+    return false
+  end
+end
+
+-- @return boolean: `true` if frame generation is enabled in the game's settings (on-demand check, not tracked in real time)
 function Tracker.IsGameFrameGeneration()
   return GameOptions.GetBool("DLSSFrameGen", "Enable")
+end
+
+-- @return boolean: `true` if game is loaded to the gameplay
+function Tracker.IsGameLoaded()
+  return GameState.isGameLoaded
+end
+
+-- @return boolean: `true` if game is loaded to the gameplay and is paused
+function Tracker.IsGamePaused()
+  return GameState.isGamePaused
+end
+
+-- @return boolean: `true` if game is in the main menu and not in the gameplay)
+function Tracker.IsGamePreGame()
+  return GameState.isPreGame
 end
 
 -- @return boolean: `true` if vehicle is mounted and player is a driver
@@ -234,16 +255,17 @@ local function TrackVehicle()
   local vehicle = Game.GetMountedVehicle(player)
   local trackedVehicle = Vehicle
 
-  trackedVehicle.isMounted = vehicle and true or false
   trackedVehicle.object = vehicle
 
   if not vehicle then
+    trackedVehicle.isMounted = false
     trackedVehicle.currentSpeed = nil
     trackedVehicle.isMoving = nil
     Player.isDriver = nil
     return
   end
 
+  trackedVehicle.isMounted = vehicle and true
   trackedVehicle.baseObject = GetVehicleBaseObject(vehicle)
   trackedVehicle.id = vehicle:GetRecord():GetID().value
   trackedVehicle.isSupported = IsVehicleSupported(trackedVehicle.baseObject)
@@ -271,14 +293,12 @@ function Tracker.OnInitialize()
   Observe('DriverCombatEvents', 'OnExit', function()
     SetVehicleWeapon(false)
   end)
-
-  Tracker.IsGameFrameGeneration()
 end
 
 function Tracker.OnUpdate()
   TrackGameState()
 
-  if GameState.isGamePaused or GameState.isPreGame then return end
+  if not Tracker.IsTracking() then return end
   TrackPlayer()
   TrackVehicle()
 end

@@ -89,7 +89,7 @@ local Localization = {
       info = "Turn off frame generation during these events."
     },
     Options = {
-      tabname = "Additional Options",
+      tabname = "Mod Settings",
       enabledDebug = "Enable debug mode",
       enabledDebugUI = "Enable debug view in the window",
       enabledHelp = "Enable tooltips",

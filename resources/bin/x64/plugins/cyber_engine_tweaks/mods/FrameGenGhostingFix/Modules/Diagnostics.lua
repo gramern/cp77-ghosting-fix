@@ -12,6 +12,10 @@ local Localization = require("Modules/Localization")
 
 local UIText = Localization.UIText
 
+
+function Diagnostics.IsUpdateRecommended()
+  return Diagnostics.isUpdateRecommended
+end
 --check for compatibility with other mods
 function Diagnostics.CheckModsCompatibility()
 end

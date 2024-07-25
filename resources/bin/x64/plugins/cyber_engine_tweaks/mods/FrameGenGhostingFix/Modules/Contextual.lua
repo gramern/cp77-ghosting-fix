@@ -525,7 +525,7 @@ function Contextual.OnInitialize()
   LoadUserSettings()
 
   -- Turn on debug mode during development
-  Globals.ModState.isDebug = true
+  Settings.SetDebug(true)
 
   -- Get the current FG state whenever mod is loaded or reloaded from CET
   Contextual.FGEnabled = GetFrameGenState()
@@ -891,7 +891,7 @@ function Contextual.DrawUI()
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle, menuToggle
 
   if ImGui.BeginTabItem(UIText.Contextual.tabname) then
-    if not Globals.ModState.isFGEnabled then
+    if not Settings.IsFGEnabled() then
       ImGui.Text("")
       ImGuiExt.TextRed(UIText.Contextual.requirement)
       ImGui.Text("")

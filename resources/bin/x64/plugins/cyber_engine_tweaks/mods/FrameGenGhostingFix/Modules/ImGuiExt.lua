@@ -5,6 +5,7 @@ local ImGuiExt = {
 
 local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 
 local UIText = Localization.UIText
 
@@ -45,7 +46,7 @@ end
 --
 -- @return None
 function ImGuiExt.SetTooltip(string)
-  if ImGui.IsItemHovered() and Globals.ModState.isHelp then
+  if ImGui.IsItemHovered() and Settings.IsHelp() then
     ImGui.SetTooltip(string)
   else
     ImGui.SetTooltip(nil)
