@@ -25,7 +25,6 @@ local Player = {
 local Vehicle = {
   baseObject = nil,
   currentSpeed = nil,
-  id = nil,
   isMounted = nil,
   isMoving = nil,
   isSupported = nil,
@@ -85,11 +84,7 @@ end
 
 -- @return boolean: `true` if player or vehicle are tracked (monitored)
 function Tracker.IsGameReady()
-  if GameState.isGameLoaded and not GameState.isGamePaused and not GameState.isPreGame then
-    return true
-  else
-    return false
-  end
+  return GameState.isGameLoaded and not (GameState.isGamePaused or GameState.isPreGame)
 end
 
 -- @return boolean: `true` if frame generation is enabled in the game's settings (checks for OnInitialize and OnOverlayOpen, not tracked in real time)
@@ -264,7 +259,6 @@ local function TrackVehicle()
 
   trackedVehicle.isMounted = vehicle and true
   trackedVehicle.baseObject = GetVehicleBaseObject(vehicle)
-  trackedVehicle.id = vehicle:GetRecord():GetID().value
   trackedVehicle.isSupported = IsVehicleSupported(trackedVehicle.baseObject)
   trackedVehicle.currentSpeed = vehicle:GetCurrentSpeed()
   trackedVehicle.isMoving = IsVehicleMoving(trackedVehicle.currentSpeed)

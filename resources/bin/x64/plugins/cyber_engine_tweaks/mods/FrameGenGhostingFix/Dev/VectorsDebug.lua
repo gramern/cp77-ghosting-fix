@@ -7,6 +7,9 @@ local ImGuiExt = require("Modules/ImGuiExt")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
+local CameraData = Vectors.GetCameraData()
+local VehicleData = Vectors.GetVehicleData()
+
 function VectorsDebug.DrawUI()
   if Vectors or VectorsCustomize then
     if ImGui.BeginTabItem("Vectors General") then
@@ -48,6 +51,7 @@ function VectorsDebug.DrawUI()
       ImGui.Separator()
 
       if Vectors.PlayerPuppet.Position then
+        ImGuiExt.Text("Player's Position:")
         ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.x))
         ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.y))
         ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.z))
@@ -59,88 +63,61 @@ function VectorsDebug.DrawUI()
     if ImGui.BeginTabItem("Vectors Camera") then
 
       ImGuiExt.Text("Camera Forward:")
-      if Vectors.Camera.Forward then
+      if CameraData.Forward then
         ImGuiExt.Text("Active Camera FOV:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Camera.fov))
+        ImGuiExt.Text(tostring(CameraData.fov))
 
         ImGui.Separator()
 
         ImGuiExt.Text("DotProduct Vehicle Forward:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forward))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.forward))
         ImGuiExt.Text("DotProduct Vehicle Forward Absolute:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.forwardAbs))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.forwardAbs))
         ImGuiExt.Text("DotProduct Vehicle Right:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.right))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.right))
         ImGuiExt.Text("DotProduct Vehicle Right Absolute:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.rightAbs))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.rightAbs))
         ImGuiExt.Text("DotProduct Vehicle Up:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.up))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.up))
         ImGuiExt.Text("DotProduct Vehicle Up Absolute:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.DotProduct.Vehicle.upAbs))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.DotProduct.Vehicle.upAbs))
         ImGui.Separator()
         ImGuiExt.Text("Camera Forward Angle:")
         ImGuiExt.Text("Vehicle Forward Horizontal Plane:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.horizontalPlane))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.Angle.Vehicle.Forward.horizontalPlane))
         ImGuiExt.Text("Vehicle Forward Median Plane:")
-        ImGuiExt.Text(tostring(Vectors.Camera.ForwardTable.Angle.Vehicle.Forward.medianPlane))
+        ImGuiExt.Text(tostring(CameraData.ForwardTable.Angle.Vehicle.Forward.medianPlane))
         ImGui.Separator()
         ImGuiExt.Text("Camera Forward Z:")
-        ImGuiExt.Text(tostring(Vectors.Camera.Forward.z))
+        ImGuiExt.Text(tostring(CameraData.Forward.z))
       end
 
       ImGui.Separator()
 
-      if Vectors.Camera.Forward then
+      if CameraData.Forward then
         ImGuiExt.Text("Camera Forward (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Camera.Forward.x))
-        ImGuiExt.Text(tostring(Vectors.Camera.Forward.y))
-        ImGuiExt.Text(tostring(Vectors.Camera.Forward.z))
+        ImGuiExt.Text(tostring(CameraData.Forward.x))
+        ImGuiExt.Text(tostring(CameraData.Forward.y))
+        ImGuiExt.Text(tostring(CameraData.Forward.z))
       end
 
       ImGui.Separator()
 
-      if Vectors.Camera.Right then
+      if CameraData.Right then
         ImGuiExt.Text("Camera Right (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Camera.Right.x))
-        ImGuiExt.Text(tostring(Vectors.Camera.Right.y))
-        ImGuiExt.Text(tostring(Vectors.Camera.Right.z))
+        ImGuiExt.Text(tostring(CameraData.Right.x))
+        ImGuiExt.Text(tostring(CameraData.Right.y))
+        ImGuiExt.Text(tostring(CameraData.Right.z))
       end
 
       ImGui.Separator()
 
-      if Vectors.Camera.Up then
+      if CameraData.Up then
         ImGuiExt.Text("Camera Up (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Camera.Up.x))
-        ImGuiExt.Text(tostring(Vectors.Camera.Up.y))
-        ImGuiExt.Text(tostring(Vectors.Camera.Up.z))
-      end
-
-      ImGui.Separator()
-
-      if Vectors.Vehicle.Forward then
-        ImGuiExt.Text("Vehicle Forward (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Forward.x))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Forward.y))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Forward.z))
-      end
-
-      ImGui.Separator()
-
-      if Vectors.Vehicle.Right then
-        ImGuiExt.Text("Vehicle Right (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Right.x))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Right.y))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Right.z))
-      end
-
-      ImGui.Separator()
-      
-      if Vectors.Vehicle.Up then
-        ImGuiExt.Text("Vehicle Up (x, y, z, w = 0):")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Up.x))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Up.y))
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Up.z))
+        ImGuiExt.Text(tostring(CameraData.Up.x))
+        ImGuiExt.Text(tostring(CameraData.Up.y))
+        ImGuiExt.Text(tostring(CameraData.Up.z))
       end
 
       ImGui.EndTabItem()
@@ -150,146 +127,173 @@ function VectorsDebug.DrawUI()
 
       ImGuiExt.Text("Is in a Vehicle:")
       ImGui.SameLine()
-      if Vectors.Vehicle.isMounted then
-        if Vectors.Vehicle.vehicleBaseObject == 0 then
+      if VehicleData.isMounted then
+        if VehicleData.vehicleBaseObject == 0 then
           ImGuiExt.Text("bike")
-        elseif Vectors.Vehicle.vehicleBaseObject == 1 then
+        elseif VehicleData.vehicleBaseObject == 1 then
           ImGuiExt.Text("car")
-        elseif Vectors.Vehicle.vehicleBaseObject == 2 then
+        elseif VehicleData.vehicleBaseObject == 2 then
           ImGuiExt.Text("tank")
-        elseif Vectors.Vehicle.vehicleBaseObject == 3 then
+        elseif VehicleData.vehicleBaseObject == 3 then
           ImGuiExt.Text("AV")
         else
           ImGuiExt.Text("unknown")
         end
 
         ImGuiExt.Text("Current Vehicle's ID")
-        if Vectors.Vehicle.vehicleID then
+        if VehicleData.vehicleID then
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.vehicleID.value))
+          ImGuiExt.Text(tostring(VehicleData.vehicleID.value))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle Current Speed:")
-        if Vectors.Vehicle.currentSpeed then
+        if VehicleData.currentSpeed then
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.currentSpeed))
+          ImGuiExt.Text(tostring(VehicleData.currentSpeed))
         end
 
         ImGuiExt.Text("Is Vehicle Moving:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.isMoving))
+        ImGuiExt.Text(tostring(VehicleData.isMoving))
 
         ImGui.Separator()
 
         ImGuiExt.Text("Active Camera Perspective:")
-        if Vectors.Camera.activePerspective then
+        if CameraData.activePerspective then
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Camera.activePerspective.value))
+          ImGuiExt.Text(tostring(CameraData.activePerspective.value))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle's Position:")
-        if Vectors.Vehicle.Position then
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Position.x))
+        if VehicleData.Position then
+          ImGuiExt.Text(tostring(VehicleData.Position.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Position.y))
+          ImGuiExt.Text(tostring(VehicleData.Position.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Position.z))
+          ImGuiExt.Text(tostring(VehicleData.Position.z))
+        end
+
+        ImGui.Separator()
+
+        if VehicleData.Forward then
+          ImGuiExt.Text("Vehicle Forward (x, y, z, w = 0):")
+          ImGuiExt.Text(tostring(VehicleData.Forward.x))
+          ImGuiExt.Text(tostring(VehicleData.Forward.y))
+          ImGuiExt.Text(tostring(VehicleData.Forward.z))
+        end
+  
+        ImGui.Separator()
+  
+        if VehicleData.Right then
+          ImGuiExt.Text("Vehicle Right (x, y, z, w = 0):")
+          ImGuiExt.Text(tostring(VehicleData.Right.x))
+          ImGuiExt.Text(tostring(VehicleData.Right.y))
+          ImGuiExt.Text(tostring(VehicleData.Right.z))
+        end
+  
+        ImGui.Separator()
+        
+        if VehicleData.Up then
+          ImGuiExt.Text("Vehicle Up (x, y, z, w = 0):")
+          ImGuiExt.Text(tostring(VehicleData.Up.x))
+          ImGuiExt.Text(tostring(VehicleData.Up.y))
+          ImGuiExt.Text(tostring(VehicleData.Up.z))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Wheels Positions:")
-        if Vectors.Vehicle.Wheel.Position.Back.Left then
+        if VehicleData.Wheel.Position.Back.Left then
           ImGuiExt.Text("Back Left")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.x))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Left.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.y))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Left.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Left.z))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Left.z))
           ImGuiExt.Text("Back Right")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.x))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Right.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.y))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Right.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Back.Right.z))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Back.Right.z))
           ImGuiExt.Text("Front Left")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.x))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Left.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.y))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Left.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Left.z))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Left.z))
           ImGuiExt.Text("Front Right")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.x))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Right.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.y))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Right.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.Position.Front.Right.z))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.Position.Front.Right.z))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle's Wheelbase:")
-        if Vectors.Vehicle.Wheel.wheelbase then
+        if VehicleData.Wheel.wheelbase then
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.wheelbase))
+          ImGuiExt.Text(tostring(VehicleData.Wheel.wheelbase))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle Axes Midpoints' Positions:")
-        if Vectors.Vehicle.Midpoint.Position.Back then
+        if VehicleData.Midpoint.Position.Back then
           ImGuiExt.Text("Back Wheels' Axis")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.x))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Back.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.y))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Back.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Back.z))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Back.z))
           ImGuiExt.Text("Front Wheels' Axis")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.x))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Front.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.y))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Front.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Front.z))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Front.z))
           ImGuiExt.Text("Left Wheels' Axis")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.x))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Left.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.y))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Left.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Left.z))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Left.z))
           ImGuiExt.Text("Right Wheels' Axis")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.x))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Right.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.y))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Right.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Midpoint.Position.Right.z))
+          ImGuiExt.Text(tostring(VehicleData.Midpoint.Position.Right.z))
         end
 
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle Bumpers Positions:")
-        if Vectors.Vehicle.Bumper.Position.Back then
+        if VehicleData.Bumper.Position.Back then
           ImGuiExt.Text("Back")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.x))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Back.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.y))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Back.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Back.z))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Back.z))
           ImGuiExt.Text("Front")
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.x))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Front.x))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.y))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Front.y))
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.Position.Front.z))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.Position.Front.z))
           ImGuiExt.Text("Distance Between Bumpers:")
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.distance))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.distance))
           ImGuiExt.Text("Bumpers Offset From Wheels:")
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.offset))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.offset))
         end
       else
         ImGuiExt.Text("false")
@@ -301,69 +305,69 @@ function VectorsDebug.DrawUI()
     if ImGui.BeginTabItem("Vectors Screen Space") then
 
       ImGuiExt.Text("Wheels Screen Space Positions:")
-      if Vectors.Vehicle.Wheel.ScreenSpace.Back.Left then
+      if VehicleData.Wheel.ScreenSpace.Back.Left then
         ImGuiExt.Text("Back Left")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.x))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Back.Left.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Left.y))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Back.Left.y))
         ImGuiExt.Text("Back Right")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.x))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Back.Right.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Back.Right.y))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Back.Right.y))
         ImGuiExt.Text("Front Left")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.x))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Front.Left.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Left.y))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Front.Left.y))
         ImGuiExt.Text("Front Right")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.x))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Front.Right.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Wheel.ScreenSpace.Front.Right.y))
+        ImGuiExt.Text(tostring(VehicleData.Wheel.ScreenSpace.Front.Right.y))
       end
 
-      if Vectors.Vehicle.Bumper.ScreenSpace.distance then
+      if VehicleData.Bumper.ScreenSpace.distance then
         ImGui.Separator()
         ImGuiExt.Text("Bumpers Screen Space Distance:")
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distance))
+        ImGuiExt.Text(tostring(VehicleData.Bumper.ScreenSpace.distance))
 
-        if Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation then
+        if VehicleData.Bumper.ScreenSpace.distanceLineRotation then
           ImGuiExt.Text("Distance (Longtitude Axis) Rotation:")
           ImGui.SameLine()
-          ImGuiExt.Text(tostring(Vectors.Vehicle.Bumper.ScreenSpace.distanceLineRotation))
+          ImGuiExt.Text(tostring(VehicleData.Bumper.ScreenSpace.distanceLineRotation))
         end
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Wheels' Axes Screen Data:")
-      if Vectors.Vehicle.Axis.ScreenRotation.back then
+      if VehicleData.Axis.ScreenRotation.back then
         ImGuiExt.Text("Back")
         ImGuiExt.Text("Rotation:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.back))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenRotation.back))
         ImGuiExt.Text("Length:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.back))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenLength.back))
         ImGuiExt.Text("Front")
         ImGuiExt.Text("Rotation:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.front))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenRotation.front))
         ImGuiExt.Text("Length:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.front))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenLength.front))
         ImGuiExt.Text("Left")
         ImGuiExt.Text("Rotation:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.left))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenRotation.left))
         ImGuiExt.Text("Length:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.left))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenLength.left))
         ImGuiExt.Text("Right")
         ImGuiExt.Text("Rotation:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenRotation.right))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenRotation.right))
         ImGuiExt.Text("Length:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.Vehicle.Axis.ScreenLength.right))
+        ImGuiExt.Text(tostring(VehicleData.Axis.ScreenLength.right))
       end
 
       ImGui.EndTabItem()

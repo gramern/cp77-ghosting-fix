@@ -82,7 +82,7 @@ function Translate.SetTranslation(sourceTablePath, key)
     -- defines defaultLocalization table for sake of further steps
     defaultLocalization = LocalizationFallback[key]
   else
-    Globals.Print(Translate.__NAME, LogText.translate_keyNotFound, key, sourceTablePath)
+    Globals.PrintError(Translate.__NAME, LogText.translate_keyNotFound, key, sourceTablePath)
   end
 
   --get current language

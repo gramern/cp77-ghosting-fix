@@ -3,6 +3,8 @@ local Globals = {
   __VERSION = { 5, 0, 0 },
 }
 
+local isDebug = nil
+
 local ModState = {
   isOpenWindow = false,
   isFirstRun = false,
@@ -63,13 +65,244 @@ local FallbackBoard = {}
 local DelayBoard = {}
 
 local Localization = require("Modules/Localization")
-local Settings = require("Modules/Settings")
 
 local LogText = Localization.LogText
 
 -----------
--- Unviersal methods
+-- Globals Debug Mode Setter
 -----------
+
+function Globals.SetDebugMode(isDebugMode)
+  isDebug = isDebugMode
+end
+
+------------------
+-- Mod State
+------------------
+
+-- @return table; The ModState table containg real-time configuration of the mod
+function Globals.GetModStateTable()
+  return ModState
+end
+
+-- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
+--
+-- @return None
+function Globals.SetModReady(isReady)
+  ModState.isReady = isReady
+end
+
+-- @return boolean: `true` if the mod is ready for operation
+function Globals.IsModReady()
+  return ModState.isReady
+end
+
+-- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
+--
+-- @return None
+function Globals.SetFirstRun(isFirstRun)
+  ModState.isFirstRun = isFirstRun
+  if not isFirstRun then return end
+  Globals.SetNewInstall(true)
+  Globals.Print(LogText.globals_firstRun)
+end
+
+-- @return boolean: `true` if this is the first run of the mod
+function Globals.IsFirstRun()
+  return ModState.isFirstRun
+end
+
+-- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
+--
+-- @return None
+function Globals.SetNewInstall(isNewInstall)
+  ModState.isNewInstall = isNewInstall
+  if not isNewInstall or ModState.isFirstRun then return end
+  Globals.Print(LogText.globals_newVersion)
+end
+
+-- @return boolean: `true` if the current installation of the mod is new
+function Globals.IsNewInstall()
+  return ModState.isNewInstall
+end
+
+-- @return boolean: `true` is the mod's window is opened
+function Globals.IsOpenWindow()
+  return ModState.isOpenWindow
+end
+
+-- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
+--
+-- @return None
+function Globals.SetOpenWindow(isOpenWindow)
+  ModState.isOpenWindow = isOpenWindow
+end
+
+------------------
+-- Masking Global
+------------------
+
+-- @return string: the masks controller name
+function Globals.GetMasksController()
+  return MaskingGlobal.masksController
+end
+
+-- @return table; The Widgets table containing masks' widgets names from the mod's global masking configuration
+function Globals.GetWidgetsTable()
+  return MaskingGlobal.Widgets
+end
+
+-----------
+-- Screen Configuration
+-----------
+
+-- @return table; The Screen table containg current screen info and configuration
+function Globals.GetScreenTable()
+  return Screen
+end
+
+-- @param None
+--
+-- @return number; The current aspect ratio of the screen. Updates `Screen.aspectRatio`, `Screen.isAspectRatioChange` and `Screen.Resolution` internally.
+function Globals.GetAspectRatio()
+  local previousAspectRatio = Screen.aspectRatio
+
+  Screen.Resolution.width, Screen.Resolution.height = GetDisplayResolution();
+  Screen.aspectRatio = Screen.Resolution.width / Screen.Resolution.height
+
+  if previousAspectRatio == 1 then return Screen.aspectRatio end
+
+  if Screen.aspectRatio ~= previousAspectRatio then
+    Screen.isAspectRatioChange = true
+    Globals.SetModReady(false)
+    Globals.Print(LogText.globals_aspectRatioChange)
+  end
+
+  return Screen.aspectRatio
+end
+
+function Globals.IsAspectRatioChange()
+  return Screen.isAspectRatioChange
+end
+
+function Globals.ResetAspectRatioChange()
+  Screen.isAspectRatioChange = false
+end
+
+-- @param None
+--
+-- @return enum; Updates `Screen.type` internally.
+function Globals.GetScreenType()
+  local screenAspectRatio = Screen.aspectRatio
+
+  if screenAspectRatio < 1.5 then
+    Screen.type = 43
+  elseif screenAspectRatio >= 1.5 and screenAspectRatio < 1.7 then
+    Screen.type = 1610
+  elseif screenAspectRatio >= 1.7 and screenAspectRatio < 2.2 then
+    Screen.type = 169
+  elseif screenAspectRatio >= 2.2 and screenAspectRatio < 3.4 then
+    Screen.type = 219
+  elseif screenAspectRatio >= 3.4 then
+    Screen.type = 329
+  end
+
+  return Screen.type
+end
+
+-- @param None
+--
+-- @return string; Updates `Screen.typeName` internally.
+function Globals.GetScreenTypeName()
+  local screenType = Screen.type
+
+  if screenType == 169 then
+    Screen.typeName = "16:9"
+  elseif screenType == 1610 then
+    Screen.typeName = "16:10"
+  elseif screenType == 219 then
+    Screen.typeName = "21:9"
+  elseif screenType == 329 then
+    Screen.typeName = "32:9"
+  elseif screenType == 43 then
+    Screen.typeName = "4:3"
+  end
+
+  return Screen.typeName
+end
+
+-- @param None
+--
+-- @return number; Returns the screen width factor based on the current screen type. Updates `Screen.Factor.width` internally.
+function Globals.GetScreenWidthFactor()
+  local screenType = Screen.type
+
+  if screenType == 169 or screenType == 1610 or screenType == 43 then
+    Screen.Factor.width = Screen.Def.Factor.width
+  elseif screenType == 219 then
+    Screen.Factor.width = 1.34
+  elseif screenType == 329 then
+    Screen.Factor.width = 2
+  end
+
+  return Screen.Factor.width
+end
+
+-- @param None
+--
+-- @return table; Returns the screen space dimensions based on the current screen type. Updates `Screen.Space` internally.
+function Globals.GetScreenSpace()
+  local screenType = Screen.type
+  local screenResDef = Screen.Def.Resolution
+  local screenFactor = Screen.Factor
+
+  if screenType == 169 or screenType == 1610 or screenType == 43 then
+    Screen.Space.width = Screen.Def.Space.width
+  elseif screenType == 219 or screenType == 329 then
+    Screen.Space.width = screenResDef.width * screenFactor.width
+  end
+
+  return Screen.Space
+end
+
+-- @param None
+--
+-- @return table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates `Screen.Edge` internally.
+function Globals.GetScreenEdge()
+  local screenType = Screen.type
+  local screenEdge = Screen.Edge
+
+  if screenType == 169 then
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2160
+  elseif screenType == 1610 then
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2280
+  elseif screenType == 219 then
+    screenEdge.left = -640
+    screenEdge.right = 4480
+    screenEdge.down = 2160
+  elseif screenType == 329 then
+    screenEdge.left = -1920
+    screenEdge.right = 5760
+    screenEdge.down = 2160
+  elseif screenType == 43 then
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2640
+  end
+
+  return screenEdge
+end
+
+------------------
+-- Unviersal methods
+------------------
+
+------------------
+-- Tables 
 
 --- Creates a deep copy of the given contents. For non-table values, it returns the original value.
 --
@@ -147,6 +380,9 @@ function Globals.MergeTables(mergeTo, mergeA)
   return mergeTo
 end
 
+------------------
+-- Printing
+
 --- Prints a formatted message with an optional module name and variable number of content items.
 --
 -- @param `moduleName`: string | nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
@@ -185,7 +421,7 @@ end
 --
 -- @return None
 function Globals.PrintDebug(moduleName, ...)
-  if not Settings.IsDebug() then return end
+  if not isDebug then return end
 
   local modError = "[" .. FrameGenGhostingFix.__NAME .. "]" .. " [Debug]"
   local module = ""
@@ -306,7 +542,8 @@ function Globals.GetWhiteBoard(moduleName,key)-- TO BE DELETED ONCE PRESETS ARE 
   end-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
 end-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
 
-------------
+------------------
+-- Fallbacks
 
 --- Sets a fallback value for a specified owner, optionally with a key.
 -- This function stores a deep copy of the provided contents in the FallbackBoard,
@@ -349,6 +586,9 @@ function Globals.GetFallback(owner,key)
     return FallbackBoard[owner]
   end
 end
+
+------------------
+-- Delays
 
 -- @param `key`: string; A unique identifier for the delay to be cancelled.
 --
@@ -414,236 +654,9 @@ function Globals.UpdateDelays(gameDeltaTime)
   end
 end
 
--- @return table; The ModState table containg real-time configuration of the mod
-function Globals.GetModStateTable()
-  return ModState
-end
-
--- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
---
--- @return None
-function Globals.SetModReady(isReady)
-  ModState.isReady = isReady
-end
-
--- @return boolean: `true` if the mod is ready for operation
-function Globals.IsModReady()
-  return ModState.isReady
-end
-
--- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
---
--- @return None
-function Globals.SetFirstRun(isFirstRun)
-  ModState.isFirstRun = isFirstRun
-  if not isFirstRun then return end
-  Globals.SetNewInstall(true)
-  Globals.Print(LogText.globals_firstRun)
-end
-
--- @return boolean: `true` if this is the first run of the mod
-function Globals.IsFirstRun()
-  return ModState.isFirstRun
-end
-
--- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
---
--- @return None
-function Globals.SetNewInstall(isNewInstall)
-  ModState.isNewInstall = isNewInstall
-  if not isNewInstall or ModState.isFirstRun then return end
-  Globals.Print(LogText.globals_newVersion)
-end
-
--- @return boolean: `true` if the current installation of the mod is new
-function Globals.IsNewInstall()
-  return ModState.isNewInstall
-end
-
--- @return boolean: `true` is the mod's window is opened
-function Globals.IsOpenWindow()
-  return ModState.isOpenWindow
-end
-
--- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
---
--- @return None
-function Globals.SetOpenWindow(isOpenWindow)
-  ModState.isOpenWindow = isOpenWindow
-end
-
-
--- @return string: the masks controller name
-function Globals.GetMasksController()
-  return MaskingGlobal.masksController
-end
-
--- @return table; The Widgets table containing masks' widgets names from the mod's global masking configuration
-function Globals.GetWidgetsTable()
-  return MaskingGlobal.Widgets
-end
-
--- @return table; The Screen table containg current screen info and configuration
-function Globals.GetScreenTable()
-  return Screen
-end
-
------------
--- Screen Configuration
------------
-
---- Calculates and updates the screen aspect ratio, detecting changes.
---
--- @param None
---
--- @return number; The current aspect ratio of the screen. Updates `Screen.aspectRatio`, `Screen.isAspectRatioChange` and `Screen.Resolution` internally.
-function Globals.GetAspectRatio()
-  local previousAspectRatio = Screen.aspectRatio
-
-  Screen.Resolution.width, Screen.Resolution.height = GetDisplayResolution();
-  Screen.aspectRatio = Screen.Resolution.width / Screen.Resolution.height
-
-  if previousAspectRatio == 1 then return Screen.aspectRatio end
-
-  if Screen.aspectRatio ~= previousAspectRatio then
-    Screen.isAspectRatioChange = true
-    Globals.SetModReady(false)
-    Globals.Print(LogText.globals_aspectRatioChange)
-  end
-
-  return Screen.aspectRatio
-end
-
-function Globals.IsAspectRatioChange()
-  return Screen.isAspectRatioChange
-end
-
-function Globals.ResetAspectRatioChange()
-  Screen.isAspectRatioChange = false
-end
-
---- Determines and returns the screen type enum based on the current aspect ratio.
---
--- @param None
---
--- @return enum; Updates `Screen.type` internally.
-function Globals.GetScreenType()
-  local screenAspectRatio = Screen.aspectRatio
-
-  if screenAspectRatio < 1.5 then
-    Screen.type = 43
-  elseif screenAspectRatio >= 1.5 and screenAspectRatio < 1.7 then
-    Screen.type = 1610
-  elseif screenAspectRatio >= 1.7 and screenAspectRatio < 2.2 then
-    Screen.type = 169
-  elseif screenAspectRatio >= 2.2 and screenAspectRatio < 3.4 then
-    Screen.type = 219
-  elseif screenAspectRatio >= 3.4 then
-    Screen.type = 329
-  end
-
-  return Screen.type
-end
-
---- Retrieves the string name of the current screen type.
---
--- @param None
---
--- @return string; Updates `Screen.typeName` internally.
-function Globals.GetScreenTypeName()
-  local screenType = Screen.type
-
-  if screenType == 169 then
-    Screen.typeName = "16:9"
-  elseif screenType == 1610 then
-    Screen.typeName = "16:10"
-  elseif screenType == 219 then
-    Screen.typeName = "21:9"
-  elseif screenType == 329 then
-    Screen.typeName = "32:9"
-  elseif screenType == 43 then
-    Screen.typeName = "4:3"
-  end
-
-  return Screen.typeName
-end
-
---- Determines and returns the screen width factor based on the current screen type.
---
--- @param None
---
--- @return number; Updates `Screen.Factor.width` internally.
-function Globals.GetScreenWidthFactor()
-  local screenType = Screen.type
-
-  if screenType == 169 or screenType == 1610 or screenType == 43 then
-    Screen.Factor.width = Screen.Def.Factor.width
-  elseif screenType == 219 then
-    Screen.Factor.width = 1.34
-  elseif screenType == 329 then
-    Screen.Factor.width = 2
-  end
-
-  return Screen.Factor.width
-end
-
---- Calculates and returns the screen space dimensions based on the current screen type.
---
--- @param None
---
--- @return table; Updates `Screen.Space` internally.
-function Globals.GetScreenSpace()
-  local screenType = Screen.type
-  local screenResDef = Screen.Def.Resolution
-  local screenFactor = Screen.Factor
-
-  if screenType == 169 or screenType == 1610 or screenType == 43 then
-    Screen.Space.width = Screen.Def.Space.width
-  elseif screenType == 219 or screenType == 329 then
-    Screen.Space.width = screenResDef.width * screenFactor.width
-  end
-
-  return Screen.Space
-end
-
-
---- Determines and returns the screen edge coordinates based on the current screen type.
---
--- @param None
---
--- @return table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates `Screen.Edge` internally.
-function Globals.GetScreenEdge()
-  local screenType = Screen.type
-  local screenEdge = Screen.Edge
-
-  if screenType == 169 then
-    screenEdge.left = 0
-    screenEdge.right = 3840
-    screenEdge.down = 2160
-  elseif screenType == 1610 then
-    screenEdge.left = 0
-    screenEdge.right = 3840
-    screenEdge.down = 2280
-  elseif screenType == 219 then
-    screenEdge.left = -640
-    screenEdge.right = 4480
-    screenEdge.down = 2160
-  elseif screenType == 329 then
-    screenEdge.left = -1920
-    screenEdge.right = 5760
-    screenEdge.down = 2160
-  elseif screenType == 43 then
-    screenEdge.left = 0
-    screenEdge.right = 3840
-    screenEdge.down = 2640
-  end
-
-  return screenEdge
-end
-
------------
--- On... handlers
------------
+------------------
+-- On... registers
+------------------
 
 function Globals.OnInitialize()
   Globals.GetAspectRatio()

@@ -20,9 +20,9 @@ local popRed, popGreen, popBlue, popAlpha = 1, 0.85, 0.31, 1
 local baseRed, baseGreen, baseBlue, baseAlpha = 1, 0.78, 0, 1
 local dimRed, dimGreen, dimBlue, dimAlpha = 0.73, 0.56, 0, 1
 
------------
+------------------
 -- Draw widgets
------------
+------------------
 
 --- Draws a checkbox in the mod's theme.
 --
@@ -63,9 +63,9 @@ function ImGuiExt.StatusBar(string)
   ImGuiExt.Text(string)
 end
 
------------
+------------------
 -- Draw text
------------
+------------------
 
 --- Draws text in in the mod's theme with an option for text wrapping.
 --
@@ -144,9 +144,9 @@ function ImGuiExt.TextColor(string, red, green, blue, alpha, wrap)
   ImGui.PopStyleColor()
 end
 
------------
+------------------
 -- Unviersal methods
------------
+------------------
 
 --- Wraps text to a specified line length. Doesn't draw text. Use for the line's length control only, otherwise use boolean wrap for ImGuiExt methods.
 --
@@ -176,9 +176,9 @@ function ImGuiExt.WrapText(string, lineLength)
   return wrappedString
 end
 
------------
+------------------
 -- Status bar logic
------------
+------------------
 
 -- Table to store current text of the mod's status bar.
 local Status = {
@@ -219,9 +219,9 @@ function ImGuiExt.GetStatusBar()
   return Status.bar
 end
 
------------
+------------------
 -- OnDraw methods
------------
+------------------
 
 --- Pushes the mod's style to the UI elements.
 --
@@ -268,9 +268,9 @@ function ImGuiExt.PopStyle()
   ImGui.PopStyleVar(1)
 end
 
------------
--- On... handlers
------------
+------------------
+-- On... registers
+------------------
 
 function ImGuiExt.OnOverlayOpen()
   -- Refresh UIText reference

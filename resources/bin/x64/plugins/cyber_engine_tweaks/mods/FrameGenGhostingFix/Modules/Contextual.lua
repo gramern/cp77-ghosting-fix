@@ -525,7 +525,7 @@ function Contextual.OnInitialize()
   LoadUserSettings()
 
   -- Turn on debug mode during development
-  Settings.SetDebug(true)
+  Settings.SetDebugMode(true)
 
   -- Get the current FG state whenever mod is loaded or reloaded from CET
   Contextual.FGEnabled = GetFrameGenState()
@@ -882,10 +882,6 @@ function Contextual.OnOverlayOpen()
   -- end
 end
 
-function Contextual.OnOverlayClose()
-  SaveUserSettings()
-end
-
 function Contextual.DrawUI()
 
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle, menuToggle
@@ -911,33 +907,33 @@ function Contextual.DrawUI()
 
     Contextual.Toggles.Vehicle.Static, isVehicleStaticToggled = ImGuiExt.Checkbox("Static", Contextual.Toggles.Vehicle.Static, isVehicleStaticToggled)
     if isVehicleStaticToggled then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetVehicleStatic(Contextual.Toggles.Vehicle.Static)
     end
 
     Contextual.Toggles.Vehicle.Driving, isVehicleDrivingToggled = ImGuiExt.Checkbox("Driving", Contextual.Toggles.Vehicle.Driving, isVehicleDrivingToggled)
     if isVehicleDrivingToggled then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetVehicleDriving(Contextual.Toggles.Vehicle.Driving)
     end
 
     Contextual.Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled = ImGuiExt.Checkbox("Static Combat (Weapon Drawn)", Contextual.Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled)
     if isVehicleStaticCombatToggled then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetVehicleStaticCombat(Contextual.Toggles.Vehicle.StaticCombat)
     end
 
     Contextual.Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled = ImGuiExt.Checkbox("Driving Combat (Weapon Drawn)", Contextual.Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled)
     if isVehicleDrivingCombatToggled then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetVehicleDrivingCombat(Contextual.Toggles.Vehicle.DrivingCombat)
     end
 
-    Settings.SetSaved(false)
+    SaveUserSettings()
     ImGuiExt.SetStatusBar(UIText.General.settings_saved)
 
     ImGui.Separator()
@@ -946,70 +942,70 @@ function Contextual.DrawUI()
 
     Contextual.Toggles.Standing, standingToggle = ImGuiExt.Checkbox("Standing", Contextual.Toggles.Standing, standingToggle)
     if standingToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetStanding(Contextual.Toggles.Standing)
     end
 
     Contextual.Toggles.Walking, walkingToggle = ImGuiExt.Checkbox("Walking (Default)", Contextual.Toggles.Walking, walkingToggle)
     if walkingToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetWalking(Contextual.Toggles.Walking)
     end
 
     Contextual.Toggles.SlowWalking, slowWalkingToggle = ImGuiExt.Checkbox("Slow Walking (Toggle walking)", Contextual.Toggles.SlowWalking, slowWalkingToggle)
     if slowWalkingToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetSlowWalking(Contextual.Toggles.SlowWalking)
     end
 
     Contextual.Toggles.Sprinting, sprintingToggle = ImGuiExt.Checkbox("Sprinting", Contextual.Toggles.Sprinting, sprintingToggle)
     if sprintingToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetSprinting(Contextual.Toggles.Sprinting)
     end
 
     Contextual.Toggles.Swimming, swimmingToggle = ImGuiExt.Checkbox("Swimming", Contextual.Toggles.Swimming, swimmingToggle)
     if swimmingToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetSwimming(Contextual.Toggles.Swimming)
     end
 
     Contextual.Toggles.Combat, combatToggle = ImGuiExt.Checkbox("Combat (Alert Status)", Contextual.Toggles.Combat, combatToggle)
     if combatToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetCombat(Contextual.Toggles.Combat)
     end
 
     Contextual.Toggles.Braindance, braindanceToggle = ImGuiExt.Checkbox("Braindance", Contextual.Toggles.Braindance, braindanceToggle)
     if braindanceToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetBraindance(Contextual.Toggles.Braindance)
     end
 
     Contextual.Toggles.Cinematic, cinematicToggle = ImGuiExt.Checkbox("Cinematic", Contextual.Toggles.Cinematic, cinematicToggle)
     if cinematicToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetCinematic(Contextual.Toggles.Cinematic)
     end
 
     Contextual.Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox("Photo Mode", Contextual.Toggles.Photomode, photoModeToggle)
     if photoModeToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetPhotoMode(Contextual.Toggles.Photomode)
     end
 
     Contextual.Toggles.Menu, menuToggle = ImGuiExt.Checkbox("Menus", Contextual.Toggles.Menu, menuToggle)
     if menuToggle then
-      Settings.SetSaved(false)
+      SaveUserSettings()
       ImGuiExt.SetStatusBar(UIText.General.settings_saved)
       SetMenu(Contextual.Toggles.Menu)
     end
