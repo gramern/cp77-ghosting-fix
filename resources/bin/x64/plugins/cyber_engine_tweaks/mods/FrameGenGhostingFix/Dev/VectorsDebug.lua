@@ -4,11 +4,13 @@ local VectorsDebug = {
 }
 
 local ImGuiExt = require("Modules/ImGuiExt")
+local Tracker = require("Modules/Tracker")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local CameraData = Vectors.GetCameraData()
 local VehicleData = Vectors.GetVehicleData()
+local VehMasksData = Vectors.GetVehMasksData()
 
 function VectorsDebug.DrawUI()
   if Vectors or VectorsCustomize then
@@ -37,15 +39,15 @@ function VectorsDebug.DrawUI()
 
       ImGuiExt.Text("Masks Paths:")
 
-      if Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath then
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedFillPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.MaskEditor1.maskPath))
+      if VehMasksData.HorizontalEdgeDown.hedCornersPath then
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedCornersPath))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedFillPath))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedTrackerPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.MaskEditor1.maskPath))
       end
 
       ImGui.Separator()
@@ -127,14 +129,14 @@ function VectorsDebug.DrawUI()
 
       ImGuiExt.Text("Is in a Vehicle:")
       ImGui.SameLine()
-      if VehicleData.isMounted then
-        if VehicleData.vehicleBaseObject == 0 then
+      if Tracker.IsVehicleMounted() then
+        if Tracker.GetVehicleBaseObject() == 0 then
           ImGuiExt.Text("bike")
-        elseif VehicleData.vehicleBaseObject == 1 then
+        elseif Tracker.GetVehicleBaseObject() == 1 then
           ImGuiExt.Text("car")
-        elseif VehicleData.vehicleBaseObject == 2 then
+        elseif Tracker.GetVehicleBaseObject() == 2 then
           ImGuiExt.Text("tank")
-        elseif VehicleData.vehicleBaseObject == 3 then
+        elseif Tracker.GetVehicleBaseObject() == 3 then
           ImGuiExt.Text("AV")
         else
           ImGuiExt.Text("unknown")
@@ -149,14 +151,12 @@ function VectorsDebug.DrawUI()
         ImGui.Separator()
 
         ImGuiExt.Text("Vehicle Current Speed:")
-        if VehicleData.currentSpeed then
-          ImGui.SameLine()
-          ImGuiExt.Text(tostring(VehicleData.currentSpeed))
-        end
+        ImGui.SameLine()
+        ImGuiExt.Text(tostring(Tracker.GetVehicleSpeed()))
 
         ImGuiExt.Text("Is Vehicle Moving:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(VehicleData.isMoving))
+        ImGuiExt.Text(tostring(Tracker.IsVehicleMoving()))
 
         ImGui.Separator()
 
@@ -376,55 +376,55 @@ function VectorsDebug.DrawUI()
     if ImGui.BeginTabItem("Vectors Masks") then
 
       ImGuiExt.Text("Current HED Opacity:")
-      if Vectors.VehMasks.HorizontalEdgeDown.Opacity.value then
+      if VehMasksData.HorizontalEdgeDown.Opacity.value then
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Opacity.value))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Opacity.value))
       end
 
       ImGuiExt.Text("Current HED Tracker Opacity:")
-      if Vectors.VehMasks.HorizontalEdgeDown.Opacity.tracker then
+      if VehMasksData.HorizontalEdgeDown.Opacity.tracker then
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Opacity.tracker))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Opacity.tracker))
       end
 
       ImGuiExt.Text("HED Fill Toggle Value:")
-      if Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue then
+      if VehMasksData.HorizontalEdgeDown.Visible.fillToggleValue then
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Visible.fillToggleValue))
       end
 
       ImGuiExt.Text("Current Masks Opacities:")
-      if Vectors.VehMasks.Opacity.value then
+      if VehMasksData.Opacity.value then
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Opacity.value))
+        ImGuiExt.Text(tostring(VehMasksData.Opacity.value))
         ImGuiExt.Text("Mask 1")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.opacity))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.opacity))
         ImGuiExt.Text("Mask 2")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.opacity))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.opacity))
         ImGuiExt.Text("Mask 3")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.opacity))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.opacity))
         ImGuiExt.Text("Mask 4")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.opacity))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.opacity))
       end
 
       ImGuiExt.Text("Opacity Gain:")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Vectors.VehMasks.Opacity.Def.gain))
+      ImGuiExt.Text(tostring(VehMasksData.Opacity.Def.gain))
 
-      if Vectors.VehMasks.Opacity.delayTime then
+      if VehMasksData.Opacity.delayTime then
         ImGuiExt.Text("Opacity Transformation Delay Time:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Opacity.delayTime))
+        ImGuiExt.Text(tostring(VehMasksData.Opacity.delayTime))
         ImGuiExt.Text("Is Opacity Normalized:")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Opacity.isNormalized))
+        ImGuiExt.Text(tostring(VehMasksData.Opacity.isNormalized))
 
-        if not Vectors.VehMasks.Opacity.isNormalized then
-          ImGuiExt.Text(tostring(Vectors.VehMasks.Opacity.normalizedValue))
+        if not VehMasksData.Opacity.isNormalized then
+          ImGuiExt.Text(tostring(VehMasksData.Opacity.normalizedValue))
         end
       end
 
@@ -432,81 +432,81 @@ function VectorsDebug.DrawUI()
 
       ImGuiExt.Text("HED Fill Lock:")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock))
+      ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Visible.Def.fillLock))
 
       ImGuiExt.Text("HED Tracker Position:")
-      if Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker then
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.x))
+      if VehMasksData.HorizontalEdgeDown.ScreenSpace.Tracker then
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.ScreenSpace.Tracker.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.ScreenSpace.Tracker.y))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.ScreenSpace.Tracker.y))
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Masks Positions:")
-      if Vectors.VehMasks.Mask1.Position then
+      if VehMasksData.Mask1.Position then
         ImGuiExt.Text("Mask1")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.Position.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.Position.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.Position.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.Position.y))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.Position.z))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.Position.z))
         ImGuiExt.Text("Mask2")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.Position.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.Position.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.Position.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.Position.y))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.Position.z))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.Position.z))
         ImGuiExt.Text("Mask3")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.Position.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.Position.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.Position.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.Position.y))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.Position.z))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.Position.z))
         ImGuiExt.Text("Mask4")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.Position.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.Position.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.Position.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.Position.y))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.Position.z))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.Position.z))
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Vehicles HED Mask Size:")
-      if Vectors.VehMasks.HorizontalEdgeDown.Size.x then
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.x))
+      if VehMasksData.HorizontalEdgeDown.Size.x then
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Size.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.y))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Size.y))
       end
 
       ImGuiExt.Text("HED Size Lock:")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock))
+      ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Size.Def.lock))
 
       ImGuiExt.Text("HED Tracker Size (x, y):")
-      if Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker then
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.x))
+      if VehMasksData.HorizontalEdgeDown.Size.Tracker then
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Size.Tracker.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.Size.Tracker.y))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.Size.Tracker.y))
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Masks Sizes:")
-      if Vectors.VehMasks.Mask1.Size.x then
+      if VehMasksData.Mask1.Size.x then
         ImGuiExt.Text("Mask1 (x, y)")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.Size.x))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.Size.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.Size.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.Size.y))
         ImGuiExt.Text("Mask2 (x, y)")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.Size.x))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.Size.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.Size.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.Size.y))
         ImGuiExt.Text("Mask3 (x, y)")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.Size.x))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.Size.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.Size.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.Size.y))
         ImGuiExt.Text("Mask4 (x, y)")
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.Size.x))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.Size.y))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.Size.x))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.Size.y))
       end
 
       ImGui.EndTabItem()

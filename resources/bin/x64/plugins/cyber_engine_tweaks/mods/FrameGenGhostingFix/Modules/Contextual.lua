@@ -42,7 +42,7 @@ local UserSettings = {}
 
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
-local Vectors = require("Modules/Vectors")
+local Tracker = require("Modules/Tracker")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 
@@ -335,7 +335,7 @@ end
 
 local function SetVehicleStaticCombat(feature)
   local playerVehicle = GetPlayerVehicle()
-  if Contextual.CurrentStates.isVehicleStaticCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and not Vectors.Shared.isMovingVehicle) then
+  if Contextual.CurrentStates.isVehicleStaticCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and not Tracker.IsVehicleMoving()) then
     if not ShouldAffectFGState("Vehicle.StaticCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -347,7 +347,7 @@ end
 
 local function SetVehicleDrivingCombat(feature)
   local playerVehicle = GetPlayerVehicle()
-  if Contextual.CurrentStates.isDrivingCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and Vectors.Shared.isMovingVehicle) then
+  if Contextual.CurrentStates.isDrivingCombat or (playerVehicle and IsPlayerInVehicleCombat(playerVehicle) and Tracker.IsVehicleMoving()) then
     if not ShouldAffectFGState("Vehicle.DrivingCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -472,7 +472,7 @@ end
 
 function HandleStaticAndDrivingStates()
 
-  if Vectors.Shared.isMovingVehicle then
+  if Tracker.IsVehicleMoving() then
     Contextual.CurrentStates.isVehicleStatic = false
     Contextual.CurrentStates.isVehicleDriving = true
   else

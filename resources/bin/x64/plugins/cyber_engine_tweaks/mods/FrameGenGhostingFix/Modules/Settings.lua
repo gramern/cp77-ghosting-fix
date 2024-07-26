@@ -18,7 +18,24 @@ local Localization = require("Modules/Localization")
 
 local LogText = Localization.LogText
 
+------------------
+-- Save To File Reqests
+------------------
+
 local isSaveRequest = nil
+
+-- @return boolean: `true` if Settings are set to save user_settings.json OnOverlayClose
+function Settings.IsSaveRequest()
+  return isSaveRequest
+end
+
+local function ResetSaveRequest()
+  isSaveRequest = false
+end
+
+local function SaveRequest()
+  isSaveRequest = true
+end
 
 ------------------
 -- Mod Settings
@@ -129,25 +146,14 @@ end
 -- UserSettings
 ------------------
 
--- @return boolean: `true` if Settings are set to save user_settings.json OnOverlayClose
-function Settings.IsSaveRequest()
-  return isSaveRequest
-end
-
-local function ResetSaveRequest()
-  isSaveRequest = false
-end
-
-function SaveRequest()
-  isSaveRequest = true
-end
-
+--- Writes to the UserSettings table and sets a global save reqest to the file on CET overlay close.
+--
 -- @param `moduleName`: string; The name of the module for which settings are being written.
 -- @param `contents`: table; The settings to be written for the module.
 --
--- @return None
+-- @return None; 
 function Settings.WriteUserSettings(moduleName, contents)
-  if not moduleName or not contents then Globals.Print("Can't write to user settings") return end --debug
+  if not moduleName or not contents then Globals.PrintDebug(Settings.__NAME, "Can't write to user settings") return end --debug
 
   local copiedContents = Globals.Deepcopy(contents)
 
@@ -165,8 +171,12 @@ function Settings.GetUserSettings(moduleName)
   return UserSettings[moduleName]
 end
 
+------------------
+-- File Handling
+------------------
+
 -- @return None
-function Settings.LoadFile()
+local function LoadFile()
   local file = io.open("user_settings.json", "r")
 
   if file then
@@ -182,9 +192,9 @@ function Settings.LoadFile()
 end
 
 -- @return None
-function Settings.SaveFile()
-  if not isSaveRequest then return end
-  if UserSettings == nil then Globals.Print(Settings.__NAME,LogText.settings_notSavedToFile) return end
+local function SaveFile()
+  if not isSaveRequest then return end -- file won't be saved without change to the UserSettings table
+  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME,LogText.settings_notSavedToFile) return end
 
   SaveModSettings()
 
@@ -203,12 +213,16 @@ function Settings.SaveFile()
   end
 end
 
+------------------
+-- On... registers
+------------------
+
 function Settings.OnInitialize()
-  Settings.LoadFile()
+  LoadFile()
 end
 
 function Settings.OnOverlayClose()
-  Settings.SaveFile()
+  SaveFile()
 end
 
 return Settings

@@ -82,6 +82,16 @@ end
 -- Global Specific Getters
 ------------------
 
+-- @return number;
+function Tracker.GetCurrentFPS()
+  return GamePerf.currentFps
+end
+
+-- @return number;
+function Tracker.GetGameDeltaTime()
+  return GamePerf.gameDeltaTime
+end
+
 -- @return boolean: `true` if player or vehicle are tracked (monitored)
 function Tracker.IsGameReady()
   return GameState.isGameLoaded and not (GameState.isGamePaused or GameState.isPreGame)

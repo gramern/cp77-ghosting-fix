@@ -13,6 +13,8 @@ local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local ModState = Globals.GetModStateTable()
 local Screen = Globals.GetScreenTable()
+local VehMasksData = Vectors.GetVehMasksData()
+
 
 function Debug.DrawUI()
   if ImGui.BeginTabItem("General Data") then
@@ -88,15 +90,15 @@ function Debug.DrawUI()
 
       ImGuiExt.Text("Masks Paths:")
 
-      if Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath then
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedCornersPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedFillPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.HorizontalEdgeDown.hedTrackerPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask1.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask2.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask3.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.Mask4.maskPath))
-        ImGuiExt.Text(tostring(Vectors.VehMasks.MaskEditor1.maskPath))
+      if VehMasksData.HorizontalEdgeDown.hedCornersPath then
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedCornersPath))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedFillPath))
+        ImGuiExt.Text(tostring(VehMasksData.HorizontalEdgeDown.hedTrackerPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask1.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask2.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask3.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.Mask4.maskPath))
+        ImGuiExt.Text(tostring(VehMasksData.MaskEditor1.maskPath))
       end
     end
 

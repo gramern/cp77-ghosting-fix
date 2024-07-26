@@ -55,9 +55,6 @@ local Screen = {
   typeName = "16:9",
 }
 
--- --stores data that is shared between modules
-local WhiteBoard = {}
-
 --stores exlusive fallbacks for any module
 local FallbackBoard = {}
 
@@ -512,35 +509,6 @@ function Globals.VersionCompare(versionTable)
 
   return true
 end
-
-------------
-
--- writes to WhiteBoard for the module name under a key if one is given -- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-function Globals.WriteWhiteBoard(moduleName,contents,key)-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  if moduleName and not contents then Globals.Print(moduleName, "Can't write to the mod's WhiteBoard, check the code...") end --debug-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  if not moduleName or not contents then Globals.Print("Can't write to the mod's WhiteBoard, check the code...") end --debug-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-
-  local copiedContents = Globals.Deepcopy(contents)-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-
-  if key then-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-    WhiteBoard[moduleName] = WhiteBoard[moduleName] or {}-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-    WhiteBoard[moduleName][key] = copiedContents-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  else
-    WhiteBoard[moduleName] = copiedContents-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  end
-end
-
--- returns a table from WhiteBoard for the module name and key
-function Globals.GetWhiteBoard(moduleName,key)-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  if WhiteBoard[moduleName] == nil then Globals.Print(moduleName, "There's no pool in the mod's WhiteBoard for the given moduleName.") end --debug-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  if key and WhiteBoard[moduleName][key] == nil then Globals.Print(moduleName, "There's no pool in the mod's WhiteBoard for the given module name and key:", key) end --debug-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-
-  if key then-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-    return WhiteBoard[moduleName][key]-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  else-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-    return WhiteBoard[moduleName]-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-  end-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
-end-- TO BE DELETED ONCE PRESETS ARE ACCESSIBLE FROM THE PRESETS MODULE
 
 ------------------
 -- Fallbacks

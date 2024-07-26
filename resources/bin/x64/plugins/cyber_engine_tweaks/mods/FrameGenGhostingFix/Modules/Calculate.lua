@@ -140,7 +140,7 @@ end
 --other getters
 
 function Calculate.GetCornersScreenSpace()
-  return  Calculate.Corners.ScreenSpace
+  return Calculate.Corners.ScreenSpace
 end
 
 function Calculate.GetBlockerSize()
@@ -467,7 +467,10 @@ function Calculate.TurnOffLiveView()
   end
 end
 
---Local UI
+------------------
+-- Local UI
+------------------
+
 local cornersOnWeaponToggle
 local blockerOnAimToggle
 local vignetteOnAimToggle

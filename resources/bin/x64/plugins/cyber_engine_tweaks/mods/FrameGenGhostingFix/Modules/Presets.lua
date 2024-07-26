@@ -15,6 +15,8 @@ local Presets = {
   }
 }
 
+local LoadedPreset = {}
+
 local UserSettings = {}
 
 local Globals = require("Modules/Globals")
@@ -30,6 +32,22 @@ local Translate = require("Modules/Translate")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
+------------------
+-- UserSettings
+------------------
+
+local function GetUserSettings()
+  UserSettings = {
+    selectedPreset = Presets.selectedPreset
+  }
+
+  return UserSettings
+end
+
+local function SaveUserSettings()
+  Settings.WriteUserSettings("Presets", GetUserSettings())
+end
+
 function Presets.LoadJSON(filename)
   local content = {}
 
@@ -41,6 +59,10 @@ function Presets.LoadJSON(filename)
 
   return content
 end
+
+------------------
+-- Presets management
+------------------
 
 function Presets.AddPreset(presetInfo, id, filename)
   -- Skip if List is already populated with the same preset
@@ -110,23 +132,11 @@ function Presets.LoadPreset()
   local loadedPreset = Presets.LoadJSON(presetPath)
 
   if loadedPreset then
-    Globals.WriteWhiteBoard("Presets", loadedPreset)
+    LoadedPreset = Globals.Deepcopy(loadedPreset)
+    Vectors.ApplyPreset(LoadedPreset)
   end
 
-  Presets.SaveUserSettings()
-
-end
-
-function Presets.GetUserSettings()
-  UserSettings = {
-    selectedPreset = Presets.selectedPreset
-  }
-
-  return UserSettings
-end
-
-function Presets.SaveUserSettings()
-  Settings.WriteUserSettings("Presets", Presets.GetUserSettings())
+  SaveUserSettings()
 end
 
 function Presets.OnInitialize()
@@ -134,6 +144,10 @@ function Presets.OnInitialize()
   Presets.GetPresets()
   Presets.LoadPreset()
 end
+
+------------------
+-- On... registers
+------------------
 
 function Presets.OnOverlayOpen()
   -- Refresh UIText
@@ -146,7 +160,10 @@ function Presets.OnOverlayOpen()
   end
 end
 
+------------------
 -- Local UI
+------------------
+
 function Presets.DrawUI()
   if ImGui.BeginTabItem(UIText.Vehicles.tabname) then
 
@@ -179,7 +196,6 @@ function Presets.DrawUI()
     ImGui.SameLine()
     if ImGui.Button("   " .. UIText.General.apply .. "   ") then
       Presets.LoadPreset()
-      Vectors.ApplyPreset()
 
       ImGuiExt.SetStatusBar(UIText.General.settings_applied_veh)
     end
@@ -201,7 +217,7 @@ function Presets.DrawUI()
     if Presets.selectedPreset == "a000" then
       if Tracker.IsVehicleMounted() then
         ImGui.Text("")
-        VectorsCustomize.DrawUI()
+        -- VectorsCustomize.DrawUI()
       else
         ImGuiExt.SetStatusBar(UIText.General.info_getIn)
       end

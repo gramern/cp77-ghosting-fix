@@ -290,14 +290,15 @@ registerForEvent("onInit", function()
 
   if not Globals.IsModReady() then return end
 
-  Presets.OnInitialize()
   Calculate.OnInitialize()
   Contextual.OnInitialize()
   Vectors.OnInitialize()
 
   if VectorsCustomize then
-    VectorsCustomize.OnInitialize()
+    -- VectorsCustomize.OnInitialize()
   end
+
+  Presets.OnInitialize()
 
   -- danyalzia: remove forced benchmarking upon new install during development
   -- if Globals.IsFirstRun() then
@@ -367,14 +368,15 @@ registerForEvent("onOverlayOpen", function()
 
   if not Globals.IsModReady() then return end
 
-  Presets.OnOverlayOpen()
   Calculate.OnOverlayOpen()
   Contextual.OnOverlayOpen()
   Vectors.OnOverlayOpen()
 
   if VectorsCustomize then
-    VectorsCustomize.OnOverlayOpen()
+    -- VectorsCustomize.OnOverlayOpen()
   end
+
+  Presets.OnOverlayOpen()
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -391,7 +393,7 @@ registerForEvent("onOverlayClose", function()
   Calculate.OnOverlayClose()
 
   if VectorsCustomize then
-    VectorsCustomize.OnOverlayClose()
+    -- VectorsCustomize.OnOverlayClose()
   end
 
   Settings.OnOverlayClose()
