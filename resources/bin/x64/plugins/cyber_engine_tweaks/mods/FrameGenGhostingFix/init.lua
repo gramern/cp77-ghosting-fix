@@ -55,6 +55,7 @@ local VectorsCustomize = require("Modules/VectorsCustomize")
 --debug
 local Debug = require("Dev/Debug")
 local TrackerDebug = require("Dev/TrackerDebug")
+local VectorsDebug = require("Dev/VectorsDebug")
 
 --game performance
 local gameDeltaTime = 0
@@ -249,9 +250,10 @@ end
 --initialize all stuff etc
 registerForEvent("onInit", function()
   if not Globals then Globals.Print(LogText.globals_missing) return end
-  if not Localization then Globals.Print(LogText.localization_missing) return end
+  if not Tracker then Globals.Print(LogText.tracker_missing) return end
   if not Settings then Globals.Print(LogText.settings_missing) return end
   if not ImGuiExt then Globals.Print(LogText.imguiext_missing) return end
+  if not Localization then Globals.Print(LogText.localization_missing) return end
   if not Calculate then Globals.Print(LogText.calculate_missing) end
   if not Contextual then Globals.Print(LogText.contextual_missing) end
   if not Presets then Globals.Print(LogText.presets_missing) end
@@ -263,6 +265,8 @@ registerForEvent("onInit", function()
   windowTitle = FrameGenGhostingFix.__NAME .. " " .. FrameGenGhostingFix.__EDITION or FrameGenGhostingFix.__NAME
 
   Globals.OnInitialize()
+  Tracker.OnInitialize()
+  Settings.OnInitialize()
 
   if not FrameGenGhostingFix.__VERSION_SUFFIX then
     Diagnostics.OnInitialize()
@@ -272,8 +276,6 @@ registerForEvent("onInit", function()
 
   if not Globals.IsModReady() then return end
 
-  Tracker.OnInitialize()
-  Settings.OnInitialize()
   Presets.OnInitialize()
   Calculate.OnInitialize()
   Contextual.OnInitialize()
@@ -340,6 +342,7 @@ registerForEvent("onOverlayOpen", function()
 
   Globals.OnOverlayOpen()
   ImGuiExt.OnOverlayOpen()
+  Tracker.OnOverlayOpen()
 
   if Diagnostics then
     Diagnostics.OnOverlayOpen()
@@ -355,7 +358,6 @@ registerForEvent("onOverlayOpen", function()
   if VectorsCustomize then
     VectorsCustomize.OnOverlayOpen()
   end
-
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -370,7 +372,6 @@ registerForEvent("onOverlayClose", function()
   if not Globals.IsModReady() then return end
 
   Calculate.OnOverlayClose()
-
   Contextual.OnOverlayClose()
 
   if VectorsCustomize then
@@ -378,7 +379,6 @@ registerForEvent("onOverlayClose", function()
   end
 
   Settings.OnOverlayClose()
-
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
@@ -391,9 +391,11 @@ registerForEvent("onUpdate", function(deltaTime)
   currentFps = 1 / deltaTime
   GetFps(deltaTime)
 
-  if not Tracker.IsGameLoaded() then return end
+  if Tracker.IsGamePaused() then return end
 
-  Globals.UpdateDelays(gameDeltaTime)
+  -- Globals.UpdateDelays(gameDeltaTime)
+
+  if not Tracker.IsVehicleMounted() then return end
   Vectors.OnUpdate()
 end)
 
@@ -408,7 +410,7 @@ registerForEvent("onDraw", function()
       if ImGui.BeginTabBar('Tabs') then
         
         --diagnostics interface starts------------------------------------------------------------------------------------------------------------------
-        if Diagnostics and Diagnostics.isUpdateRecommended then
+        if Diagnostics and Diagnostics.IsUpdateRecommended() then
             Diagnostics.DrawUI()
         end
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
@@ -417,13 +419,24 @@ registerForEvent("onDraw", function()
         if Debug and Settings.IsDebug() and Settings.IsDebugUI() then
             Debug.DrawUI()
             TrackerDebug.DrawUI()
+            VectorsDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
+
+        if not Tracker.IsGameFrameGeneration() then
+          if ImGui.BeginTabItem(UIText.Info.tabname) then
+
+            ImGuiExt.Text("Yo, your FG is turned off, turn it on in the game's settings")
+
+            ImGui.EndTabItem()
+          end
+        end
+
         -- danyalzia: remove forced benchmarking upon new install dur ing development
         -- if Globals.IsNewInstall() then
         --   if ImGui.BeginTabItem(UIText.Info.tabname) then
 
-        --     if Globals.ModState.isFirstRun then
+        --     if Globals.IsFirstRun() then
         --       ImGuiExt.Text(UIText.Info.benchmark)
         --     else
         --       ImGuiExt.Text(UIText.Info.benchmarkAsk)
@@ -433,13 +446,13 @@ registerForEvent("onDraw", function()
         --     BenchmarkUI()
         --     ImGui.Text("")
 
-        --     Globals.ModState.keepWindow, keepWindowToggle = ImGuiExt.Checkbox(UIText.Options.enabledWindow, Globals.ModState.keepWindow, keepWindowToggle)
+        --     keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(UIText.Options.enabledWindow, Settings.IsKeepWindow(), keepWindowToggle)
         --     -- if keepWindowToggle then
-        --     --   ImGuiExt.SetStatusBar(UIText.General.settings_saved)
+        --     --   Settings.SetKeepWindow(keepWindowBool)
         --     -- end
         --     ImGuiExt.SetTooltip(UIText.Options.tooltipWindow)
 
-        --     if not Globals.ModState.isFirstRun and not isBenchmark then
+        --     if not Globals.IsFirstRun() and not isBenchmark then
         --       ImGui.Text("")
 
         --       if ImGui.Button(UIText.General.yes, 240, 40) then
@@ -516,16 +529,20 @@ registerForEvent("onDraw", function()
 
             ImGui.Separator()
 
-            fgBool, fgToggle = ImGuiExt.Checkbox(UIText.Options.toggleFG, Settings.IsFGEnabled(), fgToggle)
-            if fgToggle then
-              Settings.SetFGEnabled(fgBool)
-              Settings.SetSaved(false)
-              ImGuiExt.SetStatusBar(UIText.General.settings_saved)
-              DLSSEnabler_SetFrameGenerationState(Settings.IsFGEnabled())
-            end
-            ImGuiExt.SetTooltip(UIText.Options.tooltipToggleFG)
+            if Tracker.IsGameReady() then
+              fgBool, fgToggle = ImGuiExt.Checkbox(UIText.Options.enableFG, Settings.IsFrameGeneration(), fgToggle)
+              if fgToggle then
+                Settings.SetFrameGeneration(fgBool)
+                Settings.SetSaved(false)
+                ImGuiExt.SetStatusBar(UIText.General.settings_saved)
+              end
+              ImGuiExt.SetTooltip(UIText.Options.tooltipFG)
             
-            ImGuiExt.Text(UIText.Options.fgEnableInGameMenu, true)
+              ImGuiExt.Text(UIText.Options.gameSettingsFG, true)
+            else
+              ImGuiExt.Text(UIText.Options.gameNotReadyWarning, true)
+            end
+
             ImGui.Separator()
 
             if currentFps then

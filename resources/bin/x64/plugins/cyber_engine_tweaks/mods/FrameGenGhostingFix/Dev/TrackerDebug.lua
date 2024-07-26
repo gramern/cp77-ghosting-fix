@@ -12,7 +12,7 @@ local Player = Tracker.GetPlayerTable()
 local Vehicle = Tracker.GetVehicleTable()
 
 function TrackerDebug.DrawUI()
-  if ImGui.BeginTabItem("Tracker Data") then
+  if ImGui.BeginTabItem("Tracker Debug") then
     ImGuiExt.Text("Game State:")
     ImGuiExt.Text("isPreGame:")
     ImGui.SameLine()

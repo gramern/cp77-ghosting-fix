@@ -891,11 +891,12 @@ function Contextual.DrawUI()
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle, menuToggle
 
   if ImGui.BeginTabItem(UIText.Contextual.tabname) then
-    if not Settings.IsFGEnabled() then
+    if not Settings.IsFrameGeneration() then
       ImGui.Text("")
       ImGuiExt.TextRed(UIText.Contextual.requirement)
       ImGui.Text("")
-      ImGui.ResetStatusBar()
+      ImGuiExt.ResetStatusBar()
+      
       ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
       ImGui.EndTabItem()
       return

@@ -391,10 +391,8 @@ local Vectors = {
 local Globals = require("Modules/Globals")
 local Tracker = require("Modules/Tracker")
 
-local trackedGameState = Tracker.GetGameStateTable()
-local trackedGamePerf = Tracker.GetGamePerfTable()
-local trackedPlayer = Tracker.GetPlayerTable()
-local trackedVehicle = Tracker.GetVehicleTable()
+local SharedGamePerfData = Tracker.GetGamePerfTable()
+local SharedVehicleData = Tracker.GetVehicleTable()
 
 local abs, atan, deg, floor, max, min, pi, rad, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.tan
 
@@ -971,7 +969,7 @@ end
 --Transform By
 
 local function TransformByFPS()
-  local fillToggleValue = (trackedGamePerf.currentFps - 30) * 0.01
+  local fillToggleValue = (SharedGamePerfData.currentFps - 30) * 0.01
   Vectors.VehMasks.HorizontalEdgeDown.Visible.fillToggleValue = min(0.1, fillToggleValue)
 end
 
@@ -1821,7 +1819,7 @@ local function DelayTransformOpacity()
   end
 
   opacity.value = opacity.delayedValue
-  opacity.delayTime = opacity.delayTime + trackedGamePerf.gameDeltaTime
+  opacity.delayTime = opacity.delayTime + SharedGamePerfData.gameDeltaTime
 
   if opacity.delayTime <= opacity.Def.delayDuration then return end
   ResetDelayTransformOpacity()
@@ -1949,7 +1947,7 @@ local function ApplyMasksController()
 end
 
 local function ApplyScreen()
-  local screenData = Globals.GetScreen()
+  local screenData = Globals.GetScreenTable()
   local screen = Vectors.Screen
 
   screen.Edge = screenData.Edge

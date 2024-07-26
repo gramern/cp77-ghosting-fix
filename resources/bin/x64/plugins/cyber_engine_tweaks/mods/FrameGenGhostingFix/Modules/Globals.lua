@@ -1,53 +1,56 @@
 local Globals = {
   __NAME = "Globals",
   __VERSION = { 5, 0, 0 },
-  ModState = {
-    isOpenWindow = false,
-    isFirstRun = false,
-    isNewInstall = false,
-    isReady = true,
-  },
-  MaskingGlobal = {
-    masksController = "gameuiCrosshairContainerController",
-    Widgets = {
-      hedCorners = "horizontaledgedowncorners",
-      hedFill = "horizontaledgedownfill",
-      hedTracker = "horizontaledgedowntracker",
-      hedCornersEditor = "horizontaledgedowncorners_editor",
-      hedFillEditor = "horizontaledgedowncorners_editor",
-      mask1 = "mask1",
-      mask2 = "mask2",
-      mask3 = "mask3",
-      mask4 = "mask4",
-      maskEditor1 = "mask_editor1",
-      maskEditor2 = "mask_editor2",
-      blockerAimOnFoot = "blockerAimOnFoot",
-      cornerDownLeft = "cornerDownLeftOnFoot",
-      cornerDonwRight = "cornerDownRightOnFoot",
-      vignette = "vignetteOnFoot",
-      vignette_editor = "vignetteOnFoot_editor",
-      vignetteAim = "vignetteAimOnFoot"
-    }
-  },
-  Screen = {
-    aspectRatio = 1,
-    Def = {
-      Factor = {width = 1, height = 1},
-      Resolution = {width = 3840, height = 2160},
-      Space = {width = 3840, height = 2160},
-    },
-    Edge = {
-      down = 2160,
-      left = 0,
-      right = 3840,
-    },
+}
+
+local ModState = {
+  isOpenWindow = false,
+  isFirstRun = false,
+  isNewInstall = false,
+  isReady = true,
+}
+
+local MaskingGlobal = {
+  masksController = "gameuiCrosshairContainerController",
+  Widgets = {
+    hedCorners = "horizontaledgedowncorners",
+    hedFill = "horizontaledgedownfill",
+    hedTracker = "horizontaledgedowntracker",
+    hedCornersEditor = "horizontaledgedowncorners_editor",
+    hedFillEditor = "horizontaledgedowncorners_editor",
+    mask1 = "mask1",
+    mask2 = "mask2",
+    mask3 = "mask3",
+    mask4 = "mask4",
+    maskEditor1 = "mask_editor1",
+    maskEditor2 = "mask_editor2",
+    blockerAimOnFoot = "blockerAimOnFoot",
+    cornerDownLeft = "cornerDownLeftOnFoot",
+    cornerDonwRight = "cornerDownRightOnFoot",
+    vignette = "vignetteOnFoot",
+    vignette_editor = "vignetteOnFoot_editor",
+    vignetteAim = "vignetteAimOnFoot"
+  }
+}
+
+local Screen = {
+  aspectRatio = 1,
+  Def = {
     Factor = {width = 1, height = 1},
-    isAspectRatioChange = false,
-    Resolution = {width = nil, height = nil},
+    Resolution = {width = 3840, height = 2160},
     Space = {width = 3840, height = 2160},
-    type = 169,
-    typeName = "16:9",
   },
+  Edge = {
+    down = 2160,
+    left = 0,
+    right = 3840,
+  },
+  Factor = {width = 1, height = 1},
+  isAspectRatioChange = false,
+  Resolution = {width = nil, height = nil},
+  Space = {width = 3840, height = 2160},
+  type = 169,
+  typeName = "16:9",
 }
 
 -- --stores data that is shared between modules
@@ -60,6 +63,7 @@ local FallbackBoard = {}
 local DelayBoard = {}
 
 local Localization = require("Modules/Localization")
+local Settings = require("Modules/Settings")
 
 local LogText = Localization.LogText
 
@@ -176,12 +180,12 @@ end
 
 --- Prints a formatted debug message ONLY if debug mode is enabled. Offers an optional module name and variable number of content items. Prints to the mod's exlusive log file.
 --
--- @param `moduleName`: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param `moduleName`: string | nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
 -- @param `...`: any; Variable number of items to be printed as the content of the message. 
 --
 -- @return None
 function Globals.PrintDebug(moduleName, ...)
-  if not Globals.ModState.isDebug then return end
+  if not Settings.IsDebug() then return end
 
   local modError = "[" .. FrameGenGhostingFix.__NAME .. "]" .. " [Debug]"
   local module = ""
@@ -211,7 +215,7 @@ end
 
 --- Prints a formatted error message with an optional module name and variable number of content items. Prints to the mod's exlusive log file.
 --
--- @param `moduleName`: string|nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
+-- @param `moduleName`: string | nil; The name of the module to be included in the output. If nil, no module name is printed: if only one item is given, no nil is needed (will print just the item without bracketing it as a module name).
 -- @param `...`: any; Variable number of items to be printed as the content of the message. 
 --
 -- @return None
@@ -410,23 +414,28 @@ function Globals.UpdateDelays(gameDeltaTime)
   end
 end
 
+-- @return table; The ModState table containg real-time configuration of the mod
+function Globals.GetModStateTable()
+  return ModState
+end
+
 -- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
 --
 -- @return None
 function Globals.SetModReady(isReady)
-  Globals.ModState.isReady = isReady
+  ModState.isReady = isReady
 end
 
 -- @return boolean: `true` if the mod is ready for operation
 function Globals.IsModReady()
-  return Globals.ModState.isReady
+  return ModState.isReady
 end
 
 -- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
 --
 -- @return None
 function Globals.SetFirstRun(isFirstRun)
-  Globals.ModState.isFirstRun = isFirstRun
+  ModState.isFirstRun = isFirstRun
   if not isFirstRun then return end
   Globals.SetNewInstall(true)
   Globals.Print(LogText.globals_firstRun)
@@ -434,50 +443,49 @@ end
 
 -- @return boolean: `true` if this is the first run of the mod
 function Globals.IsFirstRun()
-  return Globals.ModState.isFirstRun
+  return ModState.isFirstRun
 end
 
 -- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
 --
 -- @return None
 function Globals.SetNewInstall(isNewInstall)
-  Globals.ModState.isNewInstall = isNewInstall
-  if not isNewInstall or Globals.ModState.isFirstRun then return end
+  ModState.isNewInstall = isNewInstall
+  if not isNewInstall or ModState.isFirstRun then return end
   Globals.Print(LogText.globals_newVersion)
 end
 
 -- @return boolean: `true` if the current installation of the mod is new
 function Globals.IsNewInstall()
-  return Globals.ModState.isNewInstall
+  return ModState.isNewInstall
 end
 
 -- @return boolean: `true` is the mod's window is opened
 function Globals.IsOpenWindow()
-  return Globals.ModState.isOpenWindow
+  return ModState.isOpenWindow
 end
-
 
 -- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
 --
 -- @return None
 function Globals.SetOpenWindow(isOpenWindow)
-  Globals.ModState.isOpenWindow = isOpenWindow
+  ModState.isOpenWindow = isOpenWindow
 end
 
 
 -- @return string: the masks controller name
 function Globals.GetMasksController()
-  return Globals.MaskingGlobal.masksController
+  return MaskingGlobal.masksController
 end
 
--- @return Widgets: table; The Widgets table containing masks' widgets names from the mod's global masking configuration
-function Globals.GetWidgets()
-  return Globals.MaskingGlobal.Widgets
+-- @return table; The Widgets table containing masks' widgets names from the mod's global masking configuration
+function Globals.GetWidgetsTable()
+  return MaskingGlobal.Widgets
 end
 
--- @return Screen: table; The Screen table containg current screen info and configuration
-function Globals.GetScreen()
-  return Globals.Screen
+-- @return table; The Screen table containg current screen info and configuration
+function Globals.GetScreenTable()
+  return Screen
 end
 
 -----------
@@ -488,114 +496,114 @@ end
 --
 -- @param None
 --
--- @return number; The current aspect ratio of the screen. Updates `Globals.Screen.aspectRatio`, `Globals.Screen.isAspectRatioChange` and `Globals.Screen.Resolution` internally.
+-- @return number; The current aspect ratio of the screen. Updates `Screen.aspectRatio`, `Screen.isAspectRatioChange` and `Screen.Resolution` internally.
 function Globals.GetAspectRatio()
-  local previousAspectRatio = Globals.Screen.aspectRatio
+  local previousAspectRatio = Screen.aspectRatio
 
-  Globals.Screen.Resolution.width, Globals.Screen.Resolution.height = GetDisplayResolution();
-  Globals.Screen.aspectRatio = Globals.Screen.Resolution.width / Globals.Screen.Resolution.height
+  Screen.Resolution.width, Screen.Resolution.height = GetDisplayResolution();
+  Screen.aspectRatio = Screen.Resolution.width / Screen.Resolution.height
 
-  if previousAspectRatio == 1 then return Globals.Screen.aspectRatio end
+  if previousAspectRatio == 1 then return Screen.aspectRatio end
 
-  if Globals.Screen.aspectRatio ~= previousAspectRatio then
-    Globals.Screen.isAspectRatioChange = true
+  if Screen.aspectRatio ~= previousAspectRatio then
+    Screen.isAspectRatioChange = true
     Globals.SetModReady(false)
     Globals.Print(LogText.globals_aspectRatioChange)
   end
 
-  return Globals.Screen.aspectRatio
+  return Screen.aspectRatio
 end
 
 function Globals.IsAspectRatioChange()
-  return Globals.Screen.isAspectRatioChange
+  return Screen.isAspectRatioChange
 end
 
 function Globals.ResetAspectRatioChange()
-  Globals.Screen.isAspectRatioChange = false
+  Screen.isAspectRatioChange = false
 end
 
 --- Determines and returns the screen type enum based on the current aspect ratio.
 --
 -- @param None
 --
--- @return enum; Updates `Globals.Screen.type` internally.
+-- @return enum; Updates `Screen.type` internally.
 function Globals.GetScreenType()
-  local screenAspectRatio = Globals.Screen.aspectRatio
+  local screenAspectRatio = Screen.aspectRatio
 
   if screenAspectRatio < 1.5 then
-    Globals.Screen.type = 43
+    Screen.type = 43
   elseif screenAspectRatio >= 1.5 and screenAspectRatio < 1.7 then
-    Globals.Screen.type = 1610
+    Screen.type = 1610
   elseif screenAspectRatio >= 1.7 and screenAspectRatio < 2.2 then
-    Globals.Screen.type = 169
+    Screen.type = 169
   elseif screenAspectRatio >= 2.2 and screenAspectRatio < 3.4 then
-    Globals.Screen.type = 219
+    Screen.type = 219
   elseif screenAspectRatio >= 3.4 then
-    Globals.Screen.type = 329
+    Screen.type = 329
   end
 
-  return Globals.Screen.type
+  return Screen.type
 end
 
 --- Retrieves the string name of the current screen type.
 --
 -- @param None
 --
--- @return string; Updates `Globals.Screen.typeName` internally.
+-- @return string; Updates `Screen.typeName` internally.
 function Globals.GetScreenTypeName()
-  local screenType = Globals.Screen.type
+  local screenType = Screen.type
 
   if screenType == 169 then
-    Globals.Screen.typeName = "16:9"
+    Screen.typeName = "16:9"
   elseif screenType == 1610 then
-    Globals.Screen.typeName = "16:10"
+    Screen.typeName = "16:10"
   elseif screenType == 219 then
-    Globals.Screen.typeName = "21:9"
+    Screen.typeName = "21:9"
   elseif screenType == 329 then
-    Globals.Screen.typeName = "32:9"
+    Screen.typeName = "32:9"
   elseif screenType == 43 then
-    Globals.Screen.typeName = "4:3"
+    Screen.typeName = "4:3"
   end
 
-  return Globals.Screen.typeName
+  return Screen.typeName
 end
 
 --- Determines and returns the screen width factor based on the current screen type.
 --
 -- @param None
 --
--- @return number; Updates `Globals.Screen.Factor.width` internally.
+-- @return number; Updates `Screen.Factor.width` internally.
 function Globals.GetScreenWidthFactor()
-  local screenType = Globals.Screen.type
+  local screenType = Screen.type
 
   if screenType == 169 or screenType == 1610 or screenType == 43 then
-    Globals.Screen.Factor.width = Globals.Screen.Def.Factor.width
+    Screen.Factor.width = Screen.Def.Factor.width
   elseif screenType == 219 then
-    Globals.Screen.Factor.width = 1.34
+    Screen.Factor.width = 1.34
   elseif screenType == 329 then
-    Globals.Screen.Factor.width = 2
+    Screen.Factor.width = 2
   end
 
-  return Globals.Screen.Factor.width
+  return Screen.Factor.width
 end
 
 --- Calculates and returns the screen space dimensions based on the current screen type.
 --
 -- @param None
 --
--- @return table; Updates `Globals.Screen.Space` internally.
+-- @return table; Updates `Screen.Space` internally.
 function Globals.GetScreenSpace()
-  local screenType = Globals.Screen.type
-  local screenResDef = Globals.Screen.Def.Resolution
-  local screenFactor = Globals.Screen.Factor
+  local screenType = Screen.type
+  local screenResDef = Screen.Def.Resolution
+  local screenFactor = Screen.Factor
 
   if screenType == 169 or screenType == 1610 or screenType == 43 then
-    Globals.Screen.Space.width = Globals.Screen.Def.Space.width
+    Screen.Space.width = Screen.Def.Space.width
   elseif screenType == 219 or screenType == 329 then
-    Globals.Screen.Space.width = screenResDef.width * screenFactor.width
+    Screen.Space.width = screenResDef.width * screenFactor.width
   end
 
-  return Globals.Screen.Space
+  return Screen.Space
 end
 
 
@@ -603,33 +611,34 @@ end
 --
 -- @param None
 --
--- @return table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates `Globals.Screen.Edge` internally.
+-- @return table; A table containing the screen edge coordinates: left (x-axis), right (x-axis), down (y-axis). Updates `Screen.Edge` internally.
 function Globals.GetScreenEdge()
-  local screenType = Globals.Screen.type
+  local screenType = Screen.type
+  local screenEdge = Screen.Edge
 
   if screenType == 169 then
-    Globals.Screen.Edge.left = 0
-    Globals.Screen.Edge.right = 3840
-    Globals.Screen.Edge.down = 2160
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2160
   elseif screenType == 1610 then
-    Globals.Screen.Edge.left = 0
-    Globals.Screen.Edge.right = 3840
-    Globals.Screen.Edge.down = 2280
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2280
   elseif screenType == 219 then
-    Globals.Screen.Edge.left = -640
-    Globals.Screen.Edge.right = 4480
-    Globals.Screen.Edge.down = 2160
+    screenEdge.left = -640
+    screenEdge.right = 4480
+    screenEdge.down = 2160
   elseif screenType == 329 then
-    Globals.Screen.Edge.left = -1920
-    Globals.Screen.Edge.right = 5760
-    Globals.Screen.Edge.down = 2160
+    screenEdge.left = -1920
+    screenEdge.right = 5760
+    screenEdge.down = 2160
   elseif screenType == 43 then
-    Globals.Screen.Edge.left = 0
-    Globals.Screen.Edge.right = 3840
-    Globals.Screen.Edge.down = 2640
+    screenEdge.left = 0
+    screenEdge.right = 3840
+    screenEdge.down = 2640
   end
 
-  return Globals.Screen.Edge
+  return screenEdge
 end
 
 -----------

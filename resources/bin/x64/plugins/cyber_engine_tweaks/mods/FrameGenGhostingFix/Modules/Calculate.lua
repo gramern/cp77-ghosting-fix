@@ -220,7 +220,7 @@ function Calculate.ApplyMasksController()
 end
 
 function Calculate.ApplyScreen()
-  local screen = Globals.GetScreen()
+  local screen = Globals.GetScreenTable()
 
   Calculate.Screen.Edge = screen.Edge
   Calculate.Screen.type = screen.type

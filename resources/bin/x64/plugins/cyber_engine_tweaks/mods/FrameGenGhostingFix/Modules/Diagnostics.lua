@@ -16,12 +16,13 @@ local UIText = Localization.UIText
 function Diagnostics.IsUpdateRecommended()
   return Diagnostics.isUpdateRecommended
 end
+
 --check for compatibility with other mods
 function Diagnostics.CheckModsCompatibility()
 end
 
 function Diagnostics.OnInitialize()
-  Diagnostics.CheckModsCompatibility()
+  -- Diagnostics.CheckModsCompatibility()
   if Diagnostics.isModsCompatibility then return end
   Globals.SetModReady(false)
 end

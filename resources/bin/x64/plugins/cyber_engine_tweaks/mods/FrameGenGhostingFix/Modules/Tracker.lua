@@ -10,6 +10,7 @@ local GamePerf = {
 }
 
 local GameState = {
+  isFrameGen = nil,
   isGameLoaded = nil,
   isGamePaused = nil,
   isPreGame = nil,
@@ -29,7 +30,6 @@ local Vehicle = {
   isMoving = nil,
   isSupported = nil,
   isWeapon = nil,
-  object = nil,
 }
 
 -- IsVehicleMoving-related
@@ -83,7 +83,8 @@ end
 -- Global Specific Getters
 ------------------
 
-function Tracker.IsTracking()
+-- @return boolean: `true` if player or vehicle are tracked (monitored)
+function Tracker.IsGameReady()
   if GameState.isGameLoaded and not GameState.isGamePaused and not GameState.isPreGame then
     return true
   else
@@ -91,9 +92,9 @@ function Tracker.IsTracking()
   end
 end
 
--- @return boolean: `true` if frame generation is enabled in the game's settings (on-demand check, not tracked in real time)
+-- @return boolean: `true` if frame generation is enabled in the game's settings (checks for OnInitialize and OnOverlayOpen, not tracked in real time)
 function Tracker.IsGameFrameGeneration()
-  return GameOptions.GetBool("DLSSFrameGen", "Enable")
+  return GameState.isFrameGen
 end
 
 -- @return boolean: `true` if game is loaded to the gameplay
@@ -124,11 +125,6 @@ end
 -- @return boolean: `true` if player has weapon drawn (on-foot and in vehicle)
 function Tracker.IsPlayerWeapon()
   return Player.isWeapon
-end
-
--- @return class: `VehicleObject` if vehicle is mounted
-function Tracker.GetVehicle()
-  return Vehicle.object
 end
 
 -- @return number: `0` = bike, `1` = car, `2` = tank, `3` = AV or `4` = unknown, if vehicle is mounted
@@ -165,6 +161,10 @@ end
 -- Game State
 ------------------
 
+local function SetGameFrameGeneration(isEnabled)
+  GameState.isFrameGen = isEnabled
+end
+
 local function SetGameLoaded(isLoaded)
   GameState.isGameLoaded = isLoaded
 end
@@ -189,7 +189,6 @@ end
 ------------------
 -- Vehicle
 ------------------
-
 
 local function GetVehicleBaseObject(vehicle)
   if vehicle:IsA("vehicleBikeBaseObject") then return 0 end
@@ -255,8 +254,6 @@ local function TrackVehicle()
   local vehicle = Game.GetMountedVehicle(player)
   local trackedVehicle = Vehicle
 
-  trackedVehicle.object = vehicle
-
   if not vehicle then
     trackedVehicle.isMounted = false
     trackedVehicle.currentSpeed = nil
@@ -293,12 +290,18 @@ function Tracker.OnInitialize()
   Observe('DriverCombatEvents', 'OnExit', function()
     SetVehicleWeapon(false)
   end)
+
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+end
+
+function Tracker.OnOverlayOpen()
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 end
 
 function Tracker.OnUpdate()
   TrackGameState()
 
-  if not Tracker.IsTracking() then return end
+  if not Tracker.IsGameReady() then return end
   TrackPlayer()
   TrackVehicle()
 end
