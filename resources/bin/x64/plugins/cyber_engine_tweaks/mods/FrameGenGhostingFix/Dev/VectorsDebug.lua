@@ -8,6 +8,7 @@ local Tracker = require("Modules/Tracker")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
+local MaskingGlobalData = Vectors.GetMaskingGlobalData()
 local CameraData = Vectors.GetCameraData()
 local VehicleData = Vectors.GetVehicleData()
 local VehMasksData = Vectors.GetVehMasksData()
@@ -21,7 +22,7 @@ function VectorsDebug.DrawUI()
       if Vectors then
         ImGuiExt.Text("For Vectors Module")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Vectors.MaskingGlobal.masksController))
+        ImGuiExt.Text(tostring(MaskingGlobalData.masksController))
       end
       if VectorsCustomize then
         ImGuiExt.Text("For VectorsCustomize Module")
@@ -33,7 +34,7 @@ function VectorsDebug.DrawUI()
 
       ImGuiExt.Text("Masking enabled:")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Vectors.MaskingGlobal.vehicles))
+      ImGuiExt.Text(tostring(MaskingGlobalData.vehicles))
 
       ImGui.Separator()
 
@@ -48,15 +49,6 @@ function VectorsDebug.DrawUI()
         ImGuiExt.Text(tostring(VehMasksData.Mask3.maskPath))
         ImGuiExt.Text(tostring(VehMasksData.Mask4.maskPath))
         ImGuiExt.Text(tostring(VehMasksData.MaskEditor1.maskPath))
-      end
-
-      ImGui.Separator()
-
-      if Vectors.PlayerPuppet.Position then
-        ImGuiExt.Text("Player's Position:")
-        ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.x))
-        ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.y))
-        ImGuiExt.Text(tostring(Vectors.PlayerPuppet.Position.z))
       end
 
       ImGui.EndTabItem()

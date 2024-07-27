@@ -13,6 +13,9 @@ local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local ModState = Globals.GetModStateTable()
 local Screen = Globals.GetScreenTable()
+local CalculateMaskingGlobal = Calculate.GetMaskingGlobalData()
+local VectorsMaskingGlobal = Vectors.GetMaskingGlobalData()
+local OnFootMasksData = Calculate.GetMasksData()
 local VehMasksData = Vectors.GetVehMasksData()
 
 
@@ -60,7 +63,7 @@ function Debug.DrawUI()
     if Vectors then
       ImGuiExt.Text("For Vectors Module")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Vectors.MaskingGlobal.masksController))
+      ImGuiExt.Text(tostring(VectorsMaskingGlobal.masksController))
     end
     if VectorsCustomize then
       ImGuiExt.Text("For VectorsCustomize Module")
@@ -70,7 +73,7 @@ function Debug.DrawUI()
     if Calculate then
       ImGuiExt.Text("For Calculate Module")
       ImGui.SameLine()
-      ImGuiExt.Text(tostring(Calculate.MaskingGlobal.masksController))
+      ImGuiExt.Text(tostring(CalculateMaskingGlobal.masksController))
     end
 
     ImGui.Separator()
@@ -83,7 +86,7 @@ function Debug.DrawUI()
     ImGuiExt.Text("Masking enabled:")
     ImGuiExt.Text("For Vectors Module")
     ImGui.SameLine()
-    ImGuiExt.Text(tostring(Vectors.MaskingGlobal.vehicles))
+    ImGuiExt.Text(tostring(VectorsMaskingGlobal.vehicles))
 
     if Vectors then
       ImGui.Separator()
@@ -108,37 +111,37 @@ function Debug.DrawUI()
     if ImGui.BeginTabItem("Calculate Debug") then
 
       ImGuiExt.Text("Corner Masks Screen Space:")
-      if Calculate.Corners.ScreenSpace.Left.x then
-        ImGuiExt.Text(tostring(Calculate.Corners.ScreenSpace.Left.x))
+      if OnFootMasksData.Corners.ScreenSpace.Left.x then
+        ImGuiExt.Text(tostring(OnFootMasksData.Corners.ScreenSpace.Left.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Calculate.Corners.ScreenSpace.Right.x))
+        ImGuiExt.Text(tostring(OnFootMasksData.Corners.ScreenSpace.Right.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Calculate.Corners.ScreenSpace.Bottom.y))
+        ImGuiExt.Text(tostring(OnFootMasksData.Corners.ScreenSpace.Bottom.y))
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Blocker Size:")
-      if Calculate.Blocker.Size.x then
-        ImGuiExt.Text(tostring(Calculate.Blocker.Size.x))
+      if OnFootMasksData.Blocker.Size.x then
+        ImGuiExt.Text(tostring(OnFootMasksData.Blocker.Size.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Calculate.Blocker.Size.y))
+        ImGuiExt.Text(tostring(OnFootMasksData.Blocker.Size.y))
       end
 
       ImGui.Separator()
 
       ImGuiExt.Text("Vignette Screen Space:")
-      if Calculate.Vignette.ScreenSpace.x then
-        ImGuiExt.Text(tostring(Calculate.Vignette.ScreenSpace.x))
+      if OnFootMasksData.Vignette.ScreenSpace.x then
+        ImGuiExt.Text(tostring(OnFootMasksData.Vignette.ScreenSpace.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Calculate.Vignette.ScreenSpace.y))
+        ImGuiExt.Text(tostring(OnFootMasksData.Vignette.ScreenSpace.y))
       end
 
       ImGuiExt.Text("Vignette Size:")
-      if Calculate.Vignette.ScreenSpace.x then
-        ImGuiExt.Text(tostring(Calculate.Vignette.Size.x))
+      if OnFootMasksData.Vignette.ScreenSpace.x then
+        ImGuiExt.Text(tostring(OnFootMasksData.Vignette.Size.x))
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(Calculate.Vignette.Size.y))
+        ImGuiExt.Text(tostring(OnFootMasksData.Vignette.Size.y))
       end
 
       ImGui.EndTabItem()

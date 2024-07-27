@@ -48,6 +48,10 @@ local function SaveUserSettings()
   Settings.WriteUserSettings("Presets", GetUserSettings())
 end
 
+------------------
+-- Presets management
+------------------
+
 function Presets.LoadJSON(filename)
   local content = {}
 
@@ -59,10 +63,6 @@ function Presets.LoadJSON(filename)
 
   return content
 end
-
-------------------
--- Presets management
-------------------
 
 function Presets.AddPreset(presetInfo, id, filename)
   -- Skip if List is already populated with the same preset
@@ -174,7 +174,7 @@ function Presets.DrawUI()
     local selectedPresetName = Presets.List[Presets.selectedPreset].PresetInfo.name
 
     -- Displays list of presets' names and sets a preset
-    if ImGui.BeginCombo("##", selectedPresetName) then
+    if ImGui.BeginCombo("##Presets", selectedPresetName) then
       for _, presetId in ipairs(Presets.sortedPresetIds) do
         local name = Presets.List[presetId].PresetInfo.name
         local isSelected = (selectedPresetName == name)

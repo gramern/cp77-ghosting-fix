@@ -1,10 +1,11 @@
 local Vectors = {
   __NAME = "Vectors",
   __VERSION = { 5, 0, 0 },
-  MaskingGlobal = {
-    masksController = nil,
-    vehicles = true,
-  }
+}
+
+local MaskingGlobal = {
+  masksController = nil,
+  vehicles = true,
 }
 
 local Screen = {
@@ -367,8 +368,6 @@ local VehMasksData = {
   }
 }
 
-local MasksData = {}
-
 local Globals = require("Modules/Globals")
 local Tracker = require("Modules/Tracker")
 
@@ -497,18 +496,27 @@ end
 
 --Universal methods end here----------------------------------------------------------------------------------------------------------------------
 
+-- @return table;
+function Vectors.GetMaskingGlobalData()
+  return MaskingGlobal
+end
+
+-- @return table;
 function Vectors.GetVehElementsDef()
   return VehElementsDef
 end
 
+-- @return table;
 function Vectors.GetVehMasksData()
   return VehMasksData
 end
 
+-- @return table;
 function Vectors.GetCameraData()
   return CameraData
 end
 
+-- @return table;
 function Vectors.GetVehicleData()
   return VehicleData
 end
@@ -1827,7 +1835,7 @@ end
 --Transformation methods end here----------------------------------------------------------------------------------------------------------------------
 
 local function ApplyMasksController()
-  Vectors.MaskingGlobal.masksController = Globals.GetMasksController()
+  MaskingGlobal.masksController = Globals.GetMasksController()
 end
 
 local function ApplyScreen()
@@ -1862,17 +1870,26 @@ local function ApplySizeHed()
   hedSize.x = SetSizeHED(hedSize.Def.x, 1, true)
 end
 
+--- Returns the masking state (on/off) for vehicles.
+--
+-- @param None
+--
+-- @returnbooleans; The masking state for vehicles.
+function Vectors.GetMaskingState()
+  return MaskingGlobal.vehicles
+end
+
 --- Sets the masking state (on/off) for vehicles and enables/disables Vectors.OnUpdate() (enables it to/prevents it from gathering data and transforming masks). 
 --
 -- @param isMasking: boolean; The new masking state to set for vehicles.
 --
 -- @return maskingGlobalVehicles; The updated masking state for vehicles.
 function Vectors.SetMaskingState(isMasking)
-  Vectors.MaskingGlobal.vehicles = isMasking
+  MaskingGlobal.vehicles = isMasking
 
   SetVisibility(isMasking)
 
-  return Vectors.MaskingGlobal.vehicles
+  return MaskingGlobal.vehicles
 end
 
 --- Toggles the masking state (on/off) for vehicles and enables/disables Vectors.OnUpdate() (enables it to/prevents it from gathering data and transforming masks). 
@@ -1881,15 +1898,15 @@ end
 --
 -- @return maskingGlobalVehicles; The updated masking state for vehicles.
 function Vectors.ToggleMaskingState()
-  if Vectors.MaskingGlobal.vehicles then
-    Vectors.MaskingGlobal.vehicles = false
+  if MaskingGlobal.vehicles then
+    MaskingGlobal.vehicles = false
     SetVisibility(false)
   else
-    Vectors.MaskingGlobal.vehicles = true
+    MaskingGlobal.vehicles = true
     SetVisibility(true)
   end
 
-  return Vectors.MaskingGlobal.vehicles
+  return MaskingGlobal.vehicles
 end
 
 function Vectors.OnInitialize()
@@ -1907,7 +1924,7 @@ function Vectors.OnOverlayOpen()
 end
 
 function Vectors.OnUpdate()
-  if not Vectors.MaskingGlobal.vehicles then return end
+  if not MaskingGlobal.vehicles then return end
   GetCameraData()
   GetActivePerspective()
   GetVehicleData()
@@ -1924,7 +1941,7 @@ function Vectors.ApplyPreset(presetTable)
   local cname = CName.new
   local new2 = Vector2.new
 
-  local masksController = Vectors.MaskingGlobal.masksController
+  local masksController = MaskingGlobal.masksController
 
   local vehMasks = VehMasksData
   local hed, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
@@ -1939,9 +1956,9 @@ function Vectors.ApplyPreset(presetTable)
 
   if not presetTable or presetTable == nil then Globals.Print(Vectors.__NAME,"No preset found.") return end
 
-  Vectors.MaskingGlobal.vehicles = presetTable.MaskingGlobal.vehicles
+  MaskingGlobal.vehicles = presetTable.MaskingGlobal.vehicles
 
-  if not Vectors.MaskingGlobal.vehicles then SetVisibility(false) return end
+  if not MaskingGlobal.vehicles then SetVisibility(false) return end
 
   Globals.SafeMergeTables(VehElementsDef, presetTable.Vectors.VehElements)
   Globals.SafeMergeTables(VehMasksData, presetTable.Vectors.VehMasks)
@@ -2016,7 +2033,7 @@ function Vectors.ApplyPreset(presetTable)
     Override(masksController, 'FrameGenFrameGenGhostingFixVehicleToggleEvent', function(self, wrappedMethod)
       local originalFunction = wrappedMethod()
 
-      if Vectors.MaskingGlobal.vehicles then return originalFunction end
+      if MaskingGlobal.vehicles then return originalFunction end
       self:FrameGenGhostingFixVehicleToggle(false)
     end)
   end

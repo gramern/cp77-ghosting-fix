@@ -1010,7 +1010,7 @@ function Contextual.DrawUI()
       SetMenu(Contextual.Toggles.Menu)
     end
 
-    ImGui.Separator()
+    ImGui.Text("")
     ImGuiExt.Text("Current States: ")
     ImGuiExt.Text(StringifyStates())
 

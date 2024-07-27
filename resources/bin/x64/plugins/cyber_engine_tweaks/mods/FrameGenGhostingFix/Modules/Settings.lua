@@ -3,13 +3,7 @@ local Settings = {
   __VERSION = { 5, 0, 0 },
 }
 
-local ModSettings = {
-  isDebugMode = false,
-  isDebugView = false,
-  isHelp = true,
-  isFGEnabled = true,
-  isKeepWindow = false,
-}
+local ModSettings = {}
 
 local UserSettings = {}
 
@@ -41,18 +35,19 @@ end
 -- Mod Settings
 ------------------
 
-local function LoadModSettings()
-  local version = UserSettings.Version or false
+local function LoadModSettings(modSettings)
+  local version = modSettings.Version or false
 
   if not version or not Globals.VersionCompare(Globals.VersionStringToTable(version)) then
     Globals.SetNewInstall(true)
   end
 
-  ModSettings.isDebugMode = UserSettings.DebugMode or false
-  ModSettings.isDebugView = UserSettings.DebugView or false
-  ModSettings.isFGEnabled = UserSettings.FrameGen or true
-  ModSettings.isHelp = UserSettings.Help or true
-  ModSettings.isKeepWindow = UserSettings.KeepWindow or false
+  ModSettings.isDebugMode = modSettings.DebugMode or false
+  ModSettings.isDebugView = modSettings.DebugView or false
+  ModSettings.isFGEnabled = modSettings.FrameGen or true
+  ModSettings.isHelp = modSettings.Help or true
+  ModSettings.isKeepWindow = modSettings.KeepWindow or false
+  ModSettings.windowTheme = modSettings.WindowTheme or "Crimson"
 
   Globals.Print(Settings.__NAME,LogText.settings_loaded)
 end
@@ -63,7 +58,8 @@ local function SaveModSettings()
     DebugView = ModSettings.isDebugView,
     FrameGen = ModSettings.isDebugView,
     Help = ModSettings.isHelp,
-    KeepWindow = ModSettings.isKeepWindow
+    KeepWindow = ModSettings.isKeepWindow,
+    WindowTheme = ModSettings.windowTheme
   }
 
   Settings.WriteUserSettings("ModSettings", modSettings)
@@ -105,14 +101,14 @@ function Settings.SetHelp(isHelp)
   SaveRequest()
 end
 
--- @return boolean `true` if the mod is currently in help mode
+-- @return boolean: `true` if the mod is currently in help mode
 function Settings.IsHelp()
   return ModSettings.isHelp
 end
 
 -- @param `isFGEnabled`: boolean; The DLSS Enabler's FG state to set (`true` for FG enabled, `false` for otherwise).
 --
--- @return boolean" `true` if operation is succesful
+-- @return boolean: `true` if operation is succesful
 function Settings.SetFrameGeneration(isFGEnabled)
   local result = DLSSEnabler_SetFrameGenerationState(isFGEnabled)
 
@@ -140,6 +136,22 @@ end
 -- @return boolean: `true` for keep the window open
 function Settings.IsKeepWindow()
   return ModSettings.isKeepWindow
+end
+
+-- @return string; Selected Theme name
+function Settings.GetTheme()
+  return ModSettings.windowTheme
+end
+
+--- Saves the current theme based on the provided theme name.
+--
+-- @param `themeName`: string; The name of the theme to be applied.
+--
+-- @return None
+function Settings.SetTheme(themeName)
+  ModSettings.windowTheme = themeName
+
+  SaveRequest()
 end
 
 ------------------
@@ -175,7 +187,6 @@ end
 -- File Handling
 ------------------
 
--- @return None
 local function LoadFile()
   local file = io.open("user_settings.json", "r")
 
@@ -184,14 +195,13 @@ local function LoadFile()
     file:close()
     UserSettings = json.decode(userSettingsContents)
 
-    LoadModSettings()
+    LoadModSettings(Settings.GetUserSettings("ModSettings"))
   else
     Globals.SetFirstRun(true)
     Globals.Print(Settings.__NAME,LogText.settings_fileNotFound)
   end
 end
 
--- @return None
 local function SaveFile()
   if not isSaveRequest then return end -- file won't be saved without change to the UserSettings table
   if UserSettings == nil then Globals.PrintDebug(Settings.__NAME,LogText.settings_notSavedToFile) return end
