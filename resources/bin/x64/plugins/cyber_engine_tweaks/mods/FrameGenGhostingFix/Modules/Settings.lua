@@ -32,7 +32,7 @@ local function SaveRequest()
 end
 
 ------------------
--- Mod Settings
+-- File Version
 ------------------
 
 local function CheckFileVersion(fileVersion)

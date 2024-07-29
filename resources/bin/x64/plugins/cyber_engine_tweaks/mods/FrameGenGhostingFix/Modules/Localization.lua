@@ -173,11 +173,9 @@ local LogText = {
   calculate_applySettings = "Applying settings accordingly...",
   calculate_missing = "Can't find the 'Calculate' module. The mod's anti-ghosting feature for on-foot gameplay won't work.",
   contextual_missing = "Can't find the 'Contextual' module. The mod's contextual frame generation feature won't work.",
-  globals_aspectRatioChange = "The aspect ratio of the screen has changed. Please restart the game to ensure the mod will work as intended.",
   globals_controllerMissing = "Masks controller not set.  The mod won't work...",
   globals_firstRun = "Initial launch of the mod detected.",
   globals_missing = "Can't find the 'Globals' module. The mod won't work...",
-  globals_newVersion = "New version of the mod detected.",
   globals_wrongVersion = "The mod's 'Globals' module seems to be not compatible with the mod's current version. The mod won't work...",
   imguiext_missing = "Can't find the 'ImGuiExt' module. The mod won't work...",
   localization_baseLocalization = "Set the mod to the default language:",
@@ -349,4 +347,3 @@ function Localization.OnOverlayOpen()
 end
 
 return Localization
-

@@ -61,13 +61,9 @@ local FallbackBoard = {}
 --stores active delays
 local DelayBoard = {}
 
-local Localization = require("Modules/Localization")
-
-local LogText = Localization.GetLogText()
-
------------
+------------------
 -- Globals Debug Mode Setter
------------
+------------------
 
 function Globals.SetDebugMode(isDebugMode)
   isDebug = isDebugMode
@@ -101,7 +97,7 @@ function Globals.SetFirstRun(isFirstRun)
   ModState.isFirstRun = isFirstRun
   if not isFirstRun then return end
   Globals.SetNewInstall(true)
-  Globals.Print(Globals.__NAME, LogText.globals_firstRun)
+  Globals.Print(Globals.__NAME, "Initial launch of the mod detected.")
 end
 
 -- @return boolean: `true` if this is the first run of the mod
@@ -115,7 +111,7 @@ end
 function Globals.SetNewInstall(isNewInstall)
   ModState.isNewInstall = isNewInstall
   if not isNewInstall or ModState.isFirstRun then return end
-  Globals.Print(Globals.__NAME, LogText.globals_newVersion)
+  Globals.Print(Globals.__NAME, "New version of the mod detected.")
 end
 
 -- @return boolean: `true` if the current installation of the mod is new
@@ -172,7 +168,7 @@ function Globals.GetAspectRatio()
   if Screen.aspectRatio ~= previousAspectRatio then
     Screen.isAspectRatioChange = true
     Globals.SetModReady(false)
-    Globals.Print(Globals.__NAME, LogText.globals_aspectRatioChange)
+    Globals.Print(Globals.__NAME, "The aspect ratio of the screen has changed. Please restart the game to ensure the mod will work as intended.")
   end
 
   return Screen.aspectRatio
