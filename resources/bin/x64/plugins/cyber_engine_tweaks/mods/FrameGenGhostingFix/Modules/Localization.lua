@@ -52,6 +52,8 @@ local UIText = {
     MaskingPresets = {
       name = "Use this preset for vehicles:",
       tooltip = "Choose a preset of anti-ghosting for vehicles.",
+      description = "Preset's info:",
+      author = "Preset's author:",
     },
     Windshield = {
       name = "Customize motorcycle windshield mask",
@@ -159,10 +161,6 @@ local UIText = {
     textfield_3 = "Seems like you have a potentially conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation will work without problems in the future, please visit FrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any compatibility tweaks.",
     textfield_4 = "Potentially conflicting mods:"
   },
-  Presets = {
-    infotabname = "Preset's info:",
-    authtabname = "Preset's author:",
-  }
 }
 
 local LogText = {
@@ -185,7 +183,7 @@ local LogText = {
   localization_translationNotFound = "Couldn't find any translation for language code:",
   localization_translationAuthor = "Author of the translation:",
   presets_loaded = "Vehicle presets loaded:",
-  presets_missing = "Can't find the 'Presets' module. The mod's presets feature won't work...",
+  presets_missing = "Can't find the 'VectorsPresets' module. The mod's presets feature won't work...",
   presets_skippedFileDuplicate = "Another preset exists with the same name, skipped the file. Please use a different name.",
   presets_skippedFileData = "Skipped the preset file. It does not contain the required data for anti-ghosting masks:",
   redscript_missing = "Can't find a compatible RedScript module. The mod won't work as intended...",
@@ -227,8 +225,43 @@ local Globals = require("Modules/Globals")
 ------------------
 
 -- @return table;
-function Localization.GetUIText()
-  return UIText
+function Localization.GetGeneralText()
+  return UIText.General
+end
+
+-- @return table;
+function Localization.GetInfoText()
+  return UIText.Info
+end
+
+-- @return table;
+function Localization.GetSettingsText()
+  return UIText.Settings
+end
+
+-- @return table;
+function Localization.GetBenchmarkText()
+  return UIText.Benchmark
+end
+
+-- @return table;
+function Localization.GetDiagnosticsText()
+  return UIText.Diagnostics
+end
+
+-- @return table;
+function Localization.GetContextualText()
+  return UIText.Contextual
+end
+
+-- @return table;
+function Localization.GetOnFootText()
+  return UIText.OnFoot
+end
+
+-- @return table;
+function Localization.GetVehiclesText()
+  return UIText.Vehicles
 end
 
 -- @return table;

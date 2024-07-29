@@ -79,7 +79,8 @@ local Settings = require("Modules/Settings")
 local Tracker = require("Modules/Tracker")
 
 local LogText = Localization.GetLogText()
-local UIText = Localization.GetUIText()
+local GeneralText = Localization.GetGeneralText()
+local OnFootText = Localization.GetOnFootText()
 
 ------------------
 -- UserSettings
@@ -587,84 +588,84 @@ local vignetteScale = {}
 local vignettePosition = {}
 
 function Calculate.DrawUI()
-  if ImGui.BeginTabItem(UIText.OnFoot.tabname) then
-    ImGuiExt.Text(UIText.General.title_general)
+  if ImGui.BeginTabItem(OnFootText.tabname) then
+    ImGuiExt.Text(GeneralText.title_general)
     ImGui.Separator()
 
-    cornersOnWeaponBool, cornersOnWeaponToggle = ImGuiExt.Checkbox(UIText.OnFoot.BottomCornersMasks.name, GetCornersState("onWeapon"))
+    cornersOnWeaponBool, cornersOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.BottomCornersMasks.name, GetCornersState("onWeapon"))
     if cornersOnWeaponToggle then
       SetCornersState("onWeapon", cornersOnWeaponBool)
       SaveUserSettings()
 
-      ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
     end
-    ImGuiExt.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.BottomCornersMasks.tooltip)
 
-    blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(UIText.OnFoot.BlockerAim.name, GetBlockerState("onAim"))
+    blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(OnFootText.BlockerAim.name, GetBlockerState("onAim"))
     if blockerOnAimToggle then
       SetBlockerState("onAim", blockerOnAimBool)
-      ImGuiExt.SetStatusBar(UIText.General.settings_saved)
+      ImGuiExt.SetStatusBar(GeneralText.settings_saved)
 
       if GetVignetteState("onAim") then
         
         SetVignetteState("onAim", false)
 
-        ImGuiExt.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(GeneralText.info_aimOnFoot)
       end
 
       SaveUserSettings()
     end
-    ImGuiExt.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.BlockerAim.tooltip)
 
     ImGui.Text("")
-    ImGuiExt.Text(UIText.General.title_fps120)
+    ImGuiExt.Text(GeneralText.title_fps120)
     ImGui.Separator()
 
-    vignetteOnAimBool, vignetteOnAimToggle = ImGuiExt.Checkbox(UIText.OnFoot.VignetteAim.name, GetVignetteState("onAim"))
+    vignetteOnAimBool, vignetteOnAimToggle = ImGuiExt.Checkbox(OnFootText.VignetteAim.name, GetVignetteState("onAim"))
     if vignetteOnAimToggle then
       SetVignetteState("onAim", vignetteOnAimBool)
-      ImGuiExt.SetStatusBar(UIText.General.settings_saved)
+      ImGuiExt.SetStatusBar(GeneralText.settings_saved)
 
       if GetBlockerState("onAim") then
         SetBlockerState("onAim", false)
 
-        ImGuiExt.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(GeneralText.info_aimOnFoot)
       end
 
       SaveUserSettings()
     end
-    ImGuiExt.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.VignetteAim.tooltip)
 
-    vignetteOnWeaponBool, vignetteOnWeaponToggle = ImGuiExt.Checkbox(UIText.OnFoot.Vignette.name, GetVignetteState("onWeapon"))
+    vignetteOnWeaponBool, vignetteOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.Vignette.name, GetVignetteState("onWeapon"))
     if vignetteOnWeaponToggle then
       SetVignetteState("onWeapon", vignetteOnWeaponBool)
       SaveUserSettings()
       
-      ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
     end
-    ImGuiExt.SetTooltip(UIText.OnFoot.Vignette.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.Vignette.tooltip)
 
     if GetVignetteState("onWeapon") then
       if not Tracker.IsVehicleMounted() then
-        vignettePermamentBool, vignettePermamentToggle = ImGuiExt.Checkbox(UIText.OnFoot.VignettePermament.name, GetVignetteState("permament"))
+        vignettePermamentBool, vignettePermamentToggle = ImGuiExt.Checkbox(OnFootText.VignettePermament.name, GetVignetteState("permament"))
         if vignettePermamentToggle then
           SetVignetteState("permament", vignettePermamentBool)
           SaveUserSettings()
 
-          ImGuiExt.SetStatusBar(UIText.General.settings_applied_onfoot)
+          ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
         end
-        ImGuiExt.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
+        ImGuiExt.SetTooltip(OnFootText.VignettePermament.tooltip)
 
         if GetVignetteState("onAim") and GetVignetteState("onWeapon") then
           ImGui.Text("")
-          ImGuiExt.Text(UIText.OnFoot.VignetteAim.textfield_1, true)
+          ImGuiExt.Text(OnFootText.VignetteAim.textfield_1, true)
         end
 
         --customize vignette interface starts------------------------------------------------------------------------------------------------------------------
         ImGui.Text("")
-        ImGuiExt.Text(UIText.OnFoot.Vignette.textfield_1, true)
+        ImGuiExt.Text(OnFootText.Vignette.textfield_1, true)
         ImGui.Text("")
-        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_1)
+        ImGuiExt.Text(OnFootText.Vignette.setting_1)
       
         vignetteScale.x, vignetteScaleToggle.x = ImGui.SliderFloat("##Scale X", GetVignetteScale("x"), GetVignetteScale("x", "Min"), GetVignetteScale("x", "Max"), "%.0f")
         if vignetteScaleToggle.x then
@@ -673,7 +674,7 @@ function Calculate.DrawUI()
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_2)
+        ImGuiExt.Text(OnFootText.Vignette.setting_2)
       
         vignetteScale.y, vignetteScaleToggle.y = ImGui.SliderFloat("##Scale Y", GetVignetteScale("y"), GetVignetteScale("y", "Min"), GetVignetteScale("y", "Max"), "%.0f")
         if vignetteScaleToggle.y then
@@ -682,7 +683,7 @@ function Calculate.DrawUI()
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_3)
+        ImGuiExt.Text(OnFootText.Vignette.setting_3)
       
         vignettePosition.x, vignettePositionToggle.x = ImGui.SliderFloat("##Pos. X", GetVignetteScreenPosition("x"), GetVignetteScreenPosition("x", "Min"), GetVignetteScreenPosition("x", "Max"), "%.0f")
         if vignettePositionToggle.x then
@@ -691,7 +692,7 @@ function Calculate.DrawUI()
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(UIText.OnFoot.Vignette.setting_4)
+        ImGuiExt.Text(OnFootText.Vignette.setting_4)
       
         vignettePosition.y, vignettePositionToggle.y = ImGui.SliderFloat("##Pos. Y", GetVignetteScreenPosition("y"), GetVignetteScreenPosition("y", "Min"), GetVignetteScreenPosition("y", "Max"), "%.0f")
         if vignettePositionToggle.y then
@@ -702,23 +703,23 @@ function Calculate.DrawUI()
       
         ImGui.Text("")
       
-        if ImGui.Button(UIText.General.default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(GeneralText.default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           SetVignetteDefault('x')
           SetVignetteDefault('y')
           TurnOnLiveView()
 
-          ImGuiExt.SetStatusBar(UIText.General.settings_default)
+          ImGuiExt.SetStatusBar(GeneralText.settings_default)
         end
       
         ImGui.SameLine()
       
-        if ImGui.Button(UIText.General.settings_save, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(GeneralText.settings_save, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           SaveUserSettings()
 
-          ImGuiExt.SetStatusBar(UIText.General.settings_saved)
+          ImGuiExt.SetStatusBar(GeneralText.settings_saved)
         end
       else
-        ImGuiExt.SetStatusBar(UIText.General.info_getOut)
+        ImGuiExt.SetStatusBar(GeneralText.info_getOut)
       end
     else
       if GetVignetteState("permament") then

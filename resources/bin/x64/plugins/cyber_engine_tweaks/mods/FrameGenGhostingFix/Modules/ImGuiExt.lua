@@ -13,7 +13,7 @@ local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 
-local UIText = Localization.GetUIText()
+local GeneralText = Localization.GetGeneralText()
 
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
@@ -191,7 +191,7 @@ local Status = {
 --
 -- @return None
 function ImGuiExt.ResetStatusBar()
-  local status = UIText.General.info_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
+  local status = GeneralText.info_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
 
   ImGuiExt.SetStatusBar(status)
 end

@@ -93,6 +93,8 @@ local translation = {
       MaskingPresets = {
         name = "Use this preset for vehicles:",
         tooltip = "Choose a preset of anti-ghosting for vehicles.",
+        description = "Preset's info:",
+        author = "Preset's author:",
       },
       Windshield = {
         name = "Customize motorcycle windshield mask",
@@ -199,10 +201,6 @@ local translation = {
       textfield_2 = "Conflicting mods:",
       textfield_3 = "Seems like you have a potentially conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation will work without problems in the future, please visit FrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any compatibility tweaks.",
       textfield_4 = "Potentially conflicting mods:"
-    },
-    Presets = {
-      infotabname = "Preset's info:",
-      authtabname = "Preset's author:",
     },
   },
   PresetsInfo = {

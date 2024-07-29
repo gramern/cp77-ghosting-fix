@@ -10,7 +10,7 @@ local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 
-local UIText = Localization.GetUIText()
+local DiagnosticsText = Localization.GetDiagnosticsText()
 
 
 function Diagnostics.IsUpdateRecommended()
@@ -29,19 +29,19 @@ end
 
 --Local UI
 function Diagnostics.DrawUI()
-  if ImGui.BeginTabItem(UIText.Diagnostics.tabname) then
+  if ImGui.BeginTabItem(DiagnosticsText.tabname) then
     if not Diagnostics.isModsCompatibility then
-      ImGuiExt.TextRed(UIText.Diagnostics.title_warning)
+      ImGuiExt.TextRed(DiagnosticsText.title_warning)
       ImGui.Text("")
-      ImGuiExt.Text(UIText.Diagnostics.textfield_1)
+      ImGuiExt.Text(DiagnosticsText.textfield_1)
       ImGui.Text("")
-      ImGuiExt.Text(UIText.Diagnostics.textfield_2)
+      ImGuiExt.Text(DiagnosticsText.textfield_2)
     else
-      ImGuiExt.TextGreen(UIText.Diagnostics.title_info)
+      ImGuiExt.TextGreen(DiagnosticsText.title_info)
       ImGui.Text("")
-      ImGuiExt.Text(UIText.Diagnostics.textfield_3)
+      ImGuiExt.Text(DiagnosticsText.textfield_3)
       ImGui.Text("")
-      ImGuiExt.Text(UIText.Diagnostics.textfield_4)
+      ImGuiExt.Text(DiagnosticsText.textfield_4)
     end
 
     for _, mod in pairs(Diagnostics.modfiles) do

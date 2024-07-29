@@ -82,8 +82,12 @@ end
 -- Global Specific Getters
 ------------------
 
--- @return boolean: `true` if frame generation is enabled in DLSS Enabler
+-- @return boolean: `true` if frame generation is enabled in DLSS Enabler and is in-game
+--
+-- NOTE: Disable logging for 'dlss-enabler-bridge-2077.dll' to avoid excessive logging when calling this function frequently
 function Tracker.IsModFrameGeneration()
+  if GameState.isPreGame then return false end
+
   return DLSSEnabler_GetFrameGenerationState()
 end
 

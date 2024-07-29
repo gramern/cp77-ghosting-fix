@@ -1,8 +1,7 @@
 {
   "__VERSION": "5.0.0",
   "MaskingGlobal": {
-    "vehicles": false,
-    "onfoot": false
+    "vehicles": false
   },
   "Vectors": {
     "VehElements": {

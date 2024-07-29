@@ -50,6 +50,8 @@ local translation = {
       MaskingPresets = {
         name = "Uzyj tego presetu dla pojazdow:",
         tooltip = "Wybierz preset anty-ghostingu dla pojazdow.",
+        description = "Informacje o presecie:",
+        author = "Autor presetu:",
       },
       Windshield = {
         name = "Dostosuj maske przedniej szyby motocykla",
@@ -157,10 +159,6 @@ local translation = {
       textfield_3 = "Wyglada na to, ze masz zainstalowany potencjalnie\nkonfliktujacy mod.\n\nAby upewnic sie, ze anty-ghosting dla generowania klatek\nbedzie dzialal bez problemow w przyszlosci, odwiedz strone\nNexus moda FrameGen Ghosting 'Fix', aby pobrac i zainstalowac\nnajnowsza wersje moda.\n\nZ nowa wersja nie potrzebujesz juz zadnych\ndostosowa kompatybilnosci.",
       textfield_4 = "Potencjalnie konfliktujace mody:"
     },
-    Presets = {
-      infotabname = "Informacje o presecie:",
-      authtabname = "Autor presetu:",
-    }
   },
   PresetsList = {
     --[=====[
