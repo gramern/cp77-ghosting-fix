@@ -43,6 +43,7 @@
 
 local translation = {
   __VERSION = { 5, 0, 0 },
+  __AUTHOR = "", -- Mark your work. 
   UIText = {
     General = {
       title_general = "General Settings:",
@@ -52,13 +53,18 @@ local translation = {
       yes = "Yes",
       no = "No",
       apply = "Apply",
+      cancel = "Cancel",
       default = "Set to default",
+      disabled = "Disabled",
+      enabled = "Enabled",
       presets_comboBox = "Use this preset:",
       presets_comboBox_tooltip = "Choose a preset of anti-ghosting.",
+      save = "Save",
       settings_loaded = "User settings loaded.",
       settings_loaded_preset = "Preset loaded",
       settings_applied_veh = "[ ! ] Selected preset applied.",
       settings_restored = "Restored your previous settings.",
+      settings_load = "Load settings",
       settings_save = "Save settings",
       settings_saved = "[ ! ] Your settings will be saved.",
       settings_applied_onfoot = "[ ! ] Redraw your weapon to accept changes.",
@@ -70,12 +76,16 @@ local translation = {
       info_modNotReady = "[ ! ] Mod isn't working. Check logs for details...",
       info_version = "Mod version:",
       info_vectorsMissing = "No compatible 'Vectors' module found.",
+      info_frameGenStatus = "Current Frame Generation Status:",
+      info_frameGenOff = "[ ! ] Frame Generation is turned off in the game's settings. Masking is turned off.",
+      info_noMaskingOnFoot = "[ ! ] Ghosting masking On-Foot is turned off globally.",
+      info_noMaskingVehicles = "[ ! ] Ghosting masking for vehicles is turned off globally.",
     },
     Info = {
       tabname = "Info",
-      aspectRatioChange = "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod will\nwork as intended.",
-      benchmark = "[ ! ] FrameGen Ghosting 'Fix' is benchmarking your game's\nperformance. Please continue playing freely: once the\nbenchmark is finished, the mod will apply optimal settings\nfor your game's performance. You can change those\nsettings later.\n\nThe benchmark is conducted during the first run of the mod.",
-      benchmarkAsk = "[ ! ] Do you want to run a benchmark to let the mod measure\nyour game's performance and set optimal anti-ghosting\nsettings?\n\nIt will happen in the background, please continue playing\nfreely.",
+      aspectRatioChange = "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod will work as intended.",
+      benchmark = "[ ! ] FrameGen Ghosting 'Fix' is benchmarking your game's performance. Please continue playing freely: once the benchmark is finished, the mod will apply optimal settings for your game's performance. You can change those settings later.\n\nThe benchmark is conducted during the first run of the mod.",
+      benchmarkAsk = "[ ! ] Do you want to run a benchmark to let the mod measure your game's performance and set optimal anti-ghosting settings?\n\nIt will happen in the background, please continue playing freely.",
       modNotReady = "The mod encountered a problem:",
     },
     Vehicles = {
@@ -86,30 +96,30 @@ local translation = {
       },
       Windshield = {
         name = "Customize motorcycle windshield mask",
-        tooltip = "Enables customization of the anti-ghosting mask to stop frame generation\nfrom occuring locally around a windshield when riding a motorcycle.",
-        textfield_1 = "The sliders below let you customize the size of the motorcycle\nwindshield mask. Usually not necessary, may turn out handy for\nsome motorcycles like Apollo.",
+        tooltip = "Enables customization of the anti-ghosting mask to stop frame generation from occuring locally around a windshield when riding a motorcycle.",
+        textfield_1 = "The sliders below let you customize the size of the motorcycle windshield mask. Usually not necessary, may turn out handy for some motorcycles like Apollo.",
         setting_1 = "Windshield anti-ghosting mask width:",
         setting_2 = "Windshield anti-ghosting mask height:",
         comment_1 = "Scale width",
         comment_2 = "Scale height",
-        warning = "V needs to be sitting on a stationary motorcycle while in\nFirst Person Perspective to edit this option."
+        warning = "V needs to be sitting on a stationary motorcycle while in First Person Perspective to edit this option."
       }
     },
     OnFoot = {
-      tabname = "On Foot",
+      tabname = "On-Foot",
       BottomCornersMasks = {
         name = "Enable bottom corners anti-ghosting masks",
-        tooltip = "Enables position-fixed anti-ghosting masks to stop frame generation\nfrom occuring locally around bottom corners of your screen and reduce\nghosting when V is holding a weapon.",
+        tooltip = "Enables position-fixed anti-ghosting masks to stop frame generation from occuring locally around bottom corners of your screen and reduce ghosting when V is holding a weapon.",
       },
       VignetteAim = {
         name = "Enable anti-ghosting vignette for aiming/blocking",
-        tooltip = "Enables dynamic anti-ghosting vignette to stop frame generation\nfrom occuring locally around edges of your screen and reduce\nghosting when V is aiming/blocking with a weapon. For framerates\nlower than recommended, this setting comes at a cost of perceived\nsmoothness in outermost areas of your field of view.",
-        textfield_1 = "[ ! ] Enabling both vignette's options at the same time may cause\nmore noticeable dimming around edges of your screen."
+        tooltip = "Enables dynamic anti-ghosting vignette to stop frame generation from occuring locally around edges of your screen and reduce ghosting when V is aiming/blocking with a weapon. For framerates lower than recommended, this setting comes at a cost of perceived smoothness in outermost areas of your field of view.",
+        textfield_1 = "[ ! ] Enabling both vignette's options at the same time may cause more noticeable dimming around edges of your screen."
       },
       Vignette = {
         name = "Enable customizable anti-ghosting vignette",
-        tooltip = "Enables customizable anti-ghosting vignette to stop frame generation\nfrom occuring locally around edges of your screen and reduce ghosting\nwhen V is holding a weapon.",
-        textfield_1 = "The sliders below let you customize the vignette's dimensions\nto cover ghosting on your screen edges. For framerates lower\nthan recommended, these settings come at a noticeable cost\nof perceived smoothness in outermost areas of your field\nof view.",
+        tooltip = "Enables customizable anti-ghosting vignette to stop frame generation from occuring locally around edges of your screen and reduce ghosting when V is holding a weapon.",
+        textfield_1 = "The sliders below let you customize the vignette's dimensions to cover ghosting on your screen edges. For framerates lower than recommended, these settings come at a noticeable cost of perceived smoothness in outermost areas of your field of view.",
         setting_1 = "Vignette's width:",
         setting_2 = "Vignette's height:",
         setting_3 = "Vignette's horizontal position:",
@@ -117,224 +127,134 @@ local translation = {
       },
       VignettePermament = {
         name = "Keep the vignette turned on when V holsters a weapon",
-        tooltip = "By default, the vignette hides when V holsters a weapon.\nThis setting lets you keep the vignette turned on all the\ntime when V is on foot."
+        tooltip = "By default, the vignette hides when V holsters a weapon. This setting lets you keep the vignette turned on all the time when V is on foot."
       },
       BlockerAim = {
         name = "Enable frame gen blocker for aiming/blocking",
-        tooltip = "Enables contextual blocking of frame generation\nfor a whole screen when V is aiming/blocking with a weapon. This\nmay turn out to be helpful in higher framerates as crosshairs/\nsights tend to ghost heavily with frame generation turned on."
+        tooltip = "Enables contextual blocking of frame generation for a whole screen when V is aiming/blocking with a weapon. This may turn out to be helpful in higher framerates as crosshairs/ sights tend to ghost heavily with frame generation turned on."
       }
     },
     Contextual = {
       tabname = "Contextual",
-      requirement = 'Please check "Toggle Frame Generation" from "Additional Options" if you want to use these features.',
-      info = "Turn off frame generation during these events."
+      requirement = 'Please check "Enable Frame Generation" in the "Settings" tab to use these features.',
+      info = "Select contexts to turn off frame generation during these events.",
+      groupOther = "Other:",
+      groupOnFoot = "On-Foot:",
+      groupVehicles = "Vehicles:",
+      onFootStanding = "Standing",
+      onFootSlowWalk = "Slow Walking",
+      onFootWalk = "Walking",
+      onFootSprint = "Sprinting",
+      onFootSwimming = "Swimming",
+      vehiclesStatic = "Static",
+      vehiclesDriving = "Driving",
+      vehiclesStaticWeapon = "Static (Weapon Drawn)",
+      vehiclesDrivingWeapon = "Driving (Weapon Drawn)",
+      braindance = "Braindance",
+      cinematics = "Cinematics",
+      combat = "Combat (Enemies Alerted)",
+      menus = "In-Game Menus",
+      photoMode = "Photo Mode",
     },
-    Options = {
-      tabname = "Additional Options",
-      enabledDebug = "Enable debug view",
+    Settings = {
+      tabname = "Settings",
+      groupMod = "Mod Settings:",
+      enabledDebug = "Enable debug mode",
+      enabledDebugView = "Enable debug view in the window",
+      enabledHelp = "Enable tooltips",
+      tooltipHelp = "Enable tooltips on mouse hover for certain settings.",
       enabledWindow = "Keep this window open",
-      tooltipWindow = "Keeps this window opened after closing CET's overlay.",
-      toggleFG = "Toggle Frame Generation",
-      tooltipToggleFG = "Turn on/off Frame Generation, so you don't have to do it from the game menu.",
-      fgEnableInGameMenu = "[ ! ] Please make sure frame generation is always enabled in game menu for this to function correctly.",
-      Benchmark = {
-        currentFps = "Current FPS without Frame Gen:",
-        currentFrametime = "Current Frame-Time without Frame Gen (ms):",
-        averageFps = "Average FPS without Frame Gen:",
-        benchmark = "Benchmark enabled:",
-        benchmarkRemaining = "Remaining benchmark time (s):",
-        benchmarkPause = "[ ! ] Benchmark is paused. Unpause the game to continue.",
-        benchmarkPauseOverlay = "[ ! ] Benchmark is paused. Exit CET's overlay to continue.",
-        benchmarkRestart = "[ ! ] Benchmark restarting in:",
-        benchmarkRun = "Run benchmark",
-        benchmarkSetSuggestedSettings = "Set suggested settings",
-        benchmarkRevertSettings = "Revert to my settings",
-        benchmarkStop = "Stop benchmark",
-        benchmarkEnabled = "Benchmark enabled.",
-        benchmarkFinished = "Finished benchmarking.",
-        tooltipRunBench = "Runs the benchmark to measure your game's performance and applies\nsuggested settings once completed. When finished you can review\nthe new settings and revert to your current ones if needed."
-      },
+      tooltipWindow = "Keep this window opened after closing CET's overlay.",
+      selectTheme = "Mod's Window Theme:",
+      tooltipTheme = "Pick your colors for the mod's window.",
+      groupFG = "Frame Generation Settings:",
+      enableFG = "Enable Frame Generation",
+      tooltipFG = "Turn on/off Frame Generation on the mod level (the game's settings remain unchanged).",
+      gameSettingsFG = "[ ! ] Please make sure frame generation is always enabled in game menu for this to work correctly.",
+      gameNotReadyWarning = "[ ! ] You need to start or unpause the game to change these settings.",
+    },
+    Benchmark = {
+      groupBenchmark = "Game Performance Benchmark:",
+      currentFps = "Current FPS without Frame Gen:",
+      currentFrametime = "Current Frame-Time without Frame Gen (ms):",
+      averageFps = "Average FPS without Frame Gen:",
+      benchmark = "Benchmark enabled:",
+      benchmarkRemaining = "Remaining benchmark time (s):",
+      benchmarkPause = "[ ! ] Benchmark is paused. Unpause the game to continue.",
+      benchmarkPauseOverlay = "[ ! ] Benchmark is paused. Exit CET's overlay to continue.",
+      benchmarkRestart = "[ ! ] Benchmark restarting in:",
+      benchmarkRun = "Run benchmark",
+      benchmarkSetSuggestedSettings = "Set suggested settings",
+      benchmarkRevertSettings = "Revert to my settings",
+      benchmarkStop = "Stop benchmark",
+      benchmarkEnabled = "Benchmark enabled.",
+      benchmarkFinished = "Finished benchmarking.",
+      tooltipRunBench = "Runs the benchmark to measure your game's performance and applies suggested settings once completed. When finished you can review the new settings and revert to your current ones if needed."
     },
     Diagnostics = {
       tabname = "Diagnostics",
       title_warning = "CONFLICTS WITH OTHER MODS DETECTED",
       title_info = "UPDATE AVAILABLE",
-      textfield_1 = "Seems like you have a conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems, please, visit FrameGen\nGhosting 'Fix's Nexus page to download and install the latest version of the mod.",
+      textfield_1 = "Seems like you have a conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation will work without problems, please, visit FrameGen Ghosting 'Fix's Nexus page to download and install the latest version of the mod.",
       textfield_2 = "Conflicting mods:",
-      textfield_3 = "Seems like you have a potentially conflicting mod\ninstalled.\n\nTo ensure that anti-ghosting for frame generation\nwill work without problems in the future, please visit\nFrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any\ncompatibility tweaks.",
+      textfield_3 = "Seems like you have a potentially conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation will work without problems in the future, please visit FrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any compatibility tweaks.",
       textfield_4 = "Potentially conflicting mods:"
     },
     Presets = {
       infotabname = "Preset's info:",
       authtabname = "Preset's author:",
-    }
+    },
   },
   PresetsInfo = {
     --[=====[
     Presets are saved using IDs, to translate a preset you need the ID of it. The structure looks like following
     [PresetID] = {
-      name = "Preset's name",
-      description = "Preset's description"
+      PresetInfo = {
+        name = "Preset's name",
+        description = "Preset's description"
+      }
     }
 
     IDs have to be covered by brackets [], else your translation will fail!
     To find the ID of a preset just ask the author or take a look at the website were it'S been published.
     --]=====]
     a000 = {
-      name = "Customize",
-      description = "Customize your preset.",
-      author = nil,
+      PresetInfo = {
+        name = "Customize",
+        description = "Customize your preset.",
+      }
     },
     a001 = {
-      name = "Default",
-      description = "Default preset.",
-      author = nil,
+      PresetInfo = {
+        name = "Default",
+        description = "Default preset.",
+      }
     },
     a002 = {
-      name = "Stronger",
-      description = "Masks' anti-ghosting strength is slightly greater and\ntheir state change delay on a sudden speed decrease\nis twice as long (3 seconds instead of 1.5).",
-      author = nil,
+      PresetInfo = {
+        name = "Stronger",
+        description = "Masks' anti-ghosting strength is slightly greater and their state change delay on a sudden speed decrease is twice as long (3 seconds instead of 1.5).",
+      }
     },
     a003 = {
-      name = "Testing",
-      description = "Testing preset, all masks visible.",
-      author = nil,
+      PresetInfo = {
+          name = "Testing",
+          description = "Testing preset, all masks visible.",
+        }
     },
     a004 = {
-      name = "Testing Stronger",
-      description = "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time).",
-      author = nil,
+      PresetInfo = {
+        name = "Testing Stronger",
+        description = "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time).",
+      }
     },
     a005 = {
-      name = "Turn off anti-ghosting masking",
-      description = "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
-      author = nil,
+      PresetInfo = {
+        name = "Turn off anti-ghosting masking",
+        description = "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
+      }
     }
-  },
-  --[=====[
-  I've retained Debug's table for now, but I don't see this as necessary. The Debug module is a development tool that could change rapidly during the mod's development. 
-  
-  There's no need for translation, and introducing such would make expected changes to it tedious.
-  Debug = {
-    back = "Back",
-    front = "Front",
-    right = "Right",
-    left = "Left",
-    rotation = "Rotation",
-    length = "Length",
-    General = {
-      tabname = "General Data",
-      topic_diagnostic = "Diagnostics:",
-      compatibility = "Mods Compatibility",
-      missing_diagnostic = "Diagnostics module not present",
-      screen_resolution = "Screen Resolution:",
-      screen_aspect_ratio = "Screen Aspect Ratio:",
-      camera_fov = "Active Camera FOV:",
-      screen_aspect_factor = "Screen Aspect Factor:",
-      screen_space = "Screen Space:",
-      pre_game = "Is Pre-Game:",
-      loaded_game = "Is Game Loaded:",
-      paused_game = "Is Game Paused:",
-      current_fps = "Current FPS:",
-      masked_controller = "Masks Controller:",
-      module_presets = "For Presets Module:",
-      module_settings = "For Settings Module:",
-      module_vectors = "For Vectors Module",
-      init_file = "For init.lua",
-      masked_controller_ready = "Is Masks Controller Ready:",
-      enabled_masking = "Masking enabled:",
-      vehicle_mask = "Vehicles HED Mask Size:",
-      hed_toggle_value = "HED Fill/Tracker Toggle Value:",
-      foot_mask = "On Foot Corner Masks Margins:",
-      mask_path = "Masks Paths:",
-    },
-    Vector = {
-      tabname = "Vectors Data",
-      camera = "Camera Forward:",
-      DotProduct = {
-        vehicle = "DotProduct Vehicle Forward:",
-        vehicle_absolute = "DotProduct Vehicle Forward Absolute:",
-        vehicle_right = "DotProduct Vehicle Right:",
-        vehicle_right_absolute = "DotProduct Vehicle Right Absolute:",
-        vehicle_up = "DotProduct Vehicle Up:",
-        vehicle_up_absolute = "DotProduct Vehicle Up Absolute:",
-      },
-      camera_angle = "Camera Forward Angle:",
-      vehicle_forward_horizontal = "Vehicle Forward Horizontal Plane:",
-      vehicle_forward_median = "Vehicle Forward Median Plane:",
-      camera_forward_z = "Camera Forward Z:",
-      camera_forward_xyz = "Camera Forward (x, y, z, w = 0):",
-      camera_right_xyz = "Camera Right (x, y, z, w = 0):",
-      camera_up_xyz = "Camera Up (x, y, z, w = 0):",
-      vehicle_forward_xyz = "Vehicle Forward (x, y, z, w = 0):",
-      vehicle_right_xyz = "Vehicle Right (x, y, z, w = 0):",
-      vehicle_up_xyz = "Vehicle Up (x, y, z, w = 0):",
-    },
-    Vehicle = {
-      tabname = "Vehicle Data",
-      inside = "Is in a Vehicle:",
-      inside_negative_answer = "false",
-      Mounted = {
-        bike = "bike",
-        car = "car",
-        tank = "tank",
-        unknown = "vehicle"
-      },
-      id = "Current Vehicle's ID",
-      speed = "Vehicle Current Speed:",
-      perspective = "Active Camera Perspective in Vehicle:",
-      position = "Vehicle's Position:",
-      wheels_position = "Wheels Positions:",
-      wheel_bl = "Back Left",
-      wheel_br = "Back Right",
-      wheel_fl = "Front Left",
-      wheel_fr = "Front Right",
-      wheel_base = "Vehicle's Wheelbase:",
-      wheel_axes_postion = "Vehicle Axes Midpoints' Positions:",
-      wheel_axis_back = "Back Wheels' Axis",
-      wheel_axes_front = "Front Wheels' Axis",
-      wheel_axis_left = "Left Wheels' Axis",
-      wheel_axis_right = "Right Wheels' Axis",
-      bumper_position = "Vehicle Bumpers Positions:",
-      bumper_back = "Back",
-      bumper_front = "Front",
-      bumper_distance = "Distance Between Bumpers:",
-      bumper_offset = "Bumpers Offset From Wheels:",
-    },
-    ScreenSpace = {
-      tabname = "Screen Space Data",
-      wheels_position = "Wheels Screen Space Positions:",
-      bumper_position = "Bumpers Screen Space Distance:",
-      axis_rotation = "Distance (Longtitude Axis) Rotation:",
-      axes_screen = "Wheels' Axes Screen Data:",
-    },
-    Masks = {
-      tabname ="Masks Data",
-      hed_opacity = "Current HED Opacity:",
-      hed_tracker_opacity = "Current HED Tracker Opacity:",
-      hed_tracker_size = "HED Tracker Size (x, y):",
-      opacity = "Current Masks Opacities:",
-      opacity_gain = "Opacity Gain:",
-      opacity_delay = "Opacity Transformation Delay Time:",
-      opacity_normal = "Is Opacity Normalized:",
-      position = "Masks Positions:",
-      sizes = "Masks Sizes:",
-      cached_size = "Cached Masks Sizes:",
-      [1] = "Mask 1",
-      [2] = "Mask 2",
-      [3] = "Mask 3",
-      [4] = "Mask 4",
-      hed_fill = "HED Fill Lock:",
-      hed_tracker = "HED Tracker Position:",
-    },
-    Player = {
-      tabname = "Player Data",
-      is_moving = "Is Moving:",
-      has_weapon = "Has a Weapon in Hand:",
-      is_mounted = "Is Mounted:",
-    }
-  },
-  --]=====]
+  }
 }
 
 return translation

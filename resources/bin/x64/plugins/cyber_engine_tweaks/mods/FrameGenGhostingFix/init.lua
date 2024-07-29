@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = nil,
+  __VERSION_STATUS = "alpha",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -38,9 +38,6 @@ local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local Tracker = require("Modules/Tracker")
 
-local LogText = Localization.LogText
-local UIText = Localization.UIText
-
 --functional modules
 local Calculate = require("Modules/Calculate")
 local Contextual = require("Modules/Contextual")
@@ -49,8 +46,11 @@ local Vectors = require("Modules/Vectors")
 
 --optional modules
 local Diagnostics = require("Modules/Diagnostics")
-local Translate = require("Modules/Translate")
 local VectorsCustomize = require("Modules/VectorsCustomize")
+
+--localization tables
+local LogText = Localization.GetLogText()
+local UIText = Localization.GetUIText()
 
 --debug
 local isDebug
@@ -287,16 +287,17 @@ end
 ------------------
 
 registerForEvent("onInit", function()
-  if not Globals then Globals.Print(LogText.globals_missing) return end
-  if not Tracker then Globals.Print(LogText.tracker_missing) return end
-  if not Settings then Globals.Print(LogText.settings_missing) return end
-  if not ImGuiExt then Globals.Print(LogText.imguiext_missing) return end
-  if not Localization then Globals.Print(LogText.localization_missing) return end
-  if not Calculate then Globals.Print(LogText.calculate_missing) end
-  if not Contextual then Globals.Print(LogText.contextual_missing) end
-  if not Presets then Globals.Print(LogText.presets_missing) end
-  if not Vectors then Globals.Print(LogText.vectors_missing_missing) end
-  if not Translate then Globals.Print(LogText.translate_missing) end
+  if not ModArchiveExists("framegenghostingfix.archive") then Globals.PrintError(LogText.archive_missing) return end
+  if not Game["FrameGenGhostingFixIsRedScriptModule"] then Globals.PrintError(LogText.redscript_missing) return end
+  if not Globals then Globals.PrintError(LogText.globals_missing) return end
+  if not Tracker then Globals.PrintError(LogText.tracker_missing) return end
+  if not Settings then Globals.PrintError(LogText.settings_missing) return end
+  if not ImGuiExt then Globals.PrintError(LogText.imguiext_missing) return end
+  if not Localization then Globals.PrintError(LogText.localization_missing) return end
+  if not Calculate then Globals.PrintError(LogText.calculate_missing) end
+  if not Contextual then Globals.PrintError(LogText.contextual_missing) end
+  if not Presets then Globals.PrintError(LogText.presets_missing) end
+  if not Vectors then Globals.PrintError(LogText.vectors_missing_missing) end
 
   FrameGenGhostingFix.GetVersion()
 
@@ -366,9 +367,9 @@ if Debug then
     local mode = DLSSEnabler_GetFrameGenerationMode()
     
     if mode then
-      Globals.Print("Retrieved current Frame Generation Mode:", mode)
+      Globals.PrintDebug("Retrieved current Frame Generation Mode:", mode)
     else
-      Globals.Print("Failed to retrieve current Frame Generation Mode:", mode)
+      Globals.PrintDebug("Failed to retrieve current Frame Generation Mode:", mode)
     end
   end)
 end
@@ -381,24 +382,15 @@ registerForEvent("onOverlayOpen", function()
   Globals.SetDebugMode(isDebug)
 
   --translate UIText before other modules access it
-  if Translate then
-    Translate.SetTranslation("Modules/Localization", "UIText")
-    Localization = require("Modules/Localization")
-    UIText = Localization.UIText
-  end
+  Localization.OnOverlayOpen()
 
   Globals.OnOverlayOpen()
   ImGuiExt.OnOverlayOpen()
   Tracker.OnOverlayOpen()
 
-  if Diagnostics then
-    Diagnostics.OnOverlayOpen()
-  end
-
   if not Globals.IsModReady() then return end
 
-  Calculate.OnOverlayOpen()
-  Contextual.OnOverlayOpen()
+  -- Contextual.OnOverlayOpen()
   Vectors.OnOverlayOpen()
 
   if VectorsCustomize then
@@ -406,14 +398,6 @@ registerForEvent("onOverlayOpen", function()
   end
 
   Presets.OnOverlayOpen()
-
-  if not Tracker.IsGameFrameGeneration() then
-    Vectors.SetMaskingState(false)
-  else
-    if not Vectors.GetMaskingState() then
-      Vectors.SetMaskingState(true)
-    end
-  end
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -448,8 +432,7 @@ registerForEvent("onUpdate", function(deltaTime)
   Tracker.SetGamePerfCurrent(currentFps, deltaTime)
 
   if Tracker.IsGamePaused() then return end
-
-  -- Globals.UpdateDelays(deltaTime) -- gramern: commented out for development
+  Globals.UpdateDelays(deltaTime)
 
   if not Tracker.IsVehicleMounted() then return end
   Vectors.OnUpdate()
@@ -482,24 +465,14 @@ registerForEvent("onDraw", function()
             VectorsDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
-
-        if not Tracker.IsGameFrameGeneration() then
-          if ImGui.BeginTabItem(UIText.Info.tabname) then
-
-            ImGuiExt.Text("Yo, your FG is turned off, turn it on in the game's settings")
-
-            ImGui.EndTabItem()
-          end
-        end
-
         -- danyalzia: remove forced benchmarking upon new install dur ing development
         -- if Globals.IsNewInstall() then
         --   if ImGui.BeginTabItem(UIText.Info.tabname) then
 
         --     if Globals.IsFirstRun() then
-        --       ImGuiExt.Text(UIText.Info.benchmark)
+        --       ImGuiExt.Text(UIText.Info.benchmark, true)
         --     else
-        --       ImGuiExt.Text(UIText.Info.benchmarkAsk)
+        --       ImGuiExt.Text(UIText.Info.benchmarkAsk, true)
         --     end
 
         --     ImGui.Text("")
@@ -533,7 +506,7 @@ registerForEvent("onDraw", function()
         if Globals.IsAspectRatioChange() then
           if ImGui.BeginTabItem(UIText.Info.tabname) then
 
-            ImGuiExt.Text(UIText.Info.aspectRatioChange)
+            ImGuiExt.Text(UIText.Info.aspectRatioChange, true)
 
             ImGui.EndTabItem()
           end
@@ -618,11 +591,13 @@ registerForEvent("onDraw", function()
             
                 ImGuiExt.SetStatusBar(UIText.General.settings_saved)
               end
+            end
 
               ImGui.Text("")
               ImGuiExt.Text(UIText.Settings.groupFG)
               ImGui.Separator()
-
+            
+            if openOverlay then
               if Tracker.IsGameReady() then
                 fgBool, fgToggle = ImGuiExt.Checkbox(UIText.Settings.enableFG, Settings.IsFrameGeneration(), fgToggle)
                 if fgToggle then
@@ -634,6 +609,14 @@ registerForEvent("onDraw", function()
                 ImGuiExt.Text(UIText.Settings.gameSettingsFG, true)
               else
                 ImGuiExt.Text(UIText.Settings.gameNotReadyWarning, true)
+              end
+            else
+              ImGuiExt.Text(UIText.General.info_frameGenStatus)
+              ImGui.SameLine()
+              if Tracker.IsModFrameGeneration() then
+                ImGuiExt.Text(UIText.General.enabled)
+              else
+                ImGuiExt.Text(UIText.General.disabled)
               end
             end
 

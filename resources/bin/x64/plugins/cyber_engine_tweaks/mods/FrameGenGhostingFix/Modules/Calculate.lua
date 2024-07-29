@@ -78,8 +78,8 @@ local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 local Tracker = require("Modules/Tracker")
 
-local LogText = Localization.LogText
-local UIText = Localization.UIText
+local LogText = Localization.GetLogText()
+local UIText = Localization.GetUIText()
 
 ------------------
 -- UserSettings
@@ -413,14 +413,6 @@ function Calculate.OnInitialize()
   Toggle()
 end
 
-function Calculate.OnOverlayOpen()
-  Globals = require("Modules/Globals")
-
-  --refresh UIText in case of translation
-  Localization = require("Modules/Localization")
-  UIText = Localization.UIText
-end
-
 function Calculate.OnOverlayClose()
   ApplyScreenEdges()
   ApplyCornersScreenSpace()
@@ -665,12 +657,12 @@ function Calculate.DrawUI()
 
         if GetVignetteState("onAim") and GetVignetteState("onWeapon") then
           ImGui.Text("")
-          ImGuiExt.Text(UIText.OnFoot.VignetteAim.textfield_1)
+          ImGuiExt.Text(UIText.OnFoot.VignetteAim.textfield_1, true)
         end
 
         --customize vignette interface starts------------------------------------------------------------------------------------------------------------------
         ImGui.Text("")
-        ImGuiExt.Text(UIText.OnFoot.Vignette.textfield_1)
+        ImGuiExt.Text(UIText.OnFoot.Vignette.textfield_1, true)
         ImGui.Text("")
         ImGuiExt.Text(UIText.OnFoot.Vignette.setting_1)
       

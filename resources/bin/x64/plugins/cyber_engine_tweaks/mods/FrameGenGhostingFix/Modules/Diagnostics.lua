@@ -10,7 +10,7 @@ local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 
-local UIText = Localization.UIText
+local UIText = Localization.GetUIText()
 
 
 function Diagnostics.IsUpdateRecommended()
@@ -25,11 +25,6 @@ function Diagnostics.OnInitialize()
   -- Diagnostics.CheckModsCompatibility()
   if Diagnostics.isModsCompatibility then return end
   Globals.SetModReady(false)
-end
-
-function Diagnostics.OnOverlayOpen()
-  Localization = require("Modules/Localization")
-  UIText = Localization.UIText
 end
 
 --Local UI

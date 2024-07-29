@@ -13,7 +13,7 @@ local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 
-local UIText = Localization.UIText
+local UIText = Localization.GetUIText()
 
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
@@ -44,6 +44,7 @@ local function ApplyScaleFactor()
   end
 end
 
+-- @return number: A scaling factor for the mod's window and some widgets (buttons) for the current screen.
 function ImGuiExt.GetScaleFactor()
   return scaleFactor
 end
@@ -75,9 +76,11 @@ end
 -- @return None
 function ImGuiExt.SetTooltip(string)
   if ImGui.IsItemHovered() and Settings.IsHelp() then
-    ImGui.SetTooltip(string)
-  else
-    ImGui.SetTooltip(nil)
+    ImGui.BeginTooltip()
+    ImGui.PushTextWrapPos(ImGui.GetFontSize() * 30)
+    ImGui.TextWrapped(string)
+    ImGui.PushTextWrapPos()
+    ImGui.EndTooltip()
   end
 end
 
@@ -170,38 +173,6 @@ function ImGuiExt.TextColor(string, red, green, blue, alpha, wrap)
   end
 
   ImGui.PopStyleColor()
-end
-
-------------------
--- Unviersal methods
-------------------
-
---- Wraps text to a specified line length. Doesn't draw text. Use for the line's length control only, otherwise use boolean wrap for ImGuiExt methods.
---
--- @param `string`: string; The text to be wrapped.
--- @param `lineLength`: string; The maximum number of characters allowed per line.
---
--- @return string; The input text wrapped to the specified line length.
-function ImGuiExt.WrapText(string, lineLength)
-  local wrappedString = ""
-  local line = ""
-
-  for word in string:gmatch("%S+") do
-    if #line + #word + 1 > lineLength then
-      wrappedString = wrappedString .. line .. "\n"
-      line = word
-    else
-      if #line > 0 then
-        line = line .. " "
-      end
-      
-      line = line .. word
-    end
-  end
-
-  wrappedString = wrappedString .. line
-
-  return wrappedString
 end
 
 ------------------
@@ -349,10 +320,6 @@ end
 ------------------
 
 function ImGuiExt.OnOverlayOpen()
-  -- Refresh UIText reference
-  Localization = require("Modules/Localization")
-  UIText = Localization.UIText
-
   ApplyScaleFactor()
   ImGuiExt.ResetStatusBar()
 end

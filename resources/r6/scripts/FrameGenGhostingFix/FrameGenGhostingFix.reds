@@ -2,6 +2,8 @@
 
 // FrameGen Ghosting 'Fix' 5.0.0, 2024 gramern (scz_g), danyalzia (omniscient)
 
+// RedScript Modules Presence Check --------------------------------------------------------------------------------
+public static func FrameGenGhostingFixIsRedScriptModule() -> Void {}
 // CET add-on customization --------------------------------------------------------------------------------
 public class FrameGenGhostingFixMaskEditor1Event extends Event {}
 public class FrameGenGhostingFixMaskEditor2Event extends Event {}

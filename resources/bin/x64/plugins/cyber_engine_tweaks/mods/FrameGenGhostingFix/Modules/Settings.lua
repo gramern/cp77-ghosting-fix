@@ -10,7 +10,7 @@ local UserSettings = {}
 local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 
-local LogText = Localization.LogText
+local LogText = Localization.GetLogText()
 
 ------------------
 -- Save To File Reqests
@@ -35,13 +35,17 @@ end
 -- Mod Settings
 ------------------
 
-local function LoadModSettings(modSettings)
-  local version = modSettings.Version or false
-
-  if not version or not Globals.VersionCompare(Globals.VersionStringToTable(version)) then
+local function CheckFileVersion(fileVersion)
+  if not fileVersion or not Globals.VersionCompare(Globals.VersionStringToTable(fileVersion)) then
     Globals.SetNewInstall(true)
   end
+end
 
+------------------
+-- Mod Settings
+------------------
+
+local function LoadModSettings(modSettings)
   ModSettings.isDebugMode = modSettings.DebugMode or false
   ModSettings.isDebugView = modSettings.DebugView or false
   ModSettings.isFGEnabled = modSettings.FrameGen or true
@@ -188,38 +192,30 @@ end
 ------------------
 
 local function LoadFile()
-  local file = io.open("user_settings.json", "r")
+  local userSettingsContents = Globals.LoadJSON("user_settings", json)
 
-  if file then
-    local userSettingsContents = file:read("*a")
-    file:close()
-    UserSettings = json.decode(userSettingsContents)
-
-    LoadModSettings(Settings.GetUserSettings("ModSettings"))
+  if userSettingsContents then
+    UserSettings = userSettingsContents
   else
     Globals.SetFirstRun(true)
-    Globals.Print(Settings.__NAME,LogText.settings_fileNotFound)
+    Globals.Print(Settings.__NAME, LogText.settings_fileNotFound)
   end
 end
 
 local function SaveFile()
   if not isSaveRequest then return end -- file won't be saved without change to the UserSettings table
-  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME,LogText.settings_notSavedToFile) return end
+  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME, LogText.settings_notSavedToFile) return end
 
   SaveModSettings()
 
-  local userSettingsContents = json.encode(UserSettings)
-  local file = io.open("user_settings.json", "w+")
+  local result = Globals.SaveJSON("user_settings", UserSettings, json)
 
-  if file and userSettingsContents ~= nil then
-    file:write(userSettingsContents)
-    file:close()
-
+  if result then
     ResetSaveRequest()
-    Globals.Print(Settings.__NAME,LogText.settings_savedToFile)
+    Globals.Print(Settings.__NAME, LogText.settings_savedToFile)
   else
     ResetSaveRequest()
-    Globals.PrintError(Settings.__NAME,LogText.settings_notSavedToFile)
+    Globals.PrintError(Settings.__NAME, LogText.settings_notSavedToFile)
   end
 end
 
@@ -229,6 +225,8 @@ end
 
 function Settings.OnInitialize()
   LoadFile()
+  CheckFileVersion(Settings.GetUserSettings("Version"))
+  LoadModSettings(Settings.GetUserSettings("ModSettings"))
 end
 
 function Settings.OnOverlayClose()

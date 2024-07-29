@@ -13,8 +13,8 @@ local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 
-local LogText = Localization.LogText
-local UIText = Localization.UIText
+local LogText = Localization.GetLogText()
+local UIText = Localization.GetUIText()
 
 local Vectors = require("Modules/Vectors")
 
@@ -62,9 +62,6 @@ end
 function VectorsCustomize.OnOverlayOpen()
   VectorsCustomize.ApplyMasksController()
   VectorsCustomize.LoadUserSettings()
-
-  Localization = require("Modules/Localization")
-  UIText = Localization.UIText
 end
 
 function VectorsCustomize.OnOverlayClose()

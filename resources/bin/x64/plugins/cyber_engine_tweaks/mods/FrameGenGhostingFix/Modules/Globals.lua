@@ -63,7 +63,7 @@ local DelayBoard = {}
 
 local Localization = require("Modules/Localization")
 
-local LogText = Localization.LogText
+local LogText = Localization.GetLogText()
 
 -----------
 -- Globals Debug Mode Setter
@@ -101,7 +101,7 @@ function Globals.SetFirstRun(isFirstRun)
   ModState.isFirstRun = isFirstRun
   if not isFirstRun then return end
   Globals.SetNewInstall(true)
-  Globals.Print(LogText.globals_firstRun)
+  Globals.Print(Globals.__NAME, LogText.globals_firstRun)
 end
 
 -- @return boolean: `true` if this is the first run of the mod
@@ -115,7 +115,7 @@ end
 function Globals.SetNewInstall(isNewInstall)
   ModState.isNewInstall = isNewInstall
   if not isNewInstall or ModState.isFirstRun then return end
-  Globals.Print(LogText.globals_newVersion)
+  Globals.Print(Globals.__NAME, LogText.globals_newVersion)
 end
 
 -- @return boolean: `true` if the current installation of the mod is new
@@ -172,7 +172,7 @@ function Globals.GetAspectRatio()
   if Screen.aspectRatio ~= previousAspectRatio then
     Screen.isAspectRatioChange = true
     Globals.SetModReady(false)
-    Globals.Print(LogText.globals_aspectRatioChange)
+    Globals.Print(Globals.__NAME, LogText.globals_aspectRatioChange)
   end
 
   return Screen.aspectRatio
@@ -334,9 +334,7 @@ end
 --
 -- @return table; The updated destination `mergeTo` table after merging.
 function Globals.SafeMergeTables(mergeTo, mergeA)
-  if type(mergeTo) ~= "table" then Globals.Print("Can't merge. The mergeTo is not a table:", mergeTo) return mergeTo end
   if mergeA == nil then return mergeTo end
-  if type(mergeA) ~= "table" then Globals.Print("Can't merge. The mergeA is not a table:", mergeA) return mergeTo end
 
   for key, value in pairs(mergeA) do
       if mergeTo[key] ~= nil then  -- Only proceed if the key exists in mergeTo
@@ -358,9 +356,7 @@ end
 --
 -- @return table; The updated destination `mergeTo` table after merging.
 function Globals.MergeTables(mergeTo, mergeA)
-  if type(mergeTo) ~= "table" then Globals.Print("Can't merge. The mergeTo is not a table:", mergeTo) end
-  if mergeA == nil then return end
-  if type(mergeA) ~= "table" then Globals.Print("Can't merge. The mergeA is not a table:", mergeA) end
+  if mergeA == nil then return mergeTo end
 
   for key, value in pairs(mergeA) do
       if type(value) == "table" then
@@ -399,7 +395,7 @@ function Globals.Print(moduleName, ...)
   end
 
   if #contents == 0 and module == "" then
-      return print(mod, Globals.__NAME, "No contents to print.")
+      return Globals.Print(Globals.__NAME, "No contents to print.")
   end
 
   for i, value in ipairs(contents) do
@@ -486,7 +482,14 @@ end
 function Globals.VersionStringToTable(versionString)
   local versionTable = {}
 
-  for number in versionString:gmatch("%d+") do
+  if type(versionString) ~= "string" or versionString == "" then
+    Globals.PrintError(Globals.__NAME, "Invalid version string provided.")
+    return versionTable
+  end
+
+  local numericPart = versionString:match("^(%d+[%.%d]*)") or ""
+
+  for number in numericPart:gmatch("%d+") do
     table.insert(versionTable, tonumber(number))
   end
 
@@ -522,8 +525,8 @@ end
 -- @param `key`: string; Optional. If provided, the contents are stored under this `key` for the `owner`.
 --
 -- @return None
-function Globals.SetFallback(owner,contents,key)
-  if not contents or not owner then Globals.Print("Can't set a fallback.") end
+function Globals.SetFallback(owner, contents, key)
+  if not contents or not owner then Globals.PrintError(Globals.__NAME, "Can't set a fallback.") end
 
   local copiedContents = Globals.Deepcopy(contents)
 
@@ -544,9 +547,14 @@ end
 --
 -- @return any: The fallback content for the specified `owner` (and `key`, if provided). 
 --                        Returns nil if no fallback is found.
-function Globals.GetFallback(owner,key)
-  if FallbackBoard[owner] == nil then Globals.Print("There are no fallbacks for the owner:", owner) end --debug
-  if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then Globals.Print("There is no fallback for the given key:", key, owner) end --debug
+function Globals.GetFallback(owner, key)
+  if isDebug then
+    if FallbackBoard[owner] == nil then Globals.PrintDebug("There are no fallbacks for the owner:", owner) end 
+    if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then Globals.PrintDebug(Globals.__NAME, "There is no fallback for the given key:", key, owner) end
+  end
+
+  if FallbackBoard[owner] == nil then return nil end
+  if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then return nil end
 
   if key then
     return FallbackBoard[owner][key]
@@ -562,7 +570,7 @@ end
 --
 -- @return None
 function Globals.CancelDelay(key)
-  if not key then Globals.PrintDebug(Globals.__NAME, "Cannot find a delay:", key) return end
+  if not key then Globals.PrintError(Globals.__NAME, "Cannot find a delay:", key) return end
 
   DelayBoard[key] = nil
 end
@@ -571,7 +579,7 @@ end
 --
 -- @return boolean: `true` if the delay exists in the moment
 function Globals.IsDelay(key)
-  if not key then Globals.PrintDebug(Globals.__NAME, "Cannot find a delay:", key) return false end
+  if not key then Globals.PrintError(Globals.__NAME, "Cannot find a delay:", key) return false end
 
   if DelayBoard[key] == nil then return false end
   return true
@@ -586,7 +594,7 @@ end
 function Globals.SetDelay(duration, key, callback, ...)
   local parameters = {...}
 
-  if not duration or not key or not callback then Globals.PrintDebug(Globals.__NAME, "Cannot set the delay. Check parameters.") return end
+  if not duration or not key or not callback then Globals.PrintError(Globals.__NAME, "Cannot set the delay. Check parameters.") return end
 
   DelayBoard[key] = {
     remainingTime = duration,
@@ -619,6 +627,52 @@ function Globals.UpdateDelays(gameDeltaTime)
 
   for _, key in ipairs(delaysToRemove) do
     DelayBoard[key] = nil
+  end
+end
+
+------------------
+-- JSON
+
+-- @param `filename`: string;
+--
+-- @return any | `nil`: `nil` if failed
+function Globals.LoadJSON(filename)
+  local content = {}
+
+  if not string.find(filename, '%.json$') then
+    filename = filename .. ".json"
+  end
+
+  local file = io.open(filename, "r")
+  if file ~= nil then
+    content = json.decode(file:read("*a"))
+    file:close()
+
+    return content
+  else
+    return nil
+  end
+end
+
+-- @param `filename`: string;
+-- @param `content`: any;
+--
+-- @return boolean: `true` if succeded, `false` otherwise
+function Globals.SaveJSON(filename, content)
+  if not string.find(filename, '%.json$') then
+    filename = filename .. ".json"
+  end
+
+  content = json.encode(content)
+
+  local file = io.open(filename, "w+")
+  if file then
+    file:write(content)
+    file:close()
+
+    return true
+  else
+    return false
   end
 end
 

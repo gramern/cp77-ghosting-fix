@@ -82,6 +82,11 @@ end
 -- Global Specific Getters
 ------------------
 
+-- @return boolean: `true` if frame generation is enabled in DLSS Enabler
+function Tracker.IsModFrameGeneration()
+  return DLSSEnabler_GetFrameGenerationState()
+end
+
 -- @return number;
 function Tracker.GetCurrentFPS()
   return GamePerf.currentFps
