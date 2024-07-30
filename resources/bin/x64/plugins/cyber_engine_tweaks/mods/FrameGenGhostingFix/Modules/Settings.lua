@@ -46,12 +46,12 @@ end
 ------------------
 
 local function LoadModSettings(modSettings)
-  ModSettings.isDebugMode = modSettings.DebugMode or false
-  ModSettings.isDebugView = modSettings.DebugView or false
-  ModSettings.isFGEnabled = modSettings.FrameGen or true
-  ModSettings.isHelp = modSettings.Help or true
-  ModSettings.isKeepWindow = modSettings.KeepWindow or false
-  ModSettings.windowTheme = modSettings.WindowTheme or "Crimson"
+  ModSettings.isDebugMode = modSettings and modSettings.DebugMode or false
+  ModSettings.isDebugView = modSettings and modSettings.DebugView or false
+  ModSettings.isFGEnabled = modSettings and modSettings.FrameGen or true
+  ModSettings.isHelp = modSettings and modSettings.Help or true
+  ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
+  ModSettings.windowTheme = modSettings and modSettings.WindowTheme or "Crimson"
 
   Globals.Print(Settings.__NAME,LogText.settings_loaded)
 end
@@ -164,27 +164,27 @@ end
 
 --- Writes to the UserSettings table and sets a global save reqest to the file on CET overlay close.
 --
--- @param `moduleName`: string; The name of the module for which settings are being written.
+-- @param `poolName`: string; The name for which settings are being written.
 -- @param `contents`: table; The settings to be written for the module.
 --
 -- @return None; 
-function Settings.WriteUserSettings(moduleName, contents)
-  if not moduleName or not contents then Globals.PrintDebug(Settings.__NAME, "Can't write to user settings") return end --debug
+function Settings.WriteUserSettings(poolName, contents)
+  if not poolName or not contents then Globals.PrintDebug(Settings.__NAME, "Can't write to user settings") return end --debug
 
   local copiedContents = Globals.Deepcopy(contents)
 
-  UserSettings[moduleName] = copiedContents
+  UserSettings[poolName] = copiedContents
 
   SaveRequest()
 end
 
--- @param `moduleName`: string; The name of the module for which settings are being retrieved.
+-- @param `poolName`: string; The name for which settings are being retrieved.
 --
 -- @return table | nil; Returns the user settings for the specified module if they exist, otherwise returns nil
-function Settings.GetUserSettings(moduleName)
-  if not moduleName or UserSettings[moduleName] == nil then return nil end
+function Settings.GetUserSettings(poolName)
+  if not poolName or UserSettings[poolName] == nil then return nil end
 
-  return UserSettings[moduleName]
+  return UserSettings[poolName]
 end
 
 ------------------

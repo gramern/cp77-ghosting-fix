@@ -27,7 +27,7 @@ function VectorsDebug.DrawUI()
       if VectorsCustomize then
         ImGuiExt.Text("For VectorsCustomize Module")
         ImGui.SameLine()
-        ImGuiExt.Text(tostring(VectorsCustomize.MaskingGlobal.masksController))
+        ImGuiExt.Text(tostring(VectorsCustomize.GetMasksController()))
       end
 
       ImGui.Separator()

@@ -69,7 +69,7 @@ local gameDeltaTime = 0
 local currentFps = 0
 local currentFpsInt = 0
 local currentFrametimeInt = 0
-local currentCycle = 0.5
+local currentCycle = 1 / 2
 local currentCount = 0
 local currentFpsSum = 0
 local currentDeltaTimeSum = 0
@@ -361,6 +361,22 @@ if Debug then
 
     Vectors.ToggleMaskingState()
   end)
+
+  registerInput('getDLSSEnablerVersion', 'Get DLSSEnabler Version', function(keypress)
+    if not keypress then
+      return
+    end
+
+    local table = {}
+    
+    table = Globals.VersionStringToTable(DLSSEnabler_GetVersionAsString())
+
+    if table ~= nil then
+      Globals.PrintDebug(Globals.__NAME, "DLSS Enabler's version major:", table[1], "minor:", table[2], "patch:", table[3], "revision:", table[4])
+    else
+      Globals.PrintDebug(Globals.__NAME, "Couldn't retrieve DLSS Enabler's version.")
+    end
+  end)
 end
 
 registerForEvent("onOverlayOpen", function()
@@ -502,9 +518,9 @@ registerForEvent("onDraw", function()
 
         if openOverlay and Globals.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
 
+          Contextual.DrawUI()
           VectorsPresets.DrawUI()
           Calculate.DrawUI()
-          Contextual.DrawUI()
 
         end
         

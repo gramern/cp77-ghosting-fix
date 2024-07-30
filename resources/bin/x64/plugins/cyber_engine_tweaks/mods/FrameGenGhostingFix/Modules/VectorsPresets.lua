@@ -1,14 +1,15 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
   __VERSION = { 5, 0, 0 },
-  selectedPreset = nil, -- must be a unique identifier for the preset
-  sortedPresetIds = {},
-  PresetsList = {}
 }
 
-local LoadedPreset = {}
+local SortedPresetIds = {}
 
-local UserSettings = {}
+local PresetsList = {}
+
+local selectedPreset = nil -- must be a unique identifier for the preset
+
+local LoadedPreset = {}
 
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
@@ -28,15 +29,21 @@ local VehiclesText = Localization.GetVehiclesText()
 ------------------
 
 local function GetUserSettings()
-  UserSettings = {
-    selectedPreset = VectorsPresets.selectedPreset
+  local userSettings = {
+    SelectedPreset = selectedPreset
   }
 
-  return UserSettings
+  return userSettings
+end
+
+local function LoadUserSettings(userSettings)
+  if not userSettings or userSettings == nil then return end
+
+  selectedPreset = userSettings and userSettings.SelectedPreset
 end
 
 local function SaveUserSettings()
-  Settings.WriteUserSettings("VectorsPresets", GetUserSettings())
+  Settings.WriteUserSettings("VehiclesPreset", GetUserSettings())
 end
 
 ------------------
@@ -56,9 +63,9 @@ end
 
 function VectorsPresets.AddPreset(presetInfo, id, filename)
   -- Skip if PresetsList is already populated with the same preset
-  if VectorsPresets.PresetsList[id] ~= nil then Globals.Print(VectorsPresets.__NAME, LogText.presets_skippedFileDuplicate) return end
+  if PresetsList[id] ~= nil then Globals.Print(VectorsPresets.__NAME, LogText.presets_skippedFileDuplicate) return end
 
-  VectorsPresets.PresetsList[id] = {file = filename, PresetInfo = presetInfo}
+  PresetsList[id] = {file = filename, PresetInfo = presetInfo}
 end
 
 function VectorsPresets.GetPresets()
@@ -72,7 +79,7 @@ function VectorsPresets.GetPresets()
       local presetPath = "Presets/" .. presetFile.name
       local presetContents = Globals.LoadJSON(presetPath)
       
-      if presetContents and presetContents.PresetInfo.id and presetContents.PresetInfo.name and VectorsPresets.PresetsList[presetContents.PresetInfo.id] == nil then
+      if presetContents and presetContents.PresetInfo.id and presetContents.PresetInfo.name and PresetsList[presetContents.PresetInfo.id] == nil then
         VectorsPresets.AddPreset(presetContents.PresetInfo, presetContents.PresetInfo.id, presetFile.name)
         table.insert(addedPresets, presetFile.name)
       else
@@ -84,61 +91,61 @@ function VectorsPresets.GetPresets()
   Globals.Print(VectorsPresets.__NAME, LogText.presets_loaded, table.concat(addedPresets, ", "))
 
   -- Sort the preset names by their keys (preset ids) so they appear alphabetically in UI 
-  for k in pairs(VectorsPresets.PresetsList) do
-    table.insert(VectorsPresets.sortedPresetIds, k)
+  for k in pairs(PresetsList) do
+    table.insert(SortedPresetIds, k)
   end
 
-  table.sort(VectorsPresets.sortedPresetIds)
+  table.sort(SortedPresetIds)
 end
 
 function VectorsPresets.PrintPresets()
-  for _, presetId in ipairs(VectorsPresets.PresetsList) do
-    local name = VectorsPresets.PresetsList[presetId].PresetInfo.name
-    local description = VectorsPresets.PresetsList[presetId].PresetInfo.description
-    local author = VectorsPresets.PresetsList[presetId].PresetInfo.author
+  for _, presetId in ipairs(PresetsList) do
+    local name = PresetsList[presetId].PresetInfo.name
+    local description = PresetsList[presetId].PresetInfo.description
+    local author = PresetsList[presetId].PresetInfo.author
 
     print("| Name:", name, "| Description:", description, "| Author:", author, "| ID:", presetId)
   end
 
-  if VectorsPresets.selectedPreset then
-    Globals.Print(VectorsPresets.__NAME, "Selected preset:", VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.name)
+  if selectedPreset then
+    Globals.Print(VectorsPresets.__NAME, "Selected preset:", PresetsList[selectedPreset].PresetInfo.name)
   end
 end
 
 function VectorsPresets.LoadPreset()
   -- Use Default if user has not selected any other preset yet
-  if VectorsPresets.selectedPreset == nil then
-    VectorsPresets.selectedPreset = "a001"
+  if selectedPreset == nil then
+    selectedPreset = "a001"
   end
 
   local presetPath = "Presets/"
 
   -- Load Default when Customize preset is selected
-  if VectorsPresets.selectedPreset == "a000" then
+  if selectedPreset == "a000" then
     presetPath = presetPath .. "Default.json"
     
   else
-    presetPath = presetPath .. VectorsPresets.PresetsList[VectorsPresets.selectedPreset].file
+    presetPath = presetPath .. PresetsList[selectedPreset].file
   end
 
   local loadedPreset = Globals.LoadJSON(presetPath)
 
   if loadedPreset then
     LoadedPreset = Globals.Deepcopy(loadedPreset)
-    Vectors.ApplyPreset(LoadedPreset)
+    Vectors.LoadPreset(LoadedPreset)
   end
 
   SaveUserSettings()
 end
 
 function VectorsPresets.OnInitialize()
-  Globals.MergeTables(VectorsPresets, Settings.GetUserSettings("Presets"))
+  LoadUserSettings(Settings.GetUserSettings("VehiclesPreset"))
   VectorsPresets.GetPresets()
   VectorsPresets.LoadPreset()
 
   if not Tracker.IsGameFrameGeneration() then
     Vectors.SetMaskingState(false)
-  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not VectorsPresets.selectedPreset == "a005" then
+  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not selectedPreset == "a005" then
     Vectors.SetMaskingState(true)
   end
 end
@@ -149,11 +156,11 @@ end
 
 function VectorsPresets.OnOverlayOpen()
   -- Translate and refresh presets info and list
-  VectorsPresets.PresetsList = Localization.GetTranslation(VectorsPresets.PresetsList, "PresetsList")
+  PresetsList = Localization.GetTranslation(PresetsList, "PresetsList")
   
   if not Tracker.IsGameFrameGeneration() then
     Vectors.SetMaskingState(false)
-  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not VectorsPresets.selectedPreset == "a005" then
+  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not selectedPreset == "a005" then
     Vectors.SetMaskingState(true)
   end
 end
@@ -173,17 +180,17 @@ function VectorsPresets.DrawUI()
     ImGui.Separator()
     ImGuiExt.Text(VehiclesText.MaskingPresets.name)
 
-    local selectedPresetName = VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.name
+    local selectedPresetName = PresetsList[selectedPreset].PresetInfo.name
 
     -- Displays list of presets' names and sets a preset
     if ImGui.BeginCombo("##Presets", selectedPresetName) then
-      for _, presetId in ipairs(VectorsPresets.sortedPresetIds) do
-        local name = VectorsPresets.PresetsList[presetId].PresetInfo.name
+      for _, presetId in ipairs(SortedPresetIds) do
+        local name = PresetsList[presetId].PresetInfo.name
         local isSelected = (selectedPresetName == name)
         
         if ImGui.Selectable(name, isSelected) then
           selectedPresetName = name
-          VectorsPresets.selectedPreset = VectorsPresets.PresetsList[presetId].PresetInfo.id
+          selectedPreset = PresetsList[presetId].PresetInfo.id
         end
         if isSelected then
           ImGui.SetItemDefaultFocus()
@@ -202,21 +209,21 @@ function VectorsPresets.DrawUI()
       ImGuiExt.SetStatusBar(GeneralText.settings_applied_veh)
     end
 
-    if VectorsPresets.selectedPreset then
-      if VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.description then
+    if selectedPreset then
+      if PresetsList[selectedPreset].PresetInfo.description then
         ImGuiExt.Text(VehiclesText.MaskingPresets.description)
-        ImGuiExt.Text(VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.description, true)
+        ImGuiExt.Text(PresetsList[selectedPreset].PresetInfo.description, true)
       end
 
-      if VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.author then
+      if PresetsList[selectedPreset].PresetInfo.author then
         ImGuiExt.Text(VehiclesText.MaskingPresets.author)
         ImGui.SameLine()
-        ImGuiExt.Text(VectorsPresets.PresetsList[VectorsPresets.selectedPreset].PresetInfo.author)
+        ImGuiExt.Text(PresetsList[selectedPreset].PresetInfo.author)
       end
     end
 
     -- VectorsCustomize interface starts
-    if VectorsPresets.selectedPreset == "a000" then
+    if selectedPreset == "a000" then
       if Tracker.IsVehicleMounted() then
         ImGui.Text("")
         -- VectorsCustomize.DrawUI()

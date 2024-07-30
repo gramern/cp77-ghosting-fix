@@ -70,8 +70,6 @@ local MasksData = {
   }
 }
 
-local UserSettings = {}
-
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
@@ -87,7 +85,7 @@ local OnFootText = Localization.GetOnFootText()
 ------------------
 
 local function GetUserSettings()
-  UserSettings = {
+  local userSettings = {
     Blocker = {onAim = MasksData.Blocker.onAim},
     Corners = {onWeapon = MasksData.Corners.onWeapon},
     Vignette = {
@@ -99,23 +97,25 @@ local function GetUserSettings()
     }
   }
 
-  return UserSettings
+  return userSettings
 end
 
-local function LoadUserSettings()
-  Globals.SafeMergeTables(MasksData, Settings.GetUserSettings("Calculate"))
+local function LoadUserSettings(userSettings)
+  if not userSettings or userSettings == nil then return end
+
+  Globals.SafeMergeTables(MasksData, userSettings)
 end
 
 local function SaveUserSettings()
-  Settings.WriteUserSettings("Calculate", GetUserSettings())
+  Settings.WriteUserSettings("OnFoot", GetUserSettings())
 end
 
 local function BackupUserSettings()
-  Globals.SetFallback("Calculate", GetUserSettings())
+  Globals.SetFallback("OnFoot", GetUserSettings())
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Globals.SafeMergeTables(MasksData, Globals.GetFallback("Calculate"))
+  Calculate = Globals.SafeMergeTables(MasksData, Globals.GetFallback("OnFoot"))
 
   if Calculate == nil then Globals.Print(Calculate.__NAME, "Can't restore user settings.") end
   SaveUserSettings()
@@ -400,7 +400,7 @@ end
 ------------------
 
 function Calculate.OnInitialize()
-  LoadUserSettings()
+  LoadUserSettings(Settings.GetUserSettings("OnFoot"))
   ApplyMasksController()
   ApplyScreenEdges()
   ApplyCornersScreenSpace()

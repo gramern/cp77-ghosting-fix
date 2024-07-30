@@ -1,12 +1,36 @@
 local VectorsCustomize = {
   __NAME = "VectorsCustomize",
   __VERSION = { 5, 0, 0 },
-  MaskingGlobal = {
-    masksController = nil,
-  },
 }
 
-local UserSettings = {}
+local MaskingGlobal = {
+  masksController = nil
+}
+
+local CustomizeData = {
+  Bike = {
+    AllMasks = {
+      FPP = { visible = true },
+      TPP = { visible = true }
+    },
+    Windshield = {
+      Scale = {x = 100, y = 100},
+    },
+  },
+  Car = {
+    AllMasks = {
+      FPP = { visible = true },
+      TPP = { visible = true }
+    },
+    FrontMask = {
+      visible = true,
+    },
+    SideMasks = {
+      Scale = {x = 100, y = 100},
+      visible = true,
+    },
+  }
+}
 
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
@@ -18,6 +42,10 @@ local GeneralText = Localization.GetGeneralText()
 local VehiclesText = Localization.GetVehiclesText()
 
 local Vectors = require("Modules/Vectors")
+
+function VectorsCustomize.GetMasksController()
+  return MaskingGlobal.masksController
+end
 
 function VectorsCustomize.SetDefault()
   VectorsCustomize.SetWindshieldDefault()
@@ -32,7 +60,7 @@ function VectorsCustomize.GetUserSettings()
   UserSettings = {
     Bike = {
       Windshield = {
-        Scale = Vectors.VehMasks.Mask4.Def.Scale,
+        Scale = Vectors.GetScaleBikeWindshield()
       }
     }
   }
@@ -40,23 +68,24 @@ function VectorsCustomize.GetUserSettings()
   return UserSettings
 end
 
-function VectorsCustomize.LoadUserSettings()
-  if UserSettings == nil then return end
-  Vectors.VehMasks.Mask4.Def.Scale = Globals.SafeMergeTables(Vectors.VehMasks.Mask4.Def.Scale, UserSettings.Bike.Windshield.Scale)
+function VectorsCustomize.LoadUserSettings(userSettings)
+  if not userSettings or userSettings == nil then return end
+
+  Vectors.SetScaleBikeWindshield("x", UserSettings.Bike.Windshield.Scale.y)
+  Vectors.SetScaleBikeWindshield("x", UserSettings.Bike.Windshield.Scale.y)
 end
 
 function VectorsCustomize.SaveUserSettings()
-  Settings.WriteUserSettings("VectorsCustomize", VectorsCustomize.GetUserSettings())
-  VectorsCustomize.LoadUserSettings()
+  Settings.WriteUserSettings("VehiclesCustomize", VectorsCustomize.GetUserSettings())
 end
 
 function VectorsCustomize.OnInitialize()
-  UserSettings = Globals.MergeTables(UserSettings, Settings.GetUserSettings("VectorsCustomize"))
+  UserSettings = Globals.MergeTables(UserSettings, Settings.GetUserSettings("VehiclesCustomize"))
   VectorsCustomize.ApplyMasksController()
   VectorsCustomize.LoadUserSettings()
 
   Observe('hudCarController', 'OnMountingEvent', function()
-    VectorsCustomize.LoadUserSettings()
+    VectorsCustomize.GetUserSettings()
   end)
 end
 
@@ -71,7 +100,7 @@ function VectorsCustomize.OnOverlayClose()
 end
 
 function VectorsCustomize.ApplyMasksController()
-  VectorsCustomize.MaskingGlobal.masksController = Globals.GetMasksController()
+  MaskingGlobal.masksController = Globals.GetMasksController()
 end
 
 function VectorsCustomize.UpdateLiveView()
@@ -102,18 +131,18 @@ function VectorsCustomize.TurnOnLiveView()
   end
 end
 
-function VectorsCustomize.DefaultLiveView()
-  local masksController = VectorsCustomize.MaskingGlobal.masksController
+-- function VectorsCustomize.DefaultLiveView()
+--   local masksController = VectorsCustomize.MaskingGlobal.masksController
 
-  if Vectors and masksController then
-    Override(masksController, 'OnFrameGenGhostingFixMaskEditor1Event', function(self)
-      local mask = Vectors.VehMasks.MaskEditor1
-      local maskPath = CName.new(mask.maskPath)
+--   if Vectors and masksController then
+--     Override(masksController, 'OnFrameGenGhostingFixMaskEditor1Event', function(self)
+--       local mask = Vectors.VehMasks.MaskEditor1
+--       local maskPath = CName.new(mask.maskPath)
 
-      self:FrameGenGhostingFixSetTransformation(maskPath, Vector2.new({X = mask.ScreenSpace.x, Y = mask.ScreenSpace.y}), Vector2.new({X = mask.Size.x, Y = mask.Size.y}), mask.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 1, true)
-    end)
-  end
-end
+--       self:FrameGenGhostingFixSetTransformation(maskPath, Vector2.new({X = mask.ScreenSpace.x, Y = mask.ScreenSpace.y}), Vector2.new({X = mask.Size.x, Y = mask.Size.y}), mask.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 1, true)
+--     end)
+--   end
+-- end
 
 function VectorsCustomize.TurnOffLiveView()
   local masksController = VectorsCustomize.MaskingGlobal.masksController
@@ -164,7 +193,6 @@ function VectorsCustomize.DrawUI()
 
       if ImGui.Button(GeneralText.default, 500, 40) then
         VectorsCustomize.SetWindshieldDefault()
-        VectorsCustomize.DefaultLiveView()
 
         ImGuiExt.SetStatusBar(GeneralText.settings_default)
       end

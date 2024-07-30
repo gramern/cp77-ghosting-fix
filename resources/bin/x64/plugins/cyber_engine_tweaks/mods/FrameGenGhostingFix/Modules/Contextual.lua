@@ -38,8 +38,6 @@ local Contextual = {
   FGEnabled = false,
 }
 
-local UserSettings = {}
-
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Tracker = require("Modules/Tracker")
@@ -50,15 +48,17 @@ local ContextualText = Localization.GetContextualText()
 local GeneralText = Localization.GetGeneralText()
 
 local function GetUserSettings()
-  UserSettings = {
+  local userSettings = {
     Toggles = Contextual.Toggles
   }
 
-  return UserSettings
+  return userSettings
 end
 
-local function LoadUserSettings()
-  Globals.MergeTables(Contextual, Settings.GetUserSettings("Contextual"))
+local function LoadUserSettings(userSettings)
+  if not userSettings or userSettings == nil then return end
+
+  Globals.MergeTables(Contextual, userSettings)
 end
 
 local function SaveUserSettings()
@@ -521,7 +521,7 @@ end
 
 function Contextual.OnInitialize()
 
-  LoadUserSettings()
+  LoadUserSettings(Settings.GetUserSettings("Contextual"))
 
   -- Turn on debug mode during development
   Settings.SetDebugMode(true)
