@@ -17,7 +17,6 @@ local Contextual = {
     Braindance = false,
     Cinematic = false,
     Photomode = false,
-    Menu = false,
   },
   CurrentStates = {
     isVehicleStatic = false,
@@ -33,7 +32,6 @@ local Contextual = {
     isBraindance = false,
     isCinematic = false,
     isPhotoMode = false,
-    isMenu = false,
   },
   FGEnabled = false,
 }
@@ -103,8 +101,7 @@ local function StringifyStates()
   "\n" .. "Combat: " .. Capitalize(tostring(Contextual.CurrentStates.isCombat)) ..
   "\n" .. "Braindance: " .. Capitalize(tostring(Contextual.CurrentStates.isBraindance)) ..
   "\n" .. "Cinematic: " .. Capitalize(tostring(Contextual.CurrentStates.isCinematic)) ..
-  "\n" .. "PhotoMode: " .. Capitalize(tostring(Contextual.CurrentStates.isPhotoMode)) ..
-  "\n" .. "Menu: " .. Capitalize(tostring(Contextual.CurrentStates.isMenu))
+  "\n" .. "PhotoMode: " .. Capitalize(tostring(Contextual.CurrentStates.isPhotoMode))
 end
 
 local function GetPlayerVehicle()
@@ -225,11 +222,6 @@ local function IsInCombat()
 	return combatState == 1
 end
 
-local function IsInMenu()
-  local ui_System = Game.GetAllBlackboardDefs().UI_System
-  return Game.GetBlackboardSystem():Get(ui_System):GetBool(ui_System.IsInMenu)
-end
-
 local function IsInPhotoMode()
   local photoMode = Game.GetAllBlackboardDefs().PhotoMode
   return Game.GetBlackboardSystem():Get(photoMode):GetBool(photoMode.IsActive)
@@ -276,7 +268,6 @@ local function ShouldAffectFGState(feature)
     Braindance = Contextual.CurrentStates.isBraindance,
     Cinematic = Contextual.CurrentStates.isCinematic,
     Photomode = Contextual.CurrentStates.isPhotoMode,
-    Menu = Contextual.CurrentStates.isMenu
   }
 
   if string.find(feature, "%.") then
@@ -461,18 +452,6 @@ local function SetPhotoMode(feature)
   end
 end
 
-local function SetMenu(feature)
-  if Contextual.CurrentStates.isMenu or IsInMenu() then
-    -- Menus are exclusive, so no need to check for other states
-    -- if not ShouldAffectFGState("Menu") then return end
-    if feature == true then
-      TurnOffFrameGen()
-    else
-      TurnOnFrameGen()
-    end
-  end
-end
-
 function HandleStaticAndDrivingStates()
 
   if Tracker.IsVehicleMoving() then
@@ -483,18 +462,10 @@ function HandleStaticAndDrivingStates()
     Contextual.CurrentStates.isVehicleDriving = false
   end
 
-  -- Drive events are also present during photo mode and menu
+  -- Drive events are also present during photo mode
   -- We need special handling here to turn on FG if those toggles are not checked
   if Contextual.CurrentStates.isPhotoMode then
     if Contextual.Toggles.Photomode then
-      return
-    else
-      TurnOnFrameGen()
-      return
-    end
-  end
-  if Contextual.CurrentStates.isMenu then
-    if Contextual.Toggles.Menu then
       return
     else
       TurnOnFrameGen()
@@ -536,7 +507,6 @@ function Contextual.OnInitialize()
   Observe('PlayerPuppet', 'OnGameAttached', function()
     TurnOnFrameGen()
     Globals.PrintDebug(Contextual.__NAME, "Game started. FG Enabled (PlayerPuppet->OnGameAttached)")
-    Contextual.CurrentStates.isMenu = false
   end)
 
   -- This will prove useful in future to set contexts based on camera perspective
@@ -687,19 +657,11 @@ function Contextual.OnInitialize()
     Contextual.CurrentStates.isSlowWalking = false
     Contextual.CurrentStates.isSprinting = false
 
-    -- LocomotionEventsTransition events are also present during photo mode and menu
+    -- LocomotionEventsTransition events are also present during photo mode
     -- We need special handling here to turn on FG if those toggles are not checked
-    -- Need special handling for photo mode and menu
+    -- Need special handling for photo mode
     if Contextual.CurrentStates.isPhotoMode then
       if Contextual.Toggles.Photomode then
-        return
-      else
-        TurnOnFrameGen()
-        return
-      end
-    end
-    if Contextual.CurrentStates.isMenu then
-      if Contextual.Toggles.Menu then
         return
       else
         TurnOnFrameGen()
@@ -838,45 +800,11 @@ function Contextual.OnInitialize()
     end
   end)
 
-  ---------
-  -- Menu
-  ---------
-  -- Start Menu
-  Observe('SingleplayerMenuGameController', 'OnInitialize', function()
-    Contextual.CurrentStates.isMenu = true
-
-    if Contextual.Toggles.Menu == true then
-      TurnOffFrameGen()
-      Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". FG Disabled (SingleplayerMenuGameController->OnInitialize)")
-    end
-
-  end)
-
-  -- Different menus (inventory, map, etc.)
-  Observe('gameuiPopupsManager', 'OnMenuUpdate', function(_, IsInMenu)
-    Contextual.CurrentStates.isMenu = IsInMenu
-
-    if Contextual.Toggles.Menu == true then
-      if Contextual.CurrentStates.isMenu then
-        TurnOffFrameGen()
-        Globals.PrintDebug(Contextual.__NAME, "Menu detected" .. ". FG Disabled (gameuiPopupsManager->OnMenuUpdate)")
-      end
-      if not Contextual.CurrentStates.isMenu then
-        -- Don't turn it back on if there are existing states with toggle features enabled
-        if not ShouldAffectFGState("Menu") then
-          TurnOnFrameGen()
-          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present" .. ". FG Enabled (gameuiPopupsManager->OnMenuUpdate)")
-        else
-          Globals.PrintDebug(Contextual.__NAME, "Menu no longer present but other states and toggles are present, so FG state won't change")
-        end
-      end
-    end
-  end)
 end
 
 function Contextual.DrawUI()
 
-  local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle, menuToggle
+  local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tabname) then
     if not Settings.IsFrameGeneration() then
@@ -988,13 +916,6 @@ function Contextual.DrawUI()
       SaveUserSettings()
       ImGuiExt.SetStatusBar(GeneralText.settings_saved)
       SetCombat(Contextual.Toggles.Combat)
-    end
-
-    Contextual.Toggles.Menu, menuToggle = ImGuiExt.Checkbox(ContextualText.menus, Contextual.Toggles.Menu, menuToggle)
-    if menuToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(GeneralText.settings_saved)
-      SetMenu(Contextual.Toggles.Menu)
     end
 
     Contextual.Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox(ContextualText.photoMode, Contextual.Toggles.Photomode, photoModeToggle)

@@ -112,7 +112,6 @@ local translation = {
       braindance = "Braindance",
       cinematics = "Przerywniki filmowe",
       combat = "Walka (Wrogowie zaalarmowani)",
-      menus = "Menu w grze",
       photoMode = "Tryb fotograficzny",
     },
     Settings = {

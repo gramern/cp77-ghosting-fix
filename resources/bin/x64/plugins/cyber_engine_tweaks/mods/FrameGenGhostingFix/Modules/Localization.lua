@@ -114,7 +114,6 @@ local UIText = {
     braindance = "Braindance",
     cinematics = "Cinematics",
     combat = "Combat (Enemies Alerted)",
-    menus = "In-Game Menus",
     photoMode = "Photo Mode",
   },
   Settings = {
