@@ -357,6 +357,10 @@ local function SetVehicleDrivingCombat(feature)
 end
 
 local function SetStanding(feature)
+  -- V is in Standing state even when Player is in Vehicle because LocomotionEventsTransition events still trigger
+  local playerVehicle = GetPlayerVehicle()
+  if playerVehicle ~= nil then return end
+
   if Contextual.CurrentStates.isStanding or IsPlayerStanding() then
     if not ShouldAffectFGState("Standing") then return end
     if feature == true then
