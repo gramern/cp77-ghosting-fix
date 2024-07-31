@@ -65,11 +65,11 @@ function Debug.DrawUI()
       ImGui.SameLine()
       ImGuiExt.Text(tostring(VectorsMaskingGlobal.masksController))
     end
-    if VectorsCustomize then
-      ImGuiExt.Text("For VectorsCustomize Module")
-      ImGui.SameLine()
-      ImGuiExt.Text(tostring(VectorsCustomize.MaskingGlobal.masksController))
-    end
+    -- if VectorsCustomize then
+      -- ImGuiExt.Text("For VectorsCustomize Module")
+      -- ImGui.SameLine()
+      -- ImGuiExt.Text(tostring(VectorsCustomize.MaskingGlobal.masksController))
+    -- end
     if Calculate then
       ImGuiExt.Text("For Calculate Module")
       ImGui.SameLine()
