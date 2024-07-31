@@ -9,6 +9,7 @@ local UserSettings = {}
 
 local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
+local Tracker = require("Modules/Tracker")
 
 local LogText = Localization.GetLogText()
 
@@ -37,7 +38,7 @@ end
 
 local function CheckFileVersion(fileVersion)
   if not fileVersion or not Globals.VersionCompare(Globals.VersionStringToTable(fileVersion)) then
-    Globals.SetNewInstall(true)
+    Tracker.SetModNewInstall(true)
   end
 end
 
@@ -197,7 +198,7 @@ local function LoadFile()
   if userSettingsContents then
     UserSettings = userSettingsContents
   else
-    Globals.SetFirstRun(true)
+    Tracker.SetModFirstRun(true)
     Globals.Print(Settings.__NAME, LogText.settings_fileNotFound)
   end
 end

@@ -3,10 +3,12 @@ local Tracker = {
   __VERSION = { 5, 0, 0 },
 }
 
-local GamePerf = {
-  averageFps = nil,
-  currentFps = nil,
-  gameDeltaTime = nil,
+local ModState = {
+  isOpenWindow = false,
+  isFirstRun = false,
+  isFrameGen = false,
+  isNewInstall = false,
+  isReady = true,
 }
 
 local GameState = {
@@ -14,6 +16,12 @@ local GameState = {
   isGameLoaded = nil,
   isGamePaused = nil,
   isPreGame = nil,
+}
+
+local GamePerf = {
+  averageFps = nil,
+  currentFps = nil,
+  gameDeltaTime = nil,
 }
 
 local Player = {
@@ -38,14 +46,95 @@ local IsVehicleMovingCheck = {
   result = nil,
 }
 
+----------------------------------------------------------------------------------------------------------------------
+-- Global Getters for Tracker's Tables
+----------------------------------------------------------------------------------------------------------------------
 ------------------
--- Global Getters and Setters for Tables
+-- Mod State
+
+-- @return table; The ModState table containg real-time configuration of the mod
+function Tracker.GetModStateTable()
+  return ModState
+end
+
 ------------------
+-- GameState
+
+-- @return table
+function Tracker.GetGameStateTable()
+  return GameState
+end
+
+------------------
+-- GamePerf
 
 -- @return table
 function Tracker.GetGamePerfTable()
   return GamePerf
 end
+
+------------------
+-- Player
+
+-- @return table
+function Tracker.GetPlayerTable()
+  return Player
+end
+
+------------------
+-- Vehicle
+
+-- @return table
+function Tracker.GetVehicleTable()
+  return Vehicle
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- Specific Setters for Tracker's Tables
+----------------------------------------------------------------------------------------------------------------------
+------------------
+-- Mod State
+
+-- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
+--
+-- @return None
+function Tracker.SetModReady(isReady)
+  ModState.isReady = isReady
+end
+
+-- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
+--
+-- @return None
+function Tracker.SetModFirstRun(isFirstRun)
+  ModState.isFirstRun = isFirstRun
+  if not isFirstRun then return end
+  Tracker.SetNewInstall(true)
+end
+
+-- @param `isFirstRun`: boolean; The current DLSS Enabler's FG state to set (`true` if it's enabled, `false` otherwise).
+--
+-- @return None
+function Tracker.SetModFrameGeneration(isEnabled)
+  ModState.isFrameGen = isEnabled
+end
+
+-- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
+--
+-- @return None
+function Tracker.SetModNewInstall(isNewInstall)
+  ModState.isNewInstall = isNewInstall
+  if not isNewInstall or ModState.isFirstRun then return end
+end
+
+-- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
+--
+-- @return None
+function Tracker.SetModOpenWindow(isOpenWindow)
+  ModState.isOpenWindow = isOpenWindow
+end
+
+------------------
+-- GamePerf
 
 -- @param `currentFps`: number;
 -- @param `gamedeltaTime`: number;
@@ -63,24 +152,11 @@ function Tracker.SetGamePerfAverage(averageFps)
   GamePerf.averageFps = averageFps
 end
 
--- @return table
-function Tracker.GetGameStateTable()
-  return GameState
-end
-
--- @return table
-function Tracker.GetPlayerTable()
-  return Player
-end
-
--- @return table
-function Tracker.GetVehicleTable()
-  return Vehicle
-end
-
+----------------------------------------------------------------------------------------------------------------------
+-- Specific Getters For Tracker's Tables
+----------------------------------------------------------------------------------------------------------------------
 ------------------
--- Global Specific Getters
-------------------
+-- Mod State
 
 -- @return boolean: `true` if frame generation is enabled in DLSS Enabler and is in-game
 --
@@ -88,18 +164,32 @@ end
 function Tracker.IsModFrameGeneration()
   if GameState.isPreGame then return false end
 
-  return DLSSEnabler_GetFrameGenerationState()
+  -- return ModState.isFrameGen -- to be commented out once Contextaul pass info to Tracker
+  return DLSSEnabler_GetFrameGenerationState() -- to be deleted once Contextaul pass info to Tracker
 end
 
--- @return number;
-function Tracker.GetCurrentFPS()
-  return GamePerf.currentFps
+-- @return boolean: `true` if this is the first run of the mod
+function Tracker.IsModFirstRun()
+  return ModState.isFirstRun
 end
 
--- @return number;
-function Tracker.GetGameDeltaTime()
-  return GamePerf.gameDeltaTime
+-- @return boolean: `true` if the mod is ready for operation
+function Tracker.IsModReady()
+  return ModState.isReady
 end
+
+-- @return boolean: `true` if the current installation of the mod is new
+function Tracker.IsModNewInstall()
+  return ModState.isNewInstall
+end
+
+-- @return boolean: `true` is the mod's window is opened
+function Tracker.IsModOpenWindow()
+  return ModState.isOpenWindow
+end
+
+------------------
+-- GameState
 
 -- @return boolean: `true` if player or vehicle are tracked (monitored)
 function Tracker.IsGameReady()
@@ -126,6 +216,22 @@ function Tracker.IsGamePreGame()
   return GameState.isPreGame
 end
 
+------------------
+-- GamePerf
+
+-- @return number;
+function Tracker.GetCurrentFPS()
+  return GamePerf.currentFps
+end
+
+-- @return number;
+function Tracker.GetGameDeltaTime()
+  return GamePerf.gameDeltaTime
+end
+
+------------------
+-- Player
+
 -- @return boolean: `true` if vehicle is mounted and player is a driver
 function Tracker.IsPlayerDriver()
   return Vehicle.isDriver
@@ -140,6 +246,9 @@ end
 function Tracker.IsPlayerWeapon()
   return Player.isWeapon
 end
+
+------------------
+-- Vehicle
 
 -- @return number: `0` = bike, `1` = car, `2` = tank, `3` = AV or `4` = unknown, if vehicle is mounted
 function Tracker.GetVehicleBaseObject()
@@ -171,9 +280,9 @@ function Tracker.IsVehicleWeapon()
   return Vehicle.isWeapon
 end
 
-------------------
--- Game State
-------------------
+----------------------------------------------------------------------------------------------------------------------
+-- Game State Local Functions
+----------------------------------------------------------------------------------------------------------------------
 
 local function SetGameFrameGeneration(isEnabled)
   GameState.isFrameGen = isEnabled
@@ -188,9 +297,9 @@ local function TrackGameState()
   GameState.isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
 end
 
-------------------
--- Player
-------------------
+----------------------------------------------------------------------------------------------------------------------
+-- Player Local Functions
+----------------------------------------------------------------------------------------------------------------------
 
 local function TrackPlayer()
   local player = Game.GetPlayer()
@@ -200,9 +309,9 @@ local function TrackPlayer()
   trackedPlayer.isWeapon = Game.GetTransactionSystem():GetItemInSlot(player, TweakDBID.new("AttachmentSlots.WeaponRight")) and true or false
 end
 
-------------------
--- Vehicle
-------------------
+----------------------------------------------------------------------------------------------------------------------
+-- Vehicle Local Functions
+----------------------------------------------------------------------------------------------------------------------
 
 local function GetVehicleBaseObject(vehicle)
   if vehicle:IsA("vehicleBikeBaseObject") then return 0 end
@@ -283,6 +392,10 @@ local function TrackVehicle()
   trackedVehicle.isMoving = IsVehicleMoving(trackedVehicle.currentSpeed)
   Player.isDriver = vehicle:IsPlayerDriver()
 end
+
+----------------------------------------------------------------------------------------------------------------------
+-- On... registers
+----------------------------------------------------------------------------------------------------------------------
 
 function Tracker.OnInitialize()
   -- Game State 

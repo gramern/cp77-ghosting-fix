@@ -11,7 +11,6 @@ local Diagnostics = require("Modules/Diagnostics")
 local Vectors = require("Modules/Vectors")
 local VectorsCustomize = require("Modules/VectorsCustomize")
 
-local ModState = Globals.GetModStateTable()
 local Screen = Globals.GetScreenTable()
 local CalculateMaskingGlobal = Calculate.GetMaskingGlobalData()
 local VectorsMaskingGlobal = Vectors.GetMaskingGlobalData()
@@ -75,11 +74,6 @@ function Debug.DrawUI()
       ImGui.SameLine()
       ImGuiExt.Text(tostring(CalculateMaskingGlobal.masksController))
     end
-
-    ImGui.Separator()
-    ImGuiExt.Text("Is Mod Ready:")
-    ImGui.SameLine()
-    ImGuiExt.Text(tostring(ModState.isReady))
 
     ImGui.Separator()
 

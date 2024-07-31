@@ -5,13 +5,6 @@ local Globals = {
 
 local isDebug = nil
 
-local ModState = {
-  isOpenWindow = false,
-  isFirstRun = false,
-  isNewInstall = false,
-  isReady = true,
-}
-
 local MaskingGlobal = {
   masksController = "gameuiCrosshairContainerController",
   Widgets = {
@@ -62,73 +55,14 @@ local FallbackBoard = {}
 local DelayBoard = {}
 
 ------------------
--- Globals Debug Mode Setter
+-- Globals' Local Debug Mode Setter
 ------------------
 
+-- @param `isDebugMode`: boolean; Sets Globals' internal debug variable to `true` or `false`
+--
+-- @return None
 function Globals.SetDebugMode(isDebugMode)
   isDebug = isDebugMode
-end
-
-------------------
--- Mod State
-------------------
-
--- @return table; The ModState table containg real-time configuration of the mod
-function Globals.GetModStateTable()
-  return ModState
-end
-
--- @param `isReady`: boolean; The mod's ready state to set (`true` if the mod is ready, `false` otherwise).
---
--- @return None
-function Globals.SetModReady(isReady)
-  ModState.isReady = isReady
-end
-
--- @return boolean: `true` if the mod is ready for operation
-function Globals.IsModReady()
-  return ModState.isReady
-end
-
--- @param `isFirstRun`: boolean; The first run state to set (`true` if it's the first run, `false` otherwise). Performs related actions: sets isNewInstall to `true` if `true` retrievied.
---
--- @return None
-function Globals.SetFirstRun(isFirstRun)
-  ModState.isFirstRun = isFirstRun
-  if not isFirstRun then return end
-  Globals.SetNewInstall(true)
-  Globals.Print(Globals.__NAME, "Initial launch of the mod detected.")
-end
-
--- @return boolean: `true` if this is the first run of the mod
-function Globals.IsFirstRun()
-  return ModState.isFirstRun
-end
-
--- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
---
--- @return None
-function Globals.SetNewInstall(isNewInstall)
-  ModState.isNewInstall = isNewInstall
-  if not isNewInstall or ModState.isFirstRun then return end
-  Globals.Print(Globals.__NAME, "New version of the mod detected.")
-end
-
--- @return boolean: `true` if the current installation of the mod is new
-function Globals.IsNewInstall()
-  return ModState.isNewInstall
-end
-
--- @return boolean: `true` is the mod's window is opened
-function Globals.IsOpenWindow()
-  return ModState.isOpenWindow
-end
-
--- @param `isOpenWindow`: boolean; The open window state to set (`true` to open the window, `false` to close it).
---
--- @return None
-function Globals.SetOpenWindow(isOpenWindow)
-  ModState.isOpenWindow = isOpenWindow
 end
 
 ------------------

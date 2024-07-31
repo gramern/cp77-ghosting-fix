@@ -191,11 +191,11 @@ local function Benchmark()
 
     benchmarkSetSuggested = true
 
-    if not Globals.IsNewInstall() then return end
-    Globals.SetNewInstall(false)
+    if not Tracker.IsModNewInstall() then return end
+    Tracker.SetModNewInstall(false)
 
-    if not Globals.IsFirstRun() then return end
-    Globals.SetFirstRun(false)
+    if not Tracker.IsModFirstRun() then return end
+    Tracker.SetModFirstRun(false)
   end
 end
 
@@ -276,7 +276,7 @@ local function MonitorDelta(deltaTime)
   gameDeltaTime = deltaTime
   currentFps = 1 / deltaTime
 
-  if Globals.IsOpenWindow() then
+  if Tracker.IsModOpenWindow() then
     MonitorFps(deltaTime)
   end
 
@@ -319,7 +319,7 @@ registerForEvent("onInit", function()
   isDebug = Settings.IsDebugMode()
   Globals.SetDebugMode(isDebug)
 
-  if not Globals.IsModReady() then return end
+  if not Tracker.IsModReady() then return end
 
   Calculate.OnInitialize()
   Contextual.OnInitialize()
@@ -332,14 +332,14 @@ registerForEvent("onInit", function()
   VectorsPresets.OnInitialize()
 
   -- danyalzia: remove forced benchmarking upon new install during development
-  -- if Globals.IsFirstRun() then
+  -- if Tracker.IsModFirstRun() then
   --   SetBenchmark(true)
   -- end
 
   -- danyalzia: I am commenting it during development since I don't want to close these windows everytime I launch the game for testing :/
   -- if Debug then
   --   Globals.SetDebugMode(true)
-  --   Globals.KeepWindow(true)
+    -- Settings.SetKeepWindow(true)
   -- end
 
   ImGuiExt.SetTheme(Settings.GetTheme())
@@ -381,7 +381,7 @@ end
 
 registerForEvent("onOverlayOpen", function()
   openOverlay = true
-  Globals.SetOpenWindow(true)
+  Tracker.SetModOpenWindow(true)
 
   isDebug = Settings.IsDebugMode()
   Globals.SetDebugMode(isDebug)
@@ -393,7 +393,7 @@ registerForEvent("onOverlayOpen", function()
   ImGuiExt.OnOverlayOpen()
   Tracker.OnOverlayOpen()
 
-  if not Globals.IsModReady() then return end
+  if not Tracker.IsModReady() then return end
 
   Vectors.OnOverlayOpen()
 
@@ -408,12 +408,12 @@ registerForEvent("onOverlayClose", function()
   openOverlay = false
 
   if not Settings.IsKeepWindow() then
-    Globals.SetOpenWindow(false)
+    Tracker.SetModOpenWindow(false)
   end
 
   Globals.OnOverlayClose()
 
-  if not Globals.IsModReady() then return end
+  if not Tracker.IsModReady() then return end
 
   Calculate.OnOverlayClose()
 
@@ -447,7 +447,7 @@ end)
 ------------------
 
 registerForEvent("onDraw", function()
-  if Globals.IsOpenWindow() then
+  if Tracker.IsModOpenWindow() then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     -- ImGui.SetNextWindowSizeConstraints(ImGui.ImVec2(400, 0), ImGui.ImVec2(huge, huge))
 
@@ -470,10 +470,10 @@ registerForEvent("onDraw", function()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install dur ing development
-        -- if Globals.IsNewInstall() then
+        -- if Tracker.IsModNewInstall() then
         --   if ImGui.BeginTabItem(InfoText.tabname) then
 
-        --     if Globals.IsFirstRun() then
+        --     if Tracker.IsModFirstRun() then
         --       ImGuiExt.Text(InfoText.benchmark, true)
         --     else
         --       ImGuiExt.Text(InfoText.benchmarkAsk, true)
@@ -489,7 +489,7 @@ registerForEvent("onDraw", function()
         --     end
         --     ImGuiExt.SetTooltip(SettingsText.tooltipWindow)
 
-        --     if not Globals.IsFirstRun() and not isBenchmark then
+        --     if not Tracker.IsModFirstRun() and not isBenchmark then
         --       ImGui.Text("")
 
         --       if ImGui.Button(GeneralText.yes, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
@@ -499,7 +499,7 @@ registerForEvent("onDraw", function()
         --       ImGui.SameLine()
 
         --       if ImGui.Button(GeneralText.no, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-        --         Globals.SetNewInstall(false)
+        --         Tracker.SetModNewInstall(false)
         --         Settings.SetKeepWindow(false)
         --       end
         --     end
@@ -516,7 +516,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if openOverlay and Globals.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
+        if openOverlay and Tracker.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
 
           Contextual.DrawUI()
           VectorsPresets.DrawUI()
@@ -526,8 +526,8 @@ registerForEvent("onDraw", function()
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install during development
-        -- if not Globals.IsNewInstall() and Globals.IsModReady() then
-        if Globals.IsModReady() then
+        -- if not Tracker.IsModNewInstall() and Tracker.IsModReady() then
+        if Tracker.IsModReady() then
           if ImGui.BeginTabItem(SettingsText.tabname) then
             ImGuiExt.Text(SettingsText.groupMod)
             ImGui.Separator()
