@@ -24,9 +24,9 @@ local LogText = Localization.GetLogText()
 local GeneralText = Localization.GetGeneralText()
 local VehiclesText = Localization.GetVehiclesText()
 
-------------------
+----------------------------------------------------------------------------------------------------------------------
 -- UserSettings
-------------------
+----------------------------------------------------------------------------------------------------------------------
 
 local function GetUserSettings()
   local userSettings = {
@@ -46,9 +46,9 @@ local function SaveUserSettings()
   Settings.WriteUserSettings("VehiclesPreset", GetUserSettings())
 end
 
-------------------
+----------------------------------------------------------------------------------------------------------------------
 -- Presets management
-------------------
+----------------------------------------------------------------------------------------------------------------------
 
 local function AddCustomizePreset()
   local customizePreset = {
@@ -150,9 +150,9 @@ function VectorsPresets.OnInitialize()
   end
 end
 
-------------------
+----------------------------------------------------------------------------------------------------------------------
 -- On... registers
-------------------
+----------------------------------------------------------------------------------------------------------------------
 
 function VectorsPresets.OnOverlayOpen()
   -- Translate and refresh presets info and list
@@ -165,9 +165,9 @@ function VectorsPresets.OnOverlayOpen()
   end
 end
 
-------------------
+----------------------------------------------------------------------------------------------------------------------
 -- Local UI
-------------------
+----------------------------------------------------------------------------------------------------------------------
 
 function VectorsPresets.DrawUI()
   if ImGui.BeginTabItem(VehiclesText.tabname) then
@@ -227,6 +227,14 @@ function VectorsPresets.DrawUI()
       if Tracker.IsVehicleMounted() then
         ImGui.Text("")
         -- VectorsCustomize.DrawUI()
+        
+        -- debugging
+        if Settings.IsDebugMode() then
+          if ImGui.Button("   VectorsCustomizeTesting   ") then
+            Vectors.SetLiveViewContext(true)
+            Vectors.SetLiveViewMask(true, "Mask1")
+          end
+        end
       else
         ImGuiExt.SetStatusBar(GeneralText.info_getIn)
       end

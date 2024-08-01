@@ -1,7 +1,8 @@
 {
   "__VERSION": "5.0.0",
   "MaskingGlobal": {
-    "vehicles": true
+    "vehicles": true,
+    "isLiveViewContext": false
   },
   "Vectors": {
     "VehElements": {

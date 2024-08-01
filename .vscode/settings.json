@@ -7,6 +7,7 @@
     "**/.DS_Store?": true,
     "**/archive": true,
     "**/customSounds": true,
+    "**/red4ext": true
   },
   "[lua]": {
     "editor.tabSize": 2
@@ -21,6 +22,8 @@
     "ImGuiCond",
     "ImGuiStyleVar",
     "ImGuiWindowFlags",
+    "FrameGenGhostingFixIsRedScriptModule",
+    "DLSSEnabler_GetVersionAsString",
     "DLSSEnabler_SetFrameGenerationMode",
     "DLSSEnabler_GetFrameGenerationMode",
     "DLSSEnabler_SetFrameGenerationState",

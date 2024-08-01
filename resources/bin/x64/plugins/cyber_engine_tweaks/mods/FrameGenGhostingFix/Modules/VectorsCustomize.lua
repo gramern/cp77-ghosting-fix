@@ -18,11 +18,10 @@ local CustomizeData = {
     },
   },
   Car = {
-    AllMasks = {
-      FPP = { visible = true },
-      TPP = { visible = true }
-    },
     FrontMask = {
+      visible = true,
+    },
+    RearMask = {
       visible = true,
     },
     SideMasks = {
@@ -37,11 +36,23 @@ local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
 
+local Vectors = require("Modules/Vectors")
+
 local LogText = Localization.GetLogText()
 local GeneralText = Localization.GetGeneralText()
 local VehiclesText = Localization.GetVehiclesText()
 
-local Vectors = require("Modules/Vectors")
+----------------------------------------------------------------------------------------------------------------------
+-- Vectors Masks Data
+----------------------------------------------------------------------------------------------------------------------
+
+local VehMasks = Vectors.GetVehMasksData()
+
+local mask
+
+----------------------------------------------------------------------------------------------------------------------
+-- User Settings
+----------------------------------------------------------------------------------------------------------------------
 
 function VectorsCustomize.GetMasksController()
   return MaskingGlobal.masksController
@@ -78,6 +89,10 @@ end
 function VectorsCustomize.SaveUserSettings()
   Settings.WriteUserSettings("VehiclesCustomize", VectorsCustomize.GetUserSettings())
 end
+
+----------------------------------------------------------------------------------------------------------------------
+-- On... registers
+----------------------------------------------------------------------------------------------------------------------
 
 function VectorsCustomize.OnInitialize()
   UserSettings = Globals.MergeTables(UserSettings, Settings.GetUserSettings("VehiclesCustomize"))
@@ -118,7 +133,11 @@ function VectorsCustomize.UpdateLiveView()
   end
 end
 
-function VectorsCustomize.TurnOnLiveView()
+----------------------------------------------------------------------------------------------------------------------
+-- Toggle RedScript Methods
+----------------------------------------------------------------------------------------------------------------------
+
+function VectorsCustomize.TurnOnLiveViewMaskEditor1()
   local masksController = VectorsCustomize.MaskingGlobal.masksController
 
   if Vectors and masksController then
@@ -131,20 +150,7 @@ function VectorsCustomize.TurnOnLiveView()
   end
 end
 
--- function VectorsCustomize.DefaultLiveView()
---   local masksController = VectorsCustomize.MaskingGlobal.masksController
-
---   if Vectors and masksController then
---     Override(masksController, 'OnFrameGenGhostingFixMaskEditor1Event', function(self)
---       local mask = Vectors.VehMasks.MaskEditor1
---       local maskPath = CName.new(mask.maskPath)
-
---       self:FrameGenGhostingFixSetTransformation(maskPath, Vector2.new({X = mask.ScreenSpace.x, Y = mask.ScreenSpace.y}), Vector2.new({X = mask.Size.x, Y = mask.Size.y}), mask.rotation, Vector2.new({X = 0, Y = 0}), Vector2.new({X = 0.5, Y = 0.5}), 1, true)
---     end)
---   end
--- end
-
-function VectorsCustomize.TurnOffLiveView()
+function VectorsCustomize.TurnOffLiveViewMaskEditor1()
   local masksController = VectorsCustomize.MaskingGlobal.masksController
 
   if Vectors and masksController then
@@ -177,16 +183,16 @@ function VectorsCustomize.DrawUI()
       ImGui.Text("")
       ImGuiExt.Text(VehiclesText.Windshield.setting_1)
 
-      vehMasks.Mask4.Def.Scale.x, windshieldScaleToggle.x = ImGui.SliderFloat("##ScaleX", vehMasks.Mask4.Def.Scale.x, 70, 150, "%.0f")
+      CustomizeData.Bike.Windshield.Scale.x, windshieldScaleToggle.x = ImGui.SliderFloat("##ScaleX", CustomizeData.Bike.Windshield.Scale.x, 70, 150, "%.0f")
       if windshieldScaleToggle.x then
-        VectorsCustomize.TurnOnLiveView()
+        VectorsCustomize.TurnOnLiveViewMaskEditor1()
       end
 
       ImGuiExt.Text(VehiclesText.Windshield.setting_2)
 
-      vehMasks.Mask4.Def.Scale.y, windshieldScaleToggle.y = ImGui.SliderFloat("##ScaleY", vehMasks.Mask4.Def.Scale.y, 70, 300, "%.0f")
+      CustomizeData.Bike.Windshield.Scale.y, windshieldScaleToggle.y = ImGui.SliderFloat("##ScaleY", CustomizeData.Bike.Windshield.Scale.y, 70, 300, "%.0f")
       if windshieldScaleToggle.y then
-        VectorsCustomize.TurnOnLiveView()
+        VectorsCustomize.TurnOnLiveViewMaskEditor1()
       end
 
       ImGui.Text("")

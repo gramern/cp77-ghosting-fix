@@ -6,6 +6,7 @@ local Vectors = {
 local MaskingGlobal = {
   masksController = nil,
   vehicles = true,
+  isLiveViewContext = false,
 }
 
 local Screen = {
@@ -225,11 +226,10 @@ local CustomizeData = {
     },
   },
   Car = {
-    AllMasks = {
-      FPP = { visible = true },
-      TPP = { visible = true }
-    },
     FrontMask = {
+      visible = true,
+    },
+    RearMask = {
       visible = true,
     },
     SideMasks = {
@@ -403,15 +403,18 @@ local TrackerData = {
   currentSpeed = 0,
 }
 
+-- Universal methods
 local Universal = {}
 
+-- Import
 local Globals = require("Modules/Globals")
 local Tracker = require("Modules/Tracker")
 
+-- Math
 local abs, atan, deg, floor, max, min, pi, rad, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.tan
 
 ----------------------------------------------------------------------------------------------------------------------
---Table getters start here
+--Table getters
 ----------------------------------------------------------------------------------------------------------------------
 
 -- @return table;
@@ -440,140 +443,7 @@ function Vectors.GetVehicleData()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
--- Vectors VehMasks Customization
-----------------------------------------------------------------------------------------------------------------------
-------------------------------------------
--- Hed
-
--- Visibility
-
-function Vectors.GetVisibilityHedCorners()
-  return VehMasksData.HorizontalEdgeDown.Visible.Def.corners
-end
-
-function Vectors.GetVisibilityHedFill()
-  return VehMasksData.HorizontalEdgeDown.Visible.Def.fill
-end
-
-function Vectors.GetVisibilityHedTracker()
-  return VehMasksData.HorizontalEdgeDown.Visible.Def.tracker
-end
-
-function Vectors.SetVisibilityHedCorners(isVisible)
-  VehMasksData.HorizontalEdgeDown.Visible.Def.Def.corners = isVisible
-end
-
-function Vectors.SetVisibilityHedFill(isVisible)
-  VehMasksData.HorizontalEdgeDown.Visible.Def.fill = isVisible
-end
-
-function Vectors.SetVisibilityHedTracker(isVisible)
-  VehMasksData.HorizontalEdgeDown.Visible.Def.tracker = isVisible
-end
-
--- Locks -- preliminary
-
--- function Vectors.GetLockHedFill()
-
--- end
-
--- function Vectors.GetLockHedCorners()
-
--- end
-
--- function Vectors.SetLockHedFill(isLock)
-
--- end
-
--- function Vectors.SetLockHedCorners(isLock)
-
--- end
-
--- -- Scale
-
--- function Vectors.GetWidthHed()
-
--- end
-
--- function Vectors.SetWidthHed(scaleX)
-
--- end
-
-------------------------------------------
--- Masks All Vehicles
-
-function Vectors.GetScaleSideMasks(baseObjectString)
-  if baseObjectString == "bike" then
-    return CustomizeData.Bike.SideMasks.Scale
-  else
-    return CustomizeData.Car.SideMasks.Scale
-  end
-end
-
-function Vectors.SetScaleSideMasks(baseObjectString, axis, scale)
-  if baseObjectString == "bike" then
-    CustomizeData.Bike.SideMasks.Scale[axis] = scale
-  else
-    CustomizeData.Car.SideMasks.Scale[axis] = scale
-  end
-end
-
-function Vectors.GetVisibilityAllMasks(baseObjectString, perspective)
-  if baseObjectString == "bike" then
-    local persp = CustomizeData.Bike.AllMasks[perspective]
-
-    return persp.visible
-  else
-    local persp = CustomizeData.Car.AllMasks[perspective]
-
-    return persp.visible
-  end
-end
-
-function Vectors.SetVisibilityAllMasks(baseObjectString, perspective, isVisible)
-  if baseObjectString == "bike" then
-    local persp = CustomizeData.Bike.AllMasks[perspective]
-    
-    persp.visible = isVisible
-  else
-    local persp = CustomizeData.Car.AllMasks[perspective]
-
-    persp.visible = isVisible
-  end
-end
-
-------------------------------------------
--- Bikes
-
-function Vectors.GetScaleBikeWindshield()
-  return CustomizeData.Bike.Windshield.Scale
-end
-
-function Vectors.SetScaleBikeWindshield(axis, scale)
-  CustomizeData.Bike.Windshield.Scale[axis] = scale
-end
-
-------------------------------------------
--- Cars
-
-function Vectors.GetVisibilityCarFrontMask()
-  return CustomizeData.Car.FrontMask.visible
-end
-
-function Vectors.SetVisibilityCarFrontMask(isVisible)
-  CustomizeData.Car.FrontMask.visible = isVisible
-end
-
-function Vectors.GetVisibilityCarSideMasks()
-  return CustomizeData.Car.SideMasks.visible
-end
-
-function Vectors.SetVisibilityCarSideMasks(isVisible)
-  CustomizeData.Car.SideMasks.visible = isVisible
-end
-
-----------------------------------------------------------------------------------------------------------------------
--- Universal methods start here
+-- Universal methods
 ----------------------------------------------------------------------------------------------------------------------
 
 function Universal.GetLineIntersectionScreenSpace(anchorPoint, angleDeg, intersectionHorizont)
@@ -684,7 +554,7 @@ function Universal.GetWorldToScreenSpace(pos)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
--- Data gathering methods start here
+-- Data gathering methods
 ----------------------------------------------------------------------------------------------------------------------
 
 local function GetTrackerData()
@@ -986,7 +856,7 @@ local function GetDotProducts()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
--- Transformation methods start here
+-- Transformation methods
 ----------------------------------------------------------------------------------------------------------------------
 
 local function SetSizeHED(baseDimension, multiplier, isX)
@@ -1010,6 +880,19 @@ end
 local function SetVisibility(isVisible)
   local vehMasks = VehMasksData
   local hedVisible, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Visible, vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
+
+  hedVisible.corners = isVisible
+  hedVisible.fill = isVisible
+  hedVisible.tracker = isVisible
+  mask1.visible = isVisible
+  mask2.visible = isVisible
+  mask3.visible = isVisible
+  mask4.visible = isVisible
+end
+
+local function SetVisibilityDef(isVisible)
+  local vehMasks = VehMasksData
+  local hedVisible, mask1, mask2, mask3, mask4 = vehMasks.HorizontalEdgeDown.Visible.Def, vehMasks.Mask1.Def, vehMasks.Mask2.Def, vehMasks.Mask3.Def, vehMasks.Mask4.Def
 
   hedVisible.corners = isVisible
   hedVisible.fill = isVisible
@@ -1920,7 +1803,7 @@ local function TransformOpacity()
   local opacity = VehMasksData.Opacity
   local opacityHED = VehMasksData.HorizontalEdgeDown.Opacity
 
-  if opacity.Def.max ~= 1 then
+  if not MaskingGlobal.isLiveViewContext then
     opacityHED.value = min(opacityHED.Def.max, currentSpeedAbsInt * 0.005)
     opacity.speedValue = min(opacity.Def.max, currentSpeedAbsInt * opacity.Def.speedFactor)
     opacity.value = opacity.speedValue
@@ -1960,12 +1843,12 @@ local function TransformVisibility()
 
   hedVisible.corners = hedVisible.Def.corners
   hedVisible.tracker = hedVisible.Def.tracker
+  mask1.visible = mask1.Def.visible
+  mask2.visible = mask2.Def.visible
+  mask3.visible = mask3.Def.visible
+  mask4.visible = mask4.Def.visible
 
   if CameraData.activePerspective ~= vehicleCameraPerspective.FPP then
-    mask1.visible = mask1.Def.visible
-    mask2.visible = mask2.Def.visible
-    mask3.visible = mask3.Def.visible
-    mask4.visible = mask4.Def.visible
 
     if dotVeh.up > hedVisible.fillToggleValue then
       hedVisible.fill = hedVisible.Def.fill
@@ -1982,11 +1865,6 @@ local function TransformVisibility()
       mask2.visible = false
       mask3.visible = false
       mask4.visible = false
-    else
-      mask1.visible = mask1.Def.visible
-      mask2.visible = mask2.Def.visible
-      mask3.visible = mask3.Def.visible
-      mask4.visible = mask4.Def.visible
     end
 
     if baseObject == 0 then
@@ -2014,8 +1892,7 @@ local function TransformVisibility()
 end
 
 local function TransformVehMasks()
-  TransformByCustomization()
-  TransformVisibility()
+  -- TransformByCustomization()
   TransformByFPS()
   TransformByPerspective()
   TransformByVehBaseObject()
@@ -2026,6 +1903,7 @@ local function TransformVehMasks()
   TransformRotation()
   TransformShear()
   TransformOpacity()
+  TransformVisibility()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -2066,6 +1944,35 @@ local function ApplySizeHed()
   local hedSize = VehMasksData.HorizontalEdgeDown.Size
 
   hedSize.x = SetSizeHED(hedSize.Def.x, 1, true)
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- On... registers
+----------------------------------------------------------------------------------------------------------------------
+
+function Vectors.OnInitialize()
+  ApplyMasksController()
+  ApplyScreen()
+  ApplyScreenSpaceHed()
+  ApplySizeHed()
+end
+
+function Vectors.OnOverlayOpen()
+  ApplyMasksController()
+  ApplyScreen()
+  ApplyScreenSpaceHed()
+  ApplySizeHed()
+end
+
+function Vectors.OnUpdate()
+  if not MaskingGlobal.vehicles then return end
+  GetCameraData()
+  GetActivePerspective()
+  GetVehicleData()
+  GetDotProducts()
+  GetCameraAnglesVehicle()
+  GetDerivativeVehicleData()
+  TransformVehMasks()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -2112,33 +2019,207 @@ function Vectors.ToggleMaskingState()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
--- On... registers
+-- VehMasks Customization
+----------------------------------------------------------------------------------------------------------------------
+------------------------------------------
+-- Visibility
+
+-- HED
+
+function Vectors.GetVisibilityHedCorners()
+  return VehMasksData.HorizontalEdgeDown.Visible.Def.corners
+end
+
+function Vectors.SetVisibilityHedCorners(isVisible)
+  VehMasksData.HorizontalEdgeDown.Visible.Def.corners = isVisible
+end
+
+function Vectors.GetVisibilityHedFill()
+  return VehMasksData.HorizontalEdgeDown.Visible.Def.fill
+end
+
+function Vectors.SetVisibilityHedFill(isVisible)
+  VehMasksData.HorizontalEdgeDown.Visible.Def.fill = isVisible
+end
+
+function Vectors.GetLockHedFill()
+  return VehMasksData.HorizontalEdgeDown.Visible.Def.fillLock
+end
+
+function Vectors.SetLockHedFill(isLock)
+  VehMasksData.HorizontalEdgeDown.Visible.Def.fillLock = isLock
+end
+
+function Vectors.GetVisibilityHedTracker()
+  return VehMasksData.HorizontalEdgeDown.Visible.Def.tracker
+end
+
+function Vectors.SetVisibilityHedTracker(isVisible)
+  VehMasksData.HorizontalEdgeDown.Visible.Def.tracker = isVisible
+end
+
+-- Masks
+
+function Vectors.GetVisibilityAllMasks(baseObjectString, perspective)
+  if baseObjectString == "bike" then
+    local persp = CustomizeData.Bike.AllMasks[perspective]
+
+    return persp.visible
+  else
+    local persp = CustomizeData.Car.AllMasks[perspective]
+
+    return persp.visible
+  end
+end
+
+function Vectors.SetVisibilityAllMasks(baseObjectString, perspective, isVisible)
+  if baseObjectString == "bike" then
+    local persp = CustomizeData.Bike.AllMasks[perspective]
+    
+    persp.visible = isVisible
+  else
+    local persp = CustomizeData.Car.AllMasks[perspective]
+
+    persp.visible = isVisible
+  end
+end
+
+function Vectors.GetVisibilityCarFrontMask()
+  return CustomizeData.Car.FrontMask.visible
+end
+
+function Vectors.SetVisibilityCarFrontMask(isVisible)
+  CustomizeData.Car.FrontMask.visible = isVisible
+end
+
+function Vectors.GetVisibilityCarSideMasks()
+  return CustomizeData.Car.SideMasks.visible
+end
+
+function Vectors.SetVisibilityCarSideMasks(isVisible)
+  CustomizeData.Car.SideMasks.visible = isVisible
+end
+
+function Vectors.GetVisibilityCarRearMask()
+  return CustomizeData.Car.RearMask.visible
+end
+
+function Vectors.SetVisibilityCarRearMask(isVisible)
+  CustomizeData.Car.RearMask.visible = isVisible
+end
+
+------------------------------------------
+-- Scale
+
+function Vectors.GetScaleSideMasks(baseObjectString)
+  if baseObjectString == "bike" then
+    return CustomizeData.Bike.SideMasks.Scale
+  else
+    return CustomizeData.Car.SideMasks.Scale
+  end
+end
+
+function Vectors.SetScaleSideMasks(baseObjectString, axis, scale)
+  if baseObjectString == "bike" then
+    CustomizeData.Bike.SideMasks.Scale[axis] = scale
+  else
+    CustomizeData.Car.SideMasks.Scale[axis] = scale
+  end
+end
+
+function Vectors.GetScaleBikeWindshield()
+  return CustomizeData.Bike.Windshield.Scale
+end
+
+function Vectors.SetScaleBikeWindshield(axis, scale)
+  CustomizeData.Bike.Windshield.Scale[axis] = scale
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- Editor Context
 ----------------------------------------------------------------------------------------------------------------------
 
-function Vectors.OnInitialize()
-  ApplyMasksController()
-  ApplyScreen()
-  ApplyScreenSpaceHed()
-  ApplySizeHed()
+-- @param `isContext`: boolean; Sets on/off context for live view masks editing
+--
+-- @return None
+function Vectors.SetLiveViewContext(isContext)
+  MaskingGlobal.isLiveViewContext = isContext
+
+  VehMasksData.HorizontalEdgeDown.Opacity.Def.max = 0
+  VehMasksData.Opacity.Def.max = 0
 end
 
-function Vectors.OnOverlayOpen()
-  ApplyMasksController()
-  ApplyScreen()
-  ApplyScreenSpaceHed()
-  ApplySizeHed()
+-- @param `isLiveView`: boolean; Sets on/off live view masks editing for HED mask's part
+-- @param `...`; string; HED's part name: may be `corners`, `fill`, `tracker`
+--
+-- @return None
+function Vectors.SetLiveViewHed(isLiveView, ...)
+  if not MaskingGlobal.isLiveViewContext then return end
+
+  if isLiveView then
+    VehMasksData.HorizontalEdgeDown.Opacity.Def.max = 1
+    SetVisibilityDef(false)
+  else
+    VehMasksData.HorizontalEdgeDown.Opacity.Def.max = 0
+  end
+
+  local hedParts = {...}
+
+  for _, hedPart in ipairs(hedParts) do
+    if VehMasksData.HorizontalEdgeDown.Visible.Def[hedPart] ~= nil then
+      VehMasksData.HorizontalEdgeDown.Visible.Def[hedPart] = isLiveView
+      
+      Globals.PrintDebug(Vectors.__NAME, "Setting LiveView:", hedPart, "=", VehMasksData.HorizontalEdgeDown.Visible.Def[hedPart])
+    end
+  end
 end
 
-function Vectors.OnUpdate()
-  if not MaskingGlobal.vehicles then return end
-  GetCameraData()
-  GetActivePerspective()
-  GetVehicleData()
-  GetDotProducts()
-  GetCameraAnglesVehicle()
-  GetDerivativeVehicleData()
-  TransformVehMasks()
+-- @param `isLiveView`: boolean; Sets on/off live view masks editing for a vehicle's mask
+-- @param `...`; string; HED's part name: may be `Mask1`, `Mask2`, `Mask3`, `Mask4`
+--
+-- @return None
+function Vectors.SetLiveViewMask(isLiveView, ...)
+  if not MaskingGlobal.isLiveViewContext then return end
+
+  if isLiveView then
+    VehMasksData.Opacity.Def.max = 1
+    SetVisibilityDef(false)
+  else
+    VehMasksData.Opacity.Def.max = 0
+  end
+
+  local masks = {...}
+
+  for _, mask in ipairs(masks) do
+    if VehMasksData[mask] then
+      VehMasksData[mask]["Def"]["visible"] = isLiveView
+
+      Globals.PrintDebug(Vectors.__NAME, "Setting LiveView:", mask, "=", VehMasksData[mask]["Def"]["visible"])
+    end
+  end
 end
+
+-- HED
+
+-- function Vectors.GetLockHedCorners()
+
+-- end
+
+
+
+-- function Vectors.SetLockHedCorners(isLock)
+
+-- end
+
+-- -- Scale
+
+-- function Vectors.GetWidthHed()
+
+-- end
+
+-- function Vectors.SetWidthHed(scaleX)
+
+-- end
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Presets Loader
@@ -2167,6 +2248,7 @@ function Vectors.LoadPreset(presetTable)
   if not presetTable or presetTable == nil then Globals.Print(Vectors.__NAME,"No preset found.") return end
 
   MaskingGlobal.vehicles = presetTable.MaskingGlobal.vehicles
+  MaskingGlobal.isLiveViewContext = presetTable.MaskingGlobal.isLiveViewContext
 
   if not MaskingGlobal.vehicles then SetVisibility(false) return end
 
@@ -2176,17 +2258,6 @@ function Vectors.LoadPreset(presetTable)
   if masksController then
     --TPP Car
     Override(masksController, 'OnFrameGenGhostingFixCameraTPPCarEvent', function(self)
-      self:FrameGenGhostingFixSetSimpleTransformation(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
-      self:FrameGenGhostingFixSetSimpleTransformation(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
-      self:FrameGenGhostingFixSetTransformation(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
-      self:FrameGenGhostingFixSetTransformation(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
-      self:FrameGenGhostingFixSetTransformation(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
-      self:FrameGenGhostingFixSetTransformation(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
-      self:FrameGenGhostingFixSetTransformation(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
-    end)
-
-    --TPPFar Car
-    Override(masksController, 'OnFrameGenGhostingFixCameraTPPFarCarEvent', function(self)
       self:FrameGenGhostingFixSetSimpleTransformation(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
       self:FrameGenGhostingFixSetSimpleTransformation(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
       self:FrameGenGhostingFixSetTransformation(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
@@ -2209,17 +2280,6 @@ function Vectors.LoadPreset(presetTable)
 
     --TPP Bike
     Override(masksController, 'OnFrameGenGhostingFixCameraTPPBikeEvent', function(self)
-      self:FrameGenGhostingFixSetSimpleTransformation(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
-      self:FrameGenGhostingFixSetSimpleTransformation(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
-      self:FrameGenGhostingFixSetTransformation(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)
-      self:FrameGenGhostingFixSetTransformation(mask1Path, new2({X = mask1.ScreenSpace.x, Y = mask1.ScreenSpace.y}), new2({X = mask1.Size.x, Y = mask1.Size.y}), mask1.rotation, new2({X = mask1.Shear.x, Y = mask1.Shear.y}), new2({X = mask1.AnchorPoint.x, Y = mask1.AnchorPoint.y}), mask1.opacity, mask1.visible)
-      self:FrameGenGhostingFixSetTransformation(mask2Path, new2({X = mask2.ScreenSpace.x, Y = mask2.ScreenSpace.y}), new2({X = mask2.Size.x, Y = mask2.Size.y}), mask2.rotation, new2({X = mask2.Shear.x, Y = mask2.Shear.y}), new2({X = mask2.AnchorPoint.x, Y = mask2.AnchorPoint.y}), mask2.opacity, mask2.visible)
-      self:FrameGenGhostingFixSetTransformation(mask3Path, new2({X = mask3.ScreenSpace.x, Y = mask3.ScreenSpace.y}), new2({X = mask3.Size.x, Y = mask3.Size.y}), mask3.rotation, new2({X = mask3.Shear.x, Y = mask3.Shear.y}), new2({X = mask3.AnchorPoint.x, Y = mask3.AnchorPoint.y}), mask3.opacity, mask3.visible)
-      self:FrameGenGhostingFixSetTransformation(mask4Path, new2({X = mask4.ScreenSpace.x, Y = mask4.ScreenSpace.y}), new2({X = mask4.Size.x, Y = mask4.Size.y}), mask4.rotation, new2({X = mask4.Shear.x, Y = mask4.Shear.y}), new2({X = mask4.AnchorPoint.x, Y = mask4.AnchorPoint.y}), mask4.opacity, mask4.visible)
-    end)
-
-    --TPPFar Bike
-    Override(masksController, 'OnFrameGenGhostingFixCameraTPPFarBikeEvent', function(self)
       self:FrameGenGhostingFixSetSimpleTransformation(hedCornersPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.corners)
       self:FrameGenGhostingFixSetSimpleTransformation(hedFillPath, new2({X = hed.ScreenSpace.x, Y = hed.ScreenSpace.y}), new2({X = hed.Size.x, Y = hed.Size.y}), hed.Opacity.value, hed.Visible.fill)
       self:FrameGenGhostingFixSetTransformation(hedTrackerPath, new2({X = hed.ScreenSpace.Tracker.x, Y = hed.ScreenSpace.Tracker.y}), new2({X = hed.Size.Tracker.x, Y = hed.Size.Tracker.y}), hed.Rotation.tracker, new2({X = 0, Y = 0}), new2({X = 0.5, Y = 0.5}), hed.Opacity.tracker, hed.Visible.tracker)

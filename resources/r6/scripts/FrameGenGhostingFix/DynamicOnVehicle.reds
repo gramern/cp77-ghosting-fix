@@ -106,52 +106,6 @@ private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhosting
   this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
 }
 
-// TPP Far Car ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraTPPFarCarEvent(evt: ref<FrameGenGhostingFixCameraTPPFarCarEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.03, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.07, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.07, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.07, true);
-  
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
 // FPP Car ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhostingFixCameraFPPCarEvent>) -> Bool {
@@ -202,52 +156,6 @@ private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhosting
 // TPP Bike ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.03, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.07, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.07, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.07, true);
-  
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
-// TPP Far Bike ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraTPPFarBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPFarBikeEvent>) -> Bool {
 
   let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
   let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
@@ -439,7 +347,6 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
 
   let cameraFPPEvent: ref<FrameGenGhostingFixCameraFPPCarEvent>;
   let cameraTPPEvent: ref<FrameGenGhostingFixCameraTPPCarEvent>;
-  let cameraTPPFarEvent: ref<FrameGenGhostingFixCameraTPPFarCarEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -458,8 +365,8 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
       break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarEvent = new FrameGenGhostingFixCameraTPPFarCarEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarEvent);
+      cameraTPPEvent = new FrameGenGhostingFixCameraTPPCarEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
       break;
     default:
@@ -473,7 +380,6 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
 
   let cameraFPPBikeEvent: ref<FrameGenGhostingFixCameraFPPBikeEvent>;
   let cameraTPPBikeEvent: ref<FrameGenGhostingFixCameraTPPBikeEvent>;
-  let cameraTPPFarBikeEvent: ref<FrameGenGhostingFixCameraTPPFarBikeEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -492,8 +398,8 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
       break;
     case vehicleCameraPerspective.TPPFar:
-      cameraTPPFarBikeEvent = new FrameGenGhostingFixCameraTPPFarBikeEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeEvent);
+      cameraTPPBikeEvent = new FrameGenGhostingFixCameraTPPBikeEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
       break;
     default:
@@ -583,7 +489,6 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
 
   let cameraFPPEvent: ref<FrameGenGhostingFixCameraFPPCarEvent>;
   let cameraTPPEvent: ref<FrameGenGhostingFixCameraTPPCarEvent>;
-  let cameraTPPFarEvent: ref<FrameGenGhostingFixCameraTPPFarCarEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -602,8 +507,8 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
       // LogChannel(n"DEBUG", "Car camera is in TPPMedium mode.");
       break;
     case vehicleCameraPerspective.DriverCombatFar:
-      cameraTPPFarEvent = new FrameGenGhostingFixCameraTPPFarCarEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarEvent);
+      cameraTPPEvent = new FrameGenGhostingFixCameraTPPCarEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPEvent);
       // LogChannel(n"DEBUG", "Car camera is in TPPFar mode.");
       break;
     default:
@@ -617,7 +522,6 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
 
   let cameraFPPBikeEvent: ref<FrameGenGhostingFixCameraFPPBikeEvent>;
   let cameraTPPBikeEvent: ref<FrameGenGhostingFixCameraTPPBikeEvent>;
-  let cameraTPPFarBikeEvent: ref<FrameGenGhostingFixCameraTPPFarBikeEvent>;
 
   switch((scriptInterface.owner as VehicleObject).GetCameraManager().GetActivePerspective()) {
     case vehicleCameraPerspective.FPP:
@@ -636,8 +540,8 @@ public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface
       // LogChannel(n"DEBUG", "Bike camera is in TPPMedium mode.");
       break;
     case vehicleCameraPerspective.DriverCombatFar:
-      cameraTPPFarBikeEvent = new FrameGenGhostingFixCameraTPPFarBikeEvent();
-      scriptInterface.executionOwner.QueueEvent(cameraTPPFarBikeEvent);
+      cameraTPPBikeEvent = new FrameGenGhostingFixCameraTPPBikeEvent();
+      scriptInterface.executionOwner.QueueEvent(cameraTPPBikeEvent);
       // LogChannel(n"DEBUG", "Bike camera is in TPPFar mode.");
       break;
     default:
