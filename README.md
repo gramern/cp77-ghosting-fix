@@ -5,11 +5,11 @@
 Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achieves that by putting almost invisible HUD masks that block frame generation from presenting in certain parts of a screen.
 
 # Requirements
-+ Cyberpunk 2.12+
++ Cyberpunk 2077 2.12+
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.31.0+
 + [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.3.4.0+
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.3.4.0+ (the dll included in the `develop` branch)
 
 # Intended results
 Since 4.0.0-alpha, thanks to the major change in how masks are projected (uses the game's world space-to-screen space method, vehicle's position and camera data to project and transform masks in real-time), the mod is usable with FSR3 FG ON in lower framerates (30+ fps interpolated 60+ fps e.g.). The new mask mapping algorithm for vehicles introduced in 4.8.0xl-alpha2 brought further improvements in smoothness in lower framerates.
