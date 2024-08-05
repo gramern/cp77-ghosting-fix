@@ -11,14 +11,10 @@ local MaskingGlobal = {
     hedCorners = "horizontaledgedowncorners",
     hedFill = "horizontaledgedownfill",
     hedTracker = "horizontaledgedowntracker",
-    hedCornersEditor = "horizontaledgedowncorners_editor",
-    hedFillEditor = "horizontaledgedowncorners_editor",
     mask1 = "mask1",
     mask2 = "mask2",
     mask3 = "mask3",
     mask4 = "mask4",
-    maskEditor1 = "mask_editor1",
-    maskEditor2 = "mask_editor2",
     blockerAimOnFoot = "blockerAimOnFoot",
     cornerDownLeft = "cornerDownLeftOnFoot",
     cornerDonwRight = "cornerDownRightOnFoot",
@@ -114,6 +110,18 @@ end
 
 function Globals.ResetAspectRatioChange()
   Screen.isAspectRatioChange = false
+end
+
+-- @param `dimension`: string; Optional `width` or `height`, if not given, two numbers `width` and `height` are returned
+--
+-- @return number: Number of pixels for the given `dimension`, if not `dimension` then for `width` 
+-- @return number: If not `dimension`, number for pixels for `height`
+function Globals.GetScreenResolution(dimension)
+  if not dimension then
+    return Screen.Resolution.width, Screen.Resolution.height
+  else
+    return Screen.Resolution[dimension]
+  end
 end
 
 -- @param None
@@ -405,7 +413,6 @@ function Globals.PrintError(moduleName, ...)
   spdlog.error(printContents)
 end
 
-
 -- @param `versionString`: string; The version string  (e.g. "5.0.0") to convert to a table of numbers.
 --
 -- @return table: A table containing the version numbers.
@@ -502,6 +509,8 @@ end
 function Globals.CancelDelay(key)
   if not key then Globals.PrintError(Globals.__NAME, "Cannot find a delay:", key) return end
 
+  key = tostring(key)
+
   DelayBoard[key] = nil
 end
 
@@ -510,6 +519,8 @@ end
 -- @return boolean: `true` if the delay exists in the moment
 function Globals.IsDelay(key)
   if not key then Globals.PrintError(Globals.__NAME, "Cannot find a delay:", key) return false end
+
+  key = tostring(key)
 
   if DelayBoard[key] == nil then return false end
   return true
@@ -525,6 +536,8 @@ function Globals.SetDelay(duration, key, callback, ...)
   local parameters = {...}
 
   if not duration or not key or not callback then Globals.PrintError(Globals.__NAME, "Cannot set the delay. Check parameters.") return end
+
+  key = tostring(key)
 
   DelayBoard[key] = {
     remainingTime = duration,
@@ -604,6 +617,16 @@ function Globals.SaveJSON(filename, content)
   else
     return false
   end
+end
+
+------------------
+-- Names
+
+-- @param 'text': string;
+--
+-- @return boolean: `true` if the `text` string has only letters as characters
+function Globals.AreLettersOnly(text)
+  return not string.match(text, "[^%a]")
 end
 
 ------------------

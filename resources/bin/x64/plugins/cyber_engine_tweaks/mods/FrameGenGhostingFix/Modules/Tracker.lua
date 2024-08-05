@@ -164,7 +164,7 @@ end
 function Tracker.IsModFrameGeneration()
   if GameState.isPreGame then return false end
 
-  -- return ModState.isFrameGen -- to be commented out once Contextaul pass info to Tracker
+  -- return ModState.isFrameGen -- to be uncommented once Contextaul pass info to Tracker
   return DLSSEnabler_GetFrameGenerationState() -- to be deleted once Contextaul pass info to Tracker
 end
 

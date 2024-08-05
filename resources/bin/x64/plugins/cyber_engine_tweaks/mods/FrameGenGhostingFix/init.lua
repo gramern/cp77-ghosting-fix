@@ -46,7 +46,7 @@ local Vectors = require("Modules/Vectors")
 
 --optional modules
 local Diagnostics = require("Modules/Diagnostics")
-local VectorsCustomize = require("Modules/VectorsCustomize")
+local VectorsEditor = require("Modules/VectorsEditor")
 
 --localization tables
 local LogText = Localization.GetLogText()
@@ -324,13 +324,8 @@ registerForEvent("onInit", function()
   Calculate.OnInitialize()
   Contextual.OnInitialize()
   Vectors.OnInitialize()
-
-  if VectorsCustomize then
-    -- VectorsCustomize.OnInitialize()
-  end
-
   VectorsPresets.OnInitialize()
-
+  
   -- danyalzia: remove forced benchmarking upon new install during development
   -- if Tracker.IsModFirstRun() then
   --   SetBenchmark(true)
@@ -396,11 +391,6 @@ registerForEvent("onOverlayOpen", function()
   if not Tracker.IsModReady() then return end
 
   Vectors.OnOverlayOpen()
-
-  if VectorsCustomize then
-    -- VectorsCustomize.OnOverlayOpen() -- gramern: commented out for development
-  end
-
   VectorsPresets.OnOverlayOpen()
 end)
 
@@ -416,13 +406,10 @@ registerForEvent("onOverlayClose", function()
   if not Tracker.IsModReady() then return end
 
   Calculate.OnOverlayClose()
-
-  if VectorsCustomize then
-    -- VectorsCustomize.OnOverlayClose() -- gramern: commented out for development
-  end
-
   Settings.OnOverlayClose()
-  ImGuiExt.ResetStatusBar()
+  ImGuiExt.OnOverlayClose()
+
+  VectorsEditor.OnOverlayClose()
 end)
 
 registerForEvent("onUpdate", function(deltaTime)
@@ -447,6 +434,8 @@ end)
 ------------------
 
 registerForEvent("onDraw", function()
+  ImGuiExt.DrawNotification()
+
   if Tracker.IsModOpenWindow() then
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
     -- ImGui.SetNextWindowSizeConstraints(ImGui.ImVec2(400, 0), ImGui.ImVec2(huge, huge))
@@ -635,7 +624,7 @@ registerForEvent("onDraw", function()
                 ImGui.Text("")
 
                 if not isBenchmark then
-                  if ImGui.Button(BenchmarkText.benchmarkRun, 480 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if ImGui.Button(BenchmarkText.benchmarkRun, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     ResetBenchmarkResults()
                     SetBenchmark(true)
                     Settings.SetKeepWindow(true)
@@ -643,18 +632,18 @@ registerForEvent("onDraw", function()
 
                   ImGuiExt.SetTooltip(BenchmarkText.tooltipRunBench)
                 else
-                  if ImGui.Button(BenchmarkText.benchmarkStop, 480 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if ImGui.Button(BenchmarkText.benchmarkStop, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     ResetBenchmarkResults()
                     SetBenchmark(false)
                   end
                 end
 
                 if isBenchmarkFinished then
-                  if not benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkSetSuggestedSettings, 480 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if not benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkSetSuggestedSettings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     SetSuggestedSettings()
                   end
 
-                  if benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkRevertSettings, 480 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkRevertSettings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     RestorePreviousSettings()
 
                     ImGuiExt.SetStatusBar(GeneralText.settings_restored)
@@ -662,9 +651,6 @@ registerForEvent("onDraw", function()
                   end
                 end
               end
-
-              ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
-
             end
             ImGui.EndTabItem()
           end
@@ -672,6 +658,7 @@ registerForEvent("onDraw", function()
         --additonal options interface ends------------------------------------------------------------------------------------------------------------------
         ImGui.EndTabBar()
       end
+      ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
     end
     ImGui.End()
 

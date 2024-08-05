@@ -940,10 +940,14 @@ function Contextual.DrawUI()
         fgStatus = "Disabled"
       end
 
-      ImGuiExt.Text("Frame Gen: " .. fgStatus)
+      ImGuiExt.Text("Table Frame Gen State: " .. fgStatus)
+
+      ImGui.Separator()
+
+      local realTimeState = tostring(GetFrameGenState())
+      ImGuiExt.Text("Real-Time Frame Gen State: " .. realTimeState)
     end
 
-    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
     ImGui.EndTabItem()
   end
 

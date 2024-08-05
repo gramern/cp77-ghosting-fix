@@ -28,8 +28,8 @@ local UIText = {
     settings_saved = "[ ! ] Your settings will be saved.",
     settings_applied_onfoot = "[ ! ] Redraw your weapon to accept changes.",
     settings_default = "Default settings restored.",
-    info_getOut = "[ ! ] V must exit a vehicle to customize this option.",
-    info_getIn = "[ ! ] V must be in a vehicle to customize this option.",
+    info_getOut = "[ ! ] V must exit a vehicle to use this option.",
+    info_getIn = "[ ! ] V must be in a vehicle to use this option.",
     info_aimOnFoot = "[ ! ] You can enable one aiming/blocking feature at once.",
     info_diagnostics = "Potential conflicts with other mods detected.",
     info_modNotReady = "[ ! ] Mod isn't working. Check logs for details...",
@@ -55,15 +55,17 @@ local UIText = {
       description = "Preset's info:",
       author = "Preset's author:",
     },
-    Windshield = {
-      name = "Customize motorcycle windshield mask",
-      tooltip = "Enables customization of the anti-ghosting mask to stop frame generation from occuring locally around a windshield when riding a motorcycle.",
-      textfield_1 = "The sliders below let you customize the size of the motorcycle windshield mask. Usually not necessary, may turn out handy for some motorcycles like Apollo.",
-      setting_1 = "Windshield anti-ghosting mask width:",
-      setting_2 = "Windshield anti-ghosting mask height:",
-      comment_1 = "Scale width",
-      comment_2 = "Scale height",
-      warning = "V needs to be sitting on a stationary motorcycle while in First Person Perspective to edit this option."
+    Editor = {
+      General = {
+        isMovingWarning = "The vehicle is moving. Stop it to edit these options."
+      },
+      Windshield = {
+        name = "Customize motorcycle windshield mask",
+        tooltip = "The sliders let you customize the size of the motorcycle windshield mask. Usually not necessary, may turn out handy for some motorcycles with a bigger windshield, like Apollo.",
+        setting_1 = "Windshield anti-ghosting mask width:",
+        setting_2 = "Windshield anti-ghosting mask height:",
+        warning = "Switch to First Person Perspective to edit this option."
+      }
     }
   },
   OnFoot = {

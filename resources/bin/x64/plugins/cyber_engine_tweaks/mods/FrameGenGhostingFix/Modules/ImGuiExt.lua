@@ -12,13 +12,19 @@ local Themes = {
 local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
+local Tracker = require("Modules/Tracker")
 
 local GeneralText = Localization.GetGeneralText()
+
+local isNotification = false
+local notificationText = ""
+local notificationTextWidth = 0
 
 local ImGui = ImGui
 local ImGuiCol = ImGuiCol
 local ImGuiStyleVar = ImGuiStyleVar
 
+local screenWidth, screenHeight
 local scaleFactor = 1
 
 local selectedTheme = "Crimson"
@@ -33,6 +39,10 @@ local dimRed, dimGreen, dimBlue, dimAlpha = 0.73, 0.56, 0, 1
 ------------------
 -- Scaling
 ------------------
+
+local function ApplyScreenResolution()
+  screenWidth, screenHeight = Globals.GetScreenResolution()
+end
 
 local function ApplyScaleFactor()
   local screenWidthFactor = Globals.GetScreenWidthFactor()
@@ -91,7 +101,9 @@ end
 -- @return None
 function ImGuiExt.StatusBar(string)
   ImGui.Separator()
-  ImGuiExt.Text(string)
+  ImGui.PushStyleColor(ImGuiCol.Text, textAltRed, textAltGreen, textAltBlue, textAltAlpha)
+  ImGui.TextWrapped(string)
+  ImGui.PopStyleColor()
 end
 
 ------------------
@@ -181,41 +193,66 @@ end
 
 -- Table to store current text of the mod's status bar.
 local Status = {
-  bar = nil,
-  previousBar = nil,
+  Main = {
+    bar = nil,
+    previousBar = nil,
+  }
 }
 
 --- Resets the status bar to display the default state: the mod's version information.
 --
--- @param None
+-- @param 'barName': string; Optional: name of a separate status bar, which updates idependently
 --
 -- @return None
-function ImGuiExt.ResetStatusBar()
+function ImGuiExt.ResetStatusBar(barName)
   local status = GeneralText.info_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
 
-  ImGuiExt.SetStatusBar(status)
+  if not barName then
+    ImGuiExt.SetStatusBar(status)
+  else
+    ImGuiExt.SetStatusBar(status, barName)
+  end
 end
 
 --- Sets the text of the mod's status bar, updating only if the new text is different from the previous.
 --
 -- @param `string`: string; The new text to display in the status bar.
+-- @param 'barName': string; Optional: name of a separate status bar, which updates idependently
 --
 -- @return None
-function ImGuiExt.SetStatusBar(string)
-  if Status.previousBar == string then return end
+function ImGuiExt.SetStatusBar(string, barName)
+  if not barName and Status.Main.previousBar == string then return end
 
-  Status.bar = string
+  if not barName then
+    Status.Main.bar = string
+    Status.Main.previousBar = Status.Main.bar
+  else
+    if not Status[barName] then
+      Status[barName] = {bar = "", previousBar = ""}
+    end
+    
+    local otherStatus = Status[barName]
 
-  Status.previousBar = Status.bar
+    if otherStatus.previousBar == string then return end
+
+    otherStatus.bar = string
+    otherStatus.previousBar = otherStatus.bar
+  end
 end
 
 --- Retrieves the current text displayed in the status bar.
 --
--- @param None
+-- @param 'barName': string; Optional: name of a separate status bar, which updates idependently
 --
 -- @return string; The current text displayed in the status bar.
-function ImGuiExt.GetStatusBar()
-  return Status.bar
+function ImGuiExt.GetStatusBar(barName)
+  if not barName then
+    return Status.Main.bar
+  else
+    local otherStatus = Status[barName]
+
+    return otherStatus.bar or nil
+  end
 end
 
 ------------------
@@ -265,6 +302,39 @@ end
 function ImGuiExt.PopStyle()
   ImGui.PopStyleColor(26)
   ImGui.PopStyleVar(1)
+end
+
+local function EnableNotification(isEnabled)
+  isNotification = isEnabled
+end
+
+------------------
+-- Notifications
+------------------
+
+-- @param `timeSeconds`: number;
+-- @param `text`: string;
+--
+-- @return None
+function ImGuiExt.SetNotification(timeSeconds, text)
+  EnableNotification(true)
+  notificationText = text
+
+  Globals.SetDelay(timeSeconds, "Notification", EnableNotification, false)
+end
+
+-- @return None
+function ImGuiExt.DrawNotification()
+  if isNotification then
+    notificationTextWidth = ImGui.CalcTextSize(notificationText)
+    ImGui.SetNextWindowPos(screenWidth / 2 - notificationTextWidth / 2 - 20, screenHeight / 2)
+    ImGui.Begin("Notification", true, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoTitleBar)
+    ImGuiExt.Text(notificationText)
+    ImGui.End()
+
+    if Tracker.IsGameReady() then return end
+    EnableNotification(false)
+  end
 end
 
 ------------------
@@ -320,7 +390,12 @@ end
 ------------------
 
 function ImGuiExt.OnOverlayOpen()
+  ApplyScreenResolution()
   ApplyScaleFactor()
+  ImGuiExt.ResetStatusBar()
+end
+
+function ImGuiExt.OnOverlayClose()
   ImGuiExt.ResetStatusBar()
 end
 

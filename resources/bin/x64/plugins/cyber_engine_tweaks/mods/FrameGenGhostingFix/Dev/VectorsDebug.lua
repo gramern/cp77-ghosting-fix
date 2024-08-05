@@ -48,7 +48,6 @@ function VectorsDebug.DrawUI()
         ImGuiExt.Text(tostring(VehMasksData.Mask2.maskPath))
         ImGuiExt.Text(tostring(VehMasksData.Mask3.maskPath))
         ImGuiExt.Text(tostring(VehMasksData.Mask4.maskPath))
-        ImGuiExt.Text(tostring(VehMasksData.MaskEditor1.maskPath))
       end
 
       ImGui.EndTabItem()

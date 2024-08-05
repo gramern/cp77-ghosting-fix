@@ -2,7 +2,7 @@
   "__VERSION": "5.0.0",
   "MaskingGlobal": {
     "vehicles": false,
-    "isLiveViewContext": false
+    "isOpacityLock": false
   },
   "Vectors": {
     "VehElements": {
@@ -160,6 +160,10 @@
             "max": 0
           }
         },
+        "Scale": {
+          "y": 1,
+          "x": 1
+        },
         "Size": {
           "Def": {
             "lock": false,
@@ -184,6 +188,56 @@
           "max": 0,
           "speedFactor": 1,
           "stepFactor": 1
+        }
+      }
+    },
+    "Modifiers": {
+      "HorizontalEdgeDown": {
+        "Scale": {
+          "y": 1,
+          "x": 1
+        }
+      },
+      "Bike": {
+        "Windshield": {
+          "Scale": {
+            "y": 1,
+            "x": 1
+          }
+        },
+        "SideMasks": {
+          "Scale": {
+            "y": 1,
+            "x": 1
+          }
+        },
+        "AllMasks": {
+          "TPP": {
+            "visible": true
+          },
+          "FPP": {
+            "visible": true
+          }
+        }
+      },
+      "Car": {
+        "AllMasks": {
+          "FPP": {
+            "visible": true
+          }
+        },
+        "SideMasks": {
+          "Scale": {
+            "y": 1,
+            "x": 1
+          },
+          "visible": true
+        },
+        "FrontMask": {
+          "visible": true
+        },
+        "RearMask": {
+          "visible": true
         }
       }
     }

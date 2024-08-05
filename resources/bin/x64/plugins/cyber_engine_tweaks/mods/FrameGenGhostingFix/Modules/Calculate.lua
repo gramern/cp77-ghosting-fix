@@ -727,8 +727,6 @@ function Calculate.DrawUI()
       end
     end
 
-    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
-
     ImGui.EndTabItem()
   end
 end

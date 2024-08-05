@@ -193,7 +193,7 @@ end
 ------------------
 
 local function LoadFile()
-  local userSettingsContents = Globals.LoadJSON("user_settings", json)
+  local userSettingsContents = Globals.LoadJSON("user_settings")
 
   if userSettingsContents then
     UserSettings = userSettingsContents
@@ -209,7 +209,7 @@ local function SaveFile()
 
   SaveModSettings()
 
-  local result = Globals.SaveJSON("user_settings", UserSettings, json)
+  local result = Globals.SaveJSON("user_settings", UserSettings)
 
   if result then
     ResetSaveRequest()
