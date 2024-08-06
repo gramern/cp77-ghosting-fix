@@ -533,6 +533,11 @@ function Contextual.OnInitialize()
       Contextual.CurrentStates.isVehicleDrivingCombat = false
     end
 
+    -- Turn on framegen if it was disabled outside vehicle
+    if Contextual.Toggles.Standing == true then
+      TurnOnFrameGen()
+    end
+    
     HandleStaticAndDrivingStates()
   end)
 
@@ -682,7 +687,8 @@ function Contextual.OnInitialize()
       Contextual.CurrentStates.isWalking = true
     end
 
-    if Contextual.Toggles.Standing == true then
+    -- Only process standing logic when V is out of vehicle
+    if Contextual.Toggles.Standing == true and GetMountedVehicle(GetPlayer()) == nil then
       if Contextual.CurrentStates.isStanding then
         TurnOffFrameGen()
       else
