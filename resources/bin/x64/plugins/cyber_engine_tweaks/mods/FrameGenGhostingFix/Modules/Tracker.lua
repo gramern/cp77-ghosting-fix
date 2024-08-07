@@ -426,8 +426,6 @@ end
 
 function Tracker.OnUpdate()
   TrackGameState()
-
-  if not Tracker.IsGameReady() then return end
   TrackPlayer()
   TrackVehicle()
 end

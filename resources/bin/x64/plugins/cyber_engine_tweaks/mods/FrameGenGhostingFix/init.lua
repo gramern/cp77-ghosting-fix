@@ -591,14 +591,15 @@ registerForEvent("onDraw", function()
               ImGui.Separator()
             
             if openOverlay then
-              if Tracker.IsGameReady() then
+              -- danyalzia: IsGameReady is replaced with GetPlayer() because it is more suitable for this case until IsGameReady is separated into functions
+              if GetPlayer() then
                 fgBool, fgToggle = ImGuiExt.Checkbox(SettingsText.enableFG, Settings.IsFrameGeneration(), fgToggle)
                 if fgToggle then
                   Settings.SetFrameGeneration(fgBool)
                   ImGuiExt.SetStatusBar(GeneralText.settings_saved)
                 end
                 ImGuiExt.SetTooltip(SettingsText.tooltipFG)
-              
+
                 ImGuiExt.Text(SettingsText.gameSettingsFG, true)
               else
                 ImGuiExt.Text(SettingsText.gameNotReadyWarning, true)

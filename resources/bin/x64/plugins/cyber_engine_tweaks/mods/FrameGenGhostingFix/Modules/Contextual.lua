@@ -23,10 +23,10 @@ local Contextual = {
     isVehicleDriving = false,
     isVehicleStaticCombat = false,
     isVehicleDrivingCombat = false,
-    isStanding = false,
+    isStandingCrouching = false,
     isWalking = false,
-    isSlowWalking = false,
-    isSprinting = false,
+    isSlowWalkingCrouchWalking = false,
+    isSprintingCrouchSprinting = false,
     isSwimming = false,
     isCombat = false,
     isBraindance = false,
@@ -93,10 +93,10 @@ local function StringifyStates()
   "\n" .. "VehicleDriving: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleDriving)) ..
   "\n" .. "VehicleStaticCombat: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleStaticCombat)) ..
   "\n" .. "VehicleDrivingCombat: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleDrivingCombat)) ..
-  "\n" .. "Standing: " .. Capitalize(tostring(Contextual.CurrentStates.isStanding)) ..
+  "\n" .. "StandingCrouching: " .. Capitalize(tostring(Contextual.CurrentStates.isStandingCrouching)) ..
   "\n" .. "Walking: " .. Capitalize(tostring(Contextual.CurrentStates.isWalking)) ..
-  "\n" .. "SlowWalking: " .. Capitalize(tostring(Contextual.CurrentStates.isSlowWalking)) ..
-  "\n" .. "Sprinting: " .. Capitalize(tostring(Contextual.CurrentStates.isSprinting)) ..
+  "\n" .. "SlowWalkingCrouchWalking: " .. Capitalize(tostring(Contextual.CurrentStates.isSlowWalkingCrouchWalking)) ..
+  "\n" .. "SprintingCrouchSprinting: " .. Capitalize(tostring(Contextual.CurrentStates.isSprintingCrouchSprinting)) ..
   "\n" .. "Swimming: " .. Capitalize(tostring(Contextual.CurrentStates.isSwimming)) ..
   "\n" .. "Combat: " .. Capitalize(tostring(Contextual.CurrentStates.isCombat)) ..
   "\n" .. "Braindance: " .. Capitalize(tostring(Contextual.CurrentStates.isBraindance)) ..
@@ -197,7 +197,7 @@ local function IsPlayerStanding()
 end
 
 local function IsPlayerWalking()
-  return LocomotionState() ~= 1 and LocomotionState() ~= 3 and LocomotionState() ~= 4
+  return LocomotionState() ~= 1 and LocomotionState() ~= 4 and LocomotionState() ~= 30 and Tracker.IsPlayerMoving()
 end
 
 -- Same as crouching
@@ -206,7 +206,7 @@ local function IsPlayerSlowWalking()
 end
 
 local function IsPlayerSprinting()
-  return LocomotionState() == 4
+  return LocomotionState() == 4 or LocomotionState() == 30
 end
 
 local function IsPlayerInBraindance()
@@ -259,10 +259,10 @@ local function ShouldAffectFGState(feature)
       StaticCombat = Contextual.CurrentStates.isVehicleStaticCombat,
       DrivingCombat = Contextual.CurrentStates.isVehicleDrivingCombat,
     },
-    Standing = Contextual.CurrentStates.isStanding,
+    Standing = Contextual.CurrentStates.isStandingCrouching,
     Walking = Contextual.CurrentStates.isWalking,
-    SlowWalking = Contextual.CurrentStates.isSlowWalking,
-    Sprinting = Contextual.CurrentStates.isSprinting,
+    SlowWalking = Contextual.CurrentStates.isSlowWalkingCrouchWalking,
+    Sprinting = Contextual.CurrentStates.isSprintingCrouchSprinting,
     Swimming = Contextual.CurrentStates.isSwimming,
     Combat = Contextual.CurrentStates.isCombat,
     Braindance = Contextual.CurrentStates.isBraindance,
@@ -352,7 +352,7 @@ local function SetStanding(feature)
   local playerVehicle = GetPlayerVehicle()
   if playerVehicle ~= nil then return end
 
-  if Contextual.CurrentStates.isStanding or IsPlayerStanding() then
+  if Contextual.CurrentStates.isStandingCrouching or IsPlayerStanding() then
     if not ShouldAffectFGState("Standing") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -374,7 +374,7 @@ local function SetWalking(feature)
 end
 
 local function SetSlowWalking(feature)
-  if Contextual.CurrentStates.isSlowWalking or IsPlayerSlowWalking() then
+  if Contextual.CurrentStates.isSlowWalkingCrouchWalking or IsPlayerSlowWalking() then
     if not ShouldAffectFGState("SlowWalking") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -385,7 +385,7 @@ local function SetSlowWalking(feature)
 end
 
 local function SetSprinting(feature)
-  if Contextual.CurrentStates.isSprinting or IsPlayerSprinting() then
+  if Contextual.CurrentStates.isSprintingCrouchSprinting or IsPlayerSprinting() then
     if not ShouldAffectFGState("Sprinting") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -657,14 +657,8 @@ function Contextual.OnInitialize()
   -- Standing, Walking, Slow Walking and Sprinting
   -------------------------------------------------
   Observe('LocomotionEventsTransition', 'OnUpdate', function()
-    Contextual.CurrentStates.isStanding = false
-    Contextual.CurrentStates.isWalking = false
-    Contextual.CurrentStates.isSlowWalking = false
-    Contextual.CurrentStates.isSprinting = false
-
     -- LocomotionEventsTransition events are also present during photo mode
-    -- We need special handling here to turn on FG if those toggles are not checked
-    -- Need special handling for photo mode
+    -- We need special handling to turn on FG when photo mode toggle is not checked
     if Contextual.CurrentStates.isPhotoMode then
       if Contextual.Toggles.Photomode then
         return
@@ -675,47 +669,96 @@ function Contextual.OnInitialize()
     end
 
     local locomotionState = LocomotionState()
-
     if locomotionState == 1 then
-      Contextual.CurrentStates.isStanding = true
-    elseif  locomotionState == 3 then
-      Contextual.CurrentStates.isSlowWalking = true
-    elseif  locomotionState == 4 then
-      Contextual.CurrentStates.isSprinting = true
+      Contextual.CurrentStates.isStandingCrouching = true
+      Contextual.CurrentStates.isWalking = false
+      Contextual.CurrentStates.isSlowWalkingCrouchWalking = false
+      Contextual.CurrentStates.isSprintingCrouchSprinting = false
+    elseif locomotionState == 3 then
+      if Tracker.IsPlayerMoving() then
+        -- Player is crouching and moving slowly
+        Contextual.CurrentStates.isSlowWalkingCrouchWalking = true
+        Contextual.CurrentStates.isStandingCrouching = false
+      else
+        -- Player is crouching (but not moving) so we track it as standing as well
+        Contextual.CurrentStates.isStandingCrouching = true
+        Contextual.CurrentStates.isSlowWalkingCrouchWalking = false
+      end
+      Contextual.CurrentStates.isWalking = false
+      Contextual.CurrentStates.isSprintingCrouchSprinting = false
+    elseif locomotionState == 4 or locomotionState == 30 then
+      Contextual.CurrentStates.isSprintingCrouchSprinting = true
+      Contextual.CurrentStates.isStandingCrouching = false
+      Contextual.CurrentStates.isWalking = false
+      Contextual.CurrentStates.isSlowWalkingCrouchWalking = false
     else
-      -- There is no specific walking state, so let's assume everything else is walking
-      Contextual.CurrentStates.isWalking = true
+      Contextual.CurrentStates.isStandingCrouching = false
+      Contextual.CurrentStates.isWalking = false
+      Contextual.CurrentStates.isSlowWalkingCrouchWalking = false
+      Contextual.CurrentStates.isSprintingCrouchSprinting = false
+    end
+
+    -- There is no specific walking locomotion state
+    if Tracker.IsPlayerMoving() then
+      if locomotionState ~= 4 and locomotionState ~= 30 then
+        if Contextual.CurrentStates.isSprintingCrouchSprinting then
+          Contextual.CurrentStates.isWalking = true
+        else
+          Contextual.CurrentStates.isWalking = false
+        end
+      end
     end
 
     -- Only process standing logic when V is out of vehicle
     if Contextual.Toggles.Standing == true and GetMountedVehicle(GetPlayer()) == nil then
-      if Contextual.CurrentStates.isStanding then
+      if Contextual.CurrentStates.isStandingCrouching then
         TurnOffFrameGen()
       else
-        TurnOnFrameGen()
+        -- if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
+        if not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalking)
+        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalkingCrouchWalking)
+        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+          TurnOnFrameGen()
+        end
       end
     end
+    
     if Contextual.Toggles.Walking == true then
       if Contextual.CurrentStates.isWalking then
         TurnOffFrameGen()
       else
-        TurnOnFrameGen()
+        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
+        -- and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalking)
+        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalkingCrouchWalking)
+        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+          TurnOnFrameGen()
+        end
       end
     end
 
     if Contextual.Toggles.SlowWalking then
-      if Contextual.CurrentStates.isSlowWalking == true then
+      if Contextual.CurrentStates.isSlowWalkingCrouchWalking == true then
         TurnOffFrameGen()
       else
-        TurnOnFrameGen()
+        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
+        and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalking)
+        -- and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalkingCrouchWalking)
+        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+          TurnOnFrameGen()
+        end
       end
     end
 
     if Contextual.Toggles.Sprinting then
-      if Contextual.CurrentStates.isSprinting == true then
+      if Contextual.CurrentStates.isSprintingCrouchSprinting == true then
         TurnOffFrameGen()
       else
-        TurnOnFrameGen()
+        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
+        and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalking)
+        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalkingCrouchWalking) then
+        -- and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+          TurnOnFrameGen()
+        end
       end
     end
 
@@ -818,8 +861,7 @@ function Contextual.DrawUI()
       ImGuiExt.TextRed(ContextualText.requirement, true)
       ImGui.Text("")
       ImGuiExt.ResetStatusBar()
-      
-      ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
+
       ImGui.EndTabItem()
       return
     end
