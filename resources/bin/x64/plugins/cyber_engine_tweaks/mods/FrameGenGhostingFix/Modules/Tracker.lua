@@ -4,10 +4,11 @@ local Tracker = {
 }
 
 local ModState = {
-  isOpenWindow = false,
+  isDynamicFrameGen = false,
   isFirstRun = false,
   isFrameGen = false,
   isNewInstall = false,
+  isOpenWindow = false,
   isReady = true,
 }
 
@@ -25,18 +26,18 @@ local GamePerf = {
 }
 
 local Player = {
-  isDriver = nil,
-  isMoving = nil,
-  isWeapon = nil,
+  isDriver = false,
+  isMoving = false,
+  isWeapon = false,
 }
 
 local Vehicle = {
   baseObject = nil,
-  currentSpeed = nil,
-  isMounted = nil,
-  isMoving = nil,
-  isSupported = nil,
-  isWeapon = nil,
+  currentSpeed = 0,
+  isMounted = false,
+  isMoving = false,
+  isSupported = false,
+  isWeapon = false,
 }
 
 -- IsVehicleMoving-related
@@ -118,6 +119,13 @@ function Tracker.SetModFrameGeneration(isEnabled)
   ModState.isFrameGen = isEnabled
 end
 
+-- @param `isFirstRun`: boolean; The current DLSS Enabler's Dynamic FG state to set (`true` if it's enabled, `false` otherwise).
+--
+-- @return None
+function Tracker.SetModDynamicFrameGeneration(isEnabled)
+  ModState.isDynamicFrameGen = isEnabled
+end
+
 -- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
 --
 -- @return None
@@ -158,14 +166,20 @@ end
 ------------------
 -- Mod State
 
+-- @return boolean: `true` if dynamic frame generation is enabled in DLSS Enabler, as retrieved in a last check
+--
+-- NOTE: Disable logging for 'dlss-enabler-bridge-2077.dll' to avoid excessive logging when calling this function frequently
+function Tracker.IsModDynamicFrameGeneration()
+  return ModState.isDynamicFrameGen
+end
+
 -- @return boolean: `true` if frame generation is enabled in DLSS Enabler and is in-game
 --
 -- NOTE: Disable logging for 'dlss-enabler-bridge-2077.dll' to avoid excessive logging when calling this function frequently
 function Tracker.IsModFrameGeneration()
-  if GameState.isPreGame then return false end
+  if GameState.isPreGame or GameState.isGamePaused then return false end
 
-  -- return ModState.isFrameGen -- to be uncommented once Contextaul pass info to Tracker
-  return DLSSEnabler_GetFrameGenerationState() -- to be deleted once Contextaul pass info to Tracker
+  return ModState.isFrameGen
 end
 
 -- @return boolean: `true` if this is the first run of the mod
@@ -295,6 +309,10 @@ end
 local function TrackGameState()
   GameState.isGamePaused = Game.GetSystemRequestsHandler():IsGamePaused()
   GameState.isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
+
+  if GameState.isGameLoaded then return end
+  if not Tracker.IsPlayerMoving() then return end -- after reloading the mod in CET, isGameLoaded will get changed to `true` again after the player moves; GetPlayer() shows `true` in the main menu
+  GameState.isGameLoaded = true
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -305,7 +323,7 @@ local function TrackPlayer()
   local player = Game.GetPlayer()
   local trackedPlayer = Player
 
-  trackedPlayer.isMoving = player:IsMoving() or nil
+  trackedPlayer.isMoving = player and player:IsMoving() or false --added isMoving since Game.GetPlayer():IsMoving throws nil sometimes when added to onUpdate
   trackedPlayer.isWeapon = Game.GetTransactionSystem():GetItemInSlot(player, TweakDBID.new("AttachmentSlots.WeaponRight")) and true or false
 end
 
@@ -379,9 +397,9 @@ local function TrackVehicle()
 
   if not vehicle then
     trackedVehicle.isMounted = false
-    trackedVehicle.currentSpeed = nil
-    trackedVehicle.isMoving = nil
-    Player.isDriver = nil
+    trackedVehicle.currentSpeed = 0
+    trackedVehicle.isMoving = false
+    Player.isDriver = false
     return
   end
 
@@ -401,6 +419,8 @@ function Tracker.OnInitialize()
   -- Game State 
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     SetGameLoaded(true)
+    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState()) -- additional check and set on a loaded game
+    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState()) -- -- additional check and set on a loaded game
   end)
 
   Observe('QuestTrackerGameController', 'OnUninitialize', function()
@@ -422,6 +442,10 @@ end
 
 function Tracker.OnOverlayOpen()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState()) -- additional check and set on overlay open
+
+  if not Tracker.IsGameReady() then return end
+  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState()) -- additional check and set on overlay close
 end
 
 function Tracker.OnUpdate()

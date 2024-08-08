@@ -79,6 +79,7 @@ local Tracker = require("Modules/Tracker")
 local LogText = Localization.GetLogText()
 local GeneralText = Localization.GetGeneralText()
 local OnFootText = Localization.GetOnFootText()
+local SettingsText = Localization.GetSettingsText()
 
 ------------------
 -- UserSettings
@@ -107,15 +108,15 @@ local function LoadUserSettings(userSettings)
 end
 
 local function SaveUserSettings()
-  Settings.WriteUserSettings("OnFoot", GetUserSettings())
+  Settings.WriteUserSettings('OnFoot', GetUserSettings())
 end
 
 local function BackupUserSettings()
-  Globals.SetFallback("OnFoot", GetUserSettings())
+  Globals.SetFallback('OnFoot', GetUserSettings())
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Globals.SafeMergeTables(MasksData, Globals.GetFallback("OnFoot"))
+  Calculate = Globals.SafeMergeTables(MasksData, Globals.GetFallback('OnFoot'))
 
   if Calculate == nil then Globals.Print(Calculate.__NAME, "Can't restore user settings.") end
   SaveUserSettings()
@@ -143,6 +144,9 @@ end
 --
 -- @return boolean;
 local function GetBlockerState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Blocker[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
   return MasksData.Blocker[context]
 end
 
@@ -158,6 +162,9 @@ end
 --
 -- @return boolean;
 local function GetCornersState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Corners[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
   return MasksData.Corners[context]
 end
 
@@ -173,6 +180,9 @@ end
 --
 -- @return boolean;
 local function GetVignetteState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Vignette[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
   return MasksData.Vignette[context]
 end
 
@@ -392,7 +402,7 @@ function Calculate.ApplySuggestedSettings(averageFps)
 
   SaveUserSettings()
 
-  Globals.Print(Calculate.__NAME, LogText.calculate_applySettings)
+  Globals.Print(Calculate.__NAME, LogText.calculate_apply_settings)
 end
 
 ------------------
@@ -400,7 +410,7 @@ end
 ------------------
 
 function Calculate.OnInitialize()
-  LoadUserSettings(Settings.GetUserSettings("OnFoot"))
+  LoadUserSettings(Settings.GetUserSettings('OnFoot'))
   ApplyMasksController()
   ApplyScreenEdges()
   ApplyCornersScreenSpace()
@@ -457,7 +467,7 @@ function ToggleCornersOnWeapon()
       self:FrameGenGhostingFixMasksOnFootSetMargins(edge.left, edge.right, edge.down)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -478,7 +488,7 @@ function ToggleBlockerOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -499,7 +509,7 @@ function ToggleVignetteOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -524,7 +534,7 @@ function ToggleVignetteOnWeapon()
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -539,7 +549,7 @@ function ToggleVignettePermament()
       self:FrameGenGhostingFixVignetteOnFootDeActivationToggle(true)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -555,7 +565,7 @@ function TurnOnLiveView()
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -569,7 +579,7 @@ function TurnOffLiveView()
       self:FrameGenGhostingFixVignetteOnFootSetDimensions()
     end)
   else
-    Globals.Print(Calculate.__NAME,LogText.globals_controllerMissing)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
@@ -588,142 +598,142 @@ local vignetteScale = {}
 local vignettePosition = {}
 
 function Calculate.DrawUI()
-  if ImGui.BeginTabItem(OnFootText.tabname) then
-    ImGuiExt.Text(GeneralText.title_general)
+  if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
+    ImGuiExt.Text(GeneralText.group_general)
     ImGui.Separator()
 
-    cornersOnWeaponBool, cornersOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.BottomCornersMasks.name, GetCornersState("onWeapon"))
+    cornersOnWeaponBool, cornersOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.chk_bottom_corners_masks, GetCornersState('onWeapon'))
     if cornersOnWeaponToggle then
-      SetCornersState("onWeapon", cornersOnWeaponBool)
+      SetCornersState('onWeapon', cornersOnWeaponBool)
       SaveUserSettings()
 
-      ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
     end
-    ImGuiExt.SetTooltip(OnFootText.BottomCornersMasks.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_bottom_corners_masks)
 
-    blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(OnFootText.BlockerAim.name, GetBlockerState("onAim"))
+    blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(OnFootText.chk_blocker_aim, GetBlockerState('onAim'))
     if blockerOnAimToggle then
-      SetBlockerState("onAim", blockerOnAimBool)
-      ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+      SetBlockerState('onAim', blockerOnAimBool)
+      ImGuiExt.SetStatusBar(SettingsText)
 
-      if GetVignetteState("onAim") then
+      if GetVignetteState('onAim') then
         
-        SetVignetteState("onAim", false)
+        SetVignetteState('onAim', false)
 
-        ImGuiExt.SetStatusBar(GeneralText.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(OnFootText.status_aim)
       end
 
       SaveUserSettings()
     end
-    ImGuiExt.SetTooltip(OnFootText.BlockerAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_blocker_aim)
 
     ImGui.Text("")
-    ImGuiExt.Text(GeneralText.title_fps120)
+    ImGuiExt.Text(GeneralText.group_fps120)
     ImGui.Separator()
 
-    vignetteOnAimBool, vignetteOnAimToggle = ImGuiExt.Checkbox(OnFootText.VignetteAim.name, GetVignetteState("onAim"))
+    vignetteOnAimBool, vignetteOnAimToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette_aim, GetVignetteState('onAim'))
     if vignetteOnAimToggle then
-      SetVignetteState("onAim", vignetteOnAimBool)
-      ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+      SetVignetteState('onAim', vignetteOnAimBool)
+      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
 
-      if GetBlockerState("onAim") then
-        SetBlockerState("onAim", false)
+      if GetBlockerState('onAim') then
+        SetBlockerState('onAim', false)
 
-        ImGuiExt.SetStatusBar(GeneralText.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(OnFootText.status_aim)
       end
 
       SaveUserSettings()
     end
-    ImGuiExt.SetTooltip(OnFootText.VignetteAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_vignette_aim)
 
-    vignetteOnWeaponBool, vignetteOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.Vignette.name, GetVignetteState("onWeapon"))
+    vignetteOnWeaponBool, vignetteOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette, GetVignetteState('onWeapon'))
     if vignetteOnWeaponToggle then
-      SetVignetteState("onWeapon", vignetteOnWeaponBool)
+      SetVignetteState('onWeapon', vignetteOnWeaponBool)
       SaveUserSettings()
       
-      ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
     end
-    ImGuiExt.SetTooltip(OnFootText.Vignette.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_vignette)
 
-    if GetVignetteState("onWeapon") then
+    if GetVignetteState('onWeapon') then
       if not Tracker.IsVehicleMounted() then
-        vignettePermamentBool, vignettePermamentToggle = ImGuiExt.Checkbox(OnFootText.VignettePermament.name, GetVignetteState("permament"))
+        vignettePermamentBool, vignettePermamentToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette_permament, GetVignetteState('permament'))
         if vignettePermamentToggle then
-          SetVignetteState("permament", vignettePermamentBool)
+          SetVignetteState('permament', vignettePermamentBool)
           SaveUserSettings()
 
-          ImGuiExt.SetStatusBar(GeneralText.settings_applied_onfoot)
+          ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
         end
-        ImGuiExt.SetTooltip(OnFootText.VignettePermament.tooltip)
+        ImGuiExt.SetTooltip(OnFootText.tooltip_vignette_permament)
 
-        if GetVignetteState("onAim") and GetVignetteState("onWeapon") then
+        if GetVignetteState('onAim') and GetVignetteState('onWeapon') then
           ImGui.Text("")
-          ImGuiExt.Text(OnFootText.VignetteAim.textfield_1, true)
+          ImGuiExt.Text(OnFootText.info_dimming, true)
         end
 
         --customize vignette interface starts------------------------------------------------------------------------------------------------------------------
         ImGui.Text("")
-        ImGuiExt.Text(OnFootText.Vignette.textfield_1, true)
+        ImGuiExt.Text(OnFootText.info_vignette, true)
         ImGui.Text("")
-        ImGuiExt.Text(OnFootText.Vignette.setting_1)
+        ImGuiExt.Text(OnFootText.slider_vignette_width)
       
-        vignetteScale.x, vignetteScaleToggle.x = ImGui.SliderFloat("##Scale X", GetVignetteScale("x"), GetVignetteScale("x", "Min"), GetVignetteScale("x", "Max"), "%.0f")
+        vignetteScale.x, vignetteScaleToggle.x = ImGui.SliderFloat("##Scale X", GetVignetteScale('x'), GetVignetteScale('x', 'Min'), GetVignetteScale('x', 'Max'), "%.0f")
         if vignetteScaleToggle.x then
-          SetVignetteScale("x", vignetteScale.x)
+          SetVignetteScale('x', vignetteScale.x)
           Calculate.OnVignetteChange('x')
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(OnFootText.Vignette.setting_2)
+        ImGuiExt.Text(OnFootText.slider_vignette_height)
       
-        vignetteScale.y, vignetteScaleToggle.y = ImGui.SliderFloat("##Scale Y", GetVignetteScale("y"), GetVignetteScale("y", "Min"), GetVignetteScale("y", "Max"), "%.0f")
+        vignetteScale.y, vignetteScaleToggle.y = ImGui.SliderFloat("##Scale Y", GetVignetteScale('y'), GetVignetteScale('y', 'Min'), GetVignetteScale('y', 'Max'), "%.0f")
         if vignetteScaleToggle.y then
-          SetVignetteScale("y", vignetteScale.y)
+          SetVignetteScale('y', vignetteScale.y)
           Calculate.OnVignetteChange('y')
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(OnFootText.Vignette.setting_3)
+        ImGuiExt.Text(OnFootText.slider_vignette_pos_x)
       
-        vignettePosition.x, vignettePositionToggle.x = ImGui.SliderFloat("##Pos. X", GetVignetteScreenPosition("x"), GetVignetteScreenPosition("x", "Min"), GetVignetteScreenPosition("x", "Max"), "%.0f")
+        vignettePosition.x, vignettePositionToggle.x = ImGui.SliderFloat("##Pos. X", GetVignetteScreenPosition('x'), GetVignetteScreenPosition('x', 'Min'), GetVignetteScreenPosition('x', 'Max'), "%.0f")
         if vignettePositionToggle.x then
-          SetVignetteScreenPosition("x", vignettePosition.x)
+          SetVignetteScreenPosition('x', vignettePosition.x)
           Calculate.OnVignetteChange('x')
           TurnOnLiveView()
         end
       
-        ImGuiExt.Text(OnFootText.Vignette.setting_4)
+        ImGuiExt.Text(OnFootText.slider_vignette_pos_y)
       
-        vignettePosition.y, vignettePositionToggle.y = ImGui.SliderFloat("##Pos. Y", GetVignetteScreenPosition("y"), GetVignetteScreenPosition("y", "Min"), GetVignetteScreenPosition("y", "Max"), "%.0f")
+        vignettePosition.y, vignettePositionToggle.y = ImGui.SliderFloat("##Pos. Y", GetVignetteScreenPosition('y'), GetVignetteScreenPosition('y', 'Min'), GetVignetteScreenPosition('y', 'Max'), "%.0f")
         if vignettePositionToggle.y then
-          SetVignetteScreenPosition("y", vignettePosition.y)
+          SetVignetteScreenPosition('y', vignettePosition.y)
           Calculate.OnVignetteChange('y')
           TurnOnLiveView()
         end
       
         ImGui.Text("")
       
-        if ImGui.Button(GeneralText.default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(SettingsText.btn_default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           SetVignetteDefault('x')
           SetVignetteDefault('y')
           TurnOnLiveView()
 
-          ImGuiExt.SetStatusBar(GeneralText.settings_default)
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_default)
         end
       
         ImGui.SameLine()
       
-        if ImGui.Button(GeneralText.settings_save, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(SettingsText.btn_save_settings, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           SaveUserSettings()
 
-          ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
         end
       else
-        ImGuiExt.SetStatusBar(GeneralText.info_getOut)
+        ImGuiExt.SetStatusBar(OnFootText.status_get_out)
       end
     else
-      if GetVignetteState("permament") then
-        SetVignetteState("permament", false)
+      if GetVignetteState('permament') then
+        SetVignetteState('permament', false)
       end
     end
 

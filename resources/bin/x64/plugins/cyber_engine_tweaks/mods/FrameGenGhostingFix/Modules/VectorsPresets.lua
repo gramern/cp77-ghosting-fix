@@ -24,6 +24,7 @@ local VectorsEditor = require("Modules/VectorsEditor")
 
 local LogText = Localization.GetLogText()
 local GeneralText = Localization.GetGeneralText()
+local SettingsText = Localization.GetSettingsText()
 local VehiclesText = Localization.GetVehiclesText()
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ end
 
 function VectorsPresets.AddPreset(presetInfo, id, filename)
   -- Skip if PresetsList is already populated with the same preset
-  if PresetsList[id] ~= nil then Globals.Print(VectorsPresets.__NAME, LogText.presets_skippedFileDuplicate) return end
+  if PresetsList[id] ~= nil then Globals.Print(VectorsPresets.__NAME, LogText.presets_skipped_file_duplicate) return end
 
   PresetsList[id] = {file = filename, PresetInfo = presetInfo}
 end
@@ -79,7 +80,7 @@ function VectorsPresets.GetPresets()
         VectorsPresets.AddPreset(presetContents.PresetInfo, presetContents.PresetInfo.id, presetFile.name)
         table.insert(addedPresets, presetFile.name)
       else
-        Globals.Print(VectorsPresets.__NAME, LogText.presets_skippedFileData, presetFile.name)
+        Globals.Print(VectorsPresets.__NAME, LogText.presets_skipped_file_data, presetFile.name)
       end
     end
   end
@@ -177,15 +178,18 @@ end
 local isPresetsEditor
 
 function VectorsPresets.DrawUI()
-  if ImGui.BeginTabItem(VehiclesText.tabname) then
+  if ImGui.BeginTabItem(VehiclesText.tab_name_vehicle) then
     if not Tracker.IsGameFrameGeneration() then
-      ImGuiExt.Text(GeneralText.info_frameGenOff, true)
+      ImGui.Text("")
+      ImGuiExt.Text(SettingsText.info_frame_gen_off, true)
+
+      ImGui.EndTabItem()
       return
     end
 
-    ImGuiExt.Text(GeneralText.title_general)
+    ImGuiExt.Text(GeneralText.group_general)
     ImGui.Separator()
-    ImGuiExt.Text(VehiclesText.MaskingPresets.name)
+    ImGuiExt.Text(VehiclesText.info_presets)
 
     selectedPresetName = PresetsList[selectedPreset].PresetInfo.name
 
@@ -206,29 +210,25 @@ function VectorsPresets.DrawUI()
       end
       ImGui.EndCombo()
     end
-    ImGuiExt.SetTooltip(VehiclesText.MaskingPresets.tooltip)
+    ImGuiExt.SetTooltip(VehiclesText.tooltip_presets)
 
-    if selectedPreset ~= "a000" then
       ImGui.SameLine()
       
-      if ImGui.Button(GeneralText.apply, 100 * ImGuiExt.GetScaleFactor(), 0) then
-        VectorsPresets.LoadPreset()
-        SaveUserSettings()
+    if ImGui.Button(GeneralText.btn_apply, 100 * ImGuiExt.GetScaleFactor(), 0) then
+      VectorsPresets.LoadPreset()
+      SaveUserSettings()
 
-        ImGuiExt.SetStatusBar(GeneralText.settings_applied_veh)
-      end
-    elseif selectedPreset == "a000" and not isPresetsEditor then
-      ImGuiExt.SetStatusBar("Open presets editor by pressing the 'Open Editor' preset")
+      ImGuiExt.SetStatusBar(VehiclesText.status_applied_veh)
     end
 
     if selectedPreset then
       if PresetsList[selectedPreset].PresetInfo.description then
-        ImGuiExt.Text(VehiclesText.MaskingPresets.description)
+        ImGuiExt.Text(VehiclesText.info_description)
         ImGuiExt.Text(PresetsList[selectedPreset].PresetInfo.description, true)
       end
 
       if PresetsList[selectedPreset].PresetInfo.author then
-        ImGuiExt.Text(VehiclesText.MaskingPresets.author)
+        ImGuiExt.Text(VehiclesText.info_author)
         ImGui.SameLine()
         ImGuiExt.Text(PresetsList[selectedPreset].PresetInfo.author)
       end
@@ -236,27 +236,28 @@ function VectorsPresets.DrawUI()
 
     -- VectorsEditor
     ImGui.Text("")
-    ImGuiExt.Text("Presets Editor:")
+    ImGuiExt.Text(VehiclesText.group_editor)
     ImGui.Separator()
 
     if not isPresetsEditor then
-      if ImGui.Button("Open Presets Editor", 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+      if ImGui.Button(VehiclesText.btn_open_editor, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
         if Tracker.IsVehicleMounted() then
           isPresetsEditor = true
           VectorsEditor.SetInstance(PresetsList)
         else
-          ImGuiExt.SetStatusBar(GeneralText.info_getIn)
+          ImGuiExt.SetStatusBar(VehiclesText.status_get_in)
         end
       end
-      ImGuiExt.SetTooltip("")
+      ImGuiExt.SetTooltip(VehiclesText.tooltip_open_editor)
     else
-      if ImGui.Button("Close Presets Editor", 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+      if ImGui.Button(VehiclesText.btn_close_editor, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
         isPresetsEditor = false
         VectorsEditor.EndInstance()
 
         VectorsPresets.GetPresets()
         VectorsPresets.LoadPreset()
       end
+      ImGuiExt.SetTooltip(VehiclesText.tooltip_close_editor)
     end
     
     ImGui.EndTabItem()

@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "alpha",
+  __VERSION_STATUS = "beta1",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -56,13 +56,12 @@ local InfoText = Localization.GetInfoText()
 local SettingsText = Localization.GetSettingsText()
 
 --debug
-local isDebug
 local Debug = require("Dev/Debug")
 local TrackerDebug = require("Dev/TrackerDebug")
 local VectorsDebug = require("Dev/VectorsDebug")
 
 --math
-local huge, floor = math.huge, math.floor
+local floor = math.floor
 
 --game performance
 local gameDeltaTime = 0
@@ -125,6 +124,43 @@ function FrameGenGhostingFix.GetVersion(asString)
   end
 end
 
+
+--- Returns the version of DLSS Enabler.
+--
+-- @param asTable: boolean; Whether to return the version as a table.
+-- 
+-- @return string | table | nil; Version information. If `dlss-enabler-bridge-2077.dll` is not present, returns `nil`
+function FrameGenGhostingFix.GetDLSSEnablerVersion(asTable)
+  local version = DLSSEnabler_GetVersionAsString() or nil
+
+  if version ~= "Unknown" and asTable then
+    version = Globals.VersionStringToTable(DLSSEnabler_GetVersionAsString())
+  end
+
+  return version
+end
+
+--- Returns if a compatible of DLSS Enabler version is installed.
+--
+-- @param None
+-- 
+-- @return boolean; `true` if compatible, `false` if otherwise or DLSS Enabler is missing
+function FrameGenGhostingFix.IsDLSSEnablerCompatible()
+  local version = FrameGenGhostingFix.GetDLSSEnablerVersion(true)
+
+  if not version then return false end
+
+  local minVersion = {major = 3, minor = 1, patch = 0, revision = 12}
+
+  local isCompatible =
+    version[1] > minVersion.major or
+    (version[1] == minVersion.major and version[2] > minVersion.minor) or
+    (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] > minVersion.patch) or
+    (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] == minVersion.patch and version[4] >= minVersion.revision)
+
+  return isCompatible
+end
+
 ------------------
 -- Benchmark
 ------------------
@@ -136,7 +172,7 @@ local function SetBenchmark(boolean)
     isBenchmarkFinished = false
 
     Globals.Print(LogText.benchmark_starting)
-    ImGuiExt.SetStatusBar(BenchmarkText.benchmarkEnabled)
+    ImGuiExt.SetStatusBar(BenchmarkText.status_benchmark_enabled)
     return
   end
 
@@ -147,7 +183,7 @@ local function SetBenchmark(boolean)
   benchmarkTime = 0
   benchmarkRemainingTime = benchmarkDuration
 
-  ImGuiExt.SetStatusBar(BenchmarkText.benchmarkFinished)
+  ImGuiExt.SetStatusBar(BenchmarkText.status_benchmark_finished)
 end
 
 local function ResetBenchmarkResults()
@@ -185,7 +221,7 @@ local function Benchmark()
 
     Tracker.SetGamePerfAverage(averageFps)
 
-    Globals.Print(LogText.benchmark_avgFpsResult, averageFps)
+    Globals.Print(LogText.benchmark_avg_fps_result, averageFps)
 
     Calculate.ApplySuggestedSettings(averageFps)
 
@@ -214,38 +250,38 @@ local function RestorePreviousSettings()
 end
 
 function BenchmarkUI()
-  ImGuiExt.Text(BenchmarkText.currentFps)
+  ImGuiExt.Text(BenchmarkText.info_current_fps)
   ImGui.SameLine()
   ImGuiExt.Text(tostring(currentFpsInt))
-  ImGuiExt.Text(BenchmarkText.currentFrametime)
+  ImGuiExt.Text(BenchmarkText.info_current_frametime)
   ImGui.SameLine()
   ImGuiExt.Text(tostring(currentFrametimeInt))
   if openOverlay or isBenchmark then
-    ImGuiExt.Text(BenchmarkText.benchmark)
+    ImGuiExt.Text(BenchmarkText.info_benchmark)
     ImGui.SameLine()
     ImGuiExt.Text(tostring(isBenchmark))
-    ImGuiExt.Text(BenchmarkText.benchmarkRemaining)
+    ImGuiExt.Text(BenchmarkText.info_benchmark_remaining)
     ImGui.SameLine()
     ImGuiExt.Text(tostring(benchmarkRemainingTime))
   end
 
   if isBenchmarkFinished and openOverlay then
     ImGui.Text("")
-    ImGuiExt.Text(BenchmarkText.averageFps)
+    ImGuiExt.Text(BenchmarkText.info_average_fps)
     ImGui.SameLine()
     ImGuiExt.Text(tostring(averageFps))
   end
 
   if Tracker.IsGamePaused() or Tracker.IsGamePreGame() then
     ImGui.Text("")
-    ImGuiExt.Text(BenchmarkText.benchmarkPause, true)
+    ImGuiExt.Text(BenchmarkText.info_benchmark_pause, true)
   elseif openOverlay then
     ImGui.Text("")
-    ImGuiExt.Text(BenchmarkText.benchmarkPauseOverlay, true)
+    ImGuiExt.Text(BenchmarkText.info_benchmark_pause_overlay, true)
   else
     if benchmarkRestart then
       ImGui.Text("")
-      ImGuiExt.Text(BenchmarkText.benchmarkRestart)
+      ImGuiExt.Text(BenchmarkText.info_benchmark_restart)
       ImGui.SameLine()
       ImGuiExt.Text(tostring(benchmarkRestartRemaining))
     end
@@ -298,9 +334,25 @@ registerForEvent("onInit", function()
   if not ImGuiExt then Globals.PrintError(LogText.imguiext_missing) return end
   if not Localization then Globals.PrintError(LogText.localization_missing) return end
   if not Calculate then Globals.PrintError(LogText.calculate_missing) end
-  if not Contextual then Globals.PrintError(LogText.contextual_missing) end
   if not VectorsPresets then Globals.PrintError(LogText.presets_missing) end
-  if not Vectors then Globals.PrintError(LogText.vectors_missing_missing) end
+  if not Vectors then Globals.PrintError(LogText.vectors_missing) end
+
+  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+    if Contextual then 
+      if not FrameGenGhostingFix.GetDLSSEnablerVersion() then
+        Globals.PrintError(LogText.bridge_missing)
+        return
+      end
+      
+      if not FrameGenGhostingFix.IsDLSSEnablerCompatible() then
+        Globals.PrintError(LogText.bridge_bad_enabler_version)
+        return
+      end
+    else
+      Globals.PrintError(LogText.contextual_missing)
+      return
+    end
+  end
 
   FrameGenGhostingFix.GetVersion()
 
@@ -316,8 +368,7 @@ registerForEvent("onInit", function()
     Diagnostics = nil
   end
 
-  isDebug = Settings.IsDebugMode()
-  Globals.SetDebugMode(isDebug)
+  Globals.SetDebugMode(Settings.IsDebugMode())
 
   if not Tracker.IsModReady() then return end
 
@@ -329,12 +380,6 @@ registerForEvent("onInit", function()
   -- danyalzia: remove forced benchmarking upon new install during development
   -- if Tracker.IsModFirstRun() then
   --   SetBenchmark(true)
-  -- end
-
-  -- danyalzia: I am commenting it during development since I don't want to close these windows everytime I launch the game for testing :/
-  -- if Debug then
-  --   Globals.SetDebugMode(true)
-    -- Settings.SetKeepWindow(true)
   -- end
 
   ImGuiExt.SetTheme(Settings.GetTheme())
@@ -362,9 +407,7 @@ if Debug then
       return
     end
 
-    local table = {}
-    
-    table = Globals.VersionStringToTable(DLSSEnabler_GetVersionAsString())
+    local table = FrameGenGhostingFix.GetDLSSEnablerVersion(true)
 
     if table ~= nil then
       Globals.PrintDebug(Globals.__NAME, "DLSS Enabler's version major:", table[1], "minor:", table[2], "patch:", table[3], "revision:", table[4])
@@ -378,8 +421,7 @@ registerForEvent("onOverlayOpen", function()
   openOverlay = true
   Tracker.SetModOpenWindow(true)
 
-  isDebug = Settings.IsDebugMode()
-  Globals.SetDebugMode(isDebug)
+  Globals.SetDebugMode(Settings.IsDebugMode())
 
   --translate UIText before other modules access it
   Localization.OnOverlayOpen()
@@ -437,12 +479,11 @@ registerForEvent("onDraw", function()
   ImGuiExt.DrawNotification()
 
   if Tracker.IsModOpenWindow() then
-    ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
-    -- ImGui.SetNextWindowSizeConstraints(ImGui.ImVec2(400, 0), ImGui.ImVec2(huge, huge))
-
     ImGuiExt.PushStyle()
+    ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
 
     if ImGui.Begin(windowTitle, ImGuiWindowFlags.AlwaysAutoResize) then
+
       if ImGui.BeginTabBar('Tabs') then
         
         --diagnostics interface starts------------------------------------------------------------------------------------------------------------------
@@ -460,23 +501,23 @@ registerForEvent("onDraw", function()
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install dur ing development
         -- if Tracker.IsModNewInstall() then
-        --   if ImGui.BeginTabItem(InfoText.tabname) then
+        --   if ImGui.BeginTabItem(InfoText.tab_name_info) then
 
         --     if Tracker.IsModFirstRun() then
-        --       ImGuiExt.Text(InfoText.benchmark, true)
+        --       ImGuiExt.Text(InfoText.info_benchmark, true)
         --     else
-        --       ImGuiExt.Text(InfoText.benchmarkAsk, true)
+        --       ImGuiExt.Text(InfoText.info_benchmark_ask, true)
         --     end
 
         --     ImGui.Text("")
         --     BenchmarkUI()
         --     ImGui.Text("")
 
-        --     keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.enabledWindow, Settings.IsKeepWindow(), keepWindowToggle)
+        --     keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
         --     if keepWindowToggle then
         --       Settings.SetKeepWindow(keepWindowBool)
         --     end
-        --     ImGuiExt.SetTooltip(SettingsText.tooltipWindow)
+        --     ImGuiExt.SetTooltip(SettingsText.tooltip_window)
 
         --     if not Tracker.IsModFirstRun() and not isBenchmark then
         --       ImGui.Text("")
@@ -497,66 +538,67 @@ registerForEvent("onDraw", function()
         -- end
 
         if Globals.IsAspectRatioChange() then
-          if ImGui.BeginTabItem(InfoText.tabname) then
+          if ImGui.BeginTabItem(InfoText.tab_name_info) then
 
-            ImGuiExt.Text(InfoText.aspectRatioChange, true)
+            ImGuiExt.Text(InfoText.info_aspect_ratio_change, true)
 
             ImGui.EndTabItem()
           end
         end
 
+        if openOverlay and FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" or Settings.IsDebugMode() then
+          Contextual.DrawUI()
+        end
+
         if openOverlay and Tracker.IsModReady() then --done on purpose to mitigate possible distress during gameplay caused by some methods
 
-          Contextual.DrawUI()
           VectorsPresets.DrawUI()
           Calculate.DrawUI()
 
         end
         
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
-        -- danyalzia: remove forced benchmarking upon new install during development
-        -- if not Tracker.IsModNewInstall() and Tracker.IsModReady() then
         if Tracker.IsModReady() then
-          if ImGui.BeginTabItem(SettingsText.tabname) then
-            ImGuiExt.Text(SettingsText.groupMod)
+          if ImGui.BeginTabItem(SettingsText.tab_name_settings) then
+            ImGuiExt.Text(SettingsText.group_mod)
             ImGui.Separator()
             
             if openOverlay then
               if Debug then
-                debugBool, debugToggle = ImGuiExt.Checkbox(SettingsText.enabledDebug, Settings.IsDebugMode(), debugToggle)
+                debugBool, debugToggle = ImGuiExt.Checkbox(SettingsText.chk_debug, Settings.IsDebugMode(), debugToggle)
               end
               if debugToggle then
                 Settings.SetDebugMode(debugBool)
-                ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
 
               if Debug and Settings.IsDebugMode() then
-                debugViewBool, debugViewToggle = ImGuiExt.Checkbox(SettingsText.enabledDebugView, Settings.IsDebugView(), debugViewToggle)
+                debugViewBool, debugViewToggle = ImGuiExt.Checkbox(SettingsText.chk_debug_view, Settings.IsDebugView(), debugViewToggle)
               end
               if debugViewToggle then
                 Settings.SetDebugView(debugViewBool)
-                ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
             end
 
 
-              keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.enabledWindow, Settings.IsKeepWindow(), keepWindowToggle)
+              keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
               if keepWindowToggle then
                 Settings.SetKeepWindow(keepWindowBool)
-                ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
-              ImGuiExt.SetTooltip(SettingsText.tooltipWindow)
+              ImGuiExt.SetTooltip(SettingsText.tooltip_window)
             
             if openOverlay then
-              helpBool, helpToggle = ImGuiExt.Checkbox(SettingsText.enabledHelp, Settings.IsHelp(), helpToggle)
+              helpBool, helpToggle = ImGuiExt.Checkbox(SettingsText.chk_help, Settings.IsHelp(), helpToggle)
               if helpToggle then
                 Settings.SetHelp(helpBool)
-                ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
-              ImGuiExt.SetTooltip(SettingsText.tooltipHelp)
+              ImGuiExt.SetTooltip(SettingsText.tooltip_help)
 
               ImGui.Text("")
-              ImGuiExt.Text(SettingsText.selectTheme)
+              ImGuiExt.Text(SettingsText.combobox_theme)
               if ImGui.BeginCombo("##Themes", ImGuiExt.GetTheme()) then
                 local themesList = ImGuiExt.GetThemesList()
             
@@ -574,48 +616,46 @@ registerForEvent("onDraw", function()
             
                 ImGui.EndCombo()
               end
-
-              ImGuiExt.SetTooltip(SettingsText.tooltipTheme)
+              ImGuiExt.SetTooltip(SettingsText.tooltip_theme)
             
               ImGui.SameLine()
             
-              if ImGui.Button("   " .. GeneralText.save .. "   ") then
+              if ImGui.Button(GeneralText.btn_save,  100 * ImGuiExt.GetScaleFactor(), 0) then
                 Settings.SetTheme(ImGuiExt.GetTheme())
             
-                ImGuiExt.SetStatusBar(GeneralText.settings_saved)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
             end
 
               ImGui.Text("")
-              ImGuiExt.Text(SettingsText.groupFG)
+              ImGuiExt.Text(SettingsText.group_fg)
               ImGui.Separator()
             
-            if openOverlay then
-              -- danyalzia: IsGameReady is replaced with GetPlayer() because it is more suitable for this case until IsGameReady is separated into functions
-              if GetPlayer() then
-                fgBool, fgToggle = ImGuiExt.Checkbox(SettingsText.enableFG, Settings.IsFrameGeneration(), fgToggle)
-                if fgToggle then
-                  Settings.SetFrameGeneration(fgBool)
-                  ImGuiExt.SetStatusBar(GeneralText.settings_saved)
-                end
-                ImGuiExt.SetTooltip(SettingsText.tooltipFG)
+              if openOverlay then
+                if Tracker.IsGameReady() then -- back to Tracker.IsGameReady() since game state is triggered and changed to loaded after the mod's reload once player moves a bit
+                  fgBool, fgToggle = ImGuiExt.Checkbox(SettingsText.chk_fg, Settings.IsModFrameGeneration(), fgToggle)
+                  if fgToggle then
+                    Settings.SetModFrameGeneration(fgBool)
+                    ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+                  end
+                  ImGuiExt.SetTooltip(SettingsText.tooltip_fg)
 
-                ImGuiExt.Text(SettingsText.gameSettingsFG, true)
+                  ImGuiExt.Text(SettingsText.info_game_settings_fg, true)
+                else
+                  ImGuiExt.Text(SettingsText.info_game_not_ready_warning, true)
+                end
               else
-                ImGuiExt.Text(SettingsText.gameNotReadyWarning, true)
+                ImGuiExt.Text(SettingsText.info_frame_gen_status)
+                ImGui.SameLine()
+                if Tracker.IsModFrameGeneration() then
+                  ImGuiExt.Text(GeneralText.info_enabled)
+                else
+                  ImGuiExt.Text(GeneralText.info_disabled)
+                end
               end
-            else
-              ImGuiExt.Text(GeneralText.info_frameGenStatus)
-              ImGui.SameLine()
-              if Tracker.IsModFrameGeneration() then
-                ImGuiExt.Text(GeneralText.enabled)
-              else
-                ImGuiExt.Text(GeneralText.disabled)
-              end
-            end
 
             ImGui.Text("")
-            ImGuiExt.Text(BenchmarkText.groupBenchmark)
+            ImGuiExt.Text(BenchmarkText.group_benchmark)
             ImGui.Separator()
 
             if currentFps then
@@ -625,30 +665,30 @@ registerForEvent("onDraw", function()
                 ImGui.Text("")
 
                 if not isBenchmark then
-                  if ImGui.Button(BenchmarkText.benchmarkRun, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if ImGui.Button(BenchmarkText.btn_benchmark_run, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     ResetBenchmarkResults()
                     SetBenchmark(true)
                     Settings.SetKeepWindow(true)
                   end
 
-                  ImGuiExt.SetTooltip(BenchmarkText.tooltipRunBench)
+                  ImGuiExt.SetTooltip(BenchmarkText.tooltip_run_bench)
                 else
-                  if ImGui.Button(BenchmarkText.benchmarkStop, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if ImGui.Button(BenchmarkText.btn_benchmark_stop, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     ResetBenchmarkResults()
                     SetBenchmark(false)
                   end
                 end
 
                 if isBenchmarkFinished then
-                  if not benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkSetSuggestedSettings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if not benchmarkSetSuggested and ImGui.Button(BenchmarkText.btn_benchmark_set_suggested_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     SetSuggestedSettings()
                   end
 
-                  if benchmarkSetSuggested and ImGui.Button(BenchmarkText.benchmarkRevertSettings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  if benchmarkSetSuggested and ImGui.Button(BenchmarkText.btn_benchmark_revert_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     RestorePreviousSettings()
 
-                    ImGuiExt.SetStatusBar(GeneralText.settings_restored)
-                    Globals.Print(LogText.settings_restoredCache)
+                    ImGuiExt.SetStatusBar(SettingsText.status_settings_restored)
+                    Globals.Print(LogText.settings_restored)
                   end
                 end
               end
@@ -659,10 +699,11 @@ registerForEvent("onDraw", function()
         --additonal options interface ends------------------------------------------------------------------------------------------------------------------
         ImGui.EndTabBar()
       end
+
       ImGuiExt.StatusBar(ImGuiExt.GetStatusBar())
     end
-    ImGui.End()
 
+    ImGui.End()
     ImGuiExt.PopStyle()
   end
 end)

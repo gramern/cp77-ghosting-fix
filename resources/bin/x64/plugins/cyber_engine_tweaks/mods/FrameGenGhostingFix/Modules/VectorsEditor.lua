@@ -22,9 +22,8 @@ local Settings = require("Modules/Settings")
 local Tracker = require("Modules/Tracker")
 local Vectors = require("Modules/Vectors")
 
-local LogText = Localization.GetLogText()
 local GeneralText = Localization.GetGeneralText()
-local VehiclesText = Localization.GetVehiclesText()
+local EditorText = Localization.GetEditorText()
 
 local random, randomseed = math.random, math.randomseed
 
@@ -166,6 +165,7 @@ local function CenterCamera()
   Game.GetPlayer():QueueEvent(vehicleCameraResetEvent.new())
 end
 
+-- found in keanuWheeze's Metro System mod (https://github.com/justarandomguyintheinternet/CP77_TrainSystem/blob/318a91ddcd64abe601af56f1c4119533ac68efa4/modules/utils/utils.lua#L156)
 local function ApplyPerspective(newPerspective)
   local togglePerspectiveEvt = vehicleRequestCameraPerspectiveEvent.new()
   togglePerspectiveEvt.cameraPerspective = Enum.new("vehicleCameraPerspective", newPerspective)
@@ -278,10 +278,10 @@ function VectorsEditor.SetInstance(presetsList)
 
   if Settings.IsDebugMode() then
     SetMaxOpacity(200)
-    ImGuiExt.SetStatusBar("Presets Editor running in Debug Mode", 'PresetsEditor')
+    ImGuiExt.SetStatusBar("Presets Editor running in Debug Mode", 'PresetsEditorWindow')
   else
     SetMaxOpacity(12)
-    ImGuiExt.SetStatusBar(ImGuiExt.GetStatusBar(), 'PresetsEditor')
+    ImGuiExt.SetStatusBar(ImGuiExt.GetStatusBar(), 'PresetsEditorWindow')
   end
 
   SetPresetsList(presetsList)
@@ -302,19 +302,19 @@ function VectorsEditor.OnOverlayClose()
   if isInstance then
     Vectors.SetOpacityLock(false)
     Globals.CancelDelay('OpacityLock')
-    Globals.CancelDelay('DecoupleOpacityLock1')
-    Globals.CancelDelay('DecoupleOpacityLock2')
-    Globals.CancelDelay('DecoupleOpacityLock3')
-    Globals.CancelDelay('DecoupleOpacityLock4')
+    Globals.CancelDelay('OpacityLock1')
+    Globals.CancelDelay('OpacityLock2')
+    Globals.CancelDelay('OpacityLock3')
+    Globals.CancelDelay('OpacityLock4')
 
     if isPreviewMode then
-      Globals.SetDelay(1.5, 'VectorsEditorPreviewHed', Vectors.SetOpacityLock, true, 1)
-      Globals.SetDelay(1.5, 'VectorsEditorPreviewNotif', ImGuiExt.SetNotification, 2, "Preview Mode Enabled.")
+      Globals.SetDelay(1.5, 'VectorsEditorPreview', Vectors.SetOpacityLock, true, 1)
+      Globals.SetDelay(1.5, 'VectorsEditorPreviewNotif', ImGuiExt.SetNotification, 2, EditorText.notif_preview_mode)
     end
 
     if LoadedPreset ~= nil then -- Load current settings for preview
       Globals.SetDelay(1, 'VectorsEditorReloadSettingsNotif', Vectors.LoadPreset, LoadedPreset)
-      ImGuiExt.SetNotification(1.2, "Reloading Settings...")
+      ImGuiExt.SetNotification(1.2, EditorText.notif_reloading_settings)
     end
   end
 end
@@ -324,13 +324,14 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 local function FlagSettingChange()
-  ImGuiExt.SetStatusBar("Close the overlay without closing the editor to preview current settings.", 'PresetsEditor')
+  ImGuiExt.SetStatusBar(EditorText.status_close_overlay_preview, 'PresetsEditorWindow')
 end
 
 local function LoadPresetWindow()
+  ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(screenWidth / 2 - 210, screenHeight / 2 - 120)
 
-  if ImGui.Begin("Load Preset", ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.None) then
+  if ImGui.Begin(EditorText.window_load_preset, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.None) then
 
     selectedPresetName = PresetsList[selectedPreset].PresetInfo.name
 
@@ -351,11 +352,11 @@ local function LoadPresetWindow()
       end
       ImGui.EndCombo()
     end
-    ImGuiExt.SetTooltip("Select a base preset to load its values to the editor.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_load_preset)
 
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Cancel", 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_cancel, 100 * ImGuiExt.GetScaleFactor(), 0) then
       isLoadWindow = false
     end
 
@@ -363,63 +364,66 @@ local function LoadPresetWindow()
 
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 100 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Load", 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_load, 100 * ImGuiExt.GetScaleFactor(), 0) then
       LoadPreset()
 
-      local infoLoadedPreset = "Preset loaded: " .. selectedPresetName
-      ImGuiExt.SetStatusBar(infoLoadedPreset, 'PresetsEditor')
+      local infoLoadedPreset = EditorText.status_preset_loaded .. " " .. selectedPresetName
+      ImGuiExt.SetStatusBar(infoLoadedPreset, 'PresetsEditorWindow')
 
       isLoadWindow = false
     end
   end
 
   ImGui.End()
+  ImGuiExt.PopStyle()
 end
 
 local function SavePresetWindow()
+  ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(screenWidth / 2 - 210, screenHeight / 2 - 120)
 
-  if ImGui.Begin("Save Preset", ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.None) then
-    ImGuiExt.Text("Name:")
+  if ImGui.Begin(EditorText.window_save_preset, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.None) then
+
+    ImGuiExt.Text(EditorText.input_name)
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
     ImGui.SetNextItemWidth(300)
 
     presetName = ImGui.InputText("##Name", presetName, 30)
-    ImGuiExt.SetTooltip("Enter a name for the new preset.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_input_name)
 
-    ImGuiExt.Text("Author:")
+    ImGuiExt.Text(EditorText.input_author)
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
     ImGui.SetNextItemWidth(300)
 
     presetAuthor = ImGui.InputText("##Author", presetAuthor, 30)
-    ImGuiExt.SetTooltip("Enter an author name for the new preset.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_input_author)
 
-    ImGuiExt.Text("Description:")
+    ImGuiExt.Text(EditorText.input_description)
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
 
     presetDescription = ImGui.InputTextMultiline("##Description", presetDescription, 100, 300, 60)
-    ImGuiExt.SetTooltip("Enter a description for the new preset.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_input_description)
     
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
-    ImGuiExt.Text("Characters left:")
+    ImGuiExt.Text(EditorText.info_chars_left)
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 30 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
     ImGuiExt.Text(tostring(100 - #presetDescription))
 
-    ImGuiExt.Text("File Name:")
+    ImGuiExt.Text(EditorText.input_file_name)
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
     ImGui.SetNextItemWidth(300)
 
     presetFile = ImGui.InputText("##FileName", presetFile, 30)
-    ImGuiExt.SetTooltip("Enter a file name for the new preset (no spaces).")
+    ImGuiExt.SetTooltip(EditorText.tooltip_input_file_name)
 
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Cancel", 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_cancel, 100 * ImGuiExt.GetScaleFactor(), 0) then
       isSaveWindow = false
       presetName, presetAuthor, presetDescription, presetFile = "", "", "", ""
     end
@@ -427,133 +431,127 @@ local function SavePresetWindow()
     ImGui.SameLine()
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 100 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Save", 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_save, 100 * ImGuiExt.GetScaleFactor(), 0) then
       if presetName == "" or presetAuthor == "" or presetFile == "" then
-        ImGuiExt.SetStatusBar("Fill all fields to save.", 'SavePreset')
+        ImGuiExt.SetStatusBar(EditorText.status_fill_all_save, 'SavePresetWindow')
       elseif not Globals.AreLettersOnly(presetFile) then
-        ImGuiExt.SetStatusBar("You can use letters only in the file name.", 'SavePreset')
+        ImGuiExt.SetStatusBar(EditorText.status_file_name_letters_only, 'SavePresetWindow')
       else
         local presetId = GeneratePresetID()
         local result = SavePreset(presetName, presetAuthor, presetFile, presetDescription, presetId)
 
         if result then
-          local infoSavedPreset = "Preset saved: " .. presetFile .. ".json. Close the editor to reload presets list."
-          ImGuiExt.SetStatusBar(infoSavedPreset, 'PresetsEditor')
+          local infoSavedPreset = EditorText.status_preset_saved .. " " .. presetFile .. EditorText.status_close_overlay_reload_list
+          ImGuiExt.SetStatusBar(infoSavedPreset, 'PresetsEditorWindow')
           isSaveWindow = false
           presetName, presetAuthor, presetDescription, presetFile = "", "", "", ""
         else
-          ImGuiExt.SetStatusBar("Can't save. Try different file and preset name.", 'SavePreset')
+          ImGuiExt.SetStatusBar(EditorText.status_cant_save, 'SavePresetWindow')
         end
       end
     end
 
-    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar('SavePreset'))
+    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar('SavePresetWindow'))
   end
 
   ImGui.End()
-
+  ImGuiExt.PopStyle()
 end
 
 function VectorsEditor.DrawWindow()
+  ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(500, 300, ImGuiCond.FirstUseEver)
 
-  if ImGui.Begin("Presets Editor", ImGuiWindowFlags.AlwaysAutoResize) then
+  if ImGui.Begin(EditorText.window_presets_editor, ImGuiWindowFlags.AlwaysAutoResize) then
+
     if not Tracker.IsVehicleMounted() and not Tracker.IsPlayerDriver() then
-      ImGuiExt.TextRed("Enter a vehicle first: a bike or a car.")
+      ImGuiExt.TextRed(EditorText.info_enter_vehicle)
 
       ImGui.End()
       return
     end
 
-    if ImGui.Button("Load Preset", 180 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(EditorText.btn_load_preset, 180 * ImGuiExt.GetScaleFactor(), 0) then
       isLoadWindow = not isLoadWindow
       isSaveWindow = false
 
       screenWidth, screenHeight = Globals.GetScreenResolution()
     end
-    ImGuiExt.SetTooltip("Select a base preset to load its values to the editor.")
-  
-    if isLoadWindow then
-      LoadPresetWindow()
-    end
+    ImGuiExt.SetTooltip(EditorText.tooltip_load_preset)
 
     ImGui.SameLine()
 
-    if ImGui.Button("Save Preset", 180 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(EditorText.btn_save_preset, 180 * ImGuiExt.GetScaleFactor(), 0) then
       isSaveWindow = not isSaveWindow
       isLoadWindow = false
       screenWidth, screenHeight = Globals.GetScreenResolution()
 
-      ImGuiExt.SetStatusBar("", 'SavePreset')
+      ImGuiExt.SetStatusBar("", 'SavePresetWindow')
     end
-    ImGuiExt.SetTooltip("Save your new values as a new preset file. The new preset will be saved in the 'Presets' folder and can be shared with other users of FrameGen Ghosting 'Fix' V.")
-
-    if isSaveWindow then
-      SavePresetWindow()
-    end
+    ImGuiExt.SetTooltip(EditorText.tooltip_save_preset)
 
     ImGui.SameLine()
     
-    if ImGui.Button("Reset Values", 180 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(EditorText.btn_reset_values, 180 * ImGuiExt.GetScaleFactor(), 0) then
       LoadedPreset = Globals.Deepcopy(Globals.GetFallback('VectorsEditor'))
       Vectors.LoadPreset(LoadedPreset)
     end
-    ImGuiExt.SetTooltip("Reset current values to ones found in the loaded preset.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_reset_values)
 
     ImGui.Separator()
 
-    cameraOptionsTextWidth = ImGui.CalcTextSize("Camera Options:")
+    cameraOptionsTextWidth = ImGui.CalcTextSize(EditorText.group_camera_options)
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - cameraOptionsTextWidth / 2 - 450 * ImGuiExt.GetScaleFactor() - 3 * ImGui.GetStyle().ItemSpacing.x)
-    ImGuiExt.Text("Camera Options:")
+    ImGuiExt.Text(EditorText.group_camera_options)
 
     ImGui.SameLine()
 
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 360 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Toggle Perspective", 180 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(EditorText.btn_toggle_perspective, 180 * ImGuiExt.GetScaleFactor(), 0) then
       local newPerspective
       perspectiveToggle, newPerspective = TogglePerspective()
       Vectors.SetOpacityLock(false)
 
-      local newStatus = "Current camera perspective: " .. tostring(newPerspective)
-      ImGuiExt.SetStatusBar(newStatus, 'PresetsEditor')
+      local newStatus = EditorText.status_camera_perspective .. " " .. tostring(newPerspective)
+      ImGuiExt.SetStatusBar(newStatus, 'PresetsEditorWindow')
 
       if not perspectiveToggle then
-        ImGuiExt.SetStatusBar("Hide your vehicle's weapon to toggle through all perspectives.", 'PresetsEditor')
+        ImGuiExt.SetStatusBar(EditorText.status_hide_weapons_weponize_vehicle, 'PresetsEditorWindow')
       end
     end
-    ImGuiExt.SetTooltip("Toggle through all available camera perspectives for vehicles. The 'TPPFar' perspective is the best for editing TPP-related values.")
+    ImGuiExt.SetTooltip(EditorText.status_hide_weapons_weponize_vehicle)
   
     ImGui.SameLine()
 
     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 180 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button("Center View", 180 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(EditorText.btn_center_view, 180 * ImGuiExt.GetScaleFactor(), 0) then
       CenterCamera()
 
-      ImGuiExt.SetStatusBar("Camera centered.", 'PresetsEditor')
+      ImGuiExt.SetStatusBar(EditorText.status_camera_centered, 'PresetsEditorWindow')
     end
-    ImGuiExt.SetTooltip("Center the current perspective/camera view.")
+    ImGuiExt.SetTooltip(EditorText.tooltip_center_view)
 
     ImGui.Separator()
 
-    isPreviewMode, isPreviewModeToggle = ImGuiExt.Checkbox("Preview Mode: make enabled masks visible after overlay close", isPreviewMode)
+    isPreviewMode, isPreviewModeToggle = ImGuiExt.Checkbox(EditorText.chk_preview_mode, isPreviewMode)
     if isPreviewModeToggle and not isPreviewMode then
       Vectors.SetOpacityLock(false)
     end
-    ImGuiExt.SetTooltip("")
+    ImGuiExt.SetTooltip(EditorText.tooltip_preview_mode)
 
     ImGui.Separator()
 
     if ImGui.BeginTabBar('EditorTabs') then
-      if ImGui.BeginTabItem("Vehicle") then
+      if ImGui.BeginTabItem(EditorText.tab_name_vehicle) then
         if Tracker.GetVehicleBaseObject() == 0 then
 
           if camera.activePerspective ~= vehicleCameraPerspective.FPP then
-            ImGuiExt.Text("TPP Options:")
+            ImGuiExt.Text(EditorText.group_tpp_options)
             ImGui.Separator()
 
-            LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible, bikeAllMasksTPPToggle = ImGuiExt.Checkbox("Enable masks around a vehicle", LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible)
+            LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible, bikeAllMasksTPPToggle = ImGuiExt.Checkbox(EditorText.chk_masks_around_vehicle, LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible)
             if bikeAllMasksTPPToggle then
               Vectors.SetVisibilityAllMasks('Bike', 'TPP', LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible)
 
@@ -568,7 +566,7 @@ function VectorsEditor.DrawWindow()
 
             if LoadedPreset.Vectors.Modifiers.Bike.AllMasks.TPP.visible then
               ImGui.Text("")
-              ImGuiExt.Text("Scale masking for a vehicle's width:")
+              ImGuiExt.Text(EditorText.slider_vehicle_width)
         
               bikeSideMasksScale.y, bikeSideMasksScaleToggle.y = ImGui.SliderFloat('##BikeSideMasksScale', Vectors.GetScaleMask('Bike', 'SideMasks').y, 1, 2.5, "%.2f")
               if bikeSideMasksScaleToggle.y then
@@ -579,22 +577,22 @@ function VectorsEditor.DrawWindow()
                 FlagSettingChange()
               end
             end
-            ImGuiExt.SetTooltip("")
+            ImGuiExt.SetTooltip(EditorText.tooltip_vehicle_width)
 
             ImGui.Text("")
-            ImGuiExt.Text("FPP Options:")
+            ImGuiExt.Text(EditorText.group_fpp_options)
             ImGui.Separator()
-            ImGuiExt.Text("Switch to FPP to edit these options.")
+            ImGuiExt.Text(EditorText.info_switch_to_fpp)
           else
-            ImGuiExt.Text("TPP Options:")
+            ImGuiExt.Text(EditorText.group_tpp_options)
             ImGui.Separator()
-            ImGuiExt.Text("Switch to a TPP camera to edit these options.")
+            ImGuiExt.Text(EditorText.info_switch_to_tpp)
             ImGui.Text("")
 
-            ImGuiExt.Text("FPP Options:")
+            ImGuiExt.Text(EditorText.group_fpp_options)
             ImGui.Separator()
 
-            LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible, bikeAllMasksFPPToggle = ImGuiExt.Checkbox("Enable masks around the steering bar", LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible)
+            LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible, bikeAllMasksFPPToggle = ImGuiExt.Checkbox(EditorText.chk_masks_steering_bar, LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible)
             if bikeAllMasksFPPToggle then
               Vectors.SetVisibilityAllMasks('Bike', 'FPP', LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible)
 
@@ -609,8 +607,8 @@ function VectorsEditor.DrawWindow()
 
             if LoadedPreset.Vectors.Modifiers.Bike.AllMasks.FPP.visible then
               ImGui.Text("")
-              ImGuiExt.Text(VehiclesText.Editor.Windshield.setting_1)
-              ImGuiExt.SetTooltip(VehiclesText.Editor.Windshield.tooltip)
+              ImGuiExt.Text(EditorText.slider_windshield_width)
+              
         
               bikeWindshieldScale.x, bikeWindshieldScaleToggle.x = ImGui.SliderFloat('##WindshieldScaleX', Vectors.GetScaleMask('Bike', 'Windshield').x, 0.7, 2, "%.2f")
               if bikeWindshieldScaleToggle.x then
@@ -618,9 +616,9 @@ function VectorsEditor.DrawWindow()
                 Vectors.SetScaleMask('Bike', 'Windshield', 'x', bikeWindshieldScale.x)
                 Vectors.SetPopAndOutMask(4, 1, "Mask4")
               end
+              ImGuiExt.SetTooltip(EditorText.tooltip_windshield)
         
-              ImGuiExt.Text(VehiclesText.Editor.Windshield.setting_2)
-              ImGuiExt.SetTooltip(VehiclesText.Editor.Windshield.tooltip)
+              ImGuiExt.Text(EditorText.slider_windshield_height)
         
               bikeWindshieldScale.y, bikeWindshieldScaleToggle.y = ImGui.SliderFloat('##WindshieldScaleY', Vectors.GetScaleMask('Bike', 'Windshield').y, 0.7, 3, "%.2f")
               if bikeWindshieldScaleToggle.y then
@@ -630,15 +628,16 @@ function VectorsEditor.DrawWindow()
 
                 FlagSettingChange()
               end
+              ImGuiExt.SetTooltip(EditorText.tooltip_windshield)
             end
           end
         elseif Tracker.GetVehicleBaseObject() == 1 then
 
           if camera.activePerspective ~= vehicleCameraPerspective.FPP then
-            ImGuiExt.Text("TPP Options:")
+            ImGuiExt.Text(EditorText.group_tpp_options)
             ImGui.Separator()
 
-            LoadedPreset.Vectors.Modifiers.Car.FrontMask.visible, carFrontMaskToggle = ImGuiExt.Checkbox("Enable mask in the front", LoadedPreset.Vectors.Modifiers.Car.FrontMask.visible)
+            LoadedPreset.Vectors.Modifiers.Car.FrontMask.visible, carFrontMaskToggle = ImGuiExt.Checkbox(EditorText.chk_mask_front, LoadedPreset.Vectors.Modifiers.Car.FrontMask.visible)
             if carFrontMaskToggle then
               Vectors.SetVisibilityCar('FrontMask', LoadedPreset.Vectors.Modifiers.Car.FrontMask.visible)
 
@@ -650,9 +649,9 @@ function VectorsEditor.DrawWindow()
 
               FlagSettingChange()
             end
-            ImGuiExt.SetTooltip("")
+            ImGuiExt.SetTooltip(EditorText.tooltip_mask_front)
 
-            LoadedPreset.Vectors.Modifiers.Car.RearMask.visible, carRearMaskToggle = ImGuiExt.Checkbox("Enable mask in the rear", LoadedPreset.Vectors.Modifiers.Car.RearMask.visible)
+            LoadedPreset.Vectors.Modifiers.Car.RearMask.visible, carRearMaskToggle = ImGuiExt.Checkbox(EditorText.chk_mask_rear, LoadedPreset.Vectors.Modifiers.Car.RearMask.visible)
             if carRearMaskToggle then
               Vectors.SetVisibilityCar('RearMask', LoadedPreset.Vectors.Modifiers.Car.RearMask.visible)
 
@@ -664,9 +663,9 @@ function VectorsEditor.DrawWindow()
 
               FlagSettingChange()
             end
-            ImGuiExt.SetTooltip("")
+            ImGuiExt.SetTooltip(EditorText.tooltip_mask_rear)
 
-            LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible, carSideMasksToggle = ImGuiExt.Checkbox("Enable masks on the sides", LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible)
+            LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible, carSideMasksToggle = ImGuiExt.Checkbox(EditorText.chk_masks_sides, LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible)
             if carSideMasksToggle then
               Vectors.SetVisibilityCar('SideMasks', LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible)
 
@@ -678,12 +677,11 @@ function VectorsEditor.DrawWindow()
 
               FlagSettingChange()
             end
-            ImGuiExt.SetTooltip("")
+            ImGuiExt.SetTooltip(EditorText.tooltip_masks_sides)
             
             if LoadedPreset.Vectors.Modifiers.Car.RearMask.visible or LoadedPreset.Vectors.Modifiers.Car.SideMasks.visible then
               ImGui.Text("")
-              ImGuiExt.Text("Scale masking for a vehicle's width:")
-              ImGuiExt.SetTooltip("")
+              ImGuiExt.Text(EditorText.slider_vehicle_width)
 
               carSideMasksScale.y, carSideMasksScaleToggle.y = ImGui.SliderFloat('##CarSideMasksScale', Vectors.GetScaleMask('Car', 'SideMasks').y, 1, 2.5, "%.2f")
               if carSideMasksScaleToggle.y then
@@ -700,23 +698,23 @@ function VectorsEditor.DrawWindow()
 
                 FlagSettingChange()
               end
-              ImGuiExt.SetTooltip("")
+              ImGuiExt.SetTooltip(EditorText.tooltip_vehicle_width)
             end
 
             ImGui.Text("")
-            ImGuiExt.Text("FPP Options:")
+            ImGuiExt.Text(EditorText.group_fpp_options)
             ImGui.Separator()
-            ImGuiExt.Text("Switch to FPP to edit these options.")
+            ImGuiExt.Text(EditorText.info_switch_to_fpp)
           else
-            ImGuiExt.Text("TPP Options:")
+            ImGuiExt.Text(EditorText.group_tpp_options)
             ImGui.Separator()
-            ImGuiExt.Text("Switch to a TPP camera to edit these options.")
+            ImGuiExt.Text(EditorText.info_switch_to_tpp)
             ImGui.Text("")
 
-            ImGuiExt.Text("FPP Options:")
+            ImGuiExt.Text(EditorText.group_fpp_options)
             ImGui.Separator()
 
-            LoadedPreset.Vectors.Modifiers.Car.AllMasks.FPP.visible, carAllMasksFPPToggle = ImGuiExt.Checkbox("Enable cockpit elements masks", LoadedPreset.Vectors.Modifiers.Car.AllMasks.FPP.visible)
+            LoadedPreset.Vectors.Modifiers.Car.AllMasks.FPP.visible, carAllMasksFPPToggle = ImGuiExt.Checkbox(EditorText.chk_cockpit_masks, LoadedPreset.Vectors.Modifiers.Car.AllMasks.FPP.visible)
             if carAllMasksFPPToggle then
               Vectors.SetVisibilityAllMasks('Car', 'FPP', LoadedPreset.Vectors.Modifiers.Car.AllMasks.FPP.visible)
 
@@ -728,15 +726,15 @@ function VectorsEditor.DrawWindow()
 
               FlagSettingChange()
             end
-            ImGuiExt.SetTooltip("")
+            ImGuiExt.SetTooltip(EditorText.tooltip_cockpit_masks)
           end
         end
 
         ImGui.EndTabItem()
       end
 
-      if ImGui.BeginTabItem("Screen Bottom Edges") then
-        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners, hedCornersToggle = ImGuiExt.Checkbox("Enable corners masks", LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners)
+      if ImGui.BeginTabItem(EditorText.tab_name_bottom_edges) then
+        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners, hedCornersToggle = ImGuiExt.Checkbox(EditorText.chk_corners_masks, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners)
         if hedCornersToggle then
           Vectors.SetVisibilityHed('corners', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners)
 
@@ -748,9 +746,9 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("")
+        ImGuiExt.SetTooltip(EditorText.tooltip_cockpit_masks)
 
-        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill, hedFillToggle = ImGuiExt.Checkbox("Enable middle mask", LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill)
+        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill, hedFillToggle = ImGuiExt.Checkbox(EditorText.chk_middle_mask, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill)
         if hedFillToggle then
           Vectors.SetVisibilityHed('fill', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill)
 
@@ -762,10 +760,10 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("")
+        ImGuiExt.SetTooltip(EditorText.tooltip_middle_mask)
 
         if LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill then
-          LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock, hedFillLockToggle = ImGuiExt.Checkbox("Lock middle mask", LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock)
+          LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock, hedFillLockToggle = ImGuiExt.Checkbox(EditorText.chk_lock_middle_mask, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock)
           if hedFillLockToggle then
             Vectors.SetVisibilityHed('fillLock', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fillLock)
 
@@ -779,10 +777,10 @@ function VectorsEditor.DrawWindow()
 
             FlagSettingChange()
           end
-          ImGuiExt.SetTooltip("")
+          ImGuiExt.SetTooltip(EditorText.tooltip_lock_middle_mask)
         end
 
-        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.tracker, hedTrackerToggle = ImGuiExt.Checkbox("Enable following mask", LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.tracker)
+        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.tracker, hedTrackerToggle = ImGuiExt.Checkbox(EditorText.chk_following_mask, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.tracker)
         if hedTrackerToggle then
           Vectors.SetVisibilityHed('tracker', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.tracker)
 
@@ -794,9 +792,9 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("")
+        ImGuiExt.SetTooltip(EditorText.tooltip_following_mask)
 
-        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock, hedLockToggle = ImGuiExt.Checkbox("Lock size of the screen bottom masking", LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock)
+        LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock, hedLockToggle = ImGuiExt.Checkbox(EditorText.chk_lock_size_bottom_masking, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock)
         if hedLockToggle then
           Vectors.SetSizeLockHed(LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Size.Def.lock)
 
@@ -808,26 +806,28 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("Stops the screen bottom masking from dynamically changing its size on camera movement.")
+        ImGuiExt.SetTooltip(EditorText.tooltip_lock_size_bottom_masking)
 
-        ImGui.Text("")
-        ImGuiExt.Text("Scale screen bottom edges masks:")
-  
-        hedScale.x, hedScaleToggle.x = ImGui.SliderFloat('##HedScaleX', Vectors.GetScaleHed().x, 0.92, 1, "%.2f")
-        if hedScaleToggle.x then
-          LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Scale.x = hedScale.x
-          Vectors.SetScaleHed('x', hedScale.x)
-          Vectors.SetPopAndOutHed(4, 1, 'corners', 'fill')
+        if LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.corners or LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill then
+          ImGui.Text("")
+          ImGuiExt.Text(EditorText.slider_bottom_edges)
+    
+          hedScale.x, hedScaleToggle.x = ImGui.SliderFloat('##HedScaleX', Vectors.GetScaleHed().x, 0.92, 1, "%.2f")
+          if hedScaleToggle.x then
+            LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Scale.x = hedScale.x
+            Vectors.SetScaleHed('x', hedScale.x)
+            Vectors.SetPopAndOutHed(4, 1, 'corners', 'fill')
 
-          FlagSettingChange()
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_bottom_edges)
         end
-        ImGuiExt.SetTooltip("Scale the base width for the screen bottom masking. This size would be locked if the checkbox above is selected.")
 
         ImGui.EndTabItem()
       end
 
-      if ImGui.BeginTabItem("Masking Strength") then
-        LoadedPreset.MaskingGlobal.isOpacityLock, opacityLockToggle = ImGuiExt.Checkbox("Decouple masking strength from vehicle's speed", LoadedPreset.MaskingGlobal.isOpacityLock)
+      if ImGui.BeginTabItem(EditorText.tab_name_masking_strength) then
+        LoadedPreset.MaskingGlobal.isOpacityLock, opacityLockToggle = ImGuiExt.Checkbox(EditorText.chk_decouple_masking, LoadedPreset.MaskingGlobal.isOpacityLock)
         if opacityLockToggle then
           if LoadedPreset.MaskingGlobal.isOpacityLock then
             Vectors.SetPopAndOutHed(0.25, 1, 'corners', 'fill')
@@ -843,9 +843,9 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("")
+        ImGuiExt.SetTooltip(EditorText.tooltip_decouple_masking)
 
-        ImGuiExt.Text("Set masking strength around a vehicle:")
+        ImGuiExt.Text(EditorText.slider_strength_vehicle)
   
         opacityMasks, opacityMasksToggle = ImGui.SliderFloat('##OpacityMasks', LoadedPreset.Vectors.VehMasks.Opacity.Def.max * 200, 0, maxOpacityMasks, "%.0f")
         if opacityMasksToggle then
@@ -856,10 +856,9 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("Set masking strength around a vehicle. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 10 is a good balance between effectiveness and them being almost unnoticeable.")
-        ImGui.EndTabItem()
+        ImGuiExt.SetTooltip(EditorText.tooltip_strength_vehicle)
 
-        ImGuiExt.Text("Set masking for the screen bottom edges:")
+        ImGuiExt.Text(EditorText.slider_strength_bottom)
     
         opacityHed, opacityHedToggle = ImGui.SliderFloat('##OpacityHed', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def.max * 200, 0, maxOpacityHed, "%.0f")
         if opacityHedToggle then
@@ -870,20 +869,29 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip("Set masking strength for the screen bottom edges. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 6 is a good balance between effectiveness and them being almost unnoticeable.")
+        ImGuiExt.SetTooltip(EditorText.tooltip_strength_bottom)
 
-      ImGui.EndTabItem()
-    end
+        ImGui.EndTabItem()
+      end
 
       ImGui.EndTabBar()
     end
 
     ImGui.Text("")
 
-    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar('PresetsEditor'))
+    ImGuiExt.StatusBar(ImGuiExt.GetStatusBar('PresetsEditorWindow'))
   end
 
   ImGui.End()
+  ImGuiExt.PopStyle()
+
+  if isLoadWindow then
+    LoadPresetWindow()
+  end
+
+  if isSaveWindow then
+    SavePresetWindow()
+  end
 end
 
 

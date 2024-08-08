@@ -114,7 +114,7 @@ end
 -- @param `isFGEnabled`: boolean; The DLSS Enabler's FG state to set (`true` for FG enabled, `false` for otherwise).
 --
 -- @return boolean: `true` if operation is succesful
-function Settings.SetFrameGeneration(isFGEnabled)
+function Settings.SetModFrameGeneration(isFGEnabled)
   local result = DLSSEnabler_SetFrameGenerationState(isFGEnabled)
 
   if result then
@@ -126,7 +126,7 @@ function Settings.SetFrameGeneration(isFGEnabled)
 end
 
 -- @return boolean: `true` for DLSS Enabler's FG enabled
-function Settings.IsFrameGeneration()
+function Settings.IsModFrameGeneration()
   return ModSettings.isFGEnabled
 end
 
@@ -199,13 +199,13 @@ local function LoadFile()
     UserSettings = userSettingsContents
   else
     Tracker.SetModFirstRun(true)
-    Globals.Print(Settings.__NAME, LogText.settings_fileNotFound)
+    Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
   end
 end
 
 local function SaveFile()
   if not isSaveRequest then return end -- file won't be saved without change to the UserSettings table
-  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME, LogText.settings_notSavedToFile) return end
+  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME, LogText.settings_not_saved_to_file) return end
 
   SaveModSettings()
 
@@ -213,10 +213,10 @@ local function SaveFile()
 
   if result then
     ResetSaveRequest()
-    Globals.Print(Settings.__NAME, LogText.settings_savedToFile)
+    Globals.Print(Settings.__NAME, LogText.settings_saved_to_file)
   else
     ResetSaveRequest()
-    Globals.PrintError(Settings.__NAME, LogText.settings_notSavedToFile)
+    Globals.PrintError(Settings.__NAME, LogText.settings_not_saved_to_file)
   end
 end
 

@@ -31,6 +31,8 @@ function TrackerDebug.DrawUI()
     ImGui.SameLine()
     ImGuiExt.Text(tostring(ModState.isFrameGen))
 
+    ImGui.Separator()
+
     ImGuiExt.Text("Game State:")
     ImGuiExt.Text("isPreGame:")
     ImGui.SameLine()

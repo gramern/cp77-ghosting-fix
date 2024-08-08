@@ -29,19 +29,19 @@ end
 
 --Local UI
 function Diagnostics.DrawUI()
-  if ImGui.BeginTabItem(DiagnosticsText.tabname) then
+  if ImGui.BeginTabItem(DiagnosticsText.tab_name_diagnostics) then
     if not Diagnostics.isModsCompatibility then
-      ImGuiExt.TextRed(DiagnosticsText.title_warning)
+      ImGuiExt.TextRed(DiagnosticsText.info_warning)
       ImGui.Text("")
-      ImGuiExt.Text(DiagnosticsText.textfield_1)
+      ImGuiExt.Text(DiagnosticsText.info_conflict)
       ImGui.Text("")
-      ImGuiExt.Text(DiagnosticsText.textfield_2)
+      ImGuiExt.Text(DiagnosticsText.info_conflicting_mods)
     else
-      ImGuiExt.TextGreen(DiagnosticsText.title_info)
+      ImGuiExt.TextGreen(DiagnosticsText.info_update)
       ImGui.Text("")
-      ImGuiExt.Text(DiagnosticsText.textfield_3)
+      ImGuiExt.Text(DiagnosticsText.info_potentially)
       ImGui.Text("")
-      ImGuiExt.Text(DiagnosticsText.textfield_4)
+      ImGuiExt.Text(DiagnosticsText.info_potentially_mods)
     end
 
     for _, mod in pairs(Diagnostics.modfiles) do

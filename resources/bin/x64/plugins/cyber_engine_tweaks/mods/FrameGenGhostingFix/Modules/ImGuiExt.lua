@@ -188,6 +188,88 @@ function ImGuiExt.TextColor(string, red, green, blue, alpha, wrap)
 end
 
 ------------------
+-- Push/Pop Styles
+------------------
+
+--- Pushes the mod's style to the UI elements.
+--
+-- @param None
+--
+-- @return None
+function ImGuiExt.PushStyle()
+  ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 420 * scaleFactor, 100 * scaleFactor)
+  ImGui.PushStyleColor(ImGuiCol.Button, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.ButtonHovered, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.ButtonActive, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.CheckMark, 0, 0, 0, 1)
+  ImGui.PushStyleColor(ImGuiCol.FrameBg, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.FrameBgActive, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.Header, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.HeaderHovered, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.HeaderActive, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.PopupBg, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.ResizeGrip, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.ResizeGripActive, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.SliderGrab, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.Tab, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TabHovered, popRed, popGreen, popBlue, popAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TabActive, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TabUnfocused, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TabUnfocusedActive, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.Text, textRed, textGreen, textBlue, textAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TitleBg, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TitleBgActive, baseRed, baseGreen, baseBlue, baseAlpha)
+  ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, dimRed, dimGreen, dimBlue, dimAlpha)
+  ImGui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0.75)
+end
+
+--- Pops the mod's style.
+--
+-- @param None
+--
+-- @return None
+function ImGuiExt.PopStyle()
+  ImGui.PopStyleColor(26)
+  ImGui.PopStyleVar(1)
+end
+
+------------------
+-- Notifications logic
+------------------
+
+local function EnableNotification(isEnabled)
+  isNotification = isEnabled
+end
+
+-- @param `timeSeconds`: number;
+-- @param `text`: string;
+--
+-- @return None
+function ImGuiExt.SetNotification(timeSeconds, text)
+  EnableNotification(true)
+  notificationText = text
+
+  Globals.SetDelay(timeSeconds, "Notification", EnableNotification, false)
+end
+
+-- @return None
+function ImGuiExt.DrawNotification()
+  if isNotification then
+    notificationTextWidth = ImGui.CalcTextSize(notificationText)
+    ImGui.SetNextWindowPos(screenWidth / 2 - notificationTextWidth / 2 - 20, screenHeight / 2)
+    ImGui.Begin("Notification", true, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoTitleBar)
+    ImGuiExt.Text(notificationText)
+    ImGui.End()
+
+    if Tracker.IsGameReady() then return end
+    EnableNotification(false)
+  end
+end
+
+------------------
 -- Status bar logic
 ------------------
 
@@ -205,7 +287,7 @@ local Status = {
 --
 -- @return None
 function ImGuiExt.ResetStatusBar(barName)
-  local status = GeneralText.info_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
+  local status = GeneralText.status_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
 
   if not barName then
     ImGuiExt.SetStatusBar(status)
@@ -256,89 +338,7 @@ function ImGuiExt.GetStatusBar(barName)
 end
 
 ------------------
--- OnDraw methods
-------------------
-
---- Pushes the mod's style to the UI elements.
---
--- @param None
---
--- @return None
-function ImGuiExt.PushStyle()
-  ImGui.PushStyleVar(ImGuiStyleVar.WindowMinSize, 420 * scaleFactor, 100 * scaleFactor)
-  ImGui.PushStyleColor(ImGuiCol.Button, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.ButtonHovered, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.ButtonActive, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.CheckMark, 0, 0, 0, 1)
-  ImGui.PushStyleColor(ImGuiCol.FrameBg, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.FrameBgActive, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.Header, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.HeaderHovered, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.HeaderActive, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.PopupBg, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.ResizeGrip, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.ResizeGripHovered, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.ResizeGripActive, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.SliderGrab, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.Tab, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TabHovered, popRed, popGreen, popBlue, popAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TabActive, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TabUnfocused, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TabUnfocusedActive, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.Text, textRed, textGreen, textBlue, textAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TitleBg, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TitleBgActive, baseRed, baseGreen, baseBlue, baseAlpha)
-  ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0.75)
-end
-
---- Pops the mod's style.
---
--- @param None
---
--- @return None
-function ImGuiExt.PopStyle()
-  ImGui.PopStyleColor(26)
-  ImGui.PopStyleVar(1)
-end
-
-local function EnableNotification(isEnabled)
-  isNotification = isEnabled
-end
-
-------------------
--- Notifications
-------------------
-
--- @param `timeSeconds`: number;
--- @param `text`: string;
---
--- @return None
-function ImGuiExt.SetNotification(timeSeconds, text)
-  EnableNotification(true)
-  notificationText = text
-
-  Globals.SetDelay(timeSeconds, "Notification", EnableNotification, false)
-end
-
--- @return None
-function ImGuiExt.DrawNotification()
-  if isNotification then
-    notificationTextWidth = ImGui.CalcTextSize(notificationText)
-    ImGui.SetNextWindowPos(screenWidth / 2 - notificationTextWidth / 2 - 20, screenHeight / 2)
-    ImGui.Begin("Notification", true, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoTitleBar)
-    ImGuiExt.Text(notificationText)
-    ImGui.End()
-
-    if Tracker.IsGameReady() then return end
-    EnableNotification(false)
-  end
-end
-
-------------------
--- Themes
+-- Themes logic
 ------------------
 
 -- @return string; Selected Theme name
