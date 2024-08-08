@@ -109,7 +109,7 @@ end
 function Tracker.SetModFirstRun(isFirstRun)
   ModState.isFirstRun = isFirstRun
   if not isFirstRun then return end
-  Tracker.SetNewInstall(true)
+  Tracker.SetModNewInstall(true)
 end
 
 -- @param `isFirstRun`: boolean; The current DLSS Enabler's FG state to set (`true` if it's enabled, `false` otherwise).
@@ -167,15 +167,11 @@ end
 -- Mod State
 
 -- @return boolean: `true` if dynamic frame generation is enabled in DLSS Enabler, as retrieved in a last check
---
--- NOTE: Disable logging for 'dlss-enabler-bridge-2077.dll' to avoid excessive logging when calling this function frequently
 function Tracker.IsModDynamicFrameGeneration()
   return ModState.isDynamicFrameGen
 end
 
 -- @return boolean: `true` if frame generation is enabled in DLSS Enabler and is in-game
---
--- NOTE: Disable logging for 'dlss-enabler-bridge-2077.dll' to avoid excessive logging when calling this function frequently
 function Tracker.IsModFrameGeneration()
   if GameState.isPreGame or GameState.isGamePaused then return false end
 

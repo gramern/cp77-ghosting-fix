@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "beta1",
+  __VERSION_STATUS = "beta2",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -496,7 +496,7 @@ registerForEvent("onDraw", function()
         if Debug and Settings.IsDebugMode() and Settings.IsDebugView() then
             Debug.DrawUI()
             TrackerDebug.DrawUI()
-            VectorsDebug.DrawUI()
+            -- VectorsDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install dur ing development
