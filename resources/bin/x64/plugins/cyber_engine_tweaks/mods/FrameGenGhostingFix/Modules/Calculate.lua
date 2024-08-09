@@ -116,9 +116,8 @@ local function BackupUserSettings()
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Globals.SafeMergeTables(MasksData, Globals.GetFallback('OnFoot'))
+  Globals.SafeMergeTables(MasksData, Globals.GetFallback('OnFoot'))
 
-  if Calculate == nil then Globals.Print(Calculate.__NAME, "Can't restore user settings.") end
   SaveUserSettings()
 end
 
@@ -273,7 +272,7 @@ end
 -- @param `coordinate`: string; `x` or `y`
 --
 -- @return None
-local function SetVignetteDefault(coordinate)
+function Calculate.SetVignetteDefault(coordinate)
   SetVignetteScreenPosition(coordinate, MasksData.Vignette.Def.ScreenPosition[coordinate])
   SetVignetteScale(coordinate, MasksData.Vignette.Def.Scale[coordinate])
 end
@@ -714,8 +713,8 @@ function Calculate.DrawUI()
         ImGui.Text("")
       
         if ImGui.Button(SettingsText.btn_default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-          SetVignetteDefault('x')
-          SetVignetteDefault('y')
+          Calculate.SetVignetteDefault('x')
+          Calculate.SetVignetteDefault('y')
           TurnOnLiveView()
 
           ImGuiExt.SetStatusBar(SettingsText.status_settings_default)

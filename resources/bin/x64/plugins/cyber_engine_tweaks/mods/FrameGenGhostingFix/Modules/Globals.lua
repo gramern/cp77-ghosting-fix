@@ -311,6 +311,31 @@ function Globals.MergeTables(mergeTo, mergeA)
   return mergeTo
 end
 
+--- Converts a table to a string representation.
+--
+-- @param `table`: table; The table to be converted to a string.
+--
+-- @return string: A string representation of the input table.
+function Globals.TableToString(table)
+  if table == nil then
+    Globals.PrintDebug(Globals.__NAME, "[TableToString]", "Table is nil")
+    return
+  end
+
+  local result = "{"
+
+  for k, v in pairs(table) do
+    if type(v) == "table" then
+      result = result .. k .. " = " .. Globals.TableToString(v) .. ", "
+    else
+      result = result .. k .. " = " .. tostring(v) .. ", "
+    end
+  end
+
+  -- Remove trailing comma and space
+  return result:sub(1, -3) .. "}"
+end
+
 ------------------
 -- Printing
 
@@ -413,6 +438,33 @@ function Globals.PrintError(moduleName, ...)
   spdlog.error(printContents)
 end
 
+--- Prints the contents of a table, including nested tables.
+--
+-- @param `table`: table; The table to be printed.
+--
+-- @return None
+function Globals.PrintTable(table)
+  if table == nil then
+    Globals.PrintDebug(Globals.__NAME, "[PrintTable]", "Table is nil")
+    return
+  end
+
+  for k, v in pairs(table) do
+    if type(v) == "table" then
+      local tableAsString = k .. ": " .. Globals.TableToString(v)
+
+      Globals.PrintDebug(tableAsString)
+    else
+      local tableAsString = k .. ": " .. tostring(v)
+
+      Globals.PrintDebug(tableAsString)
+    end
+  end
+end
+
+------------------
+-- Version check
+
 -- @param `versionString`: string; The version string  (e.g. "5.0.0") to convert to a table of numbers.
 --
 -- @return table: A table containing the version numbers.
@@ -486,7 +538,7 @@ end
 --                        Returns nil if no fallback is found.
 function Globals.GetFallback(owner, key)
   if isDebug then
-    if FallbackBoard[owner] == nil then Globals.PrintDebug("There are no fallbacks for the owner:", owner) end 
+    if FallbackBoard[owner] == nil then Globals.PrintDebug(Globals.__NAME, "There are no fallbacks for the owner:", owner) end 
     if key and FallbackBoard[owner] and FallbackBoard[owner][key] == nil then Globals.PrintDebug(Globals.__NAME, "There is no fallback for the given key:", key, owner) end
   end
 
@@ -614,6 +666,8 @@ function Globals.SaveJSON(filename, content)
   if file then
     file:write(content)
     file:close()
+
+    Globals.PrintDebug(Globals.__NAME, "File saved:", filename)
 
     return true
   else

@@ -32,6 +32,7 @@ local random, randomseed = math.random, math.randomseed
 ----------------------------------------------------------------------------------------------------------------------
 
 local screenWidth, screenHeight
+
 local isInstance = false
 local isLoadWindow = false
 local isSaveWindow = false
@@ -464,8 +465,19 @@ function VectorsEditor.DrawWindow()
 
   if ImGui.Begin(EditorText.window_presets_editor, ImGuiWindowFlags.AlwaysAutoResize) then
 
+    if not Tracker.IsGameLoaded() then
+      ImGui.Text("")
+      ImGuiExt.TextRed(EditorText.info_game_loading_wait)
+      ImGui.Text("")
+
+      ImGui.End()
+      return
+    end
+
     if not Tracker.IsVehicleMounted() and not Tracker.IsPlayerDriver() then
+      ImGui.Text("")
       ImGuiExt.TextRed(EditorText.info_enter_vehicle)
+      ImGui.Text("")
 
       ImGui.End()
       return
@@ -746,7 +758,7 @@ function VectorsEditor.DrawWindow()
 
           FlagSettingChange()
         end
-        ImGuiExt.SetTooltip(EditorText.tooltip_cockpit_masks)
+        ImGuiExt.SetTooltip(EditorText.tooltip_corners_masks)
 
         LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill, hedFillToggle = ImGuiExt.Checkbox(EditorText.chk_middle_mask, LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Visible.Def.fill)
         if hedFillToggle then

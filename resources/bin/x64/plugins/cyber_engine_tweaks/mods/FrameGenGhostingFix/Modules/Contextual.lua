@@ -57,7 +57,10 @@ local GeneralText = Localization.GetGeneralText()
 local SettingsText = Localization.GetSettingsText()
 
 local function GetUserSettings()
-  local userSettings = Toggles
+  local userSettings = {
+    Contexts = Contexts,
+    Toggles = Toggles,
+  }
 
   return userSettings
 end
@@ -65,7 +68,8 @@ end
 local function LoadUserSettings(userSettings)
   if not userSettings or userSettings == nil then return end
 
-  Globals.MergeTables(Toggles, userSettings)
+  Globals.SafeMergeTables(Contexts, userSettings.Contexts)
+  Globals.SafeMergeTables(Toggles, userSettings.Toggles)
 end
 
 local function SaveUserSettings()
@@ -973,9 +977,36 @@ function Contextual.DrawUI()
         SaveUserSettings()
         ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
       else
-        contextSightseeingToggle = true
-        contextSlowPacedAndCinematicsToggle = true
-        contextFastPacedToggle = true
+        if Toggles.Standing and
+            Toggles.SlowWalking and
+            Toggles.Photomode then
+
+          Contexts.Sightseeing = true
+        else
+          Contexts.Sightseeing = false
+        end
+
+        if Toggles.Walking and
+            Toggles.Swimming and
+            Toggles.Vehicle.Static and
+            Toggles.Braindance and
+            Toggles.Cinematic then
+
+          Contexts.SlowPacedAndCinematics = true
+        else
+          Contexts.SlowPacedAndCinematics = false
+        end
+
+        if Toggles.Sprinting and
+            Toggles.Vehicle.Driving and
+            Toggles.Vehicle.StaticCombat and
+            Toggles.Vehicle.DrivingCombat and
+            Toggles.Combat then
+
+          Contexts.FastPaced = true
+        else
+          Contexts.FastPaced = false
+        end
       end
     end
     ImGuiExt.SetTooltip(ContextualText.tooltip_context_my_own)

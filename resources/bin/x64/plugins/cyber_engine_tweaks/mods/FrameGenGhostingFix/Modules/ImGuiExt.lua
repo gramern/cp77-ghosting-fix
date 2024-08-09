@@ -16,8 +16,6 @@ local Tracker = require("Modules/Tracker")
 
 local GeneralText = Localization.GetGeneralText()
 
-local openOverlay
-
 local isNotification = false
 local notificationText = ""
 local notificationTextWidth = 0
@@ -33,6 +31,8 @@ local selectedTheme = "Crimson"
 
 local textRed, textGreen, textBlue, textAlpha = 0, 0, 0, 1
 local textAltRed, textAltGreen, textAltBlue, textAltAlpha = 1, 1, 1, 1
+
+local bgRed, bgGreen, bgBlue, bgAlpha = 0, 0, 0, 0.75
 
 local popRed, popGreen, popBlue, popAlpha = 1, 0.85, 0.31, 1
 local baseRed, baseGreen, baseBlue, baseAlpha = 1, 0.78, 0, 1
@@ -203,7 +203,7 @@ function ImGuiExt.PushStyle()
   ImGui.PushStyleColor(ImGuiCol.Button, baseRed, baseGreen, baseBlue, baseAlpha)
   ImGui.PushStyleColor(ImGuiCol.ButtonHovered, popRed, popGreen, popBlue, popAlpha)
   ImGui.PushStyleColor(ImGuiCol.ButtonActive, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.CheckMark, 0, 0, 0, 1)
+  ImGui.PushStyleColor(ImGuiCol.CheckMark, textRed, textGreen, textBlue, textAlpha)
   ImGui.PushStyleColor(ImGuiCol.FrameBg, baseRed, baseGreen, baseBlue, baseAlpha)
   ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, popRed, popGreen, popBlue, popAlpha)
   ImGui.PushStyleColor(ImGuiCol.FrameBgActive, dimRed, dimGreen, dimBlue, dimAlpha)
@@ -225,7 +225,7 @@ function ImGuiExt.PushStyle()
   ImGui.PushStyleColor(ImGuiCol.TitleBg, dimRed, dimGreen, dimBlue, dimAlpha)
   ImGui.PushStyleColor(ImGuiCol.TitleBgActive, baseRed, baseGreen, baseBlue, baseAlpha)
   ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, dimRed, dimGreen, dimBlue, dimAlpha)
-  ImGui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0.75)
+  ImGui.PushStyleColor(ImGuiCol.WindowBg, bgRed, bgGreen, bgBlue, bgAlpha)
 end
 
 --- Pops the mod's style.
@@ -294,7 +294,7 @@ function ImGuiExt.ResetStatusBar(barName)
     status = GeneralText.status_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
   else
     status = "The mod has encountered an error: check logs."
-    Globals.PrintError("The mod has encountered an error. Turn off the game and check logs.")
+    Globals.PrintError(ImGuiExt.__NAME, "The mod has encountered an error. Turn off the game and check logs.")
     Tracker.SetModReady(false)
   end
 
@@ -399,16 +399,12 @@ end
 ------------------
 
 function ImGuiExt.OnOverlayOpen()
-  openOverlay = true
-
   ApplyScreenResolution()
   ApplyScaleFactor()
   ImGuiExt.ResetStatusBar()
 end
 
 function ImGuiExt.OnOverlayClose()
-  openOverlay = false
-
   ImGuiExt.ResetStatusBar()
 end
 

@@ -14,12 +14,13 @@ local Tracker = require("Modules/Tracker")
 local LogText = Localization.GetLogText()
 
 ------------------
--- Save To File Reqests
+-- Locl Reqests
 ------------------
 
 local isSaveRequest = nil
+local isLoadRequest = nil
 
--- @return boolean: `true` if Settings are set to save user_settings.json OnOverlayClose
+-- @return boolean: `true` if Settings are set to save user-settings.json OnOverlayClose
 function Settings.IsSaveRequest()
   return isSaveRequest
 end
@@ -53,8 +54,6 @@ local function LoadModSettings(modSettings)
   ModSettings.isHelp = modSettings and modSettings.Help or true
   ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
   ModSettings.windowTheme = modSettings and modSettings.WindowTheme or "Crimson"
-
-  Globals.Print(Settings.__NAME,LogText.settings_loaded)
 end
 
 local function SaveModSettings()
@@ -184,11 +183,13 @@ function Settings.WriteUserSettings(poolName, contents)
   SaveRequest()
 end
 
--- @param `poolName`: string; The name for which settings are being retrieved.
+-- @param `poolName`: string; The name for which settings are being retrieved. If no poolName, the whole UserSettings table.
 --
 -- @return table | nil; Returns the user settings for the specified module if they exist, otherwise returns nil
 function Settings.GetUserSettings(poolName)
-  if not poolName or UserSettings[poolName] == nil then return nil end
+  if not poolName then
+    return UserSettings or nil
+  elseif UserSettings[poolName] == nil then return nil end
 
   return UserSettings[poolName]
 end
@@ -198,13 +199,18 @@ end
 ------------------
 
 local function LoadFile()
-  local userSettingsContents = Globals.LoadJSON("user_settings")
+  local userSettingsContents = Globals.Deepcopy(Globals.LoadJSON("user-settings"))
 
   if userSettingsContents then
-    UserSettings = userSettingsContents
+    UserSettings = Globals.Deepcopy(userSettingsContents)
+
+    Globals.Print(Settings.__NAME, LogText.settings_loaded)
+    Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
+    return true
   else
     Tracker.SetModFirstRun(true)
     Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
+    return false
   end
 end
 
@@ -214,7 +220,7 @@ local function SaveFile()
 
   SaveModSettings()
 
-  local result = Globals.SaveJSON("user_settings", UserSettings)
+  local result = Globals.SaveJSON("user-settings", UserSettings)
 
   if result then
     ResetSaveRequest()
@@ -235,8 +241,54 @@ function Settings.OnInitialize()
   LoadModSettings(Settings.GetUserSettings("ModSettings"))
 end
 
+-- The mod forcefully tries to load user-settings.json if it didn't onInit
+function Settings.OnOverlayOpen()
+  if UserSettings == nil then
+    local result = LoadFile()
+
+    if result then 
+      LoadModSettings(Settings.GetUserSettings("ModSettings"))
+    else
+      SaveRequest()
+    end
+  end
+end
+
 function Settings.OnOverlayClose()
   SaveFile()
+end
+
+-- leaving for later: another way to make th mod forcefully try to load user-settings.json if it didn't onInit
+function Settings.OnUpdate()
+  if not isLoadRequest and UserSettings == nil then
+    local result = LoadFile()
+
+    if result and UserSettings and UserSettings.ModSettings then
+      if UserSettings and UserSettings.ModSettings and UserSettings.ModSettings.DebugMode then
+        Globals.PrintTable(UserSettings)
+      end
+
+      LoadModSettings(Settings.GetUserSettings("ModSettings"))
+
+      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+      isLoadRequest = true
+
+      Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
+    else
+      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+      isLoadRequest = true
+
+      Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
+    end 
+  end
+
+  if UserSettings ~= nil then
+    FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+
+    isLoadRequest = true
+
+    Globals.PrintDebug(Settings.__NAME, "UserSettings found, stopping the check.")
+  end
 end
 
 return Settings

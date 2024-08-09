@@ -447,7 +447,7 @@ local function TrackVehicle()
     return
   end
 
-  trackedVehicle.isMounted = vehicle and true
+  trackedVehicle.isMounted = true
   trackedVehicle.baseObject = GetVehicleBaseObject(vehicle)
   trackedVehicle.isSupported = IsVehicleSupported(trackedVehicle.baseObject)
   trackedVehicle.currentSpeed = vehicle:GetCurrentSpeed()

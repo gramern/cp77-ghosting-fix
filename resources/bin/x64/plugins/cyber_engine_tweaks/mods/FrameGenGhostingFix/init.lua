@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "beta5",
+  __VERSION_STATUS = "beta10",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -73,7 +73,6 @@ local currentCount = 0
 local currentFpsSum = 0
 local currentDeltaTimeSum = 0
 
-
 --benchmark related
 local isBenchmark = false
 local isBenchmarkFinished = false
@@ -87,6 +86,9 @@ local benchmarkSetSuggested = false
 local benchmarkTime = 0
 local averageFps = 0
 local countFps = 0
+
+-- user_settings not loading on SteamOS - problem mitigation attempt
+local userSettingsLoaded = false
 
 --ui
 local windowTitle
@@ -161,6 +163,15 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
     (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] == minVersion.patch and version[4] >= minVersion.revision)
 
   return isCompatible
+end
+
+--- Sets internal info, that user settings file has been loaded. A mitigation for specific problems with normal file loading on Linux/SteamOs
+--
+-- @param `isLoaded`: boolean;
+-- 
+-- @return None
+function FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(isExecuted)
+  userSettingsLoaded = isExecuted
 end
 
 ------------------
@@ -388,9 +399,9 @@ registerForEvent("onInit", function()
   VectorsPresets.OnInitialize()
   
   -- danyalzia: remove forced benchmarking upon new install during development
-  -- if Tracker.IsModFirstRun() then
-  --   SetBenchmark(true)
-  -- end
+  if Tracker.IsModFirstRun() then
+    SetBenchmark(true)
+  end
 
   ImGuiExt.SetTheme(Settings.GetTheme())
 end)
@@ -440,6 +451,7 @@ registerForEvent("onOverlayOpen", function()
   Globals.OnOverlayOpen()
   ImGuiExt.OnOverlayOpen()
   Tracker.OnOverlayOpen()
+  Settings.OnOverlayOpen()
 
   Vectors.OnOverlayOpen()
   VectorsPresets.OnOverlayOpen()
@@ -509,43 +521,44 @@ registerForEvent("onDraw", function()
             VectorsDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
+        
         -- danyalzia: remove forced benchmarking upon new install dur ing development
-        -- if Tracker.IsModNewInstall() then
-        --   if ImGui.BeginTabItem(InfoText.tab_name_info) then
+        if Tracker.IsModNewInstall() then
+          if ImGui.BeginTabItem(InfoText.tab_name_info) then
 
-        --     if Tracker.IsModFirstRun() then
-        --       ImGuiExt.Text(InfoText.info_benchmark, true)
-        --     else
-        --       ImGuiExt.Text(InfoText.info_benchmark_ask, true)
-        --     end
+            if Tracker.IsModFirstRun() then
+              ImGuiExt.Text(InfoText.info_benchmark, true)
+            else
+              ImGuiExt.Text(InfoText.info_benchmark_ask, true)
+            end
 
-        --     ImGui.Text("")
-        --     BenchmarkUI()
-        --     ImGui.Text("")
+            ImGui.Text("")
+            BenchmarkUI()
+            ImGui.Text("")
 
-        --     keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
-        --     if keepWindowToggle then
-        --       Settings.SetKeepWindow(keepWindowBool)
-        --     end
-        --     ImGuiExt.SetTooltip(SettingsText.tooltip_window)
+            keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
+            if keepWindowToggle then
+              Settings.SetKeepWindow(keepWindowBool)
+            end
+            ImGuiExt.SetTooltip(SettingsText.tooltip_window)
 
-        --     if not Tracker.IsModFirstRun() and not isBenchmark then
-        --       ImGui.Text("")
+            if not Tracker.IsModFirstRun() and not isBenchmark then
+              ImGui.Text("")
 
-        --       if ImGui.Button(GeneralText.yes, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-        --         SetBenchmark(true)
-        --       end
+              if ImGui.Button(GeneralText.yes, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                SetBenchmark(true)
+              end
 
-        --       ImGui.SameLine()
+              ImGui.SameLine()
 
-        --       if ImGui.Button(GeneralText.no, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-        --         Tracker.SetModNewInstall(false)
-        --         Settings.SetKeepWindow(false)
-        --       end
-        --     end
-        --     ImGui.EndTabItem()
-        --   end
-        -- end
+              if ImGui.Button(GeneralText.no, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                Tracker.SetModNewInstall(false)
+                Settings.SetKeepWindow(false)
+              end
+            end
+            ImGui.EndTabItem()
+          end
+        end
 
         if Globals.IsAspectRatioChange() then
           if ImGui.BeginTabItem(InfoText.tab_name_info) then
@@ -588,6 +601,12 @@ registerForEvent("onDraw", function()
               if debugViewToggle then
                 Settings.SetDebugView(debugViewBool)
                 ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+              end
+
+              ImGui.Text("")
+
+              if ImGui.Button(SettingsText.btn_print_user_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                Globals.PrintTable(Globals.LoadJSON('user_settings'))
               end
 
               ImGui.Text("")
@@ -711,8 +730,8 @@ registerForEvent("onDraw", function()
                     SetBenchmark(true)
                     Settings.SetKeepWindow(true)
                   end
-
                   ImGuiExt.SetTooltip(BenchmarkText.tooltip_run_bench)
+
                 else
                   if ImGui.Button(BenchmarkText.btn_benchmark_stop, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                     ResetBenchmarkResults()
