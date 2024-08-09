@@ -5,6 +5,13 @@ local Contextual = {
 
 local FGEnabled = false
 
+local Contexts = {
+  Sightseeing = false,
+  SlowPacedAndCinematics = false,
+  FastPaced = false,
+  MyOwn = false,
+}
+
 local CurrentStates = {
   isVehicleStatic = false,
   isVehicleDriving = false,
@@ -28,7 +35,7 @@ local Toggles = {
     StaticCombat = false,
     DrivingCombat = false,
   },
-  StandingCrouching = false,
+  Standing = false,
   Walking = false,
   SlowWalking = false,
   Sprinting = false,
@@ -97,7 +104,7 @@ local function StringifyStates()
   "\n" .. "VehicleDriving: " .. Capitalize(tostring(CurrentStates.isVehicleDriving)) ..
   "\n" .. "VehicleStaticCombat: " .. Capitalize(tostring(CurrentStates.isVehicleStaticCombat)) ..
   "\n" .. "VehicleDrivingCombat: " .. Capitalize(tostring(CurrentStates.isVehicleDrivingCombat)) ..
-  "\n" .. "StandingCrouching: " .. Capitalize(tostring(CurrentStates.isStandingCrouching)) ..
+  "\n" .. "Standing: " .. Capitalize(tostring(CurrentStates.isStandingCrouching)) ..
   "\n" .. "WalkingCrouchWalking: " .. Capitalize(tostring(CurrentStates.isWalkingCrouchWalking)) ..
   "\n" .. "SprintingCrouchSprinting: " .. Capitalize(tostring(CurrentStates.isSprintingCrouchSprinting)) ..
   "\n" .. "SlowWalking: " .. Capitalize(tostring(CurrentStates.isSlowWalking)) ..
@@ -190,7 +197,7 @@ end
 
 -- gramern: Separated "Slow Walking" from "Crouch Walking", since there is no exclusive state for "Crouch Slow Walking":
 -- new states:
--- StandingCrouching
+-- Standing
 -- Walking/Crouch Walking
 -- Sprinting/Crouch Spriting
 -- SlowWalking
@@ -253,7 +260,7 @@ local function ShouldAffectFGState(feature)
       StaticCombat = CurrentStates.isVehicleStaticCombat,
       DrivingCombat = CurrentStates.isVehicleDrivingCombat,
     },
-    StandingCrouching = CurrentStates.isStandingCrouching,
+    Standing = CurrentStates.isStandingCrouching,
     Walking = CurrentStates.isWalkingCrouchWalking,
     SlowWalking = CurrentStates.isSlowWalking,
     Sprinting = CurrentStates.isSprintingCrouchSprinting,
@@ -338,12 +345,12 @@ local function SetVehicleDrivingCombat(feature)
 end
 
 local function SetStandingCrouching(feature)
-  -- V is in StandingCrouching state even when Player is in Vehicle because LocomotionEventsTransition events still trigger
+  -- V is in Standing state even when Player is in Vehicle because LocomotionEventsTransition events still trigger
   local playerVehicle = GetPlayerVehicle()
   if playerVehicle ~= nil then return end
 
   if CurrentStates.isStandingCrouching then
-    if not ShouldAffectFGState("StandingCrouching") then return end
+    if not ShouldAffectFGState("Standing") then return end
     if feature == true then
       TurnOffFrameGen()
     else
@@ -526,7 +533,7 @@ function Contextual.OnInitialize()
     end
 
     -- Turn on framegen if it was disabled outside vehicle
-    if Toggles.StandingCrouching == true then
+    if Toggles.Standing == true then
       TurnOnFrameGen()
     end
     
@@ -657,7 +664,7 @@ function Contextual.OnInitialize()
 	end)
 
   -------------------------------------------------
-  -- StandingCrouching, Walking, Slow Walking and Sprinting
+  -- Standing, Walking, Slow Walking and Sprinting
   -------------------------------------------------
   ---
   Observe('LocomotionEventsTransition', 'OnUpdate', function()
@@ -727,11 +734,11 @@ function Contextual.OnInitialize()
     end
 
     -- Only process standing logic when V is out of vehicle
-    if Toggles.StandingCrouching == true then
+    if Toggles.Standing == true then
       if CurrentStates.isStandingCrouching then
         TurnOffFrameGen()
       else
-        -- if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        -- if not (Toggles.Standing and CurrentStates.isStandingCrouching)
         if not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
         and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
         and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
@@ -744,7 +751,7 @@ function Contextual.OnInitialize()
       if CurrentStates.isWalkingCrouchWalking then
         TurnOffFrameGen()
       else
-        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        if not (Toggles.Standing and CurrentStates.isStandingCrouching)
         -- and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
         and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
         and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
@@ -757,7 +764,7 @@ function Contextual.OnInitialize()
       if CurrentStates.isSlowWalking == true then
         TurnOffFrameGen()
       else
-        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        if not (Toggles.Standing and CurrentStates.isStandingCrouching)
         and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
         -- and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
         and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
@@ -770,7 +777,7 @@ function Contextual.OnInitialize()
       if CurrentStates.isSprintingCrouchSprinting == true then
         TurnOffFrameGen()
       else
-        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        if not (Toggles.Standing and CurrentStates.isStandingCrouching)
         and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
         and not (Toggles.SlowWalking and CurrentStates.isSlowWalking) then
         -- and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
@@ -832,7 +839,7 @@ function Contextual.OnInitialize()
 		  CurrentStates.isCinematic = true
     end
 
-    if Toggles.isCinematic == true then
+    if Toggles.Cinematic == true then
       if CurrentStates.isCinematic then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Cinematic detected. FG Disabled (PlayerPuppet->OnSceneTierChange)")
@@ -869,6 +876,7 @@ end
 
 function Contextual.DrawUI()
 
+  local contextSightseeingToggle, contextSlowPacedAndCinematicsToggle, contextFastPacedToggle, contextMyOwnToggle
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
@@ -906,113 +914,179 @@ function Contextual.DrawUI()
     ImGuiExt.Text(GeneralText.group_overview)
     ImGui.Separator()
     ImGuiExt.Text(ContextualText.info_select_context, true)
-
     ImGui.Text("")
-    ImGuiExt.Text(ContextualText.group_on_foot)
+    ImGuiExt.Text(ContextualText.group_contexts)
     ImGui.Separator()
 
-    Toggles.StandingCrouching, standingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_standing, Toggles.StandingCrouching, standingToggle)
-    if standingToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetStandingCrouching(Toggles.StandingCrouching)
+    if not Contexts.MyOwn then
+      Contexts.Sightseeing, contextSightseeingToggle = ImGuiExt.Checkbox(ContextualText.chk_context_sightseeing, Contexts.Sightseeing, contextSightseeingToggle)
+      if contextSightseeingToggle then
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetStandingCrouching(Contexts.Sightseeing)
+        Toggles.Standing = Contexts.Sightseeing
+        SetSlowWalking(Contexts.Sightseeing)
+        Toggles.SlowWalking = Contexts.Sightseeing
+        SetPhotoMode(Contexts.Sightseeing)
+        Toggles.Photomode = Contexts.Sightseeing
+        SaveUserSettings()
+      end
+      ImGuiExt.SetTooltip(ContextualText.tooltip_context_sightseeing)
+
+      Contexts.SlowPacedAndCinematics, contextSlowPacedAndCinematicsToggle = ImGuiExt.Checkbox(ContextualText.chk_context_slow_paced, Contexts.SlowPacedAndCinematics, contextSlowPacedAndCinematicsToggle)
+      if contextSlowPacedAndCinematicsToggle then
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetWalking(Contexts.SlowPacedAndCinematics)
+        Toggles.Walking = Contexts.SlowPacedAndCinematics
+        SetSwimming(Contexts.SlowPacedAndCinematics)
+        Toggles.Swimming = Contexts.SlowPacedAndCinematics
+        SetVehicleStatic(Contexts.SlowPacedAndCinematics)
+        Toggles.Vehicle.Static = Contexts.SlowPacedAndCinematics
+        SetBraindance(Contexts.SlowPacedAndCinematics)
+        Toggles.Braindance = Contexts.SlowPacedAndCinematics
+        SetCinematic(Contexts.SlowPacedAndCinematics)
+        Toggles.Cinematic = Contexts.SlowPacedAndCinematics
+        SaveUserSettings()
+      end
+      ImGuiExt.SetTooltip(ContextualText.tooltip_context_slow_paced)
+
+      Contexts.FastPaced, contextFastPacedToggle = ImGuiExt.Checkbox(ContextualText.chk_context_fast_paced, Contexts.FastPaced, contextFastPacedToggle)
+      if contextFastPacedToggle then
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetSprinting(Contexts.FastPaced)
+        Toggles.Sprinting = Contexts.FastPaced
+        SetVehicleDriving(Contexts.FastPaced)
+        Toggles.Vehicle.Driving = Contexts.FastPaced
+        SetVehicleStaticCombat(Contexts.FastPaced)
+        Toggles.Vehicle.StaticCombat = Contexts.FastPaced
+        SetVehicleDrivingCombat(Contexts.FastPaced)
+        Toggles.Vehicle.DrivingCombat = Contexts.FastPaced
+        SetCombat(Contexts.FastPaced)
+        Toggles.Combat = Contexts.FastPaced
+        SaveUserSettings()
+      end
+      ImGuiExt.SetTooltip(ContextualText.tooltip_context_fast_paced)
     end
 
-    Toggles.Walking, walkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_walking, Toggles.Walking, walkingToggle)
-    if walkingToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetWalking(Toggles.Walking)
+    Contexts.MyOwn, contextMyOwnToggle = ImGuiExt.Checkbox(ContextualText.chk_context_my_own, Contexts.MyOwn, contextMyOwnToggle)
+    if contextMyOwnToggle then
+      if Contexts.MyOwn then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+      else
+        contextSightseeingToggle = true
+        contextSlowPacedAndCinematicsToggle = true
+        contextFastPacedToggle = true
+      end
     end
+    ImGuiExt.SetTooltip(ContextualText.tooltip_context_my_own)
 
-    Toggles.Sprinting, sprintingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_sprinting, Toggles.Sprinting, sprintingToggle)
-    if sprintingToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSprinting(Toggles.Sprinting)
-    end
+    if Contexts.MyOwn then
+      ImGui.Text("")
+      ImGuiExt.Text(ContextualText.group_on_foot)
+      ImGui.Separator()
 
-    Toggles.SlowWalking, slowWalkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_slow_walking, Toggles.SlowWalking, slowWalkingToggle)
-    if slowWalkingToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSlowWalking(Toggles.SlowWalking)
-    end
+      Toggles.Standing, standingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_standing, Toggles.Standing, standingToggle)
+      if standingToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetStandingCrouching(Toggles.Standing)
+      end
 
-    Toggles.Swimming, swimmingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_swimming, Toggles.Swimming, swimmingToggle)
-    if swimmingToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSwimming(Toggles.Swimming)
-    end
+      Toggles.Walking, walkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_walking, Toggles.Walking, walkingToggle)
+      if walkingToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetWalking(Toggles.Walking)
+      end
 
-    ImGui.Text("")
-    ImGuiExt.Text(ContextualText.group_vehicles)
-    ImGui.Separator()
+      Toggles.Sprinting, sprintingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_sprinting, Toggles.Sprinting, sprintingToggle)
+      if sprintingToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetSprinting(Toggles.Sprinting)
+      end
 
-    Toggles.Vehicle.Static, isVehicleStaticToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static, Toggles.Vehicle.Static, isVehicleStaticToggled)
-    if isVehicleStaticToggled then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleStatic(Toggles.Vehicle.Static)
-    end
+      Toggles.SlowWalking, slowWalkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_slow_walking, Toggles.SlowWalking, slowWalkingToggle)
+      if slowWalkingToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetSlowWalking(Toggles.SlowWalking)
+      end
 
-    Toggles.Vehicle.Driving, isVehicleDrivingToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving, Toggles.Vehicle.Driving, isVehicleDrivingToggled)
-    if isVehicleDrivingToggled then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleDriving(Toggles.Vehicle.Driving)
-    end
+      Toggles.Swimming, swimmingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_swimming, Toggles.Swimming, swimmingToggle)
+      if swimmingToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetSwimming(Toggles.Swimming)
+      end
 
-    Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static_weapon, Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled)
-    if isVehicleStaticCombatToggled then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleStaticCombat(Toggles.Vehicle.StaticCombat)
-    end
+      ImGui.Text("")
+      ImGuiExt.Text(ContextualText.group_vehicles)
+      ImGui.Separator()
 
-    Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving_weapon, Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled)
-    if isVehicleDrivingCombatToggled then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleDrivingCombat(Toggles.Vehicle.DrivingCombat)
-    end
+      Toggles.Vehicle.Static, isVehicleStaticToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static, Toggles.Vehicle.Static, isVehicleStaticToggled)
+      if isVehicleStaticToggled then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetVehicleStatic(Toggles.Vehicle.Static)
+      end
 
-    ImGui.Text("")
-    ImGuiExt.Text(ContextualText.group_other)
-    ImGui.Separator()
+      Toggles.Vehicle.Driving, isVehicleDrivingToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving, Toggles.Vehicle.Driving, isVehicleDrivingToggled)
+      if isVehicleDrivingToggled then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetVehicleDriving(Toggles.Vehicle.Driving)
+      end
 
-    Toggles.Braindance, braindanceToggle = ImGuiExt.Checkbox(ContextualText.chk_braindance, Toggles.Braindance, braindanceToggle)
-    if braindanceToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetBraindance(Toggles.Braindance)
-    end
+      Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static_weapon, Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled)
+      if isVehicleStaticCombatToggled then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetVehicleStaticCombat(Toggles.Vehicle.StaticCombat)
+      end
 
-    Toggles.Cinematic, cinematicToggle = ImGuiExt.Checkbox(ContextualText.chk_cinematics, Toggles.Cinematic, cinematicToggle)
-    if cinematicToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetCinematic(Toggles.Cinematic)
-    end
+      Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving_weapon, Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled)
+      if isVehicleDrivingCombatToggled then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetVehicleDrivingCombat(Toggles.Vehicle.DrivingCombat)
+      end
 
-    Toggles.Combat, combatToggle = ImGuiExt.Checkbox(ContextualText.chk_combat, Toggles.Combat, combatToggle)
-    if combatToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetCombat(Toggles.Combat)
-    end
+      ImGui.Text("")
+      ImGuiExt.Text(ContextualText.group_other)
+      ImGui.Separator()
 
-    Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox(ContextualText.chk_photo_mode, Toggles.Photomode, photoModeToggle)
-    if photoModeToggle then
-      SaveUserSettings()
-      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetPhotoMode(Toggles.Photomode)
+      Toggles.Braindance, braindanceToggle = ImGuiExt.Checkbox(ContextualText.chk_braindance, Toggles.Braindance, braindanceToggle)
+      if braindanceToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetBraindance(Toggles.Braindance)
+      end
+
+      Toggles.Cinematic, cinematicToggle = ImGuiExt.Checkbox(ContextualText.chk_cinematics, Toggles.Cinematic, cinematicToggle)
+      if cinematicToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetCinematic(Toggles.Cinematic)
+      end
+
+      Toggles.Combat, combatToggle = ImGuiExt.Checkbox(ContextualText.chk_combat, Toggles.Combat, combatToggle)
+      if combatToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetCombat(Toggles.Combat)
+      end
+
+      Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox(ContextualText.chk_photo_mode, Toggles.Photomode, photoModeToggle)
+      if photoModeToggle then
+        SaveUserSettings()
+        ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+        SetPhotoMode(Toggles.Photomode)
+      end
     end
 
     if Settings.IsDebugMode() then
       ImGui.Text("")
-
       ImGui.Separator()
 
       local realTimeVehicleMoving = tostring(Tracker.IsVehicleMoving())
@@ -1050,6 +1124,7 @@ function Contextual.DrawUI()
       ImGuiExt.Text("Real-Time Frame Gen State: " .. realTimeState)
     end
 
+    ImGui.Text("")
     ImGui.EndTabItem()
   end
 
