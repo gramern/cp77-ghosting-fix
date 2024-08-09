@@ -372,7 +372,7 @@ end
 function Calculate.ApplySuggestedSettings(averageFps)
   BackupUserSettings()
 
-  if averageFps >= 38 then
+  if averageFps >= 35 then
     MasksData.Corners.onWeapon = true
   else
     MasksData.Corners.onWeapon = false
@@ -386,7 +386,7 @@ function Calculate.ApplySuggestedSettings(averageFps)
     MasksData.Vignette.onAim = false
   end
 
-  if averageFps >= 59 then
+  if averageFps >= 50 then
     MasksData.Vignette.onWeapon = true
   else
     MasksData.Vignette.onWeapon = false
@@ -614,7 +614,7 @@ function Calculate.DrawUI()
     blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(OnFootText.chk_blocker_aim, GetBlockerState('onAim'))
     if blockerOnAimToggle then
       SetBlockerState('onAim', blockerOnAimBool)
-      ImGuiExt.SetStatusBar(SettingsText)
+      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
 
       if GetVignetteState('onAim') then
         

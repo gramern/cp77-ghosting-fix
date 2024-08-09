@@ -544,6 +544,8 @@ function Globals.SetDelay(duration, key, callback, ...)
     callback = callback,
     parameters = parameters
   }
+
+  -- Globals.PrintDebug(Globals.__NAME, "Set Delay:", duration, "for:", key)
 end
 
 -- @param `gameDeltaTime`: number;

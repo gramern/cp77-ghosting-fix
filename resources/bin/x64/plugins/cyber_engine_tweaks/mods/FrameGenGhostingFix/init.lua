@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "beta2",
+  __VERSION_STATUS = "beta4",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -133,6 +133,8 @@ end
 function FrameGenGhostingFix.GetDLSSEnablerVersion(asTable)
   local version = DLSSEnabler_GetVersionAsString() or nil
 
+  if not version then return nil end
+
   if version ~= "Unknown" and asTable then
     version = Globals.VersionStringToTable(DLSSEnabler_GetVersionAsString())
   end
@@ -148,7 +150,7 @@ end
 function FrameGenGhostingFix.IsDLSSEnablerCompatible()
   local version = FrameGenGhostingFix.GetDLSSEnablerVersion(true)
 
-  if not version then return false end
+  if not version then Globals.PrintError(LogText.bridge_missing) return false end
 
   local minVersion = {major = 3, minor = 1, patch = 0, revision = 12}
 
@@ -250,12 +252,18 @@ local function RestorePreviousSettings()
 end
 
 function BenchmarkUI()
-  ImGuiExt.Text(BenchmarkText.info_current_fps)
-  ImGui.SameLine()
-  ImGuiExt.Text(tostring(currentFpsInt))
-  ImGuiExt.Text(BenchmarkText.info_current_frametime)
-  ImGui.SameLine()
-  ImGuiExt.Text(tostring(currentFrametimeInt))
+  if not Tracker.IsGamePreGame() then
+    ImGuiExt.Text(BenchmarkText.info_current_fps)
+    ImGui.SameLine()
+    ImGuiExt.Text(tostring(currentFpsInt))
+    ImGuiExt.Text(BenchmarkText.info_current_frametime)
+    ImGui.SameLine()
+    ImGuiExt.Text(tostring(currentFrametimeInt))
+  else
+    ImGui.Text("")
+    ImGuiExt.Text(BenchmarkText.info_benchmark_pre_game, true)
+  end
+
   if openOverlay or isBenchmark then
     ImGuiExt.Text(BenchmarkText.info_benchmark)
     ImGui.SameLine()
@@ -272,18 +280,20 @@ function BenchmarkUI()
     ImGuiExt.Text(tostring(averageFps))
   end
 
-  if Tracker.IsGamePaused() or Tracker.IsGamePreGame() then
-    ImGui.Text("")
-    ImGuiExt.Text(BenchmarkText.info_benchmark_pause, true)
-  elseif openOverlay then
-    ImGui.Text("")
-    ImGuiExt.Text(BenchmarkText.info_benchmark_pause_overlay, true)
-  else
-    if benchmarkRestart then
+  if isBenchmark then
+    if not Tracker.IsGameReady() then
       ImGui.Text("")
-      ImGuiExt.Text(BenchmarkText.info_benchmark_restart)
-      ImGui.SameLine()
-      ImGuiExt.Text(tostring(benchmarkRestartRemaining))
+      ImGuiExt.Text(BenchmarkText.info_benchmark_pause, true)
+    elseif openOverlay then
+      ImGui.Text("")
+      ImGuiExt.Text(BenchmarkText.info_benchmark_pause_overlay, true)
+    else
+      if benchmarkRestart then
+        ImGui.Text("")
+        ImGuiExt.Text(BenchmarkText.info_benchmark_restart)
+        ImGui.SameLine()
+        ImGuiExt.Text(tostring(benchmarkRestartRemaining))
+      end
     end
   end
 end
@@ -337,15 +347,12 @@ registerForEvent("onInit", function()
   if not VectorsPresets then Globals.PrintError(LogText.presets_missing) end
   if not Vectors then Globals.PrintError(LogText.vectors_missing) end
 
+  -- check for the right DLSS Enabler's version for the contextual edition of the mod
   if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
     if Contextual then 
-      if not FrameGenGhostingFix.GetDLSSEnablerVersion() then
-        Globals.PrintError(LogText.bridge_missing)
-        return
-      end
-      
       if not FrameGenGhostingFix.IsDLSSEnablerCompatible() then
         Globals.PrintError(LogText.bridge_bad_enabler_version)
+        Tracker.SetModReady(false)
         return
       end
     else
@@ -353,6 +360,9 @@ registerForEvent("onInit", function()
       return
     end
   end
+
+  -- the first early return on very first problems with the mod
+  if not Tracker.IsModReady() then return end
 
   FrameGenGhostingFix.GetVersion()
 
@@ -362,18 +372,18 @@ registerForEvent("onInit", function()
   Tracker.OnInitialize()
   Settings.OnInitialize()
 
-  if not FrameGenGhostingFix.__VERSION_SUFFIX then
-    Diagnostics.OnInitialize()
-  else
-    Diagnostics = nil
-  end
-
   Globals.SetDebugMode(Settings.IsDebugMode())
 
+  -- the second early return on problems with the game/user settings
   if not Tracker.IsModReady() then return end
 
   Calculate.OnInitialize()
-  Contextual.OnInitialize()
+
+  -- check for the non-contextual edition of the mod
+  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+    Contextual.OnInitialize()
+  end
+
   Vectors.OnInitialize()
   VectorsPresets.OnInitialize()
   
@@ -418,6 +428,7 @@ if Debug then
 end
 
 registerForEvent("onOverlayOpen", function()
+  if not Tracker.IsModReady() then return end
   openOverlay = true
   Tracker.SetModOpenWindow(true)
 
@@ -429,8 +440,6 @@ registerForEvent("onOverlayOpen", function()
   Globals.OnOverlayOpen()
   ImGuiExt.OnOverlayOpen()
   Tracker.OnOverlayOpen()
-
-  if not Tracker.IsModReady() then return end
 
   Vectors.OnOverlayOpen()
   VectorsPresets.OnOverlayOpen()
@@ -476,6 +485,7 @@ end)
 ------------------
 
 registerForEvent("onDraw", function()
+  if not Tracker.IsModReady() then return end
   ImGuiExt.DrawNotification()
 
   if Tracker.IsModOpenWindow() then
@@ -496,7 +506,7 @@ registerForEvent("onDraw", function()
         if Debug and Settings.IsDebugMode() and Settings.IsDebugView() then
             Debug.DrawUI()
             TrackerDebug.DrawUI()
-            -- VectorsDebug.DrawUI()
+            VectorsDebug.DrawUI()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         -- danyalzia: remove forced benchmarking upon new install dur ing development
@@ -546,7 +556,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if openOverlay and FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" or Settings.IsDebugMode() then
+        if openOverlay and FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" or Contextual and Settings.IsDebugMode() then
           Contextual.DrawUI()
         end
 
@@ -560,34 +570,38 @@ registerForEvent("onDraw", function()
         --additional options interface starts------------------------------------------------------------------------------------------------------------------
         if Tracker.IsModReady() then
           if ImGui.BeginTabItem(SettingsText.tab_name_settings) then
-            ImGuiExt.Text(SettingsText.group_mod)
-            ImGui.Separator()
-            
-            if openOverlay then
-              if Debug then
-                debugBool, debugToggle = ImGuiExt.Checkbox(SettingsText.chk_debug, Settings.IsDebugMode(), debugToggle)
-              end
+
+            if Debug and openOverlay then
+              ImGuiExt.Text("Debug:")
+              ImGui.Separator()
+
+              debugBool, debugToggle = ImGuiExt.Checkbox(SettingsText.chk_debug, Settings.IsDebugMode(), debugToggle)
               if debugToggle then
                 Settings.SetDebugMode(debugBool)
                 ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
 
-              if Debug and Settings.IsDebugMode() then
+              if Settings.IsDebugMode() then
                 debugViewBool, debugViewToggle = ImGuiExt.Checkbox(SettingsText.chk_debug_view, Settings.IsDebugView(), debugViewToggle)
               end
+
               if debugViewToggle then
                 Settings.SetDebugView(debugViewBool)
                 ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
+
+              ImGui.Text("")
             end
 
+            ImGuiExt.Text(SettingsText.group_mod)
+            ImGui.Separator()
 
-              keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
-              if keepWindowToggle then
-                Settings.SetKeepWindow(keepWindowBool)
-                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-              end
-              ImGuiExt.SetTooltip(SettingsText.tooltip_window)
+            keepWindowBool, keepWindowToggle = ImGuiExt.Checkbox(SettingsText.chk_window, Settings.IsKeepWindow(), keepWindowToggle)
+            if keepWindowToggle then
+              Settings.SetKeepWindow(keepWindowBool)
+              ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+            end
+            ImGuiExt.SetTooltip(SettingsText.tooltip_window)
             
             if openOverlay then
               helpBool, helpToggle = ImGuiExt.Checkbox(SettingsText.chk_help, Settings.IsHelp(), helpToggle)
@@ -627,32 +641,59 @@ registerForEvent("onDraw", function()
               end
             end
 
+            if not Tracker.IsGamePreGame() and not Tracker.IsGameLoaded() then
               ImGui.Text("")
-              ImGuiExt.Text(SettingsText.group_fg)
-              ImGui.Separator()
-            
-              if openOverlay then
-                if Tracker.IsGameReady() then -- back to Tracker.IsGameReady() since game state is triggered and changed to loaded after the mod's reload once player moves a bit
-                  fgBool, fgToggle = ImGuiExt.Checkbox(SettingsText.chk_fg, Settings.IsModFrameGeneration(), fgToggle)
-                  if fgToggle then
-                    Settings.SetModFrameGeneration(fgBool)
-                    ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-                  end
-                  ImGuiExt.SetTooltip(SettingsText.tooltip_fg)
 
-                  ImGuiExt.Text(SettingsText.info_game_settings_fg, true)
+              if ImGui.Button(SettingsText.btn_reload_mod, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                local result = Tracker.SetGameLoaded(true)
+
+                if result then
+                  ImGuiExt.SetStatusBar(SettingsText.status_mod_reloaded)
                 else
-                  ImGuiExt.Text(SettingsText.info_game_not_ready_warning, true)
-                end
-              else
-                ImGuiExt.Text(SettingsText.info_frame_gen_status)
-                ImGui.SameLine()
-                if Tracker.IsModFrameGeneration() then
-                  ImGuiExt.Text(GeneralText.info_enabled)
-                else
-                  ImGuiExt.Text(GeneralText.info_disabled)
+                  ImGuiExt.SetStatusBar(SettingsText.status_game_loaded_fail)
                 end
               end
+              ImGuiExt.SetTooltip(SettingsText.tooltip_reload_mod)
+            end
+
+            ImGui.Text("")
+            ImGuiExt.Text(SettingsText.group_fg)
+            ImGui.Separator()
+          
+            -- this toggle is a debug exclusive since it's a double of the game's settings switch and 
+            if Settings.IsDebugMode() and openOverlay then
+              fgBool, fgToggle = ImGuiExt.Checkbox(SettingsText.chk_fg, Settings.IsModFrameGeneration(), fgToggle)
+              if fgToggle then
+                Settings.SetModFrameGeneration(fgBool)
+                ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
+              end
+              ImGuiExt.SetTooltip(SettingsText.tooltip_fg)
+
+              if Tracker.IsGameReady() then
+                ImGuiExt.Text(SettingsText.info_game_settings_fg, true)
+              else
+                ImGuiExt.Text(SettingsText.info_game_not_ready_warning, true)
+              end
+
+              ImGui.Text("")
+            end
+            
+            ImGuiExt.Text(SettingsText.info_frame_gen_status)
+            ImGui.SameLine()
+            
+            if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+              if Tracker. IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
+                ImGuiExt.Text(GeneralText.info_enabled)
+              else
+                ImGuiExt.Text(GeneralText.info_disabled)
+              end
+            else
+              if Tracker. IsGameFrameGeneration() then
+                ImGuiExt.Text(GeneralText.info_enabled)
+              else
+                ImGuiExt.Text(GeneralText.info_disabled)
+              end
+            end
 
             ImGui.Text("")
             ImGuiExt.Text(BenchmarkText.group_benchmark)

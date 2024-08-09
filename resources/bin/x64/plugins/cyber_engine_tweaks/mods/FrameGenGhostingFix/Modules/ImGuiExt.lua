@@ -16,6 +16,8 @@ local Tracker = require("Modules/Tracker")
 
 local GeneralText = Localization.GetGeneralText()
 
+local openOverlay
+
 local isNotification = false
 local notificationText = ""
 local notificationTextWidth = 0
@@ -259,7 +261,7 @@ end
 function ImGuiExt.DrawNotification()
   if isNotification then
     notificationTextWidth = ImGui.CalcTextSize(notificationText)
-    ImGui.SetNextWindowPos(screenWidth / 2 - notificationTextWidth / 2 - 20, screenHeight / 2)
+    ImGui.SetNextWindowPos(screenWidth / 2 - notificationTextWidth / 2 - 2 * ImGui.GetStyle().ItemSpacing.x, screenHeight / 2)
     ImGui.Begin("Notification", true, ImGuiWindowFlags.AlwaysAutoResize + ImGuiWindowFlags.NoTitleBar)
     ImGuiExt.Text(notificationText)
     ImGui.End()
@@ -270,7 +272,7 @@ function ImGuiExt.DrawNotification()
 end
 
 ------------------
--- Status bar logic
+-- Status Bar logic
 ------------------
 
 -- Table to store current text of the mod's status bar.
@@ -287,7 +289,14 @@ local Status = {
 --
 -- @return None
 function ImGuiExt.ResetStatusBar(barName)
-  local status = GeneralText.status_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
+  local status
+  if FrameGenGhostingFix.__VERSION_STRING then
+    status = GeneralText.status_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
+  else
+    status = "The mod has encountered an error: check logs."
+    Globals.PrintError("The mod has encountered an error. Turn off the game and check logs.")
+    Tracker.SetModReady(false)
+  end
 
   if not barName then
     ImGuiExt.SetStatusBar(status)
@@ -390,12 +399,16 @@ end
 ------------------
 
 function ImGuiExt.OnOverlayOpen()
+  openOverlay = true
+
   ApplyScreenResolution()
   ApplyScaleFactor()
   ImGuiExt.ResetStatusBar()
 end
 
 function ImGuiExt.OnOverlayClose()
+  openOverlay = false
+
   ImGuiExt.ResetStatusBar()
 end
 

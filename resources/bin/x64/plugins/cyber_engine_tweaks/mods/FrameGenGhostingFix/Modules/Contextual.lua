@@ -1,39 +1,42 @@
 local Contextual = {
   __NAME = "Contextual",
   __VERSION = { 5, 0, 0 },
-  Toggles = {
-    Vehicle = {
-      Static = false,
-      Driving = false,
-      StaticCombat = false,
-      DrivingCombat = false,
-    },
-    Standing = false,
-    Walking = false,
-    SlowWalking = false,
-    Sprinting = false,
-    Swimming = false,
-    Combat = false,
-    Braindance = false,
-    Cinematic = false,
-    Photomode = false,
+}
+
+local FGEnabled = false
+
+local CurrentStates = {
+  isVehicleStatic = false,
+  isVehicleDriving = false,
+  isVehicleStaticCombat = false,
+  isVehicleDrivingCombat = false,
+  isStandingCrouching = false,
+  isWalkingCrouchWalking = false,
+  isSprintingCrouchSprinting = false,
+  isSlowWalking = false,
+  isSwimming = false,
+  isCombat = false,
+  isBraindance = false,
+  isCinematic = false,
+  isPhotoMode = false,
+}
+
+local Toggles = {
+  Vehicle = {
+    Static = false,
+    Driving = false,
+    StaticCombat = false,
+    DrivingCombat = false,
   },
-  CurrentStates = {
-    isVehicleStatic = false,
-    isVehicleDriving = false,
-    isVehicleStaticCombat = false,
-    isVehicleDrivingCombat = false,
-    isStandingCrouching = false,
-    isWalkingCrouchWalking = false,
-    isSprintingCrouchSprinting = false,
-    isSlowWalking = false,
-    isSwimming = false,
-    isCombat = false,
-    isBraindance = false,
-    isCinematic = false,
-    isPhotoMode = false,
-  },
-  FGEnabled = false,
+  StandingCrouching = false,
+  Walking = false,
+  SlowWalking = false,
+  Sprinting = false,
+  Swimming = false,
+  Combat = false,
+  Braindance = false,
+  Cinematic = false,
+  Photomode = false,
 }
 
 local Globals = require("Modules/Globals")
@@ -47,9 +50,7 @@ local GeneralText = Localization.GetGeneralText()
 local SettingsText = Localization.GetSettingsText()
 
 local function GetUserSettings()
-  local userSettings = {
-    Toggles = Contextual.Toggles
-  }
+  local userSettings = Toggles
 
   return userSettings
 end
@@ -57,31 +58,31 @@ end
 local function LoadUserSettings(userSettings)
   if not userSettings or userSettings == nil then return end
 
-  Globals.MergeTables(Contextual, userSettings)
+  Globals.MergeTables(Toggles, userSettings)
 end
 
 local function SaveUserSettings()
   Settings.WriteUserSettings("Contextual", GetUserSettings())
 end
 
-local function GetFrameGenState()
-  return DLSSEnabler_GetFrameGenerationState()
-end
-
 local function TurnOnFrameGen()
+  if not Tracker.IsGameReady() then return end
+
   -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
-  if Contextual.FGEnabled == false then
+  if FGEnabled == false then
     DLSSEnabler_SetFrameGenerationState(true)
-    Contextual.FGEnabled = true
+    FGEnabled = true
     Tracker.SetModFrameGeneration(true)
   end
 end
 
 local function TurnOffFrameGen()
+  if not Tracker.IsGameReady() then return end
+
   -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
-  if Contextual.FGEnabled == true then
+  if FGEnabled == true then
     DLSSEnabler_SetFrameGenerationState(false)
-    Contextual.FGEnabled = false
+    FGEnabled = false
     Tracker.SetModFrameGeneration(false)
   end
 end
@@ -92,19 +93,19 @@ local function Capitalize(str)
 end
 
 local function StringifyStates()
-  return "VehicleStatic: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleStatic)) ..
-  "\n" .. "VehicleDriving: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleDriving)) ..
-  "\n" .. "VehicleStaticCombat: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleStaticCombat)) ..
-  "\n" .. "VehicleDrivingCombat: " .. Capitalize(tostring(Contextual.CurrentStates.isVehicleDrivingCombat)) ..
-  "\n" .. "StandingCrouching: " .. Capitalize(tostring(Contextual.CurrentStates.isStandingCrouching)) ..
-  "\n" .. "WalkingCrouchWalking: " .. Capitalize(tostring(Contextual.CurrentStates.isWalkingCrouchWalking)) ..
-  "\n" .. "SprintingCrouchSprinting: " .. Capitalize(tostring(Contextual.CurrentStates.isSprintingCrouchSprinting)) ..
-  "\n" .. "SlowWalking: " .. Capitalize(tostring(Contextual.CurrentStates.isSlowWalking)) ..
-  "\n" .. "Swimming: " .. Capitalize(tostring(Contextual.CurrentStates.isSwimming)) ..
-  "\n" .. "Combat: " .. Capitalize(tostring(Contextual.CurrentStates.isCombat)) ..
-  "\n" .. "Braindance: " .. Capitalize(tostring(Contextual.CurrentStates.isBraindance)) ..
-  "\n" .. "Cinematic: " .. Capitalize(tostring(Contextual.CurrentStates.isCinematic)) ..
-  "\n" .. "PhotoMode: " .. Capitalize(tostring(Contextual.CurrentStates.isPhotoMode))
+  return "VehicleStatic: " .. Capitalize(tostring(CurrentStates.isVehicleStatic)) ..
+  "\n" .. "VehicleDriving: " .. Capitalize(tostring(CurrentStates.isVehicleDriving)) ..
+  "\n" .. "VehicleStaticCombat: " .. Capitalize(tostring(CurrentStates.isVehicleStaticCombat)) ..
+  "\n" .. "VehicleDrivingCombat: " .. Capitalize(tostring(CurrentStates.isVehicleDrivingCombat)) ..
+  "\n" .. "StandingCrouching: " .. Capitalize(tostring(CurrentStates.isStandingCrouching)) ..
+  "\n" .. "WalkingCrouchWalking: " .. Capitalize(tostring(CurrentStates.isWalkingCrouchWalking)) ..
+  "\n" .. "SprintingCrouchSprinting: " .. Capitalize(tostring(CurrentStates.isSprintingCrouchSprinting)) ..
+  "\n" .. "SlowWalking: " .. Capitalize(tostring(CurrentStates.isSlowWalking)) ..
+  "\n" .. "Swimming: " .. Capitalize(tostring(CurrentStates.isSwimming)) ..
+  "\n" .. "Combat: " .. Capitalize(tostring(CurrentStates.isCombat)) ..
+  "\n" .. "Braindance: " .. Capitalize(tostring(CurrentStates.isBraindance)) ..
+  "\n" .. "Cinematic: " .. Capitalize(tostring(CurrentStates.isCinematic)) ..
+  "\n" .. "PhotoMode: " .. Capitalize(tostring(CurrentStates.isPhotoMode))
 end
 
 local function GetPlayerVehicle()
@@ -115,42 +116,12 @@ local function GetPlayerVehicle()
   return playerVehicle
 end
 
--- gramern: replaced with Tracker.IsVehicleSupported()
---
--- local function IsInVehicle(playerVehicle)
---   if playerVehicle:IsA('vehicleAVBaseObject') then return false end
---   if playerVehicle:IsA('vehicleTankBaseObject') then return false end
---   return playerVehicle:IsPlayerDriver()
--- end
-
--- gramern: replaced with Tracker.IsVehicleMoving() = false
---
--- local function IsPlayerVehicleStatic(playerVehicle)
---   local currentSpeed = playerVehicle:GetCurrentSpeed()
---   if currentSpeed == nil or currentSpeed > 1 then return false end
---   if currentSpeed ~= nil and currentSpeed < 1 then
---     return true
---   end
--- end
-
--- gramern: replaced with Tracker.IsVehicleMoving() = true
---
--- local function IsPlayerVehicleDriving(playerVehicle)
---   local currentSpeed = playerVehicle:GetCurrentSpeed()
---   if currentSpeed == nil or currentSpeed < 1 then return false end
---   if currentSpeed ~= nil and currentSpeed > 1 then
---     return true
---   end
--- end
-
--- gramern: this doesn't work with weaponized vehicles as I tested, so to get general Vehicle Combat would be: 
--- Tracker.IsPlayerWeapon() and Tracker.IsVehicleMounted() (for hand weapons drawn while in vehicle) or Tracker.IsVehicleWeapon (for vehicle weapons drawn)
---
--- local function IsPlayerInVehicleCombat(playerVehicle)
---   local player = Game.GetPlayer()
---   if IsInVehicle(playerVehicle) and player:GetActiveWeapon() ~= nil then return true end
---   return false
--- end
+local function OnPlayerDriverEvent()
+  CurrentStates.isStandingCrouching = false
+  CurrentStates.isWalkingCrouchWalking = false
+  CurrentStates.isSprintingCrouchSprinting = false
+  CurrentStates.isSlowWalking = false
+end
 
 local function IsPlayerInVehicleCombat()
   if Tracker.IsVehicleMounted() and Tracker.IsPlayerWeapon() or Tracker.IsVehicleWeapon() then return true end
@@ -206,10 +177,10 @@ function LocomotionState()
   return blackboardPSM:GetInt(blackboardDefs.PlayerStateMachine.LocomotionDetailed)
 end
 
--- gramern: Changed the first check to Tracker.IsPlayerMoving() = false since GetPlayer():IsMoving() seems to be more robust than locomotion state = 1
-local function IsPlayerStanding()
-  return not Tracker.IsPlayerMoving()
-end
+--- gramern: this turns out redundant since Tracker.IsPlaerMoving() is goin on anyway and locomotion state = 1 isn't the one to trust
+-- local function IsPlayerStandingCrouching()
+--   return not Tracker.IsPlayerMoving()
+-- end
 
 -- gramern: Changed logic for "Walking" sice the game seems to report some locomotion states wrongly and despite Tracker.IsPlayerMoving() = true, "Walking" state didn't trigger
 -- gramern: Added "Crouch Walking" to "Walking"
@@ -219,7 +190,7 @@ end
 
 -- gramern: Separated "Slow Walking" from "Crouch Walking", since there is no exclusive state for "Crouch Slow Walking":
 -- new states:
--- Standing/Crouching
+-- StandingCrouching
 -- Walking/Crouch Walking
 -- Sprinting/Crouch Spriting
 -- SlowWalking
@@ -277,20 +248,20 @@ end
 local function ShouldAffectFGState(feature)
   local stateMap = {
     Vehicle = {
-      Static = Contextual.CurrentStates.isVehicleStatic,
-      Driving = Contextual.CurrentStates.isVehicleDriving,
-      StaticCombat = Contextual.CurrentStates.isVehicleStaticCombat,
-      DrivingCombat = Contextual.CurrentStates.isVehicleDrivingCombat,
+      Static = CurrentStates.isVehicleStatic,
+      Driving = CurrentStates.isVehicleDriving,
+      StaticCombat = CurrentStates.isVehicleStaticCombat,
+      DrivingCombat = CurrentStates.isVehicleDrivingCombat,
     },
-    Standing = Contextual.CurrentStates.isStandingCrouching,
-    Walking = Contextual.CurrentStates.isWalkingCrouchWalking,
-    SlowWalking = Contextual.CurrentStates.isSlowWalking,
-    Sprinting = Contextual.CurrentStates.isSprintingCrouchSprinting,
-    Swimming = Contextual.CurrentStates.isSwimming,
-    Combat = Contextual.CurrentStates.isCombat,
-    Braindance = Contextual.CurrentStates.isBraindance,
-    Cinematic = Contextual.CurrentStates.isCinematic,
-    Photomode = Contextual.CurrentStates.isPhotoMode,
+    StandingCrouching = CurrentStates.isStandingCrouching,
+    Walking = CurrentStates.isWalkingCrouchWalking,
+    SlowWalking = CurrentStates.isSlowWalking,
+    Sprinting = CurrentStates.isSprintingCrouchSprinting,
+    Swimming = CurrentStates.isSwimming,
+    Combat = CurrentStates.isCombat,
+    Braindance = CurrentStates.isBraindance,
+    Cinematic = CurrentStates.isCinematic,
+    Photomode = CurrentStates.isPhotoMode,
   }
 
   if string.find(feature, "%.") then
@@ -306,13 +277,13 @@ local function ShouldAffectFGState(feature)
   for toggle, value in pairs(stateMap) do
     if toggle == "Vehicle" then
       for vehicleToggle, vehicleValue in pairs(stateMap.Vehicle) do
-        if Contextual.Toggles.Vehicle[vehicleToggle] and vehicleValue then
+        if Toggles.Vehicle[vehicleToggle] and vehicleValue then
           Globals.PrintDebug(Contextual.__NAME, "Vehicle State '" .. vehicleToggle .. "' is present and currently toggled. FG state will not change.")
           return false
         end
       end
     else
-      if Contextual.Toggles[toggle] and value then
+      if Toggles[toggle] and value then
         Globals.PrintDebug(Contextual.__NAME, "State '" .. toggle .. "' is present and currently toggled. FG state will not change.")
         return false
       end
@@ -323,7 +294,7 @@ local function ShouldAffectFGState(feature)
 end
 
 local function SetVehicleStatic(feature)
-  if Contextual.CurrentStates.isVehicleStatic or not Tracker.IsVehicleMoving() then
+  if CurrentStates.isVehicleStatic or not Tracker.IsVehicleMoving() then
     if not ShouldAffectFGState("Vehicle.Static") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -334,7 +305,7 @@ local function SetVehicleStatic(feature)
 end
 
 local function SetVehicleDriving(feature)
-  if Contextual.CurrentStates.isVehicleDriving or Tracker.IsVehicleMoving() then
+  if CurrentStates.isVehicleDriving or Tracker.IsVehicleMoving() then
     if not ShouldAffectFGState("Vehicle.Driving") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -345,7 +316,7 @@ local function SetVehicleDriving(feature)
 end
 
 local function SetVehicleStaticCombat(feature)
-  if Contextual.CurrentStates.isVehicleStaticCombat or IsPlayerInVehicleCombat() and not Tracker.IsVehicleMoving() then
+  if CurrentStates.isVehicleStaticCombat or IsPlayerInVehicleCombat() and not Tracker.IsVehicleMoving() then
     if not ShouldAffectFGState("Vehicle.StaticCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -356,7 +327,7 @@ local function SetVehicleStaticCombat(feature)
 end
 
 local function SetVehicleDrivingCombat(feature)
-  if Contextual.CurrentStates.isDrivingCombat or IsPlayerInVehicleCombat() and Tracker.IsVehicleMoving() then
+  if CurrentStates.isDrivingCombat or IsPlayerInVehicleCombat() and Tracker.IsVehicleMoving() then
     if not ShouldAffectFGState("Vehicle.DrivingCombat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -366,13 +337,13 @@ local function SetVehicleDrivingCombat(feature)
   end
 end
 
-local function SetStanding(feature)
-  -- V is in Standing state even when Player is in Vehicle because LocomotionEventsTransition events still trigger
+local function SetStandingCrouching(feature)
+  -- V is in StandingCrouching state even when Player is in Vehicle because LocomotionEventsTransition events still trigger
   local playerVehicle = GetPlayerVehicle()
   if playerVehicle ~= nil then return end
 
-  if Contextual.CurrentStates.isStandingCrouching or IsPlayerStanding() then
-    if not ShouldAffectFGState("Standing") then return end
+  if CurrentStates.isStandingCrouching then
+    if not ShouldAffectFGState("StandingCrouching") then return end
     if feature == true then
       TurnOffFrameGen()
     else
@@ -382,7 +353,7 @@ local function SetStanding(feature)
 end
 
 local function SetWalking(feature)
-  if Contextual.CurrentStates.isWalkingCrouchWalking or IsPlayerWalking() then
+  if CurrentStates.isWalkingCrouchWalking or IsPlayerWalking() then
     if not ShouldAffectFGState("Walking") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -393,7 +364,7 @@ local function SetWalking(feature)
 end
 
 local function SetSlowWalking(feature)
-  if Contextual.CurrentStates.isSlowWalking or IsPlayerSlowWalking() then
+  if CurrentStates.isSlowWalking or IsPlayerSlowWalking() then
     if not ShouldAffectFGState("SlowWalking") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -404,7 +375,7 @@ local function SetSlowWalking(feature)
 end
 
 local function SetSprinting(feature)
-  if Contextual.CurrentStates.isSprintingCrouchSprinting or IsPlayerSprinting() then
+  if CurrentStates.isSprintingCrouchSprinting or IsPlayerSprinting() then
     if not ShouldAffectFGState("Sprinting") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -415,7 +386,7 @@ local function SetSprinting(feature)
 end
 
 local function SetSwimming(feature)
-  if Contextual.CurrentStates.isSwimming or IsPlayerSwimming() then
+  if CurrentStates.isSwimming or IsPlayerSwimming() then
     if not ShouldAffectFGState("Swimming") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -426,7 +397,7 @@ local function SetSwimming(feature)
 end
 
 local function SetCombat(feature)
-  if Contextual.CurrentStates.isCombat or IsInCombat() then
+  if CurrentStates.isCombat or IsInCombat() then
     if not ShouldAffectFGState("Combat") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -437,7 +408,7 @@ local function SetCombat(feature)
 end
 
 local function SetBraindance(feature)
-  if Contextual.CurrentStates.isBraindance or IsPlayerInBraindance() then
+  if CurrentStates.isBraindance or IsPlayerInBraindance() then
     if not ShouldAffectFGState("Braindance") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -448,7 +419,7 @@ local function SetBraindance(feature)
 end
 
 local function SetCinematic(feature)
-  if Contextual.CurrentStates.isCinematic or IsInCinematic() then
+  if CurrentStates.isCinematic or IsInCinematic() then
     if not ShouldAffectFGState("Cinematic") then return end
     if feature == true then
       TurnOffFrameGen()
@@ -460,7 +431,7 @@ end
 
 
 local function SetPhotoMode(feature)
-  if Contextual.CurrentStates.isPhotoMode or IsInPhotoMode()  then
+  if CurrentStates.isPhotoMode or IsInPhotoMode()  then
     -- Photo mode is exclusive, so no need to check for other states
     -- if not ShouldAffectFGState("PhotoMode") then return end
     if feature == true then
@@ -473,19 +444,19 @@ end
 
 function HandleStaticAndDrivingStates()
   if Tracker.IsVehicleMoving() then
-    Contextual.CurrentStates.isVehicleStatic = false
-    Contextual.CurrentStates.isVehicleDriving = true
-    Contextual.CurrentStates.isVehicleStaticCombat = false
-    Contextual.CurrentStates.isVehicleDrivingCombat = false
+    CurrentStates.isVehicleStatic = false
+    CurrentStates.isVehicleDriving = true
+    CurrentStates.isVehicleStaticCombat = false
+    CurrentStates.isVehicleDrivingCombat = false
   else
-    Contextual.CurrentStates.isVehicleStatic = true
-    Contextual.CurrentStates.isVehicleDriving = false
+    CurrentStates.isVehicleStatic = true
+    CurrentStates.isVehicleDriving = false
   end
 
   -- Drive events are also present during photo mode
   -- We need special handling here to turn on FG if those toggles are not checked
-  if Contextual.CurrentStates.isPhotoMode then
-    if Contextual.Toggles.Photomode then
+  if CurrentStates.isPhotoMode then
+    if Toggles.Photomode then
       return
     else
       TurnOnFrameGen()
@@ -493,21 +464,21 @@ function HandleStaticAndDrivingStates()
     end
   end
 
-  if Contextual.Toggles.Vehicle.Static == true then
-    if Contextual.CurrentStates.isVehicleStatic then
+  if Toggles.Vehicle.Static == true then
+    if CurrentStates.isVehicleStatic then
       TurnOffFrameGen()
     else
-      if not Contextual.Toggles.Vehicle.Driving and Contextual.CurrentStates.isVehicleDriving then
+      if not Toggles.Vehicle.Driving and CurrentStates.isVehicleDriving then
         TurnOnFrameGen()
       end
     end
   end
 
-  if Contextual.Toggles.Vehicle.Driving == true then
-    if Contextual.CurrentStates.isVehicleDriving then
+  if Toggles.Vehicle.Driving == true then
+    if CurrentStates.isVehicleDriving then
       TurnOffFrameGen()
     else
-      if not Contextual.Toggles.Vehicle.Static and Contextual.CurrentStates.isVehicleStatic then
+      if not Toggles.Vehicle.Static and CurrentStates.isVehicleStatic then
         TurnOnFrameGen()
       end
     end
@@ -518,21 +489,17 @@ function Contextual.OnInitialize()
 
   LoadUserSettings(Settings.GetUserSettings("Contextual"))
 
-  -- Turn on debug mode during development
-  Settings.SetDebugMode(true)
+  -- deleting this, since Contextual doesn't need current FG state, Contextual sets it when possible
+  -- if Tracker.IsGameReady() then
+  --   -- Get the current FG state when the mod is initalized during start of the game
+  --   FGEnabled = Settings.IsModFrameGeneration()
+  -- end
 
-  if Tracker.IsGamePreGame() or Tracker.IsGamePaused() then
-    -- Get the current FG state when the mod is initalized during start of the game
-    Contextual.FGEnabled = Settings.IsModFrameGeneration()
-  else
-    -- Get the current FG state wheneverthe mod is reloaded from CET 
-    Contextual.FGEnabled = GetFrameGenState() or Settings.IsModFrameGeneration()
-  end
-
-  Observe('PlayerPuppet', 'OnGameAttached', function()
-    TurnOnFrameGen()
-    Globals.PrintDebug(Contextual.__NAME, "Game started. FG Enabled (PlayerPuppet->OnGameAttached)")
-  end)
+  -- this is redundant since the FG state can't be requested onInit; changed to 
+  -- Observe('PlayerPuppet', 'OnGameAttached', function()
+  --   TurnOnFrameGen()
+  --   Globals.PrintDebug(Contextual.__NAME, "Game started. FG Enabled (PlayerPuppet->OnGameAttached)")
+  -- end)
 
   -- This will prove useful in future to set contexts based on camera perspective
   -- Observe('VehicleTransition', 'RequestToggleVehicleCamera', function() end)
@@ -545,21 +512,21 @@ function Contextual.OnInitialize()
   Observe('DriveEvents', 'OnUpdate', function()
     -- When DriveEvents->OnUpdate is triggered, it means vehicle is no longer in combat mode (so it's equivalent to DriverCombatEvents->OnExit state)
     -- We need to make sure vehicle combat states are reverted
-    if Contextual.CurrentStates.isVehicleStaticCombat == true then
-      if Contextual.Toggles.Vehicle.StaticCombat then
+    if CurrentStates.isVehicleStaticCombat == true then
+      if Toggles.Vehicle.StaticCombat then
         TurnOnFrameGen()
       end
-      Contextual.CurrentStates.isVehicleStaticCombat = false
+      CurrentStates.isVehicleStaticCombat = false
     end
-    if Contextual.CurrentStates.isVehicleDrivingCombat == true then
-      if Contextual.Toggles.Vehicle.DrivingCombat then
+    if CurrentStates.isVehicleDrivingCombat == true then
+      if Toggles.Vehicle.DrivingCombat then
         TurnOnFrameGen()
       end
-      Contextual.CurrentStates.isVehicleDrivingCombat = false
+      CurrentStates.isVehicleDrivingCombat = false
     end
 
     -- Turn on framegen if it was disabled outside vehicle
-    if Contextual.Toggles.Standing == true then
+    if Toggles.StandingCrouching == true then
       TurnOnFrameGen()
     end
     
@@ -575,44 +542,44 @@ function Contextual.OnInitialize()
     HandleStaticAndDrivingStates()
 
     -- Vehicle static combat and driving combat states are mutually exclusive, so they can't be true at once
-    if Contextual.CurrentStates.isVehicleStatic then
-      Contextual.CurrentStates.isVehicleStaticCombat = true
-      Contextual.CurrentStates.isVehicleDrivingCombat = false
+    if CurrentStates.isVehicleStatic then
+      CurrentStates.isVehicleStaticCombat = true
+      CurrentStates.isVehicleDrivingCombat = false
     end
 
-    if Contextual.CurrentStates.isVehicleDriving then
-      Contextual.CurrentStates.isVehicleDrivingCombat = true
-      Contextual.CurrentStates.isVehicleStaticCombat = false
+    if CurrentStates.isVehicleDriving then
+      CurrentStates.isVehicleDrivingCombat = true
+      CurrentStates.isVehicleStaticCombat = false
     end
 
-    if Contextual.Toggles.Vehicle.StaticCombat == true then
-      if Contextual.CurrentStates.isVehicleStaticCombat then
+    if Toggles.Vehicle.StaticCombat == true then
+      if CurrentStates.isVehicleStaticCombat then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) detected. FG Disabled (DriverCombatEvents->OnUpdate)")
       else
         -- Make sure the vehice static combat state is not overlapped with vehicle driving combat state
-        if not Contextual.CurrentStates.isVehicleDrivingCombat then
+        if not CurrentStates.isVehicleDrivingCombat then
           TurnOnFrameGen()
           Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
         end
-        if not Contextual.Toggles.Vehicle.DrivingCombat and Contextual.CurrentStates.isVehicleDrivingCombat then
+        if not Toggles.Vehicle.DrivingCombat and CurrentStates.isVehicleDrivingCombat then
           TurnOnFrameGen()
           Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (static) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
         end
       end
     end
 
-    if Contextual.Toggles.Vehicle.DrivingCombat == true then
-      if Contextual.CurrentStates.isVehicleDrivingCombat then
+    if Toggles.Vehicle.DrivingCombat == true then
+      if CurrentStates.isVehicleDrivingCombat then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) detected. FG Disabled (DriverCombatEvents->OnUpdate)")
       else
         -- Make sure the vehice driving combat state is not overlapped with vehicle static combat state
-        if not Contextual.CurrentStates.isVehicleStaticCombat then
+        if not CurrentStates.isVehicleStaticCombat then
           TurnOnFrameGen()
           Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
         end
-        if not Contextual.Toggles.Vehicle.StaticCombat and Contextual.CurrentStates.isVehicleStaticCombat then
+        if not Toggles.Vehicle.StaticCombat and CurrentStates.isVehicleStaticCombat then
           TurnOnFrameGen()
           Globals.PrintDebug(Contextual.__NAME, "Vehicle combat (driving) no longer detected. FG Enabled (DriverCombatEvents->OnUpdate)")
         end
@@ -624,14 +591,11 @@ function Contextual.OnInitialize()
   -- Vehicle Mounting/Unmounting
   ----------
 
-  Observe('hudCarController', 'OnMountingEvent', function()
-    Contextual.CurrentStates.isStandingCrouching = false
-  end)
   Observe('hudCarController', 'OnUnmountingEvent', function()
-    Contextual.CurrentStates.isVehicleStatic = false
-    Contextual.CurrentStates.isVehicleDriving = false
-    Contextual.CurrentStates.isVehicleStaticCombat = false
-    Contextual.CurrentStates.isVehicleDrivingCombat = false
+    CurrentStates.isVehicleStatic = false
+    CurrentStates.isVehicleDriving = false
+    CurrentStates.isVehicleStaticCombat = false
+    CurrentStates.isVehicleDrivingCombat = false
   end)
 
   ----------
@@ -640,15 +604,15 @@ function Contextual.OnInitialize()
   -- These events occur when Alert status (on top right below the map) is set to Combat
   -- This is different from vehicle combat mode (which is only about whether player is using weapons inside the vehicle regardless of the alert status)
   Observe('CombatEvents', 'OnEnter', function()
-    Contextual.CurrentStates.isCombat = true
-    if Contextual.Toggles.Combat == true then
+    CurrentStates.isCombat = true
+    if Toggles.Combat == true then
       TurnOffFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. FG Disabled (CombatEvents->OnEnter)")
     end
   end)
   Observe('CombatEvents', 'OnExit', function()
-    Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true then
+    CurrentStates.isCombat = false
+    if Toggles.Combat == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatEvents->OnExit)")
     end
@@ -657,35 +621,35 @@ function Contextual.OnInitialize()
   -- in case the above events don't trigger (need more testing to rule out redundant events)
   -- These have reverse operations
   Observe('CombatExitingEvents', 'OnEnter', function()
-    Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true then
+    CurrentStates.isCombat = false
+    if Toggles.Combat == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnEnter)")
     end
   end)
   Observe('CombatExitingEvents', 'OnExit', function()
-    Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true then
+    CurrentStates.isCombat = false
+    if Toggles.Combat == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnExit)")
     end
   end)
   Observe('CombatExitingEvents', 'OnForcedExit', function()
-    Contextual.CurrentStates.isCombat = false
-    if Contextual.Toggles.Combat == true then
+    CurrentStates.isCombat = false
+    if Toggles.Combat == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (CombatExitingEvents->OnForcedExit)")
     end
   end)
 
   Observe("PlayerPuppet", "OnCombatStateChanged", function ()
-		Contextual.CurrentStates.isCombat = IsInCombat()
-    if Contextual.Toggles.Combat == true then
-      if Contextual.CurrentStates.isCombat then
+		CurrentStates.isCombat = IsInCombat()
+    if Toggles.Combat == true then
+      if CurrentStates.isCombat then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Combat mode detected. FG Disabled (PlayerPuppet->OnCombatStateChanged)")
       end
-      if not Contextual.CurrentStates.isCombat then
+      if not CurrentStates.isCombat then
         TurnOnFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Combat mode is no longer present. FG Enabled (PlayerPuppet->OnCombatStateChanged)")
       end
@@ -693,14 +657,17 @@ function Contextual.OnInitialize()
 	end)
 
   -------------------------------------------------
-  -- Standing, Walking, Slow Walking and Sprinting
+  -- StandingCrouching, Walking, Slow Walking and Sprinting
   -------------------------------------------------
   ---
   Observe('LocomotionEventsTransition', 'OnUpdate', function()
+    -- LocomotionEventsTransition OnUpdate fires up also when in a vehicle
+    if Tracker.IsPlayerDriver() then OnPlayerDriverEvent() return end
+
     -- LocomotionEventsTransition events are also present during photo mode
     -- We need special handling to turn on FG when photo mode toggle is not checked
-    if Contextual.CurrentStates.isPhotoMode then
-      if Contextual.Toggles.Photomode then
+    if CurrentStates.isPhotoMode then
+      if Toggles.Photomode then
         return
       else
         TurnOnFrameGen()
@@ -709,7 +676,7 @@ function Contextual.OnInitialize()
     end
 
     local locomotionState = LocomotionState()
-  
+    
     -- Slide = 5
     -- SlideFall = 6
     -- Dodge = 7
@@ -731,143 +698,101 @@ function Contextual.OnInitialize()
     
     -- gramern: locomotionState == 1 isn't working too well apparently
     if not Tracker.IsPlayerMoving() then
-      Contextual.CurrentStates.isStandingCrouching = true
-      Contextual.CurrentStates.isWalkingCrouchWalking = false
-      Contextual.CurrentStates.isSprintingCrouchSprinting = false
-      Contextual.CurrentStates.isSlowWalking = false
+      CurrentStates.isStandingCrouching = true
+      CurrentStates.isWalkingCrouchWalking = false
+      CurrentStates.isSprintingCrouchSprinting = false
+      CurrentStates.isSlowWalking = false
     else
-      Contextual.CurrentStates.isStandingCrouching = false
+      CurrentStates.isStandingCrouching = false
 
       if locomotionState == 3 then
         if Game.GetPlayer().inCrouch then
-          Contextual.CurrentStates.isWalkingCrouchWalking = true
-          Contextual.CurrentStates.isSprintingCrouchSprinting = false
-          Contextual.CurrentStates.isSlowWalking = false
+          CurrentStates.isWalkingCrouchWalking = true
+          CurrentStates.isSprintingCrouchSprinting = false
+          CurrentStates.isSlowWalking = false
         else
-          Contextual.CurrentStates.isWalkingCrouchWalking = false
-          Contextual.CurrentStates.isSprintingCrouchSprinting = false
-          Contextual.CurrentStates.isSlowWalking = true
+          CurrentStates.isWalkingCrouchWalking = false
+          CurrentStates.isSprintingCrouchSprinting = false
+          CurrentStates.isSlowWalking = true
         end
       elseif locomotionState == 4 or locomotionState == 30 then
-        Contextual.CurrentStates.isWalkingCrouchWalking = false
-        Contextual.CurrentStates.isSprintingCrouchSprinting = true
-        Contextual.CurrentStates.isSlowWalking = false
+        CurrentStates.isWalkingCrouchWalking = false
+        CurrentStates.isSprintingCrouchSprinting = true
+        CurrentStates.isSlowWalking = false
       else
-        Contextual.CurrentStates.isWalkingCrouchWalking = true
-        Contextual.CurrentStates.isSprintingCrouchSprinting = false
-        Contextual.CurrentStates.isSlowWalking = false
+        CurrentStates.isWalkingCrouchWalking = true
+        CurrentStates.isSprintingCrouchSprinting = false
+        CurrentStates.isSlowWalking = false
       end
     end
 
-    -- local locomotionState = LocomotionState()
-    -- if locomotionState == 1 then
-    --   Contextual.CurrentStates.isStandingCrouching = true
-    --   Contextual.CurrentStates.isWalkingCrouchWalking = false
-    --   Contextual.CurrentStates.isSlowWalking = false
-    --   Contextual.CurrentStates.isSprintingCrouchSprinting = false
-    -- elseif locomotionState == 3 then
-    --   if Tracker.IsPlayerMoving() then
-    --     -- Player is crouching and moving slowly
-    --     Contextual.CurrentStates.isSlowWalking = true
-    --     Contextual.CurrentStates.isStandingCrouching = false
-    --   else
-    --     -- Player is crouching (but not moving) so we track it as standing as well
-    --     Contextual.CurrentStates.isStandingCrouching = true
-    --     Contextual.CurrentStates.isSlowWalking = false
-    --   end
-    --   Contextual.CurrentStates.isWalkingCrouchWalking = false
-    --   Contextual.CurrentStates.isSprintingCrouchSprinting = false
-    -- elseif locomotionState == 4 or locomotionState == 30 then
-    --   Contextual.CurrentStates.isSprintingCrouchSprinting = true
-    --   Contextual.CurrentStates.isStandingCrouching = false
-    --   Contextual.CurrentStates.isWalkingCrouchWalking = false
-    --   Contextual.CurrentStates.isSlowWalking = false
-    -- else
-    --   Contextual.CurrentStates.isStandingCrouching = false
-    --   Contextual.CurrentStates.isWalkingCrouchWalking = false
-    --   Contextual.CurrentStates.isSlowWalking = false
-    --   Contextual.CurrentStates.isSprintingCrouchSprinting = false
-    -- end
-
-    -- -- There is no specific walking locomotion state
-    -- if Tracker.IsPlayerMoving() then
-    --   if locomotionState ~= 4 and locomotionState ~= 30 then
-    --     if Contextual.CurrentStates.isSprintingCrouchSprinting then
-    --       Contextual.CurrentStates.isWalkingCrouchWalking = true
-    --     else
-    --       Contextual.CurrentStates.isWalkingCrouchWalking = false
-    --     end
-    --   end
-    -- end
-
     -- Only process standing logic when V is out of vehicle
-    if Contextual.Toggles.Standing == true then
-      if Contextual.CurrentStates.isStandingCrouching then
+    if Toggles.StandingCrouching == true then
+      if CurrentStates.isStandingCrouching then
         TurnOffFrameGen()
       else
-        -- if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
-        if not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalkingCrouchWalking)
-        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalking)
-        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+        -- if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        if not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
+        and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
+        and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
           TurnOnFrameGen()
         end
       end
     end
     
-    if Contextual.Toggles.Walking == true then
-      if Contextual.CurrentStates.isWalkingCrouchWalking then
+    if Toggles.Walking == true then
+      if CurrentStates.isWalkingCrouchWalking then
         TurnOffFrameGen()
       else
-        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
-        -- and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalkingCrouchWalking)
-        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalking)
-        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        -- and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
+        and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
+        and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
           TurnOnFrameGen()
         end
       end
     end
 
-    if Contextual.Toggles.SlowWalking then
-      if Contextual.CurrentStates.isSlowWalking == true then
+    if Toggles.SlowWalking then
+      if CurrentStates.isSlowWalking == true then
         TurnOffFrameGen()
       else
-        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
-        and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalkingCrouchWalking)
-        -- and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalking)
-        and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
+        -- and not (Toggles.SlowWalking and CurrentStates.isSlowWalking)
+        and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
           TurnOnFrameGen()
         end
       end
     end
 
-    if Contextual.Toggles.Sprinting then
-      if Contextual.CurrentStates.isSprintingCrouchSprinting == true then
+    if Toggles.Sprinting then
+      if CurrentStates.isSprintingCrouchSprinting == true then
         TurnOffFrameGen()
       else
-        if not (Contextual.Toggles.Standing and Contextual.CurrentStates.isStandingCrouching)
-        and not (Contextual.Toggles.Walking and Contextual.CurrentStates.isWalkingCrouchWalking)
-        and not (Contextual.Toggles.SlowWalking and Contextual.CurrentStates.isSlowWalking) then
-        -- and not (Contextual.Toggles.Sprinting and Contextual.CurrentStates.isSprintingCrouchSprinting) then
+        if not (Toggles.StandingCrouching and CurrentStates.isStandingCrouching)
+        and not (Toggles.Walking and CurrentStates.isWalkingCrouchWalking)
+        and not (Toggles.SlowWalking and CurrentStates.isSlowWalking) then
+        -- and not (Toggles.Sprinting and CurrentStates.isSprintingCrouchSprinting) then
           TurnOnFrameGen()
         end
       end
     end
-
   end)
 
   ------------
   -- Swimming
   ------------
   Observe('SwimmingEvents', 'OnEnter', function()
-    Contextual.CurrentStates.isSwimming = true
-    if Contextual.Toggles.Swimming == true then
+    CurrentStates.isSwimming = true
+    if Toggles.Swimming == true then
       TurnOffFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Player is swimming. FG Disabled (SwimmingEvents->OnEnter)")
     end
   end)
   Observe('SwimmingEvents', 'OnExit', function()
-    Contextual.CurrentStates.isSwimming = false
-    if Contextual.Toggles.Swimming == true then
+    CurrentStates.isSwimming = false
+    if Toggles.Swimming == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Player is no longer swimming. FG Enabled (SwimmingEvents->OnExit)")
     end
@@ -882,10 +807,10 @@ function Contextual.OnInitialize()
       isActive = _
     end
 
-    Contextual.CurrentStates.isBraindance = isActive
+    CurrentStates.isBraindance = isActive
 
-    if Contextual.Toggles.Braindance == true then
-      if Contextual.CurrentStates.isBraindance then
+    if Toggles.Braindance == true then
+      if CurrentStates.isBraindance then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Player is braindance. FG Disabled (BraindanceGameController->OnIsActiveUpdated)")
       else
@@ -901,18 +826,18 @@ function Contextual.OnInitialize()
   Observe("PlayerPuppet", "OnSceneTierChange", function (_, sceneTier)
     Globals.PrintDebug(Contextual.__NAME, "Scene Tier change detected: " .. tostring(sceneTier))
 
-    Contextual.CurrentStates.isCinematic = false
+    CurrentStates.isCinematic = false
 
     if sceneTier == 5 or IsInCinematic() then
-		  Contextual.CurrentStates.isCinematic = true
+		  CurrentStates.isCinematic = true
     end
 
-    if Contextual.Toggles.isCinematic == true then
-      if Contextual.CurrentStates.isCinematic then
+    if Toggles.isCinematic == true then
+      if CurrentStates.isCinematic then
         TurnOffFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Cinematic detected. FG Disabled (PlayerPuppet->OnSceneTierChange)")
       end
-      if not Contextual.CurrentStates.isCinematic then
+      if not CurrentStates.isCinematic then
         TurnOnFrameGen()
         Globals.PrintDebug(Contextual.__NAME, "Cinematic no longer present. FG Enabled (PlayerPuppet->OnSceneTierChange)")
       end
@@ -923,18 +848,18 @@ function Contextual.OnInitialize()
   -- Photo Mode
   ---------------
   Observe('gameuiPhotoModeMenuController', 'OnShow', function()
-    Contextual.CurrentStates.isPhotoMode = true
+    CurrentStates.isPhotoMode = true
 
-    if Contextual.Toggles.Photomode == true then
+    if Toggles.Photomode == true then
       TurnOffFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Photo mode detected" .. ". FG Disabled (gameuiPhotoModeMenuController->OnShow)")
     end
   end)
 
   Observe('gameuiPhotoModeMenuController', 'OnHide', function()
-    Contextual.CurrentStates.isPhotoMode = false
+    CurrentStates.isPhotoMode = false
 
-    if Contextual.Toggles.Photomode == true then
+    if Toggles.Photomode == true then
       TurnOnFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Photo mode no longer preset" .. ". FG Enabled (gameuiPhotoModeMenuController->OnHide)")
     end
@@ -947,9 +872,20 @@ function Contextual.DrawUI()
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
-    if not Settings.IsModFrameGeneration() then
+    -- Contextual sets FG as it's needed anyway, the chack is not needed
+    -- if not Settings.IsModFrameGeneration() then
+    --   ImGui.Text("")
+    --   ImGuiExt.TextRed(ContextualText.info_mod_frame_gen_required, true)
+    --   ImGui.Text("")
+    --   ImGuiExt.ResetStatusBar()
+
+    --   ImGui.EndTabItem()
+    --   return
+    -- end
+
+    if not Tracker.IsGameFrameGeneration() then
       ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_requirement, true)
+      ImGuiExt.TextRed(ContextualText.info_game_frame_gen_required, true)
       ImGui.Text("")
       ImGuiExt.ResetStatusBar()
 
@@ -959,7 +895,7 @@ function Contextual.DrawUI()
 
     if Tracker.IsModDynamicFrameGeneration() then
       ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_dynamic_frame_gen, true)
+      ImGuiExt.TextRed(ContextualText.info_dynamic_frame_gen_forbidden, true)
       ImGui.Text("")
       ImGuiExt.ResetStatusBar()
 
@@ -967,7 +903,7 @@ function Contextual.DrawUI()
       return
     end
 
-    ImGuiExt.Text(GeneralText.group_general)
+    ImGuiExt.Text(GeneralText.group_overview)
     ImGui.Separator()
     ImGuiExt.Text(ContextualText.info_select_context, true)
 
@@ -975,103 +911,103 @@ function Contextual.DrawUI()
     ImGuiExt.Text(ContextualText.group_on_foot)
     ImGui.Separator()
 
-    Contextual.Toggles.Standing, standingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_standing, Contextual.Toggles.Standing, standingToggle)
+    Toggles.StandingCrouching, standingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_standing, Toggles.StandingCrouching, standingToggle)
     if standingToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetStanding(Contextual.Toggles.Standing)
+      SetStandingCrouching(Toggles.StandingCrouching)
     end
 
-    Contextual.Toggles.Walking, walkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_walking, Contextual.Toggles.Walking, walkingToggle)
+    Toggles.Walking, walkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_walking, Toggles.Walking, walkingToggle)
     if walkingToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetWalking(Contextual.Toggles.Walking)
+      SetWalking(Toggles.Walking)
     end
 
-    Contextual.Toggles.Sprinting, sprintingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_sprinting, Contextual.Toggles.Sprinting, sprintingToggle)
+    Toggles.Sprinting, sprintingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_sprinting, Toggles.Sprinting, sprintingToggle)
     if sprintingToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSprinting(Contextual.Toggles.Sprinting)
+      SetSprinting(Toggles.Sprinting)
     end
 
-    Contextual.Toggles.SlowWalking, slowWalkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_slow_walking, Contextual.Toggles.SlowWalking, slowWalkingToggle)
+    Toggles.SlowWalking, slowWalkingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_slow_walking, Toggles.SlowWalking, slowWalkingToggle)
     if slowWalkingToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSlowWalking(Contextual.Toggles.SlowWalking)
+      SetSlowWalking(Toggles.SlowWalking)
     end
 
-    Contextual.Toggles.Swimming, swimmingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_swimming, Contextual.Toggles.Swimming, swimmingToggle)
+    Toggles.Swimming, swimmingToggle = ImGuiExt.Checkbox(ContextualText.chk_on_foot_swimming, Toggles.Swimming, swimmingToggle)
     if swimmingToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetSwimming(Contextual.Toggles.Swimming)
+      SetSwimming(Toggles.Swimming)
     end
 
     ImGui.Text("")
     ImGuiExt.Text(ContextualText.group_vehicles)
     ImGui.Separator()
 
-    Contextual.Toggles.Vehicle.Static, isVehicleStaticToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static, Contextual.Toggles.Vehicle.Static, isVehicleStaticToggled)
+    Toggles.Vehicle.Static, isVehicleStaticToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static, Toggles.Vehicle.Static, isVehicleStaticToggled)
     if isVehicleStaticToggled then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleStatic(Contextual.Toggles.Vehicle.Static)
+      SetVehicleStatic(Toggles.Vehicle.Static)
     end
 
-    Contextual.Toggles.Vehicle.Driving, isVehicleDrivingToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving, Contextual.Toggles.Vehicle.Driving, isVehicleDrivingToggled)
+    Toggles.Vehicle.Driving, isVehicleDrivingToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving, Toggles.Vehicle.Driving, isVehicleDrivingToggled)
     if isVehicleDrivingToggled then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleDriving(Contextual.Toggles.Vehicle.Driving)
+      SetVehicleDriving(Toggles.Vehicle.Driving)
     end
 
-    Contextual.Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static_weapon, Contextual.Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled)
+    Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_static_weapon, Toggles.Vehicle.StaticCombat, isVehicleStaticCombatToggled)
     if isVehicleStaticCombatToggled then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleStaticCombat(Contextual.Toggles.Vehicle.StaticCombat)
+      SetVehicleStaticCombat(Toggles.Vehicle.StaticCombat)
     end
 
-    Contextual.Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving_weapon, Contextual.Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled)
+    Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled = ImGuiExt.Checkbox(ContextualText.chk_vehicles_driving_weapon, Toggles.Vehicle.DrivingCombat, isVehicleDrivingCombatToggled)
     if isVehicleDrivingCombatToggled then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetVehicleDrivingCombat(Contextual.Toggles.Vehicle.DrivingCombat)
+      SetVehicleDrivingCombat(Toggles.Vehicle.DrivingCombat)
     end
 
     ImGui.Text("")
     ImGuiExt.Text(ContextualText.group_other)
     ImGui.Separator()
 
-    Contextual.Toggles.Braindance, braindanceToggle = ImGuiExt.Checkbox(ContextualText.chk_braindance, Contextual.Toggles.Braindance, braindanceToggle)
+    Toggles.Braindance, braindanceToggle = ImGuiExt.Checkbox(ContextualText.chk_braindance, Toggles.Braindance, braindanceToggle)
     if braindanceToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetBraindance(Contextual.Toggles.Braindance)
+      SetBraindance(Toggles.Braindance)
     end
 
-    Contextual.Toggles.Cinematic, cinematicToggle = ImGuiExt.Checkbox(ContextualText.chk_cinematics, Contextual.Toggles.Cinematic, cinematicToggle)
+    Toggles.Cinematic, cinematicToggle = ImGuiExt.Checkbox(ContextualText.chk_cinematics, Toggles.Cinematic, cinematicToggle)
     if cinematicToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetCinematic(Contextual.Toggles.Cinematic)
+      SetCinematic(Toggles.Cinematic)
     end
 
-    Contextual.Toggles.Combat, combatToggle = ImGuiExt.Checkbox(ContextualText.chk_combat, Contextual.Toggles.Combat, combatToggle)
+    Toggles.Combat, combatToggle = ImGuiExt.Checkbox(ContextualText.chk_combat, Toggles.Combat, combatToggle)
     if combatToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetCombat(Contextual.Toggles.Combat)
+      SetCombat(Toggles.Combat)
     end
 
-    Contextual.Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox(ContextualText.chk_photo_mode, Contextual.Toggles.Photomode, photoModeToggle)
+    Toggles.Photomode, photoModeToggle = ImGuiExt.Checkbox(ContextualText.chk_photo_mode, Toggles.Photomode, photoModeToggle)
     if photoModeToggle then
       SaveUserSettings()
       ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
-      SetPhotoMode(Contextual.Toggles.Photomode)
+      SetPhotoMode(Toggles.Photomode)
     end
 
     if Settings.IsDebugMode() then
@@ -1094,17 +1030,23 @@ function Contextual.DrawUI()
       ImGui.Separator()
 
       local fgStatus = "Enabled"
-      if Contextual.FGEnabled == true then
+
+      if FGEnabled == true then
         fgStatus = "Enabled"
       else
         fgStatus = "Disabled"
       end
 
-      ImGuiExt.Text("Table Frame Gen State: " .. fgStatus)
+      ImGuiExt.Text("Contextual Frame Gen State: " .. fgStatus)
 
       ImGui.Separator()
 
-      local realTimeState = tostring(DLSSEnabler_GetFrameGenerationState())
+      local realTimeState = "Disabled"
+
+      if Tracker.IsGameReady() then
+        realTimeState = tostring(DLSSEnabler_GetFrameGenerationState())
+      end
+
       ImGuiExt.Text("Real-Time Frame Gen State: " .. realTimeState)
     end
 

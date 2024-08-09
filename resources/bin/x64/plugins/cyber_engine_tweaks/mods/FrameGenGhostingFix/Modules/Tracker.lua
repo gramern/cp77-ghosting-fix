@@ -3,15 +3,6 @@ local Tracker = {
   __VERSION = { 5, 0, 0 },
 }
 
-local ModState = {
-  isDynamicFrameGen = false,
-  isFirstRun = false,
-  isFrameGen = false,
-  isNewInstall = false,
-  isOpenWindow = false,
-  isReady = true,
-}
-
 local GameState = {
   isFrameGen = nil,
   isGameLoaded = nil,
@@ -19,10 +10,23 @@ local GameState = {
   isPreGame = nil,
 }
 
+local GameEvents = {
+  gamePaused = false,
+}
+
 local GamePerf = {
   averageFps = nil,
   currentFps = nil,
   gameDeltaTime = nil,
+}
+
+local ModState = {
+  isDynamicFrameGen = false,
+  isFirstRun = false,
+  isFrameGen = false,
+  isNewInstall = false,
+  isOpenWindow = false,
+  isReady = true,
 }
 
 local Player = {
@@ -40,12 +44,13 @@ local Vehicle = {
   isWeapon = false,
 }
 
--- IsVehicleMoving-related
 local IsVehicleMovingCheck = {
   delayTime = 1.5,
   remainingTime = nil,
   result = nil,
 }
+
+local Globals = require("Modules/Globals")
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Global Getters for Tracker's Tables
@@ -112,18 +117,22 @@ function Tracker.SetModFirstRun(isFirstRun)
   Tracker.SetModNewInstall(true)
 end
 
--- @param `isFirstRun`: boolean; The current DLSS Enabler's FG state to set (`true` if it's enabled, `false` otherwise).
+-- @param `isEnabled`: boolean; The current DLSS Enabler's FG state to set (`true` if it's enabled, `false` otherwise).
 --
 -- @return None
 function Tracker.SetModFrameGeneration(isEnabled)
   ModState.isFrameGen = isEnabled
+
+  -- Globals.PrintDebug(Tracker.__NAME, "Set Mod Frame Generation State to:", isEnabled)
 end
 
--- @param `isFirstRun`: boolean; The current DLSS Enabler's Dynamic FG state to set (`true` if it's enabled, `false` otherwise).
+-- @param `isEnabled`: boolean; The current DLSS Enabler's Dynamic FG state to set (`true` if it's enabled, `false` otherwise).
 --
 -- @return None
 function Tracker.SetModDynamicFrameGeneration(isEnabled)
   ModState.isDynamicFrameGen = isEnabled
+
+  -- Globals.PrintDebug(Tracker.__NAME, "Set Mod DynamicFrame Generation State to:", isEnabled)
 end
 
 -- @param `isNewInstall`: boolean; The mod's new install state to set (`true` if it's a new install, `false` otherwise). Logs a message if `true`.
@@ -160,6 +169,20 @@ function Tracker.SetGamePerfAverage(averageFps)
   GamePerf.averageFps = averageFps
 end
 
+
+------------------
+-- GameState
+
+-- @param `isLoaded`: boolean;
+--
+-- @return boolean: `true` if game can be set to loaded (isPreGame = `false`)
+function Tracker.SetGameLoaded(isLoaded)
+  if GameState.isPreGame then return false end
+  
+  GameState.isGameLoaded = isLoaded
+  return true
+end
+
 ----------------------------------------------------------------------------------------------------------------------
 -- Specific Getters For Tracker's Tables
 ----------------------------------------------------------------------------------------------------------------------
@@ -173,7 +196,7 @@ end
 
 -- @return boolean: `true` if frame generation is enabled in DLSS Enabler and is in-game
 function Tracker.IsModFrameGeneration()
-  if GameState.isPreGame or GameState.isGamePaused then return false end
+  if GameState.isPreGame or not GameState.isGameLoaded then return false end
 
   return ModState.isFrameGen
 end
@@ -244,7 +267,7 @@ end
 
 -- @return boolean: `true` if vehicle is mounted and player is a driver
 function Tracker.IsPlayerDriver()
-  return Vehicle.isDriver
+  return Player.isDriver
 end
 
 -- @return boolean: `true` if player is moving on-foot
@@ -298,17 +321,42 @@ local function SetGameFrameGeneration(isEnabled)
   GameState.isFrameGen = isEnabled
 end
 
-local function SetGameLoaded(isLoaded)
-  GameState.isGameLoaded = isLoaded
-end
-
 local function TrackGameState()
   GameState.isGamePaused = Game.GetSystemRequestsHandler():IsGamePaused()
   GameState.isPreGame = Game.GetSystemRequestsHandler():IsPreGame()
+end
 
-  if GameState.isGameLoaded then return end
-  if not Tracker.IsPlayerMoving() then return end -- after reloading the mod in CET, isGameLoaded will get changed to `true` again after the player moves; GetPlayer() shows `true` in the main menu
-  GameState.isGameLoaded = true
+----------------------------------------------------------------------------------------------------------------------
+-- Game Events Local Functions
+----------------------------------------------------------------------------------------------------------------------
+
+local function OnGamePaused()
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+  Tracker.SetModFrameGeneration(false)
+end
+
+local function OnGameUnpaused()
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+
+  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+end
+
+local function TrackGameEvents()
+  if GameState.isGamePaused then
+    if GameEvents.gamePaused then return end
+
+    OnGamePaused()
+    GameEvents.gamePaused = true
+  else
+    if not GameEvents.gamePaused then return end
+
+    -- set to fire up with a delay to ensure accurate results
+    Globals.SetDelay(1, 'TrackerOnGameUnpasued', OnGameUnpaused)
+    GameEvents.gamePaused = false
+  end
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -412,19 +460,28 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 function Tracker.OnInitialize()
-  -- Game State 
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+  --Game / Mod State
   Observe('QuestTrackerGameController', 'OnInitialize', function()
-    SetGameLoaded(true)
-    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState()) -- additional check and set on a loaded game
-    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState()) -- -- additional check and set on a loaded game
+    Tracker.SetGameLoaded(true)
+
+    SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+
+    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
   end)
 
   Observe('QuestTrackerGameController', 'OnUninitialize', function()
-    SetGameLoaded(false)
+    Tracker.SetGameLoaded(false)
+
+    SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+    Tracker.SetModFrameGeneration(false)
   end)
 
   -- Vehicle
-  -- gramern: I'm using those methods for masking and they're effective
   Observe('DriverCombatEvents', 'OnEnter', function()
     SetVehicleWeapon(true)
   end)
@@ -432,21 +489,27 @@ function Tracker.OnInitialize()
   Observe('DriverCombatEvents', 'OnExit', function()
     SetVehicleWeapon(false)
   end)
-
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 end
 
 function Tracker.OnOverlayOpen()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
-  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState()) -- additional check and set on overlay open
 
   if not Tracker.IsGameReady() then return end
-  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState()) -- additional check and set on overlay close
+
+  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+
+  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
 end
 
 function Tracker.OnUpdate()
   TrackGameState()
+
+  TrackGameEvents()
+
+  if not Tracker.IsGameReady() then return end
+
   TrackPlayer()
+
   TrackVehicle()
 end
 

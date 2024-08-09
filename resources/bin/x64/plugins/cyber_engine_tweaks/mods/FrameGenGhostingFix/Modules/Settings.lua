@@ -119,9 +119,14 @@ function Settings.SetModFrameGeneration(isFGEnabled)
 
   if result then
     ModSettings.isFGEnabled = isFGEnabled
+
+    Tracker.SetModFrameGeneration(isFGEnabled) -- update Tracker's value
+
     SaveRequest()
+    return true
   else
     Globals.Print(Settings.__NAME, "Couldn't set Frame Generation using API.")
+    return false
   end
 end
 
