@@ -32,9 +32,11 @@ Since 4.0.0-alpha, thanks to a major change in how masks are projected (using th
 
 While there are no framerate limits to use this feature, 55+ base FPS (without frame generation) is recommended due to the perceived smoothness difference between frame generation ON and OFF states.
 
+# Installation
+Extract the mod's zip archive to your Cyberpunk 2077 folder.
+
 # Using the repo from within the mod's WolvenKit project folder
 The repo is configured to be placed 'as is' in the `source` folder of the mod's WolvenKit project. To avoid `*.reds` files being indexed twice by Redscript extensions for VSCode, open the `source` folder in the IDE directly.
-
 
 # Translations for the mod
 The mod supports UI translations. Necessary information on how to prepare a translation (which you can publish later on Nexus) can be found [here](docs/create-custom-translation.md) and [here](resources/bin/x64/plugins/cyber_engine_tweaks/mods/FrameGenGhostingFix/Translations/Translation-Blueprint.lua).
