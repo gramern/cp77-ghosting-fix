@@ -89,27 +89,27 @@ local CameraData = {
   activePerspective = nil,
   Forward = nil,
   ForwardTable = {
-    Abs = {x=nil, y = nil, z = nil},
+    Abs = {x = 0, y = 0, z = 0},
     Angle = {
       Vehicle = {
         Forward = {
-          horizontalPlane = nil,
-          medianPlane = nil,
+          horizontalPlane = 0,
+          medianPlane = 0,
         },
       }
     },
     DotProduct = {
       Vehicle = {
-        forward = nil,
-        forwardAbs = nil,
-        right = nil,
-        rightAbs = nil,
-        up = nil,
-        upAbs = nil
+        forward = 0,
+        forwardAbs = 0,
+        right = 0,
+        rightAbs = 0,
+        up = 0,
+        upAbs = 0
       }
     },
   },
-  fov = nil,
+  fov = 0,
   fovFactorFPP = nil,
   Right = nil,
   Up = nil,
@@ -558,7 +558,7 @@ local function GetActivePerspective(currentSpeed)
   local vehicle = Game.GetMountedVehicle(player) or false
 
   if vehicle and currentSpeed ~= nil then
-    CameraData.activePerspective = vehicle:GetCameraManager():GetActivePerspective()
+    CameraData.activePerspective = vehicle:GetCameraManager():GetActivePerspective() or CameraData.activePerspective
   end
 end
 
@@ -819,7 +819,7 @@ local function GetDotProducts()
   local cameraForward, dotVeh = CameraData.Forward, CameraData.ForwardTable.DotProduct.Vehicle
   local vecVehicle = VehicleData
 
-  dotVeh.forward = dot(vecVehicle.Forward, cameraForward) or false
+  dotVeh.forward = dot(vecVehicle.Forward, cameraForward) or dotVeh.forward
 
   if not dotVeh.forward then
     GetDotProductsBackup()

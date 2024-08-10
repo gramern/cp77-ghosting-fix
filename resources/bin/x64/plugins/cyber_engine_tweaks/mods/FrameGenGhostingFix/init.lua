@@ -603,13 +603,15 @@ registerForEvent("onDraw", function()
                 ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
               end
 
-              ImGui.Text("")
+              if Settings.IsDebugMode() then
+                ImGui.Text("")
 
-              if ImGui.Button(SettingsText.btn_print_user_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-                Globals.PrintTable(Globals.LoadJSON('user_settings'))
+                if ImGui.Button(SettingsText.btn_print_user_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+                  Globals.PrintTable(Globals.LoadJSON('user-settings'))
+                end
+
+                ImGui.Text("")
               end
-
-              ImGui.Text("")
             end
 
             ImGuiExt.Text(SettingsText.group_mod)

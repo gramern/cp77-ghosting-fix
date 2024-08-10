@@ -18,6 +18,7 @@ local UIText = {
     info_disabled = "Disabled",
     info_enabled = "Enabled",
     info_mod_not_ready = "[ ! ] Mod isn't working. Check logs for details...",
+    info_important = "IMPORTANT:",
     status_version = "Mod version:",
   },
   Info = {
@@ -154,6 +155,7 @@ local UIText = {
     info_game_frame_gen_required = "Please enable FSR 3 Frame Generation in the game's settings to use these features.",
     info_mod_frame_gen_required = "Please check 'Enable Frame Generation' in the 'Settings' tab to use these features.",
     info_select_context = "The contextual feature allows you to prioritize image quality for specific game events by seamlessly turning off frame generation for them.\n\nSelect contexts for which you want to automatically turn off frame generation.",
+    info_contextual_requirements ="This feature needs 55+ base FPS (without frame generation) to work in the intended way.",
     group_contexts = "Contexts:",
     group_other = "Other:",
     group_on_foot = "On-Foot:",
