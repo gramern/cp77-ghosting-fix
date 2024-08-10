@@ -12,11 +12,16 @@ Allows prioritizing image quality for certain in-game events by automatically tu
 
 
 # Requirements
+**Base (Anti-Ghosting) requirements:**
 + Cyberpunk 2077 2.12+
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.32.0+
 + [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
+
+**Contextual Frame Generation additionally requires:**
++ [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.01.000.0+
 + [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.3.4.0+ _(the dll file is included in this repo)_
++ [RED4ext](https://github.com/WopsS/RED4ext) 1.25.0+
 
 # Intended results
 **Anti-ghosting:**
