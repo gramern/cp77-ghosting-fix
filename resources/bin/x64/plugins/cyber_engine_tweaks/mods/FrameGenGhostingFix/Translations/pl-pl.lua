@@ -1,89 +1,43 @@
---[=====[ 
-
-  Rename this file fitting to your translation and keep it in the 'Translations' folder. Following Codes are supported by the game:
-    ar-ar = Arabic
-    zh-cn = Chinese (Simplified)
-    zh-tw = Chinese (Traditional)
-    cz-cz = Czech
-    fr-fr = French
-    de-de = German
-    hu-hu = Hungarian
-    it-it = Italian
-    jp-jp = Japanese
-    kr-kr = Korean
-    pl-pl = Polish
-    pt-br = Portuguese (Brazillian)
-    ru-ru = Russian
-    es-mx = Spanish (Latin American)
-    es-es = Spanish
-    th-th = Thai
-    tr-tr = Turkish
-    ua-ua = Ukrainian
-  
-  A translation for German would be called de-de.lua for example.
-  Authros can upload their own presets. Presets are saved using IDs translating those will be a litte more complex:
-  Further down you'll find Presets.Info follow the instrunctions for translating a preset
-
-
-  If you don't know how to translate something you can either keep it on english or delete the key
-  for example:
-  {
-    infolog = "Here is the requested info",
-    warnlog = "This is a warning do not follow it"
-  }
-    would then be
-  {
-      infolog = "Hier sind die angeforderten Infos",
-      --warnlog = "This is a warning do not follow it"
-  }
-
-  -- creates a comment, that way you can translate it later without having to search for the key again before being able to translate it
-
---]=====]
-
 local translation = {
   __VERSION = { 5, 0, 0 },
-  __AUTHOR = "", -- Mark your work. 
+  __AUTHOR = "Testing Translation System",
   UIText = {
     General = {
-      group_general = "General Settings:",
-      group_fps90 = "90+ FPS FG ON Settings:",
-      group_fps120 = "120+ FPS FG ON Settings:",
-      group_overview = "Overview:",
-      btn_yes = "Yes",
-      btn_no = "No",
-      btn_apply = "Apply",
-      btn_cancel = "Cancel",
-      btn_load = "Load",
-      btn_save = "Save",
-      info_disabled = "Disabled",
-      info_enabled = "Enabled",
-      info_mod_not_ready = "[ ! ] Mod isn't working. Check logs for details...",
-      info_important = "IMPORTANT:",
-      status_version = "Mod version:",
+      group_general = "Ustawienia ogolne:",
+      group_fps90 = "Ustawienia dla 90+ FPS z FG:",
+      group_fps120 = "Ustawienia dla 120+ FPS z FG:",
+      btn_yes = "Tak",
+      btn_no = "Nie",
+      btn_apply = "Zastosuj",
+      btn_cancel = "Anuluj",
+      btn_load = "Wczytaj",
+      btn_save = "Zapisz",
+      info_disabled = "Wylaczone",
+      info_enabled = "Wlaczone",
+      info_mod_not_ready = "[ ! ] Mod nie dziala. Sprawdz logi, aby uzyskac szczegoly...",
+      status_version = "Wersja moda:",
     },
     Info = {
-      tab_name_info = "Info",
-      info_aspect_ratio_change= "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod will work as intended.",
-      info_benchmark = "[ ! ] FrameGen Ghosting 'Fix' is benchmarking your game's performance. Please continue playing freely: once the benchmark is finished, the mod will apply optimal settings for your game's performance. You can change those settings later.\n\nThe benchmark is conducted during the first run of the mod.",
-      info_benchmark_ask = "[ ! ] Do you want to run a benchmark to let the mod measure your game's performance and set optimal anti-ghosting settings?\n\nIt will happen in the background, please continue playing freely.",
-      info_mod_not_ready = "The mod encountered a problem:",
+      tab_name_info = "Informacje",
+      info_aspect_ratio_change= "[ ! ] Proporcje ekranu zostaly zmienione.\n\nProsze zrestartowac gre, aby upewnic sie, ze mod bedzie dzialal prawidlowo.",
+      info_benchmark = "[ ! ] FrameGen Ghosting 'Fix' przeprowadza test wydajnosci twojej gry. Prosze grac swobodnie: po zakonczeniu testu mod zastosuje optymalne ustawienia dla wydajnosci twojej gry. Mozesz pozniej zmienic te ustawienia.\n\nTest jest przeprowadzany podczas pierwszego uruchomienia moda.",
+      info_benchmark_ask = "[ ! ] Czy chcesz przeprowadzic test wydajnosci, aby mod mogl zmierzyc wydajnosc twojej gry i ustawic optymalne ustawienia anty-ghostingowe?\n\nOdbedzie sie to w tle, prosze grac swobodnie.",
+      info_mod_not_ready = "Mod napotkal problem:",
     },
     Vehicles = {
-      tab_name_vehicle = "Vehicles",
-      btn_close_editor = "Close Presets Editor",
-      btn_open_editor = "Open Presets Editor",
-      group_editor = "Presets Editor:",
-      info_author = "Preset's author:",
-      info_description = "Preset's info:",
-      info_no_masking_vehicles = "[ ! ] Ghosting masking for vehicles is turned off globally.",
-      info_presets = "Use this preset for vehicles:",
-      info_presets_locked = "Presets are locked when Presets Editor is opened. Please close it when you finish your work.",
-      status_applied_veh = "[ ! ] Selected preset applied.",
-      status_get_in = "[ ! ] V must be in a vehicle to use this option.",
-      tooltip_presets = "Choose a preset of anti-ghosting for vehicles.",
-      tooltip_open_editor = "Open Preset Editor: a tool that allows you to modify ghosting masking settings, test them, find ones that suit you best, and save them as a new preset to a file that can be shared with others.",
-      tooltip_close_editor = "Close Preset Editor and reaload the preset list.",
+      tab_name_vehicle = "Pojazdy",
+      btn_close_editor = "Zamknij edytor ustawien",
+      btn_open_editor = "Otworz edytor ustawien",
+      group_editor = "Edytor ustawien:",
+      info_author = "Autor ustawienia:",
+      info_description = "Informacje o ustawieniu:",
+      info_no_masking_vehicles = "[ ! ] Maskowanie ghostingu dla pojazdow jest globalnie wylaczone.",
+      info_presets = "Uzyj tego ustawienia dla pojazdow:",
+      status_applied_veh = "[ ! ] Wybrane ustawienie zastosowane.",
+      status_get_in = "[ ! ] V musi byc w pojezdzie, aby uzyc tej opcji.",
+      tooltip_presets = "Wybierz ustawienie anty-ghostingowe dla pojazdow.",
+      tooltip_open_editor = "Otworz edytor ustawien naciskajac 'Otworz edytor'",
+      tooltip_close_editor = "",
     },
     Editor = {
       window_presets_editor = "Presets Editor",
@@ -97,14 +51,14 @@ local translation = {
       btn_reset_values = "Reset Values",
       btn_toggle_perspective = "Toggle Perspective",
       btn_center_view = "Center View",
-      chk_preview_mode = "Preview Mode: Make enabled masks visible after overlay closes",
+      chk_preview_mode = "Preview Mode: make enabled masks visible after overlay close",
       chk_masks_around_vehicle = "Enable masks around a vehicle",
       chk_masks_steering_bar = "Enable masks around the steering bar",
       chk_mask_front = "Enable mask in the front",
       chk_mask_rear = "Enable mask in the rear",
       chk_masks_sides = "Enable masks on the sides",
       chk_cockpit_masks = "Enable cockpit elements masks",
-      chk_corners_masks = "Enable corner masks",
+      chk_corners_masks = "Enable corners masks",
       chk_middle_mask = "Enable middle mask",
       chk_lock_middle_mask = "Lock middle mask",
       chk_following_mask = "Enable following mask",
@@ -136,36 +90,35 @@ local translation = {
       input_description = "Description:",
       input_file_name = "File Name:",
       info_enter_vehicle = "Enter a vehicle first: a bike or a car.",
-      info_game_loading_wait = "Wait for the game to load.",
       info_switch_to_fpp = "Switch to FPP to edit these options.",
       info_switch_to_tpp = "Switch to a TPP camera to edit these options.",
       info_chars_left = "Characters left:",
       info_is_moving_vehicle = "The vehicle is moving. Stop it to edit these options.",
-      tooltip_bottom_edges = "Scale the base width for the whole screen bottom masking. This size will be locked if the 'Lock size of the screen bottom masking' checkbox is selected.",
-      tooltip_center_view = "Center the current perspective/camera view.",
-      tooltip_cockpit_masks = "Toggle on/off for masks coverings side mirrors and doors' lower parts while driving a car in FPP.",
-      tooltip_corners_masks = "Toggle on/off for masks covering bottom corners of the screen while driving a vehicle.",
-      tooltip_decouple_masking = "Enabling this option decouples masking strength from a vehicle's speed. If enabled, masks are fully active all the time while driving a vehicle: also when vehicle is static (its current speed is 0).",
-      tooltip_following_mask = "Toggle on/off for the mask following the front or rear end of a vehicle, that is currently closer to the bottom edge of the screen.",
       tooltip_input_name = "Enter a name for the new preset.",
       tooltip_input_author = "Enter an author name for the new preset.",
       tooltip_input_description = "Enter a description for the new preset.",
       tooltip_input_file_name = "Enter a file name for the new preset (no spaces).",
       tooltip_load_preset = "Select a base preset to load its values to the editor.",
-      tooltip_lock_middle_mask = "Lock the mask covering the middle part of the screen while driving a vehicle. This option makes the mask being active for all camera angle.",
-      tooltip_lock_size_bottom_masking = "Stop the screen bottom masking from dynamically changing its size on camera movement.",
-      tooltip_mask_front = "Toggle on/off for the mask in the front of a car.",
-      tooltip_mask_rear = "Toggle on/off for the mask in the rear of a car.",
-      tooltip_masks_sides = "Toggle on/off for masks on a car's sides.",
-      tooltip_middle_mask = "Toggle on/off for the mask covering the middle part of the screen while driving a vehicle. The mask is dynamic by default and activates for specific camera angles.",
       tooltip_save_preset = "Save your new values as a new preset file. The new preset will be saved in the 'Presets' folder and can be shared with other users of FrameGen Ghosting 'Fix' V.",
-      tooltip_strength_vehicle = "Set masking strength around a vehicle. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 10 is a good balance between effectiveness and them being almost unnoticeable.",
-      tooltip_strength_bottom = "Set masking strength for the screen bottom edges. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 6 is a good balance between effectiveness and them being almost unnoticeable.",
-      tooltip_preview_mode = "Enable Preview Mode, which allows you to see masks after the overlay closes while the editor remains open. This lets you view which parts of the screen are being masked and how your current settings work.",
       tooltip_reset_values = "Reset current values to ones found in the loaded preset.",
       tooltip_toggle_perspective = "Toggle through all available camera perspectives for vehicles. The 'TPPFar' perspective is the best for editing TPP-related values.",
-      tooltip_windshield = "The sliders let you customize the size of the motorcycle windshield mask. Usually not necessary, but may be handy for some motorcycles with a bigger windshield, like Apollo.",
-      tooltip_vehicle_width = "Set an area that will be covered by anti-ghosting masks on sides and in the rear of a car.",
+      tooltip_center_view = "Center the current perspective/camera view.",
+      tooltip_lock_size_bottom_masking = "Stop the screen bottom masking from dynamically changing its size on camera movement.",
+      tooltip_windshield = "The sliders let you customize the size of the motorcycle windshield mask. Usually not necessary, may turn out handy for some motorcycles with a bigger windshield, like Apollo.",
+      tooltip_preview_mode = "",
+      tooltip_mask_front = "",
+      tooltip_mask_rear = "",
+      tooltip_masks_sides = "",
+      tooltip_vehicle_width = "",
+      tooltip_cockpit_masks = "",
+      tooltip_corners_masks = "",
+      tooltip_middle_mask = "",
+      tooltip_lock_middle_mask = "",
+      tooltip_following_mask = "",
+      tooltip_bottom_edges = "Scale the base width for the screen bottom masking. This size will be locked if the 'Lock size of the screen bottom masking' checkbox is selected.",
+      tooltip_decouple_masking = "",
+      tooltip_strength_vehicle = "Set masking strength around a vehicle. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 10 is a good balance between effectiveness and them being almost unnoticeable.",
+      tooltip_strength_bottom = "Set masking strength for the screen bottom edges. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 6 is a good balance between effectiveness and them being almost unnoticeable.",
     },
     OnFoot = {
       tab_name_on_foot = "On-Foot",
@@ -192,23 +145,15 @@ local translation = {
     },
     Contextual = {
       tab_name_contextual = "Contextual",
-      info_dynamic_frame_gen_forbidden = "Turn off 'Dynamic Frame Generation' in DLSS Enabler's settings to ensure these features work properly. Reopen CET's overlay after change.",
-      info_game_frame_gen_required = "Please enable FSR 3 Frame Generation in the game's settings to use these features.",
-      info_mod_frame_gen_required = "Please check 'Enable Frame Generation' in the 'Settings' tab to use these features.",
-      info_select_context = "The contextual feature allows you to prioritize image quality for specific game events by seamlessly turning off frame generation for them.\n\nSelect contexts for which you want to automatically turn off frame generation.",
-      info_contextual_requirements ="This feature needs 55+ base FPS (without frame generation) to work in the intended way.",
-      group_contexts = "Contexts:",
+      info_requirement = 'Please check "Enable Frame Generation" in the "Settings" tab to use these features.',
+      info_select_context = "Select contexts to turn off frame generation during these events.",
       group_other = "Other:",
       group_on_foot = "On-Foot:",
       group_vehicles = "Vehicles:",
-      chk_context_sightseeing = "Sightseeing",
-      chk_context_slow_paced = "Slow-Paced and Cinematics",
-      chk_context_fast_paced = "Fast-Paced",
-      chk_context_my_own = "My Own",
-      chk_on_foot_standing = "Standing/Crouching",
+      chk_on_foot_standing = "Standing",
       chk_on_foot_slow_walking = "Slow Walking",
-      chk_on_foot_walking = "Walking/Crouch Walking",
-      chk_on_foot_sprinting = "Sprinting/Crouch Sprinting",
+      chk_on_foot_walking = "Walking",
+      chk_on_foot_sprinting = "Sprinting",
       chk_on_foot_swimming = "Swimming",
       chk_vehicles_static = "Static",
       chk_vehicles_driving = "Driving",
@@ -218,17 +163,11 @@ local translation = {
       chk_cinematics = "Cinematics",
       chk_combat = "Combat (Enemies Alerted)",
       chk_photo_mode = "Photo Mode",
-      tooltip_context_sightseeing = "Automatically turns off frame generation for:\n- V being stationary (standing and crouching),\n- slow walk (usually activated after pressing the 'G' key),\n- photo mode.",
-      tooltip_context_slow_paced = "Automatically turns off frame generation for slow-paced contexts apart from those triggered by 'Sightseeing':\n- normal walking and crouch walking,\n- swimming,\n- being in a stationary vehicle,\n- during braindance sequences,\n- during cinematics.",
-      tooltip_context_fast_paced = "Automatically turns off frame generation for:\n- sprinting and crouch sprinting,\n- driving a vehicle,\n- being in a stationary vehicle with a weapon drawn,\n- driving a vehicle with a weapon drawn,\n- during combat sequences.",
-      tooltip_context_my_own = "This feature allows you to select exact events to automatically turn off frame generation.",
     },
     Settings = {
       tab_name_settings = "Settings",
       btn_default = "Set to default",
       btn_load_settings = "Load settings",
-      btn_reload_mod = "Reload Mod",
-      btn_print_user_settings = "Print User Settings From File",
       btn_save_settings = "Save settings",
       chk_debug = "Enable debug mode",
       chk_debug_view = "Enable debug tabs in the window",
@@ -242,8 +181,6 @@ local translation = {
       info_frame_gen_off = "[ ! ] Frame Generation is turned off in the game's settings. Masking is turned off.",
       info_game_not_ready_warning = "[ ! ] You need to start or unpause the game to change these settings.",
       info_game_settings_fg = "[ ! ] Please make sure frame generation is always enabled in game menu for this to work correctly.",
-      status_mod_reloaded = "The mod has been reloaded.",
-      status_game_loaded_fail = "The game is in the main menu, can't be set to loaded.",
       status_settings_default = "Default settings restored.",
       status_settings_loaded = "User settings loaded.",
       status_settings_restored = "Restored your previous settings.",
@@ -251,7 +188,6 @@ local translation = {
       tooltip_fg = "Turn on/off Frame Generation on the mod level (the game's settings remain unchanged).",
       tooltip_help = "Enable tooltips on mouse hover for certain settings.",
       tooltip_theme = "Pick your colors for the mod's window.",
-      tooltip_reload_mod = "Reload the mod after using 'Reload all mods' option in Cyber Engine Tweaks.",
       tooltip_window = "Keep this window opened after closing CET's overlay.",
     },
     Benchmark = {
@@ -263,7 +199,6 @@ local translation = {
       info_benchmark = "Benchmark enabled:",
       info_benchmark_pause = "[ ! ] Benchmark is paused. Unpause the game to continue.",
       info_benchmark_pause_overlay = "[ ! ] Benchmark is paused. Exit CET's overlay to continue.",
-      info_benchmark_pre_game = "[ ! ] Game metrics are paused. Load the game to continue.",
       info_benchmark_remaining = "Remaining benchmark time (s):",
       info_benchmark_restart = "[ ! ] Benchmark restarting in:",
       info_current_fps = "Current FPS without Frame Gen:",
@@ -281,58 +216,46 @@ local translation = {
       info_conflicting_mods = "Conflicting mods:",
       info_potentially = "Seems like you have a potentially conflicting mod installed.\n\nTo ensure that anti-ghosting for frame generation will work without problems in the future, please visit FrameGenGhosting 'Fix's Nexus page to download and install the latest version of the mod.\n\nWith the new version you no longer need any compatibility tweaks.",
       info_potentially_mods = "Potentially conflicting mods:"
-    },
-  },
-  PresetsInfo = {
-    --[=====[
-    Presets are saved using IDs, to translate a preset you need the ID of it. The structure looks like following
-    [PresetID] = {
-      PresetInfo = {
-        name = "Preset's name",
-        description = "Preset's description"
-      }
     }
-
-    IDs have to be covered by brackets [], else your translation will fail!
-    To find the ID of a preset just ask the author or take a look at the website were it'S been published.
-    --]=====]
+  },
+  PresetsList = {
     a000 = {
       PresetInfo = {
-        name = "Customize",
-        description = "Customize your preset.",
+        name = "Dostosuj",
+        description = "Dostosuj swoj preset.",
       }
     },
     a001 = {
       PresetInfo = {
-        name = "Default",
-        description = "Default preset.",
+        name = "Domyslny",
+        description = "Preset domyslny.",
       }
     },
     a002 = {
       PresetInfo = {
-        name = "Stronger",
-        description = "Masks' anti-ghosting strength is slightly greater and their state change delay on a sudden speed decrease is twice as long (3 seconds instead of 1.5).",
+        name = "Mocniejszy",
+        description = "Sila anty-ghostingu masek jest nieco wieksza,\na opoznienie zmiany ich stanu przy naglym\nzmniejszeniu predkosci jest dwukrotnie dluzsze\n(3 sekundy zamiast 1.5).",
       }
     },
     a003 = {
       PresetInfo = {
-          name = "Testing",
-          description = "Testing preset, all masks visible.",
-        }
+        name = "Testowy",
+        description = "Preset testowy, wszystkie maski widoczne.",
+      }
     },
     a004 = {
       PresetInfo = {
-        name = "Testing Stronger",
-        description = "Testing 'Stronger' preset, all masks visible. Opacity normalization doesn't work in this one (Masks are visible all the time).",
+        name = "Testowy Mocniejszy",
+        description = "Testowy preset 'Mocniejszy', wszystkie maski widoczne. Normalizacja przezroczystosci nie dziala w tym presecie (Maski sa widoczne caly czas).",
       }
     },
     a005 = {
       PresetInfo = {
-        name = "Turn off anti-ghosting masking",
-        description = "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
+        name = "Wylacz maskowanie anty-ghostingu",
+        description = "Wylacza maski anty-ghostingu TPP i FPP dla wszystkich pojazdow.",
       }
     }
-  }
+  },
 }
 
 return translation

@@ -7,11 +7,31 @@
     "**/.DS_Store?": true,
     "**/archive": true,
     "**/customSounds": true,
+    "**/red4ext": true
   },
   "[lua]": {
     "editor.tabSize": 2
   },
   "[reds]": {
     "editor.tabSize": 2
-  }
+  },
+  "Lua.diagnostics.globals": [
+    "json",
+    "ImGui",
+    "ImGuiCol",
+    "ImGuiCond",
+    "ImGuiStyleVar",
+    "ImGuiWindowFlags",
+    "FrameGenGhostingFixIsRedScriptModule",
+    "DLSSEnabler_GetVersionAsString",
+    "DLSSEnabler_SetFrameGenerationMode",
+    "DLSSEnabler_GetFrameGenerationMode",
+    "DLSSEnabler_SetFrameGenerationState",
+    "DLSSEnabler_GetFrameGenerationState",
+    "DLSSEnabler_SetDynamicFrameGenerationState",
+    "DLSSEnabler_GetDynamicFrameGenerationState",
+  ],
+  "Lua.diagnostics.disable": [
+    "redundant-parameter"
+  ]
 }

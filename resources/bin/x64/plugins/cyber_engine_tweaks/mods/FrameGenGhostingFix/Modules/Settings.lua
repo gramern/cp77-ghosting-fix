@@ -1,151 +1,294 @@
-local Settings ={
+local Settings = {
   __NAME = "Settings",
-  __VERSION_NUMBER = 490,
-  isSaved = nil,
+  __VERSION = { 5, 0, 0 },
 }
+
+local ModSettings = {}
 
 local UserSettings = {}
 
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
 local Localization = require("Modules/Localization")
+local Tracker = require("Modules/Tracker")
 
-local LogText = Localization.LogText
+local LogText = Localization.GetLogText()
 
-function Settings.SetSaved(boolean)
-  Settings.isSaved = boolean
+------------------
+-- Locl Reqests
+------------------
+
+local isSaveRequest = nil
+local isLoadRequest = nil
+
+-- @return boolean: `true` if Settings are set to save user-settings.json OnOverlayClose
+function Settings.IsSaveRequest()
+  return isSaveRequest
 end
 
-function Settings.IsSaved()
-  return Settings.isSaved
+local function ResetSaveRequest()
+  isSaveRequest = false
 end
 
-local function Translate(legacyUserSettings)
-  local userSettings = {
-    Calculate = {
-      Blocker = {},
-      Corners = {},
-      Vignette = {
-        ScreenPosition = {},
-        Scale = {}
-      }
-    },
-    Config = {
-      version = nil,
-      keepWindow = nil,
-    },
-    VectorsCustomize = {
-      Bike = {
-        Windshield = {
-          Scale = {}
-        }
-      }
-    },
-    Presets = {
-      selectedPreset = nil,
-    }
+local function SaveRequest()
+  isSaveRequest = true
+end
+
+------------------
+-- File Version
+------------------
+
+local function CheckFileVersion(fileVersion)
+  if not fileVersion or not Globals.VersionCompare(Globals.VersionStringToTable(fileVersion)) then
+    Tracker.SetModNewInstall(true)
+  end
+end
+
+------------------
+-- Mod Settings
+------------------
+
+local function LoadModSettings(modSettings)
+  ModSettings.isDebugMode = modSettings and modSettings.DebugMode or false
+  ModSettings.isDebugView = modSettings and modSettings.DebugView or false
+  ModSettings.isFGEnabled = modSettings and modSettings.FrameGen or true
+  ModSettings.isHelp = modSettings and modSettings.Help or true
+  ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
+  ModSettings.windowTheme = modSettings and modSettings.WindowTheme or "Crimson"
+end
+
+local function SaveModSettings()
+  local modSettings = {
+    DebugMode = ModSettings.isDebugMode,
+    DebugView = ModSettings.isDebugView,
+    FrameGen = ModSettings.isDebugView,
+    Help = ModSettings.isHelp,
+    KeepWindow = ModSettings.isKeepWindow,
+    WindowTheme = ModSettings.windowTheme
   }
 
-  userSettings.Calculate.Blocker.onAim = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledBlockerAimOnFoot or false
-  userSettings.Calculate.Corners.onWeapon = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledOnFoot or false
-  userSettings.Calculate.Vignette.onAim = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignetteAimOnFoot or false
-  userSettings.Calculate.Vignette.permament = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignettePermamentOnFoot or false
-  userSettings.Calculate.Vignette.onWeapon = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.enabledVignetteOnFoot or false
-  userSettings.Calculate.Vignette.ScreenPosition.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginLeft or 100
-  userSettings.Calculate.Vignette.ScreenPosition.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootMarginTop or 80
-  userSettings.Calculate.Vignette.Scale.x = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeX or 120
-  userSettings.Calculate.Vignette.Scale.y = legacyUserSettings.FPPOnFoot and legacyUserSettings.FPPOnFoot.vignetteFootSizeY or 120
+  Settings.WriteUserSettings("ModSettings", modSettings)
 
-  userSettings.VectorsCustomize.Bike.Windshield.Scale.x = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.width or 100
-  userSettings.VectorsCustomize.Bike.Windshield.Scale.y = legacyUserSettings.FPPBikeWindshield and legacyUserSettings.FPPBikeWindshield.height or 100
-
-  userSettings.Config.keepWindow = legacyUserSettings.General and legacyUserSettings.General.enabledWindow or false
-
-  return userSettings
+  Settings.WriteUserSettings("Version", FrameGenGhostingFix.GetVersion(true))
 end
 
-function Settings.WriteUserSettings(moduleName,contents)
-  if not contents or not moduleName then Config.Print("Can't write to user settings",nil,nil,moduleName) end --debug
-  if contents == nil then return end
-
-  local copiedContents = Config.Deepcopy(contents)
-
-  UserSettings[moduleName] = copiedContents
-
-  Settings.SetSaved(false)
+-- @param `isDebugMode`: boolean; The debug setting to set (`true` for debug mode, `false` for normal mode).
+--
+-- @return None
+function Settings.SetDebugMode(isDebugMode)
+  ModSettings.isDebugMode = isDebugMode
+  SaveRequest()
 end
 
-function Settings.GetUserSettings(moduleName)
-  -- if not moduleName or UserSettings[moduleName] == nil then Config.Print("Can't get user settings.",nil,nil,moduleName) return nil end --debug
-  if not moduleName or UserSettings[moduleName] == nil then return nil end
-
-  return UserSettings[moduleName]
+-- @return boolean `true` if the mod is currently in debug mode
+function Settings.IsDebugMode()
+  return ModSettings.isDebugMode
 end
 
-function Settings.LoadFile()
-  local file = io.open("user_settings.json", "r")
+-- @param `isDebugView`: boolean; The debug UI state to set (`true` for debug UI visble, `false` for invisble).
+--
+-- @return None
+function Settings.SetDebugView(isDebugView)
+  ModSettings.isDebugView = isDebugView
+  SaveRequest()
+end
 
-  if file then
-    local userSettingsContents = file:read("*a")
-    file:close()
-    UserSettings = json.decode(userSettingsContents)
+-- @return boolean: `true` if the mod is currently in debug UI visible mode
+function Settings.IsDebugView()
+  return ModSettings.isDebugView
+end
 
-    local version = UserSettings.Config and UserSettings.Config.ModState and UserSettings.Config.ModState.version or false
+-- @param `isHelp`: boolean; The help setting to set (`true` for help mode, `false` for normal mode).
+--
+-- @return None
+function Settings.SetHelp(isHelp)
+  ModSettings.isHelp = isHelp
+  SaveRequest()
+end
 
-    if not version then
-      UserSettings = Translate(UserSettings)
-      Config.SetNewInstall(true)
-    end
+-- @return boolean: `true` if the mod is currently in help mode
+function Settings.IsHelp()
+  return ModSettings.isHelp
+end
 
-    Config.ModState.keepWindow = UserSettings.Config and UserSettings.Config.keepWindow or false
+-- @param `isFGEnabled`: boolean; The DLSS Enabler's FG state to set (`true` for FG enabled, `false` for otherwise).
+--
+-- @return boolean: `true` if operation is succesful
+function Settings.SetModFrameGeneration(isFGEnabled)
+  local result = DLSSEnabler_SetFrameGenerationState(isFGEnabled)
 
-    Config.Print(LogText.settings_loaded,nil,nil,Settings.__NAME)
+  if result then
+    ModSettings.isFGEnabled = isFGEnabled
+
+    Tracker.SetModFrameGeneration(isFGEnabled) -- update Tracker's value
+
+    SaveRequest()
     return true
   else
-    Config.SetFirstRun(true)
-    Config.Print(LogText.settings_fileNotFound,nil,nil,Settings.__NAME)
+    Globals.Print(Settings.__NAME, "Couldn't set Frame Generation using API.")
+    return false
   end
 end
 
-function Settings.SaveFile()
-  if Settings.isSaved or Settings.isSaved == nil then return end
-  if UserSettings == nil then Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME) return end
+-- @return boolean: `true` for DLSS Enabler's FG enabled
+function Settings.IsModFrameGeneration()
+  return ModSettings.isFGEnabled
+end
 
-  Settings.WriteUserSettings("Config",{
-    ModState = {
-      keepWindow = Config.ModState.keepWindow,
-      version = Config.__VERSION_NUMBER,
-  }})
+-- @param `isKeepWindow`: boolean; The keep window state to set (`true` to keep the window open, `false` to allow it to close, prioritized over isOpenWindow).
+--
+-- @return None
+function Settings.SetKeepWindow(isKeepWindow)
+  ModSettings.isKeepWindow = isKeepWindow
+  SaveRequest()
+end
 
-  local userSettingsContents = json.encode(UserSettings)
-  local file = io.open("user_settings.json", "w+")
+-- @return boolean: `true` for keep the window open
+function Settings.IsKeepWindow()
+  return ModSettings.isKeepWindow
+end
 
-  if file and userSettingsContents ~= nil then
-    file:write(userSettingsContents)
-    file:close()
+-- @return string; Selected Theme name
+function Settings.GetTheme()
+  return ModSettings.windowTheme
+end
 
-    file = io.open("user_settings.json", "r")
+--- Saves the current theme based on the provided theme name.
+--
+-- @param `themeName`: string; The name of the theme to be applied.
+--
+-- @return None
+function Settings.SetTheme(themeName)
+  ModSettings.windowTheme = themeName
 
-    if file then
-      file:close()
+  SaveRequest()
+end
 
-      Settings.SetSaved(true)
-      Config.Print(LogText.settings_savedToFile,nil,nil,Settings.__NAME)
-    else
-      Settings.SetSaved(false)
-      Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
-    end
+------------------
+-- UserSettings
+------------------
+
+--- Writes to the UserSettings table and sets a global save reqest to the file on CET overlay close.
+--
+-- @param `poolName`: string; The name for which settings are being written.
+-- @param `contents`: table; The settings to be written for the module.
+--
+-- @return None; 
+function Settings.WriteUserSettings(poolName, contents)
+  if not poolName or not contents then Globals.PrintDebug(Settings.__NAME, "Can't write to user settings") return end --debug
+
+  local copiedContents = Globals.Deepcopy(contents)
+
+  UserSettings[poolName] = copiedContents
+
+  SaveRequest()
+end
+
+-- @param `poolName`: string; The name for which settings are being retrieved. If no poolName, the whole UserSettings table.
+--
+-- @return table | nil; Returns the user settings for the specified module if they exist, otherwise returns nil
+function Settings.GetUserSettings(poolName)
+  if not poolName then
+    return UserSettings or nil
+  elseif UserSettings[poolName] == nil then return nil end
+
+  return UserSettings[poolName]
+end
+
+------------------
+-- File Handling
+------------------
+
+local function LoadFile()
+  local userSettingsContents = Globals.Deepcopy(Globals.LoadJSON("user-settings"))
+
+  if userSettingsContents then
+    UserSettings = Globals.Deepcopy(userSettingsContents)
+
+    Globals.Print(Settings.__NAME, LogText.settings_loaded)
+    Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
+    return true
   else
-    Settings.SetSaved(false)
-    Config.Print(LogText.settings_notSavedToFile,nil,nil,Settings.__NAME)
+    Tracker.SetModFirstRun(true)
+    Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
+    return false
   end
 end
+
+local function SaveFile()
+  if not isSaveRequest then return end -- file won't be saved without change to the UserSettings table
+  if UserSettings == nil then Globals.PrintDebug(Settings.__NAME, LogText.settings_not_saved_to_file) return end
+
+  SaveModSettings()
+
+  local result = Globals.SaveJSON("user-settings", UserSettings)
+
+  if result then
+    ResetSaveRequest()
+    Globals.Print(Settings.__NAME, LogText.settings_saved_to_file)
+  else
+    ResetSaveRequest()
+    Globals.PrintError(Settings.__NAME, LogText.settings_not_saved_to_file)
+  end
+end
+
+------------------
+-- On... registers
+------------------
 
 function Settings.OnInitialize()
-  Settings.LoadFile()
+  LoadFile()
+  CheckFileVersion(Settings.GetUserSettings("Version"))
+  LoadModSettings(Settings.GetUserSettings("ModSettings"))
+end
+
+-- The mod forcefully tries to load user-settings.json if it didn't onInit
+function Settings.OnOverlayOpen()
+  if UserSettings == nil then
+    local result = LoadFile()
+
+    if result then 
+      LoadModSettings(Settings.GetUserSettings("ModSettings"))
+    else
+      SaveRequest()
+    end
+  end
 end
 
 function Settings.OnOverlayClose()
-  Settings.SaveFile()
+  SaveFile()
+end
+
+-- leaving for later: another way to make th mod forcefully try to load user-settings.json if it didn't onInit
+function Settings.OnUpdate()
+  if not isLoadRequest and UserSettings == nil then
+    local result = LoadFile()
+
+    if result and UserSettings and UserSettings.ModSettings then
+      if UserSettings and UserSettings.ModSettings and UserSettings.ModSettings.DebugMode then
+        Globals.PrintTable(UserSettings)
+      end
+
+      LoadModSettings(Settings.GetUserSettings("ModSettings"))
+
+      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+      isLoadRequest = true
+
+      Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
+    else
+      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+      isLoadRequest = true
+
+      Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
+    end 
+  end
+
+  if UserSettings ~= nil then
+    FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
+
+    isLoadRequest = true
+
+    Globals.PrintDebug(Settings.__NAME, "UserSettings found, stopping the check.")
+  end
 end
 
 return Settings

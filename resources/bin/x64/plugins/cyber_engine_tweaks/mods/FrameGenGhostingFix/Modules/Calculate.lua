@@ -1,18 +1,23 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION_NUMBER = 492,
-  MaskingGlobal = {
-    masksController = nil,
-    onFoot = true -- not used for now
+  __VERSION = { 5, 0, 0 },
+}
+
+local MaskingGlobal = {
+  masksController = nil,
+  onFoot = true -- not used for now
+}
+
+local Screen = {
+  Edge = {
+    down = 2160,
+    left = 0,
+    right = 3840,
   },
-  Screen = {
-    Edge = {
-      down = 2160,
-      left = 0,
-      right = 3840,
-    },
-    type = 169,
-  },
+  type = 169,
+}
+
+local MasksData = {
   Blocker = {
     Def = {
       ScreenSpace = {x = 1920, y = 1080},
@@ -62,287 +67,398 @@ local Calculate = {
     },
     ScreenSpace = {x = 1920, y = 1080},
     Size = {x = 4840, y = 2560},
-  },
+  }
 }
 
-local UserSettings = {}
-
-local Config = require("Modules/Config")
+local Globals = require("Modules/Globals")
+local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
 local Settings = require("Modules/Settings")
-local UI = require("Modules/UI")
+local Tracker = require("Modules/Tracker")
 
-local LogText = Localization.LogText
-local UIText = Localization.UIText
+local LogText = Localization.GetLogText()
+local GeneralText = Localization.GetGeneralText()
+local OnFootText = Localization.GetOnFootText()
+local SettingsText = Localization.GetSettingsText()
 
+------------------
+-- UserSettings
+------------------
 
-function Calculate.SetVignetteScreenPosition(coordinate, value)
-  Calculate.Vignette.ScreenPosition[coordinate] = value
-
-  Calculate.GetVignetteScreenSpace(coordinate)
-end
-
-function Calculate.GetVignetteScreenSpace(coordinate)
-  local floor = math.floor
-  local newSpace = 0
-
-  newSpace = Calculate.Vignette.Def.ScreenSpace[coordinate] * (Calculate.Vignette.ScreenPosition[coordinate] / 100)
-  Calculate.Vignette.ScreenSpace[coordinate] = (floor(newSpace + 0.5))
-
-  -- print("Vignette position and screen space",coordinate,Calculate.Vignette.ScreenPosition[coordinate],Calculate.Vignette.ScreenSpace[coordinate])
-
-  return Calculate.Vignette.ScreenSpace
-end
-
-function Calculate.SetVignetteScale(coordinate, value)
-  Calculate.Vignette.Scale[coordinate] = value
-
-  Calculate.OnVignetteChange(coordinate)
-  Calculate.GetVignetteSize(coordinate)
-end
-
-function Calculate.GetVignetteSize(coordinate)
-  local floor = math.floor
-  local newSize = 0
-
-   newSize = Calculate.Vignette.Def.Size[coordinate] * (Calculate.Vignette.Scale[coordinate] / 100)
-   Calculate.Vignette.Size[coordinate] = (floor(newSize + 0.5))
-
-  -- print("Vignette scale and size",coordinate,Calculate.Vignette.Scale[coordinate],Calculate.Vignette.Size[coordinate])
-
-  return Calculate.Vignette.Size
-end
-
-function Calculate.OnVignetteChange(coordinate)
-  local scaleChange = Calculate.Vignette.Scale[coordinate] - Calculate.Vignette.Scale.Min[coordinate]
-
-  Calculate.Vignette.ScreenPosition.Min[coordinate] = 100 - scaleChange
-  Calculate.Vignette.ScreenPosition.Max[coordinate] = 100 + scaleChange
-
-  if Calculate.Vignette.ScreenPosition[coordinate] < Calculate.Vignette.ScreenPosition.Min[coordinate] then
-    Calculate.Vignette.ScreenPosition[coordinate] = Calculate.Vignette.ScreenPosition.Min[coordinate]
-  end
-
-  if Calculate.Vignette.ScreenPosition[coordinate] > Calculate.Vignette.ScreenPosition.Max[coordinate] then
-    Calculate.Vignette.ScreenPosition[coordinate] = Calculate.Vignette.ScreenPosition.Max[coordinate]
-  end
-
-  Calculate.GetVignetteSize(coordinate)
-  Calculate.GetVignetteScreenSpace(coordinate)
-end
-
-function Calculate.SetVignetteDefault(coordinate)
-  Calculate.SetVignetteScreenPosition(coordinate, Calculate.Vignette.Def.ScreenPosition[coordinate])
-  Calculate.SetVignetteScale(coordinate, Calculate.Vignette.Def.Scale[coordinate])
-end
-
---other getters
-
-function Calculate.GetCornersScreenSpace()
-  return  Calculate.Corners.ScreenSpace
-end
-
-function Calculate.GetBlockerSize()
-  return Calculate.Blocker.Size
-end
-
-function Calculate.GetVignetteScreenPosition()
-  return Calculate.Vignette.ScreenPosition
-end
-
-function Calculate.GetVignetteScale()
-  return Calculate.Vignette.Scale
-end
-
---appliers
-
-function Calculate.ApplyCornersScreenSpace()
-  local screenType = Calculate.Screen.type
-  local screenEdge = Calculate.Screen.Edge
-
-  Calculate.Corners.ScreenSpace.Left.x = screenEdge.left
-  Calculate.Corners.ScreenSpace.Right.x = screenEdge.right
-
-  if screenType == 43 then
-    Calculate.Corners.ScreenSpace.Bottom.y = 2440
-  elseif screenType == 1610 then
-    Calculate.Corners.ScreenSpace.Bottom.y = 2280
-  else
-    Calculate.Corners.ScreenSpace.Bottom.y = screenEdge.down
-  end
-
-  -- print("Corners screen space",Calculate.Corners.ScreenSpace.Left.x,Calculate.Corners.ScreenSpace.Right.x,Calculate.Corners.ScreenSpace.Bottom.y)
-end
-
-function Calculate.ApplyBlockerSize()
-  local screenType = Calculate.Screen.type
-
-  if screenType == 43 then
-    Calculate.Blocker.Size = {x = 3840, y = 3074}
-  elseif screenType == 169 then
-    Calculate.Blocker.Size = {x = 3840, y = 2440}
-  elseif screenType == 1610 then
-    Calculate.Blocker.Size = {x = 3840, y = 2640}
-  elseif screenType == 219 then
-    Calculate.Blocker.Size = {x = 5140, y = 2440}
-  elseif screenType == 329 then
-    Calculate.Blocker.Size = {x = 7700, y = 2640}
-  end
-  -- print("Blocker size:",Calculate.Blocker.Size.x,Calculate.Blocker.Size.y)
-end
-
-function Calculate.ApplyVignetteSize()
-  local screenType = Calculate.Screen.type
-
-  if screenType == 43 then
-    Calculate.Vignette.Def.Size = {x = 4840, y = 3072}
-  elseif screenType == 169 then
-    Calculate.Vignette.Def.Size = {x = 4840, y = 2560}
-  elseif screenType == 1610 then
-    Calculate.Vignette.Def.Size = {x = 4840, y = 2880}
-  elseif screenType == 219 then
-    Calculate.Vignette.Def.Size = {x = 6460, y = 2560}
-  elseif screenType == 329 then
-    Calculate.Vignette.Def.Size = {x = 9680, y = 2560}
-  end
-  -- print("Vignette default size:",Calculate.Vignette.Def.Size.x,Calculate.Vignette.Def.Size.y)
-end
-
-function Calculate.ApplyExceptions()
-  if Calculate.Screen.type == 43 then
-    Calculate.Vignette.Scale.Min.y = 95
-  end
-end
-
-function Calculate.ApplyMasksController()
-  Calculate.MaskingGlobal.masksController = Config.GetMasksController()
-end
-
-function Calculate.ApplyScreen()
-  local screen = Config.GetScreen()
-
-  Calculate.Screen.Edge = screen.Edge
-  Calculate.Screen.type = screen.type
-end
-
-function Calculate.GetUserSettings()
-  UserSettings = {
-    Blocker = {onAim = Calculate.Blocker.onAim},
-    Corners = {onWeapon = Calculate.Corners.onWeapon},
+local function GetUserSettings()
+  local userSettings = {
+    Blocker = {onAim = MasksData.Blocker.onAim},
+    Corners = {onWeapon = MasksData.Corners.onWeapon},
     Vignette = {
-      permament = Calculate.Vignette.permament,
-      onAim = Calculate.Vignette.onAim,
-      onWeapon = Calculate.Vignette.onWeapon,
-      ScreenPosition = {x = Calculate.Vignette.ScreenPosition.x, y = Calculate.Vignette.ScreenPosition.y},
-      Scale = {x = Calculate.Vignette.Scale.x, y = Calculate.Vignette.Scale.y},
+      permament = MasksData.Vignette.permament,
+      onAim = MasksData.Vignette.onAim,
+      onWeapon = MasksData.Vignette.onWeapon,
+      ScreenPosition = {x = MasksData.Vignette.ScreenPosition.x, y = MasksData.Vignette.ScreenPosition.y},
+      Scale = {x = MasksData.Vignette.Scale.x, y = MasksData.Vignette.Scale.y},
     }
   }
 
-  return UserSettings
+  return userSettings
 end
 
-function Calculate.ApplySuggestedSettings(averageFps)
-  Config.SetFallback("Calculate",Calculate.GetUserSettings())
+local function LoadUserSettings(userSettings)
+  if not userSettings or userSettings == nil then return end
 
-  if averageFps >= 38 then
-    Calculate.Corners.onWeapon = true
-  else
-    Calculate.Corners.onWeapon = false
-  end
-
-  if averageFps >= 45 then
-    Calculate.Blocker.onAim = true
-    Calculate.Vignette.onAim = false
-  else
-    Calculate.Blocker.onAim = false
-    Calculate.Vignette.onAim = false
-  end
-
-  if averageFps >= 59 then
-    Calculate.Vignette.onWeapon = true
-  else
-    Calculate.Vignette.onWeapon = false
-  end
-
-  if averageFps >= 65 then
-    Calculate.Vignette.permament = true
-  else
-    Calculate.Vignette.permament = false
-  end
-
-  Calculate.Toggle()
-
-  Calculate.SaveUserSettings()
-
-  Config.Print(LogText.calculate_applySettings,nil,nil,Calculate.__NAME)
+  Globals.SafeMergeTables(MasksData, userSettings)
 end
 
-function Calculate.SaveUserSettings()
-  Settings.WriteUserSettings("Calculate",Calculate.GetUserSettings())
+local function SaveUserSettings()
+  Settings.WriteUserSettings('OnFoot', GetUserSettings())
+end
+
+local function BackupUserSettings()
+  Globals.SetFallback('OnFoot', GetUserSettings())
 end
 
 function Calculate.RestoreUserSettings()
-  Calculate = Config.SafeMergeTables(Calculate,Config.GetFallback("Calculate"))
+  Globals.SafeMergeTables(MasksData, Globals.GetFallback('OnFoot'))
 
-  if Calculate == nil then Config.Print("The 'Calculate' table is empty...",nil,nil,"Calculate") end
-  Calculate.SaveUserSettings()
+  SaveUserSettings()
 end
+
+------------------
+-- Get Tables
+------------------
+
+-- @return table;
+function Calculate.GetMaskingGlobalData()
+  return MaskingGlobal
+end
+
+-- @return table;
+function Calculate.GetMasksData()
+  return MasksData
+end
+
+------------------
+-- Masks'
+------------------
+
+-- @param `context`: string; Contexts: `onAim`
+--
+-- @return boolean;
+local function GetBlockerState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Blocker[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
+  return MasksData.Blocker[context]
+end
+
+-- @param `context`: string; Contexts: `onAim`
+-- @param `isEnabled`: boolean
+--
+-- @return None
+local function SetBlockerState(context, isEnabled)
+  MasksData.Blocker[context] = isEnabled
+end
+
+-- @param `context`: string; Contexts: `onWeapon`
+--
+-- @return boolean;
+local function GetCornersState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Corners[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
+  return MasksData.Corners[context]
+end
+
+-- @param `context`: string; Contexts: `onWeapon`
+-- @param `isEnabled`: boolean
+--
+-- @return None
+local function SetCornersState(context, isEnabled)
+  MasksData.Corners[context] = isEnabled
+end
+
+-- @param `context`: string; Contexts: `onAim`, `onWeapon`, `permament`
+--
+-- @return boolean;
+local function GetVignetteState(context)
+  if not context then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, no context given.") return end
+
+  if MasksData.Vignette[context] == nil then Globals.PrintDebug(Calculate.__NAME, "Cannot retireve a state, bad context given.") return end
+  return MasksData.Vignette[context]
+end
+
+-- @param `context`: string; Contexts: `onAim`, `onWeapon`, `permament`
+-- @param `isEnabled`: boolean
+--
+-- @return None
+local function SetVignetteState(context, isEnabled)
+  MasksData.Vignette[context] = isEnabled
+end
+
+-- @param `coordinate`: string; `x` or `y`
+--
+-- @return number;
+local function GetVignetteScreenSpace(coordinate)
+  local floor = math.floor
+  local newSpace = 0
+
+  newSpace = MasksData.Vignette.Def.ScreenSpace[coordinate] * (MasksData.Vignette.ScreenPosition[coordinate] / 100)
+  MasksData.Vignette.ScreenSpace[coordinate] = (floor(newSpace + 0.5))
+
+  -- Globals.PrintDebug(Calculate.__NAME, "Vignette position and screen space",coordinate,MasksData.Vignette.ScreenPosition[coordinate],MasksData.Vignette.ScreenSpace[coordinate])
+  return MasksData.Vignette.ScreenSpace[coordinate]
+end
+
+-- @param `coordinate`: string; `x` or `y`
+-- @param `minMax`: string; Optional `Min` or `Max`
+--
+-- @return number;
+local function GetVignetteScreenPosition(coordinate, minMax)
+  if not minMax then
+    return MasksData.Vignette.ScreenPosition[coordinate]
+  else
+    local minMaxKey = MasksData.Vignette.ScreenPosition[minMax]
+
+    return minMaxKey[coordinate]
+  end
+end
+
+-- @param `coordinate`: string `x` or `y`
+-- @param `value`: number
+--
+-- @return None
+local function SetVignetteScreenPosition(coordinate, value)
+  MasksData.Vignette.ScreenPosition[coordinate] = value
+
+  Calculate.OnVignetteChange(coordinate)
+end
+
+-- @param `coordinate`: string; `x` or `y`
+--
+-- @return number;
+local function GetVignetteSize(coordinate)
+  local floor = math.floor
+  local newSize = 0
+
+  newSize = MasksData.Vignette.Def.Size[coordinate] * (MasksData.Vignette.Scale[coordinate] / 100)
+  MasksData.Vignette.Size[coordinate] = (floor(newSize + 0.5))
+
+  -- Globals.PrintDebug(Calculate.__NAME, "Vignette scale and size",coordinate,MasksData.Vignette.Scale[coordinate],MasksData.Vignette.Size[coordinate])
+  return MasksData.Vignette.Size[coordinate]
+end
+
+-- @param `coordinate`: string; `x` or `y`
+-- @param `minMax`: string; Optional `Min` or `Max`
+--
+-- @return number;
+local function GetVignetteScale(coordinate, minMax)
+  if not minMax then
+    return MasksData.Vignette.Scale[coordinate]
+  else
+    local minMaxKey = MasksData.Vignette.Scale[minMax]
+
+    return minMaxKey[coordinate]
+  end
+end
+
+-- @param `coordinate`: string; `x` or `y`
+-- @param `value`: number
+--
+-- @return None
+local function SetVignetteScale(coordinate, value)
+  MasksData.Vignette.Scale[coordinate] = value
+
+  Calculate.OnVignetteChange(coordinate)
+end
+
+-- @param `coordinate`: string; `x` or `y`
+--
+-- @return None
+function Calculate.SetVignetteDefault(coordinate)
+  SetVignetteScreenPosition(coordinate, MasksData.Vignette.Def.ScreenPosition[coordinate])
+  SetVignetteScale(coordinate, MasksData.Vignette.Def.Scale[coordinate])
+end
+
+function Calculate.OnVignetteChange(coordinate)
+  local scaleChange = MasksData.Vignette.Scale[coordinate] - MasksData.Vignette.Scale.Min[coordinate]
+
+  MasksData.Vignette.ScreenPosition.Min[coordinate] = 100 - scaleChange
+  MasksData.Vignette.ScreenPosition.Max[coordinate] = 100 + scaleChange
+
+  if MasksData.Vignette.ScreenPosition[coordinate] < MasksData.Vignette.ScreenPosition.Min[coordinate] then
+    MasksData.Vignette.ScreenPosition[coordinate] = MasksData.Vignette.ScreenPosition.Min[coordinate]
+  end
+
+  if MasksData.Vignette.ScreenPosition[coordinate] > MasksData.Vignette.ScreenPosition.Max[coordinate] then
+    MasksData.Vignette.ScreenPosition[coordinate] = MasksData.Vignette.ScreenPosition.Max[coordinate]
+  end
+
+  GetVignetteSize(coordinate)
+  GetVignetteScreenSpace(coordinate)
+end
+
+------------------
+-- Prepare masks for the screen
+------------------
+
+local function ApplyCornersScreenSpace()
+  local screenType = Screen.type
+  local screenEdge = Screen.Edge
+
+  MasksData.Corners.ScreenSpace.Left.x = screenEdge.left
+  MasksData.Corners.ScreenSpace.Right.x = screenEdge.right
+
+  if screenType == 43 then
+    MasksData.Corners.ScreenSpace.Bottom.y = 2440
+  elseif screenType == 1610 then
+    MasksData.Corners.ScreenSpace.Bottom.y = 2280
+  else
+    MasksData.Corners.ScreenSpace.Bottom.y = screenEdge.down
+  end
+
+  -- Globals.PrintDebug("Corners screen space",MasksData.Corners.ScreenSpace.Left.x,MasksData.Corners.ScreenSpace.Right.x,MasksData.Corners.ScreenSpace.Bottom.y)
+end
+
+local function ApplyBlockerSize()
+  local screenType = Screen.type
+
+  if screenType == 43 then
+    MasksData.Blocker.Size = {x = 3840, y = 3074}
+  elseif screenType == 169 then
+    MasksData.Blocker.Size = {x = 3840, y = 2440}
+  elseif screenType == 1610 then
+    MasksData.Blocker.Size = {x = 3840, y = 2640}
+  elseif screenType == 219 then
+    MasksData.Blocker.Size = {x = 5140, y = 2440}
+  elseif screenType == 329 then
+    MasksData.Blocker.Size = {x = 7700, y = 2640}
+  end
+  -- Globals.PrintDebug("Blocker size:",MasksData.Blocker.Size.x,MasksData.Blocker.Size.y)
+end
+
+local function ApplyVignetteSize()
+  local screenType = Screen.type
+
+  if screenType == 43 then
+    MasksData.Vignette.Def.Size = {x = 4840, y = 3072}
+  elseif screenType == 169 then
+    MasksData.Vignette.Def.Size = {x = 4840, y = 2560}
+  elseif screenType == 1610 then
+    MasksData.Vignette.Def.Size = {x = 4840, y = 2880}
+  elseif screenType == 219 then
+    MasksData.Vignette.Def.Size = {x = 6460, y = 2560}
+  elseif screenType == 329 then
+    MasksData.Vignette.Def.Size = {x = 9680, y = 2560}
+  end
+  -- Globals.PrintDebug("Vignette default size:",MasksData.Vignette.Def.Size.x,MasksData.Vignette.Def.Size.y)
+end
+
+local function ApplyExceptions()
+  if Screen.type == 43 then
+    MasksData.Vignette.Scale.Min.y = 95
+  end
+end
+
+local function ApplyMasksController()
+  MaskingGlobal.masksController = Globals.GetMasksController()
+end
+
+local function ApplyScreenEdges()
+  local screen = Globals.GetScreenTable()
+
+  Screen.Edge = screen.Edge
+  Screen.type = screen.type
+end
+
+function Calculate.ApplySuggestedSettings(averageFps)
+  BackupUserSettings()
+
+  if averageFps >= 35 then
+    MasksData.Corners.onWeapon = true
+  else
+    MasksData.Corners.onWeapon = false
+  end
+
+  if averageFps >= 45 then
+    MasksData.Blocker.onAim = true
+    MasksData.Vignette.onAim = false
+  else
+    MasksData.Blocker.onAim = false
+    MasksData.Vignette.onAim = false
+  end
+
+  if averageFps >= 50 then
+    MasksData.Vignette.onWeapon = true
+  else
+    MasksData.Vignette.onWeapon = false
+  end
+
+  if averageFps >= 65 then
+    MasksData.Vignette.permament = true
+  else
+    MasksData.Vignette.permament = false
+  end
+
+  Toggle()
+
+  SaveUserSettings()
+
+  Globals.Print(Calculate.__NAME, LogText.calculate_apply_settings)
+end
+
+------------------
+-- On... registers
+------------------
 
 function Calculate.OnInitialize()
-  Config.SafeMergeTables(Calculate,Settings.GetUserSettings("Calculate"))
-  Calculate.ApplyMasksController()
-  Calculate.ApplyScreen()
-  Calculate.ApplyCornersScreenSpace()
-  Calculate.ApplyBlockerSize()
-  Calculate.ApplyVignetteSize()
-  Calculate.ApplyExceptions()
-  Calculate.GetVignetteScreenSpace('x')
-  Calculate.GetVignetteScreenSpace('y')
-  Calculate.GetVignetteSize('x')
-  Calculate.GetVignetteSize('y')
-  Calculate.Toggle()
-end
-
-function Calculate.OnOverlayOpen()
-  Config = require("Modules/Config")
-
-  --refresh UIText in case of translation
-  Localization = require("Modules/Localization")
-  UIText = Localization.UIText
+  LoadUserSettings(Settings.GetUserSettings('OnFoot'))
+  ApplyMasksController()
+  ApplyScreenEdges()
+  ApplyCornersScreenSpace()
+  ApplyBlockerSize()
+  ApplyVignetteSize()
+  ApplyExceptions()
+  GetVignetteScreenSpace('x')
+  GetVignetteScreenSpace('y')
+  GetVignetteSize('x')
+  GetVignetteSize('y')
+  Toggle()
 end
 
 function Calculate.OnOverlayClose()
-  Calculate.ApplyScreen()
-  Calculate.ApplyCornersScreenSpace()
-  Calculate.ApplyBlockerSize()
-  Calculate.ApplyVignetteSize()
-  Calculate.ApplyExceptions()
-  Calculate.GetVignetteScreenSpace('x')
-  Calculate.GetVignetteScreenSpace('y')
-  Calculate.GetVignetteSize('x')
-  Calculate.GetVignetteSize('y')
-  Calculate.Toggle()
-  Calculate.TurnOffLiveView()
+  ApplyScreenEdges()
+  ApplyCornersScreenSpace()
+  ApplyBlockerSize()
+  ApplyVignetteSize()
+  ApplyExceptions()
+  GetVignetteScreenSpace('x')
+  GetVignetteScreenSpace('y')
+  GetVignetteSize('x')
+  GetVignetteSize('y')
+  Toggle()
+  TurnOffLiveView()
 end
 
-function Calculate.Toggle()
-  Calculate.ToggleCornersOnWeapon()
-  Calculate.ToggleBlockerOnAim()
-  Calculate.ToggleVignetteOnAim()
-  Calculate.ToggleVignetteOnWeapon()
-  Calculate.ToggleVignettePermament()
+------------------
+-- Toggle RedScript Methods
+------------------
+
+function Toggle()
+  ToggleCornersOnWeapon()
+  ToggleBlockerOnAim()
+  ToggleVignetteOnAim()
+  ToggleVignetteOnWeapon()
+  ToggleVignettePermament()
 end
 
-function Calculate.ToggleCornersOnWeapon()
-  local masksController = Calculate.MaskingGlobal.masksController
+function ToggleCornersOnWeapon()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
-    local edge = Calculate.Screen.Edge
+    local edge = Screen.Edge
 
     Override(masksController, 'FrameGenGhostingFixOnFootToggleEvent', function(self, wrappedMethod)
       local originalOnFoot = wrappedMethod()
 
-      if not Calculate.Corners.onWeapon then return originalOnFoot end
+      if not MasksData.Corners.onWeapon then return originalOnFoot end
       self:FrameGenGhostingFixOnFootToggle(true)
     end)
 
@@ -350,20 +466,20 @@ function Calculate.ToggleCornersOnWeapon()
       self:FrameGenGhostingFixMasksOnFootSetMargins(edge.left, edge.right, edge.down)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.ToggleBlockerOnAim()
-  local masksController = Calculate.MaskingGlobal.masksController
+function ToggleBlockerOnAim()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
-    local size = Calculate.Blocker.Size
+    local size = MasksData.Blocker.Size
 
     Override(masksController, 'FrameGenGhostingFixBlockerAimOnFootToggleEvent', function(self, wrappedMethod)
       local originalBlockerAim = wrappedMethod()
 
-      if not Calculate.Blocker.onAim then return originalBlockerAim end
+      if not MasksData.Blocker.onAim then return originalBlockerAim end
       self:FrameGenGhostingFixBlockerAimOnFootToggle(true)
     end)
 
@@ -371,20 +487,20 @@ function Calculate.ToggleBlockerOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.ToggleVignetteOnAim()
-  local masksController = Calculate.MaskingGlobal.masksController
+function ToggleVignetteOnAim()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
-    local size = Calculate.Blocker.Size
+    local size = MasksData.Blocker.Size
 
     Override(masksController, 'FrameGenGhostingFixVignetteAimOnFootToggleEvent', function(self, wrappedMethod)
       local originalVignetteAim = wrappedMethod()
 
-      if not Calculate.Vignette.onAim then return originalVignetteAim end
+      if not MasksData.Vignette.onAim then return originalVignetteAim end
       self:FrameGenGhostingFixVignetteAimOnFootToggle(true)
     end)
 
@@ -392,68 +508,68 @@ function Calculate.ToggleVignetteOnAim()
       self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.ToggleVignetteOnWeapon()
-  local masksController = Calculate.MaskingGlobal.masksController
+function ToggleVignetteOnWeapon()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
-    local space = Calculate.Vignette.ScreenSpace
-    local size = Calculate.Vignette.Size
+    local space = MasksData.Vignette.ScreenSpace
+    local size = MasksData.Vignette.Size
 
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootToggleEvent', function(self, wrappedMethod)
       local originalVignette = wrappedMethod()
 
-      if not  Calculate.Vignette.onWeapon then return originalVignette end
+      if not  MasksData.Vignette.onWeapon then return originalVignette end
       self:FrameGenGhostingFixVignetteOnFootToggle(true)
     end)
 
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent', function(self, wrappedMethod)
       local originalVignetteDimensions = wrappedMethod()
 
-      if not Calculate.Vignette.onWeapon then return originalVignetteDimensions end
+      if not MasksData.Vignette.onWeapon then return originalVignetteDimensions end
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.ToggleVignettePermament()
-  local masksController = Calculate.MaskingGlobal.masksController
+function ToggleVignettePermament()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent', function(self, wrappedMethod)
       local originalFunction = wrappedMethod()
 
-      if not Calculate.Vignette.permament then return originalFunction end
+      if not MasksData.Vignette.permament then return originalFunction end
       self:FrameGenGhostingFixVignetteOnFootDeActivationToggle(true)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.TurnOnLiveView()
-  local masksController = Calculate.MaskingGlobal.masksController
+function TurnOnLiveView()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
-    local space = Calculate.Vignette.ScreenSpace
-    local size = Calculate.Vignette.Size
+    local space = MasksData.Vignette.ScreenSpace
+    local size = MasksData.Vignette.Size
 
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
       self:FrameGenGhostingFixVignetteOnFootEditorContext(true)
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
-function Calculate.TurnOffLiveView()
-  local masksController = Calculate.MaskingGlobal.masksController
+function TurnOffLiveView()
+  local masksController = MaskingGlobal.masksController
 
   if masksController then
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
@@ -462,155 +578,165 @@ function Calculate.TurnOffLiveView()
       self:FrameGenGhostingFixVignetteOnFootSetDimensions()
     end)
   else
-    Config.Print(LogText.config_controllerMissing,nil,nil,Calculate.__NAME)
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
   end
 end
 
---Local UI
-local cornersOnWeaponToggle
-local blockerOnAimToggle
-local vignetteOnAimToggle
-local vignetteOnWeaponToggle
-local vignettePermamentToggle
+------------------
+-- Local UI
+------------------
+
+local cornersOnWeaponBool, cornersOnWeaponToggle
+local blockerOnAimBool, blockerOnAimToggle
+local vignetteOnAimBool, vignetteOnAimToggle
+local vignetteOnWeaponBool, vignetteOnWeaponToggle
+local vignettePermamentBool, vignettePermamentToggle
 local vignetteScaleToggle = {}
 local vignettePositionToggle = {}
-
-local vignetteScale = Calculate.Vignette.Scale
-local vignettePosition = Calculate.Vignette.ScreenPosition
+local vignetteScale = {}
+local vignettePosition = {}
 
 function Calculate.DrawUI()
-  if UI.Std.BeginTabItem(UIText.OnFoot.tabname) then
-    UI.Ext.TextWhite(UIText.General.title_general)
-    UI.Std.Separator()
+  if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
+    ImGuiExt.Text(GeneralText.group_general)
+    ImGui.Separator()
 
-    Calculate.Corners.onWeapon, cornersOnWeaponToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BottomCornersMasks.name, Calculate.Corners.onWeapon)
+    cornersOnWeaponBool, cornersOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.chk_bottom_corners_masks, GetCornersState('onWeapon'))
     if cornersOnWeaponToggle then
-      Calculate.SaveUserSettings()
+      SetCornersState('onWeapon', cornersOnWeaponBool)
+      SaveUserSettings()
 
-      Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+      ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.BottomCornersMasks.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_bottom_corners_masks)
 
-    Calculate.Blocker.onAim, blockerOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.BlockerAim.name, Calculate.Blocker.onAim)
+    blockerOnAimBool, blockerOnAimToggle = ImGuiExt.Checkbox(OnFootText.chk_blocker_aim, GetBlockerState('onAim'))
     if blockerOnAimToggle then
-      Config.SetStatusBar(UIText.General.settings_saved)
+      SetBlockerState('onAim', blockerOnAimBool)
+      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
 
-      if Calculate.Vignette.onAim then
+      if GetVignetteState('onAim') then
         
-        Calculate.Vignette.onAim = false
+        SetVignetteState('onAim', false)
 
-        Config.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(OnFootText.status_aim)
       end
 
-      Calculate.SaveUserSettings()
+      SaveUserSettings()
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.BlockerAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_blocker_aim)
 
-    UI.Std.Text("")
-    UI.Ext.TextWhite(UIText.General.title_fps120)
-    UI.Std.Separator()
+    ImGui.Text("")
+    ImGuiExt.Text(GeneralText.group_fps120)
+    ImGui.Separator()
 
-    Calculate.Vignette.onAim, vignetteOnAimToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignetteAim.name, Calculate.Vignette.onAim)
+    vignetteOnAimBool, vignetteOnAimToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette_aim, GetVignetteState('onAim'))
     if vignetteOnAimToggle then
-      Config.SetStatusBar(UIText.General.settings_saved)
+      SetVignetteState('onAim', vignetteOnAimBool)
+      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
 
-      if Calculate.Blocker.onAim then
-        Calculate.Blocker.onAim = false
+      if GetBlockerState('onAim') then
+        SetBlockerState('onAim', false)
 
-        Config.SetStatusBar(UIText.General.info_aimOnFoot)
+        ImGuiExt.SetStatusBar(OnFootText.status_aim)
       end
 
-      Calculate.SaveUserSettings()
+      SaveUserSettings()
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.VignetteAim.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_vignette_aim)
 
-    Calculate.Vignette.onWeapon, vignetteOnWeaponToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.Vignette.name, Calculate.Vignette.onWeapon)
+    vignetteOnWeaponBool, vignetteOnWeaponToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette, GetVignetteState('onWeapon'))
     if vignetteOnWeaponToggle then
-      Calculate.SaveUserSettings()
-
-      Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+      SetVignetteState('onWeapon', vignetteOnWeaponBool)
+      SaveUserSettings()
+      
+      ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
     end
-    UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.Vignette.tooltip)
+    ImGuiExt.SetTooltip(OnFootText.tooltip_vignette)
 
-    if Calculate.Vignette.onWeapon then
-      if not Config.IsMounted() then
-        Calculate.Vignette.permament, vignettePermamentToggle = UI.Ext.Checkbox.TextWhite(UIText.OnFoot.VignettePermament.name, Calculate.Vignette.permament)
+    if GetVignetteState('onWeapon') then
+      if not Tracker.IsVehicleMounted() then
+        vignettePermamentBool, vignettePermamentToggle = ImGuiExt.Checkbox(OnFootText.chk_vignette_permament, GetVignetteState('permament'))
         if vignettePermamentToggle then
-          Calculate.SaveUserSettings()
+          SetVignetteState('permament', vignettePermamentBool)
+          SaveUserSettings()
 
-          Config.SetStatusBar(UIText.General.settings_applied_onfoot)
+          ImGuiExt.SetStatusBar(OnFootText.status_reload_accept_changes)
         end
-        UI.Ext.OnItemHovered.SetTooltip(UIText.OnFoot.VignettePermament.tooltip)
+        ImGuiExt.SetTooltip(OnFootText.tooltip_vignette_permament)
 
-        if Calculate.Vignette.onAim and Calculate.Vignette.onWeapon then
-          UI.Std.Text("")
-          UI.Ext.TextWhite(UIText.OnFoot.VignetteAim.textfield_1)
+        if GetVignetteState('onAim') and GetVignetteState('onWeapon') then
+          ImGui.Text("")
+          ImGuiExt.Text(OnFootText.info_dimming, true)
         end
+
         --customize vignette interface starts------------------------------------------------------------------------------------------------------------------
-        UI.Std.Text("")
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.textfield_1)
-        UI.Std.Text("")
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_1)
+        ImGui.Text("")
+        ImGuiExt.Text(OnFootText.info_vignette, true)
+        ImGui.Text("")
+        ImGuiExt.Text(OnFootText.slider_vignette_width)
       
-        vignetteScale.x, vignetteScaleToggle.x = UI.Std.SliderFloat("Scale X",vignetteScale.x, vignetteScale.Min.x, vignetteScale.Max.x, "%.0f")
+        vignetteScale.x, vignetteScaleToggle.x = ImGui.SliderFloat("##Scale X", GetVignetteScale('x'), GetVignetteScale('x', 'Min'), GetVignetteScale('x', 'Max'), "%.0f")
         if vignetteScaleToggle.x then
+          SetVignetteScale('x', vignetteScale.x)
           Calculate.OnVignetteChange('x')
-          Calculate.TurnOnLiveView()
+          TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_2)
+        ImGuiExt.Text(OnFootText.slider_vignette_height)
       
-        vignetteScale.y, vignetteScaleToggle.y = UI.Std.SliderFloat("Scale Y",vignetteScale.y, vignetteScale.Min.y, vignetteScale.Max.y, "%.0f")
+        vignetteScale.y, vignetteScaleToggle.y = ImGui.SliderFloat("##Scale Y", GetVignetteScale('y'), GetVignetteScale('y', 'Min'), GetVignetteScale('y', 'Max'), "%.0f")
         if vignetteScaleToggle.y then
+          SetVignetteScale('y', vignetteScale.y)
           Calculate.OnVignetteChange('y')
-          Calculate.TurnOnLiveView()
+          TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_3)
+        ImGuiExt.Text(OnFootText.slider_vignette_pos_x)
       
-        vignettePosition.x, vignettePositionToggle.x = UI.Std.SliderFloat("Pos. X",vignettePosition.x, vignettePosition.Min.x, vignettePosition.Max.y, "%.0f")
+        vignettePosition.x, vignettePositionToggle.x = ImGui.SliderFloat("##Pos. X", GetVignetteScreenPosition('x'), GetVignetteScreenPosition('x', 'Min'), GetVignetteScreenPosition('x', 'Max'), "%.0f")
         if vignettePositionToggle.x then
+          SetVignetteScreenPosition('x', vignettePosition.x)
           Calculate.OnVignetteChange('x')
-          Calculate.TurnOnLiveView()
+          TurnOnLiveView()
         end
       
-        UI.Ext.TextWhite(UIText.OnFoot.Vignette.setting_4)
+        ImGuiExt.Text(OnFootText.slider_vignette_pos_y)
       
-        vignettePosition.y, vignettePositionToggle.y = UI.Std.SliderFloat("Pos. Y",vignettePosition.y, vignettePosition.Min.y, vignettePosition.Max.y, "%.0f")
+        vignettePosition.y, vignettePositionToggle.y = ImGui.SliderFloat("##Pos. Y", GetVignetteScreenPosition('y'), GetVignetteScreenPosition('y', 'Min'), GetVignetteScreenPosition('y', 'Max'), "%.0f")
         if vignettePositionToggle.y then
+          SetVignetteScreenPosition('y', vignettePosition.y)
           Calculate.OnVignetteChange('y')
-          Calculate.TurnOnLiveView()
+          TurnOnLiveView()
         end
       
-        UI.Std.Text("")
+        ImGui.Text("")
       
-        if UI.Std.Button(UIText.General.default, 240, 40) then
+        if ImGui.Button(SettingsText.btn_default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           Calculate.SetVignetteDefault('x')
           Calculate.SetVignetteDefault('y')
-          Calculate.TurnOnLiveView()
+          TurnOnLiveView()
 
-          Config.SetStatusBar(UIText.General.settings_default)
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_default)
         end
       
-        UI.Std.SameLine()
+        ImGui.SameLine()
       
-        if UI.Std.Button(UIText.General.settings_save, 240, 40) then
-          Calculate.SaveUserSettings()
+        if ImGui.Button(SettingsText.btn_save_settings, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+          SaveUserSettings()
 
-          Config.SetStatusBar(UIText.General.settings_saved)
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
         end
       else
-        Config.SetStatusBar(UIText.General.info_getOut)
+        ImGuiExt.SetStatusBar(OnFootText.status_get_out)
       end
     else
-      if Calculate.Vignette.permament then
-        Calculate.Vignette.permament = false
+      if GetVignetteState('permament') then
+        SetVignetteState('permament', false)
       end
     end
 
-    UI.Ext.StatusBar(Config.GetStatusBar())
-
-    UI.Std.EndTabItem()
+    ImGui.EndTabItem()
   end
 end
 
