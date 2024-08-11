@@ -3,7 +3,13 @@ local Contextual = {
   __VERSION = { 5, 0, 0 },
 }
 
+local isDebug = nil
+
 local FGEnabled = false
+
+-- keeps current context to avoid unwanted context changes for sudden switches between locamotion states
+local isOnHold = false
+local timeOnHold = 0
 
 local Contexts = {
   Sightseeing = false,
@@ -56,6 +62,10 @@ local ContextualText = Localization.GetContextualText()
 local GeneralText = Localization.GetGeneralText()
 local SettingsText = Localization.GetSettingsText()
 
+------------------
+-- User Settings
+------------------
+
 local function GetUserSettings()
   local userSettings = {
     Contexts = Contexts,
@@ -76,6 +86,21 @@ local function SaveUserSettings()
   Settings.WriteUserSettings("Contextual", GetUserSettings())
 end
 
+------------------
+-- Local Debug Mode Setter
+------------------
+
+-- @param `isDebugMode`: boolean; Sets internal debug variable to `true` or `false`
+--
+-- @return None
+function SetDebugMode(isDebugMode)
+  isDebug = isDebugMode
+end
+
+------------------
+-- Main Logic Starts Here
+------------------
+
 local function TurnOnFrameGen()
   if not Tracker.IsGameReady() then return end
 
@@ -95,6 +120,29 @@ local function TurnOffFrameGen()
     DLSSEnabler_SetFrameGenerationState(false)
     FGEnabled = false
     Tracker.SetModFrameGeneration(false)
+  end
+end
+
+local function KeepOnHold(timeSeconds)
+  if isOnHold then
+    timeOnHold = timeOnHold - Tracker.GetGameDeltaTime()
+
+    if timeOnHold > 0 then return end
+  
+    isOnHold = false
+
+    if not isDebug then return end
+    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [" .. Contextual.__NAME .. "] Previous context released."
+    print(msg)
+    spdlog.debug(msg)
+  else
+    isOnHold = true
+    timeOnHold = timeSeconds
+
+    if not isDebug then return end
+    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [" .. Contextual.__NAME .. "] Keeping previous context on hold for: " .. timeSeconds .. " seconds."
+    print(msg)
+    spdlog.debug(msg)
   end
 end
 
@@ -496,6 +544,10 @@ function HandleStaticAndDrivingStates()
   end
 end
 
+---------------
+-- On... registers
+--------------- 
+
 function Contextual.OnInitialize()
 
   LoadUserSettings(Settings.GetUserSettings("Contextual"))
@@ -703,7 +755,10 @@ function Contextual.OnInitialize()
         locomotionState == 19 or
         locomotionState == 20 or
         locomotionState == 21 or
-        locomotionState == 22 then
+        locomotionState == 22 or
+        isOnHold
+        then
+          KeepOnHold(2)
           return -- early return to continue previous states on sliding, dodging and jumping
         end
     
@@ -877,6 +932,14 @@ function Contextual.OnInitialize()
   end)
 
 end
+
+function Contextual.OnOverlayClose()
+  SetDebugMode(Settings.IsDebugMode())
+end
+
+---------------
+-- Local UI
+--------------- 
 
 function Contextual.DrawUI()
 

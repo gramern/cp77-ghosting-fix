@@ -394,7 +394,7 @@ local Globals = require("Modules/Globals")
 local Tracker = require("Modules/Tracker")
 
 -- Math
-local abs, atan, deg, floor, max, min, pi, rad, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.tan
+local abs, atan, deg, floor, max, min, pi, rad, sqrt, tan = math.abs, math.atan, math.deg, math.floor, math.max, math.min, math.pi, math.rad, math.sqrt, math.tan
 
 ----------------------------------------------------------------------------------------------------------------------
 --Table getters
@@ -1197,7 +1197,7 @@ local function TransformWidthBike()
   if CameraData.activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     if not hedSize.Def.lock then
-      local newHEDx = min(hedScale.x, dotVeh.forwardAbs ^ 0.5)
+      local newHEDx = min(hedScale.x, sqrt(dotVeh.forwardAbs))
       newHEDx = max(0.92, newHEDx)
       hedSize.x = SetSizeHED(hedSize.Def.x, newHEDx, true)
     else
@@ -1250,7 +1250,7 @@ local function TransformWidthCar(currentSpeed)
   if activePerspective ~= vehicleCameraPerspective.FPP then
     --HED
     if not hedSize.Def.lock then
-      local newHEDx = min(hedScale.x, dotVeh.forwardAbs ^ 0.5)
+      local newHEDx = min(hedScale.x, sqrt(dotVeh.forwardAbs))
       newHEDx = max(0.92, newHEDx)
       hedSize.x = SetSizeHED(hedSize.Def.x, newHEDx, true)
     else
@@ -1270,13 +1270,23 @@ local function TransformWidthCar(currentSpeed)
       --Mask4
       local mask4Size = min(axisLength.front * 2.5, axisLength.front * abs(medianAngle) * 0.4)
       mask4.Size.x = max(mask4Size, axisLength.front * 2)
+      mask4.Size.x = max(mask4Size, mask4Size * ModifiersDerivatives.scaleMaskingInWidth)
     else
-      --Mask1
-      local mask1Size = max(axisLength.back * 2, bumpersScreenDistance * 0.5)
-      mask1.Size.x = max(mask1Size, mask1Size * ModifiersDerivatives.scaleMaskingInWidth)
+      local maskSize = max(axisLength.back * 2, bumpersScreenDistance * 0.5)
 
-      --Mask4
-      mask4.Size.x = max(axisLength.back * 2, bumpersScreenDistance * 0.5)
+      if dotVeh.forward > 0 then
+        --Mask1
+        mask1.Size.x = max(maskSize, maskSize * dotVeh.forwardAbs * dotVeh.forwardAbs * dotVeh.forwardAbs * ModifiersDerivatives.scaleMaskingInWidth)
+
+        --Mask4
+        mask4.Size.x = maskSize
+      else
+        --Mask1
+        mask1.Size.x = maskSize
+
+        --Mask4
+        mask4.Size.x = max(maskSize, maskSize * dotVeh.forwardAbs * ModifiersDerivatives.scaleMaskingInWidth)
+      end
     end
 
     --Mask2
@@ -1403,7 +1413,7 @@ local function TransformHeightCar(currentSpeed)
 
     if dotVeh.forward > 0 then
       --Mask1
-      mask1.Size.y = max(axisLength.back * 2.5, bumpersScreenDistance * 1.5) * (1 + (dotVeh.rightAbs ^ 0.5))
+      mask1.Size.y = max(axisLength.back * 2.5, bumpersScreenDistance * 1.5) * (1 + sqrt(dotVeh.rightAbs))
 
       --Mask4
       mask4.Size.y = max(axisLength.back * 2, bumpersScreenDistance) * max(dotVeh.upAbs * 1.5, dotVeh.rightAbs)

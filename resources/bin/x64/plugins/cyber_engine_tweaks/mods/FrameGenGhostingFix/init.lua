@@ -3,7 +3,7 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "beta10",
+  __VERSION_STATUS = "beta11",
   __VERSION_STRING = nil,
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
@@ -469,6 +469,7 @@ registerForEvent("onOverlayClose", function()
   if not Tracker.IsModReady() then return end
 
   Calculate.OnOverlayClose()
+  Contextual.OnOverlayClose()
   Settings.OnOverlayClose()
   ImGuiExt.OnOverlayClose()
 
