@@ -4,11 +4,11 @@
 # Features
 **Anti-ghosting:** 
 
-Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achieves this by placing nearly invisible HUD masks that block frame generation in certain parts of the screen. Offers customization options, including masking parameters on-foot, built-in presets, and a presets editor for vehicles.
+Limits ghosting behind some moving 3D objects caused by modded FSR3 frame generation in Cyberpunk 2077. Achieves this by placing nearly invisible HUD masks that block frame generation in certain parts of the screen. Offers customization options, including [masking parameters on-foot](docs/assets/images/on-foot-customize.gif), [built-in presets system and presets editor for vehicles](docs/assets/images/vehicles-presets-editor.gif).
 
 **Contextual Frame Generation:** 
 
-Allows prioritizing image quality for certain in-game events by automatically turning frame generation on/off without lag or stutter.
+Allows prioritizing image quality for [certain in-game events](docs/assets/images/contextual-menu.gif) by automatically turning frame generation on/off without lag or stutter.
 
 
 # Requirements
