@@ -4,10 +4,6 @@
 
 // RedScript Modules Presence Check --------------------------------------------------------------------------------
 public static func FrameGenGhostingFixIsRedScriptModule() -> Void {}
-// CET add-on customization --------------------------------------------------------------------------------
-public class FrameGenGhostingFixMaskEditor1Event extends Event {}
-public class FrameGenGhostingFixMaskEditor2Event extends Event {}
-public class FrameGenGhostingFixVignetteOnFootEditorEvent extends Event {}
 // Car camera change ---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixCameraTPPCarEvent extends Event {}
 public class FrameGenGhostingFixCameraTPPFarCarEvent extends Event {}
@@ -54,8 +50,8 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
         this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
       }
 
-      this.controller.FrameGenGhostingFixBlockerAimOnFootToggleEvent();
-      this.controller.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
+      this.controller.FrameGenGhostingFixBlockerAimOnFootToggle(false);
+      this.controller.FrameGenGhostingFixVignetteAimOnFootToggle(false);
 
       if Equals(this.controller.m_upperBodyState, IntEnum<gamePSMUpperBodyStates>(6)) {
         if Equals(this.controller.m_blockerAimOnFootEnabled, true) && NotEquals(this.controller.m_blockerAimOnFootActivated, true) {
@@ -103,7 +99,7 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
     }
   
     if NotEquals(this.controller.m_isVehicleMountedFGGF, true) {
-      this.controller.FrameGenGhostingFixVignetteOnFootEditorToggle();
+      this.controller.FrameGenGhostingFixVignetteOnFootEditorContext(false);
       if Equals(this.controller.m_vignetteOnFootEditor, true) {
         this.controller.FrameGenGhostingFixVignetteOnFootEditor();
       }
@@ -222,10 +218,10 @@ protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   };
 
   this.FrameGenGhostingFixCallback();
-  this.FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent();
+  this.FrameGenGhostingFixMasksOnFootSetMarginsToggle();
   this.FrameGenGhostingFixVignetteOnFootSetDimensions();
-  this.FrameGenGhostingFixVignetteAimOnFootToggleEvent();
-  this.FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent();
+  this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
+  this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
   this.FrameGenGhostingFixAimOnFootSetDimensions();
 
   // LogChannel(n"DEBUG", s"Main Loop initialized...");

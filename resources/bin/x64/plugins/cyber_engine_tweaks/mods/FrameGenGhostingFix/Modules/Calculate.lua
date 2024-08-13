@@ -45,7 +45,7 @@ local MasksData = {
         Max = {x = 150, y = 145},
         Min = {x = 50, y = 55},
         x = 100,
-        y = 80,
+        y = 75,
       },
       ScreenSpace = {x = 1920, y = 1080},
       Size = {x = 4840, y = 2560},
@@ -421,6 +421,12 @@ function Calculate.OnInitialize()
   GetVignetteSize('x')
   GetVignetteSize('y')
   Toggle()
+
+  -- if not MaskingGlobal.masksController then return end
+
+  -- ObserveAfter(MaskingGlobal.masksController, 'OnPlayerAttach', function(self, playerGameObject)
+  --   ToggleOnAttach()
+  -- end)
 end
 
 function Calculate.OnOverlayClose()
@@ -455,14 +461,14 @@ function ToggleCornersOnWeapon()
   if masksController then
     local edge = Screen.Edge
 
-    Override(masksController, 'FrameGenGhostingFixOnFootToggleEvent', function(self, wrappedMethod)
-      local originalOnFoot = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixOnFootToggle', function(self, masksOnFoot, wrappedMethod)
+      local originalOnFoot = wrappedMethod(masksOnFoot)
 
       if not MasksData.Corners.onWeapon then return originalOnFoot end
-      self:FrameGenGhostingFixOnFootToggle(true)
+      self.masksOnFootEnabled = true
     end)
 
-    Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggleEvent', function(self)
+    Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggle', function(self)
       self:FrameGenGhostingFixMasksOnFootSetMargins(edge.left, edge.right, edge.down)
     end)
   else
@@ -476,15 +482,16 @@ function ToggleBlockerOnAim()
   if masksController then
     local size = MasksData.Blocker.Size
 
-    Override(masksController, 'FrameGenGhostingFixBlockerAimOnFootToggleEvent', function(self, wrappedMethod)
-      local originalBlockerAim = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixBlockerAimOnFootToggle', function(self, blockerAimOnFoot, wrappedMethod)
+      local originalBlockerAim = wrappedMethod(blockerAimOnFoot)
 
       if not MasksData.Blocker.onAim then return originalBlockerAim end
-      self:FrameGenGhostingFixBlockerAimOnFootToggle(true)
+      self.blockerAimOnFootEnabled = true
     end)
 
-    Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
-      self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
+    Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggle', function(self, aimOnFootSizeX, aimOnFootSizeY, wrappedMethod)
+      self.aimOnFootSizeX = size.x
+      self.aimOnFootSizeY = size.y
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -497,15 +504,16 @@ function ToggleVignetteOnAim()
   if masksController then
     local size = MasksData.Blocker.Size
 
-    Override(masksController, 'FrameGenGhostingFixVignetteAimOnFootToggleEvent', function(self, wrappedMethod)
-      local originalVignetteAim = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixVignetteAimOnFootToggle', function(self, vignetteAimOnFoot, wrappedMethod)
+      local originalVignetteAim = wrappedMethod(vignetteAimOnFoot)
 
       if not MasksData.Vignette.onAim then return originalVignetteAim end
-      self:FrameGenGhostingFixVignetteAimOnFootToggle(true)
+      self.vignetteAimOnFootEnabled = true
     end)
 
-    Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggleEvent', function(self)
-      self:FrameGenGhostingFixAimOnFootSetDimensionsToggle(size.x, size.y)
+    Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggle', function(self, aimOnFootSizeX, aimOnFootSizeY, wrappedMethod)
+      self.aimOnFootSizeX = size.x
+      self.aimOnFootSizeY = size.y
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -519,18 +527,21 @@ function ToggleVignetteOnWeapon()
     local space = MasksData.Vignette.ScreenSpace
     local size = MasksData.Vignette.Size
 
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootToggleEvent', function(self, wrappedMethod)
-      local originalVignette = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootToggle', function(self, vignetteOnFoot, wrappedMethod)
+      local originalVignette = wrappedMethod(vignetteOnFoot)
 
       if not  MasksData.Vignette.onWeapon then return originalVignette end
-      self:FrameGenGhostingFixVignetteOnFootToggle(true)
+      self.vignetteOnFootEnabled = true
     end)
 
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggleEvent', function(self, wrappedMethod)
-      local originalVignetteDimensions = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggle', function(self, vignetteOnFootMarginLeft, vignetteOnFootMarginTop, vignetteOnFootSizeX, vignetteOnFootSizeY, wrappedMethod)
+      local originalVignetteDimensions = wrappedMethod(vignetteOnFootMarginLeft, vignetteOnFootMarginTop, vignetteOnFootSizeX, vignetteOnFootSizeY)
 
       if not MasksData.Vignette.onWeapon then return originalVignetteDimensions end
-      self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
+      self.vignetteOnFootMarginLeft = space.x
+      self.vignetteOnFootMarginTop = space.y
+      self.vignetteOnFootSizeX = size.x
+      self.vignetteOnFootSizeY = size.y
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -541,11 +552,11 @@ function ToggleVignettePermament()
   local masksController = MaskingGlobal.masksController
 
   if masksController then
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootDeActivationToggleEvent', function(self, wrappedMethod)
-      local originalFunction = wrappedMethod()
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootActivationToggle', function(self, vignetteOnFootActivation, wrappedMethod)
+      local originalFunction = wrappedMethod(vignetteOnFootActivation)
 
       if not MasksData.Vignette.permament then return originalFunction end
-      self:FrameGenGhostingFixVignetteOnFootDeActivationToggle(true)
+      self.vignetteOnFootActivated = true
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -559,8 +570,8 @@ function TurnOnLiveView()
     local space = MasksData.Vignette.ScreenSpace
     local size = MasksData.Vignette.Size
 
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
-      self:FrameGenGhostingFixVignetteOnFootEditorContext(true)
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorContext', function(self, vignetteOnFootEditor, wrappedMethod)
+      self.vignetteOnFootEditor = true
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
@@ -572,8 +583,8 @@ function TurnOffLiveView()
   local masksController = MaskingGlobal.masksController
 
   if masksController then
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorToggle', function(self)
-      self:FrameGenGhostingFixVignetteOnFootEditorContext(false)
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorContext', function(self, vignetteOnFootEditor, wrappedMethod)
+      self.vignetteOnFootEditor = false
       self:FrameGenGhostingFixVignetteOnFootEditorTurnOff()
       self:FrameGenGhostingFixVignetteOnFootSetDimensions()
     end)
