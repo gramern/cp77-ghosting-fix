@@ -180,7 +180,7 @@ end
 
 function VectorsPresets.OnOverlayOpen()
   -- Translate and refresh presets info and list
-  PresetsList = Localization.GetTranslation(PresetsList, "PresetsList")
+  PresetsList = Localization.GetLocalization(PresetsList, "PresetsList")
   
   if not Tracker.IsGameFrameGeneration() then
     Vectors.SetMaskingState(false)
@@ -198,6 +198,7 @@ function VectorsPresets.DrawUI()
     if not Tracker.IsGameFrameGeneration() then
       ImGui.Text("")
       ImGuiExt.Text(SettingsText.info_frame_gen_off, true)
+      ImGui.Text("")
 
       ImGui.EndTabItem()
       return

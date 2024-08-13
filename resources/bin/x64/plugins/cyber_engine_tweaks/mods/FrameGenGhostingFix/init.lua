@@ -3,8 +3,9 @@ FrameGenGhostingFix = {
   __EDITION = "V",
   __VERSION = { 5, 0, 0 },
   __VERSION_SUFFIX = nil,
-  __VERSION_STATUS = "beta11",
+  __VERSION_STATUS = "beta12",
   __VERSION_STRING = nil,
+  __DLSS_ENABLER_VERSION_MIN = { 3, 0, 0, 1},
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -51,6 +52,7 @@ local VectorsEditor = require("Modules/VectorsEditor")
 --localization tables
 local LogText = Localization.GetLogText()
 local BenchmarkText = Localization.GetBenchmarkText()
+local ContextualText = Localization.GetContextualText()
 local GeneralText = Localization.GetGeneralText()
 local InfoText = Localization.GetInfoText()
 local SettingsText = Localization.GetSettingsText()
@@ -88,7 +90,7 @@ local averageFps = 0
 local countFps = 0
 
 -- user_settings not loading on SteamOS - problem mitigation attempt
-local userSettingsLoaded = false
+-- local userSettingsLoaded = false
 
 --ui
 local windowTitle
@@ -154,7 +156,8 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
 
   if not version then Globals.PrintError(LogText.bridge_missing) return false end
 
-  local minVersion = {major = 3, minor = 1, patch = 0, revision = 12}
+  local enablerVersion = FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN
+  local minVersion = {major = enablerVersion[1], minor = enablerVersion[2], patch = enablerVersion[3], revision = enablerVersion[4]}
 
   local isCompatible =
     version[1] > minVersion.major or
@@ -170,9 +173,9 @@ end
 -- @param `isLoaded`: boolean;
 -- 
 -- @return None
-function FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(isExecuted)
-  userSettingsLoaded = isExecuted
-end
+-- function FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(isExecuted)
+--   userSettingsLoaded = isExecuted
+-- end
 
 ------------------
 -- Benchmark
@@ -362,9 +365,8 @@ registerForEvent("onInit", function()
   if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
     if Contextual then 
       if not FrameGenGhostingFix.IsDLSSEnablerCompatible() then
-        Globals.PrintError(LogText.bridge_bad_enabler_version)
-        Tracker.SetModReady(false)
-        return
+        Globals.PrintError(Contextual.__NAME, LogText.bridge_bad_enabler_version)
+        Globals.PrintError(Contextual.__NAME, LogText.bridge_found_enabler_version, FrameGenGhostingFix.GetDLSSEnablerVersion())
       end
     else
       Globals.PrintError(LogText.contextual_missing)
@@ -469,7 +471,12 @@ registerForEvent("onOverlayClose", function()
   if not Tracker.IsModReady() then return end
 
   Calculate.OnOverlayClose()
-  Contextual.OnOverlayClose()
+
+  -- check for the non-contextual edition of the mod
+  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+    Contextual.OnOverlayClose()
+  end
+
   Settings.OnOverlayClose()
   ImGuiExt.OnOverlayClose()
 
@@ -546,13 +553,13 @@ registerForEvent("onDraw", function()
             if not Tracker.IsModFirstRun() and not isBenchmark then
               ImGui.Text("")
 
-              if ImGui.Button(GeneralText.yes, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+              if ImGui.Button(GeneralText.yes, 234 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                 SetBenchmark(true)
               end
 
               ImGui.SameLine()
 
-              if ImGui.Button(GeneralText.no, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+              if ImGui.Button(GeneralText.no, 234 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                 Tracker.SetModNewInstall(false)
                 Settings.SetKeepWindow(false)
               end
@@ -565,6 +572,28 @@ registerForEvent("onDraw", function()
           if ImGui.BeginTabItem(InfoText.tab_name_info) then
 
             ImGuiExt.Text(InfoText.info_aspect_ratio_change, true)
+
+            ImGui.EndTabItem()
+          end
+        end
+
+        if FrameGenGhostingFix.__VERSION_SUFFIX and not Settings.IsMessage() then
+          if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
+
+            ImGuiExt.Text(ContextualText.info_contextual, true)
+            ImGui.Text("")
+            ImGuiExt.Text(ContextualText.info_contextual_dependencies, true)
+            ImGui.Text("")
+            ImGuiExt.Text(GeneralText.info_version, true)
+            ImGuiExt.Text(FrameGenGhostingFix.__VERSION_STRING, true)
+            ImGui.Text("")
+            ImGuiExt.TextColor(GeneralText.info_important, 1, 0.85, 0.31, 1, true)
+            ImGuiExt.Text(ContextualText.info_contextual_requirements, true)
+            ImGui.Text("")
+
+            if ImGui.Button(GeneralText.btn_apply, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+              Settings.SetMessage(true)
+            end
 
             ImGui.EndTabItem()
           end

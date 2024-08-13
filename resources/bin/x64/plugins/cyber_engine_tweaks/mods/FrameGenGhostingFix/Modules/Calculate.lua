@@ -598,6 +598,15 @@ local vignettePosition = {}
 
 function Calculate.DrawUI()
   if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
+    if not Tracker.IsGameFrameGeneration() then
+      ImGui.Text("")
+      ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
+      ImGui.Text("")
+
+      ImGui.EndTabItem()
+      return
+    end
+
     ImGuiExt.Text(GeneralText.group_general)
     ImGui.Separator()
 
@@ -712,7 +721,7 @@ function Calculate.DrawUI()
       
         ImGui.Text("")
       
-        if ImGui.Button(SettingsText.btn_default, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(SettingsText.btn_default, 234 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           Calculate.SetVignetteDefault('x')
           Calculate.SetVignetteDefault('y')
           TurnOnLiveView()
@@ -722,7 +731,7 @@ function Calculate.DrawUI()
       
         ImGui.SameLine()
       
-        if ImGui.Button(SettingsText.btn_save_settings, 240 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+        if ImGui.Button(SettingsText.btn_save_settings, 234 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
           SaveUserSettings()
 
           ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)

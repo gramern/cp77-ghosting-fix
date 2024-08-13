@@ -485,16 +485,51 @@ function Globals.VersionStringToTable(versionString)
   return versionTable
 end
 
---- Compares a given version table with the mod's current version (`FrameGenGhostingFix.__VERSION`) to check compatibility.
+-- @param `versionTable`: table; Input version table with 1 to 4 numbers
 --
--- @param `versionTable`: table; The version table (must be 3 integers: `{ major, minor, patch }`) to compare against `FrameGenGhostingFix.__VERSION`.
+-- @return string: A formatted version string (e.g., "3.0.0.1")
+function Globals.VersionTableToString(versionTable)
+  local result = {}
+
+  for i = 1, math.min(4, #versionTable) do
+    if type(versionTable[i]) ~= "number" then
+      Globals.PrintError(Globals.__NAME, "All elements in the version table must be numbers")
+    end
+    table.insert(result, tostring(versionTable[i]))
+  end
+
+  return table.concat(result, ".")
+end
+
+--- Pads a version table to ensure it has 4 elements
 --
--- @return boolean: Returns true if the given version table is newer or equal, false otherwise.
-function Globals.VersionCompare(versionTable)
-  for i = 1, 3 do
-    if   FrameGenGhostingFix.__VERSION[i] > versionTable[i] then
+-- @param `versionTable`: table; Input version table with 1 to 4 numbers
+--
+-- @return table: A new table with the original version numbers padded to 4 elements
+function Globals.PadVersion(versionTable)
+  local padded = {table.unpack(versionTable)}
+
+  for i = #padded + 1, 4 do
+    padded[i] = 0
+  end
+
+  return padded
+end
+
+--- Compares given version tables
+--
+-- @param `requiredVersionTable`: table; Max 4 numbers (major, minor, patch, revision)
+-- @param `foundVersionTable`: table; Max 4 numbers (major, minor, patch, revision)
+--
+-- @return boolean: Returns true if the given `foundVersionTable` table is newer or equal, false otherwise.
+function Globals.VersionCompare(requiredVersionTable, foundVersionTable)
+  local reqVersion = Globals.PadVersion(requiredVersionTable)
+  local foundVersion = Globals.PadVersion(foundVersionTable)
+
+  for i = 1, 4 do
+    if reqVersion[i] > foundVersion[i] then
       return false
-    elseif FrameGenGhostingFix.__VERSION[i] < versionTable[i] then
+    elseif reqVersion[i] < foundVersion[i] then
       return true
     end
   end

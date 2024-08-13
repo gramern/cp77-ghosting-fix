@@ -19,6 +19,9 @@ local UIText = {
     info_enabled = "Enabled",
     info_mod_not_ready = "[ ! ] Mod isn't working. Check logs for details...",
     info_important = "IMPORTANT:",
+    info_reopen_overlay = " Reopen CET's overlay after change.",
+    info_required = "Required:",
+    info_version = "Your FrameGen Ghosting 'Fix' version:",
     status_version = "Mod version:",
   },
   Info = {
@@ -102,10 +105,10 @@ local UIText = {
     info_is_moving_vehicle = "The vehicle is moving. Stop it to edit these options.",
     tooltip_bottom_edges = "Scale the base width for the whole screen bottom masking. This size will be locked if the 'Lock size of the screen bottom masking' checkbox is selected.",
     tooltip_center_view = "Center the current perspective/camera view.",
-    tooltip_cockpit_masks = "Toggle on/off for masks coverings side mirrors and doors' lower parts while driving a car in FPP.",
-    tooltip_corners_masks = "Toggle on/off for masks covering bottom corners of the screen while driving a vehicle.",
+    tooltip_cockpit_masks = "Toggle ON/OFF for masks coverings side mirrors and doors' lower parts while driving a car in FPP.",
+    tooltip_corners_masks = "Toggle ON/OFF for masks covering bottom corners of the screen while driving a vehicle.",
     tooltip_decouple_masking = "Enabling this option decouples masking strength from a vehicle's speed. If enabled, masks are fully active all the time while driving a vehicle: also when vehicle is static (its current speed is 0).",
-    tooltip_following_mask = "Toggle on/off for the mask following the front or rear end of a vehicle, that is currently closer to the bottom edge of the screen.",
+    tooltip_following_mask = "Toggle ON/OFF for the mask following the front or rear end of a vehicle, that is currently closer to the bottom edge of the screen.",
     tooltip_input_name = "Enter a name for the new preset.",
     tooltip_input_author = "Enter an author name for the new preset.",
     tooltip_input_description = "Enter a description for the new preset.",
@@ -113,10 +116,10 @@ local UIText = {
     tooltip_load_preset = "Select a base preset to load its values to the editor.",
     tooltip_lock_middle_mask = "Lock the mask covering the middle part of the screen while driving a vehicle. This option makes the mask being active for all camera angle.",
     tooltip_lock_size_bottom_masking = "Stop the screen bottom masking from dynamically changing its size on camera movement.",
-    tooltip_mask_front = "Toggle on/off for the mask in the front of a car.",
-    tooltip_mask_rear = "Toggle on/off for the mask in the rear of a car.",
-    tooltip_masks_sides = "Toggle on/off for masks on a car's sides.",
-    tooltip_middle_mask = "Toggle on/off for the mask covering the middle part of the screen while driving a vehicle. The mask is dynamic by default and activates for specific camera angles.",
+    tooltip_mask_front = "Toggle ON/OFF for the mask in the front of a car.",
+    tooltip_mask_rear = "Toggle ON/OFF for the mask in the rear of a car.",
+    tooltip_masks_sides = "Toggle ON/OFF for masks on a car's sides.",
+    tooltip_middle_mask = "Toggle ON/OFF for the mask covering the middle part of the screen while driving a vehicle. The mask is dynamic by default and activates for specific camera angles.",
     tooltip_save_preset = "Save your new values as a new preset file. The new preset will be saved in the 'Presets' folder and can be shared with other users of FrameGen Ghosting 'Fix' V.",
     tooltip_strength_vehicle = "Set masking strength around a vehicle. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 10 is a good balance between effectiveness and them being almost unnoticeable.",
     tooltip_strength_bottom = "Set masking strength for the screen bottom edges. Higher values cover frame generation artifacts more effectively, but masks might become noticeable. 6 is a good balance between effectiveness and them being almost unnoticeable.",
@@ -152,10 +155,13 @@ local UIText = {
   Contextual = {
     tab_name_contextual = "Contextual",
     info_dynamic_frame_gen_forbidden = "Turn off 'Dynamic Frame Generation' in DLSS Enabler's settings to ensure these features work properly. Reopen CET's overlay after change.",
-    info_game_frame_gen_required = "Please enable FSR 3 Frame Generation in the game's settings to use these features.",
-    info_mod_frame_gen_required = "Please check 'Enable Frame Generation' in the 'Settings' tab to use these features.",
-    info_select_context = "The contextual feature allows you to prioritize image quality for specific game events by seamlessly turning off frame generation for them.\n\nSelect contexts for which you want to automatically turn off frame generation.",
-    info_contextual_requirements ="This feature needs 55+ base FPS (without frame generation) to work in the intended way.",
+    info_overview = "The contextual feature allows you to prioritize image quality for specific game events by seamlessly turning off frame generation for them.",
+    info_select_context = "Select contexts for which you want to automatically turn off frame generation.",
+    info_bad_enabler_version = "[ ! ] DLSS Enabler is incompatible or missing. The mod's contextual frame generation feature won't work.",
+    info_found_enabler_version = "DLSS Enabler version:",
+    info_contextual = "Contextual Frame Generation is a new feature that smoothly toggles frame generation ON/OFF based on the game's events. The feature allows you to prioritize image quality and get rid of frame generation artifacts for selected contexts, like city sightseeing, slow-paced scenes or cinematics.",
+    info_contextual_dependencies = "To use the new feature, you need 'FSR3 Frame Gen for Cyberpunk 2077 (DLSS Enabler 2077 Edition)' 3.00.000.0+ and FrameGen Ghosting 'Fix' 5.0.0+.",
+    info_contextual_requirements = "This feature needs 55+ base FPS (without frame generation) to work in the intended way.",
     group_contexts = "Contexts:",
     group_other = "Other:",
     group_on_foot = "On-Foot:",
@@ -201,13 +207,15 @@ local UIText = {
     info_frame_gen_off = "[ ! ] Frame Generation is turned off in the game's settings. Masking is turned off.",
     info_game_not_ready_warning = "[ ! ] You need to start or unpause the game to change these settings.",
     info_game_settings_fg = "[ ! ] Please make sure frame generation is always enabled in game menu for this to work correctly.",
+    info_game_frame_gen_required = "[ ! ] Please enable FSR 3 Frame Generation in the game's settings to use these features.",
+    info_mod_frame_gen_required = "[ ! ] Please check 'Enable Frame Generation' in the 'Settings' tab to use these features.",
     status_mod_reloaded = "The mod has been reloaded.",
     status_game_loaded_fail = "The game is in the main menu, can't be set to loaded.",
     status_settings_default = "Default settings restored.",
     status_settings_loaded = "User settings loaded.",
     status_settings_restored = "Restored your previous settings.",
     status_settings_saved = "[ ! ] Your settings will be saved.",
-    tooltip_fg = "Turn on/off Frame Generation on the mod level (the game's settings remain unchanged).",
+    tooltip_fg = "Turn ON/OFF Frame Generation on the mod level (the game's settings remain unchanged).",
     tooltip_help = "Enable tooltips on mouse hover for certain settings.",
     tooltip_theme = "Pick your colors for the mod's window.",
     tooltip_reload_mod = "Reload the mod after using 'Reload all mods' option in Cyber Engine Tweaks.",
@@ -249,6 +257,7 @@ local LogText = {
   benchmark_restarting = "Restarting benchmark...",
   benchmark_avg_fps_result = "Measured average FPS without frame generation =",
   bridge_bad_enabler_version = "DLSS Enabler is incompatible or missing. The mod's contextual frame generation feature won't work.",
+  bridge_found_enabler_version = "DLSS Enabler version:",
   bridge_missing = "Can't find the 'dlss-enabler-bridge-2077.dll' file. The mod's contextual frame generation feature won't work.",
   calculate_apply_settings = "Applying settings accordingly...",
   calculate_missing = "Can't find the 'Calculate' module. The mod's anti-ghosting feature for on-foot gameplay won't work.",
@@ -432,7 +441,7 @@ end
 -- @param `key`: string; A name for the method to recognize the sourceTable in a translation file.
 --
 -- return table; A translated table if a translation is found and needed, `sourceTable` otherwise.
-function Localization.GetTranslation(sourceTable, key)
+function Localization.GetLocalization(sourceTable, key)
   --get current language
   Localization.GetOnScreenLanguage()
 
@@ -460,7 +469,7 @@ end
 ------------------
 
 function Localization.OnOverlayOpen()
-  UIText = Localization.GetTranslation(UIText, "UIText")
+  UIText = Localization.GetLocalization(UIText, "UIText")
 end
 
 return Localization

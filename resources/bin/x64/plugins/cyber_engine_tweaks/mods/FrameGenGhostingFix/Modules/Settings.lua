@@ -38,7 +38,7 @@ end
 ------------------
 
 local function CheckFileVersion(fileVersion)
-  if not fileVersion or not Globals.VersionCompare(Globals.VersionStringToTable(fileVersion)) then
+  if not fileVersion or not Globals.VersionCompare(FrameGenGhostingFix.GetDLSSEnablerVersion(true), Globals.VersionStringToTable(fileVersion)) then
     Tracker.SetModNewInstall(true)
   end
 end
@@ -53,6 +53,7 @@ local function LoadModSettings(modSettings)
   ModSettings.isFGEnabled = modSettings and modSettings.FrameGen or true
   ModSettings.isHelp = modSettings and modSettings.Help or true
   ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
+  ModSettings.isMessage = modSettings and modSettings.Message or false
   ModSettings.windowTheme = modSettings and modSettings.WindowTheme or "Crimson"
 end
 
@@ -63,6 +64,7 @@ local function SaveModSettings()
     FrameGen = ModSettings.isDebugView,
     Help = ModSettings.isHelp,
     KeepWindow = ModSettings.isKeepWindow,
+    Message = ModSettings.isMessage,
     WindowTheme = ModSettings.windowTheme
   }
 
@@ -145,6 +147,19 @@ end
 -- @return boolean: `true` for keep the window open
 function Settings.IsKeepWindow()
   return ModSettings.isKeepWindow
+end
+
+-- @param `isDelivered`: boolean; Whether a message has been delivered to user.
+--
+-- @return None
+function Settings.SetMessage(isDelivered)
+  ModSettings.isMessage = isDelivered
+  SaveRequest()
+end
+
+-- @return boolean: `true` if a message has been delivered to user.
+function Settings.IsMessage()
+  return ModSettings.isMessage
 end
 
 -- @return string; Selected Theme name

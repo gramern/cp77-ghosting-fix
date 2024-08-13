@@ -5,6 +5,10 @@ local Contextual = {
 
 local isDebug = nil
 
+local isDLSSEnabler
+local versionDLSSEnabler
+local versionRequired
+
 local FGEnabled = false
 
 -- keeps current context to avoid unwanted context changes for sudden switches between locamotion states
@@ -552,11 +556,12 @@ function Contextual.OnInitialize()
 
   LoadUserSettings(Settings.GetUserSettings("Contextual"))
 
-  -- deleting this, since Contextual doesn't need current FG state, Contextual sets it when possible
-  -- if Tracker.IsGameReady() then
-  --   -- Get the current FG state when the mod is initalized during start of the game
-  --   FGEnabled = Settings.IsModFrameGeneration()
-  -- end
+  isDLSSEnabler = FrameGenGhostingFix.IsDLSSEnablerCompatible()
+
+  if not isDLSSEnabler then
+    versionDLSSEnabler = FrameGenGhostingFix.GetDLSSEnablerVersion()
+    versionRequired = Globals.VersionTableToString(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN)
+  end
 
   -- this is redundant since the FG state can't be requested onInit; changed to 
   -- Observe('PlayerPuppet', 'OnGameAttached', function()
@@ -947,20 +952,27 @@ function Contextual.DrawUI()
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
-    -- Contextual sets FG as it's needed anyway, the chack is not needed
-    -- if not Settings.IsModFrameGeneration() then
-    --   ImGui.Text("")
-    --   ImGuiExt.TextRed(ContextualText.info_mod_frame_gen_required, true)
-    --   ImGui.Text("")
-    --   ImGuiExt.ResetStatusBar()
 
-    --   ImGui.EndTabItem()
-    --   return
-    -- end
+    if not isDLSSEnabler then
+      ImGui.Text("")
+      ImGuiExt.TextRed(ContextualText.info_bad_enabler_version, true)
+      ImGui.Text("")
+      ImGuiExt.TextRed(ContextualText.info_found_enabler_version)
+      ImGui.SameLine()
+      ImGuiExt.TextRed(versionDLSSEnabler)
+      ImGuiExt.TextRed(GeneralText.info_required)
+      ImGui.SameLine()
+      ImGuiExt.TextRed(versionRequired)
+      ImGui.Text("")
+      ImGuiExt.ResetStatusBar()
+
+      ImGui.EndTabItem()
+      return
+    end
 
     if not Tracker.IsGameFrameGeneration() then
       ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_game_frame_gen_required, true)
+      ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
       ImGui.Text("")
       ImGuiExt.ResetStatusBar()
 
@@ -972,6 +984,8 @@ function Contextual.DrawUI()
       ImGui.Text("")
       ImGuiExt.TextRed(ContextualText.info_dynamic_frame_gen_forbidden, true)
       ImGui.Text("")
+      ImGuiExt.TextRed(GeneralText.info_reopen_overlay, true)
+      ImGui.Text("")
       ImGuiExt.ResetStatusBar()
 
       ImGui.EndTabItem()
@@ -980,10 +994,14 @@ function Contextual.DrawUI()
 
     ImGuiExt.Text(GeneralText.group_overview)
     ImGui.Separator()
+    ImGuiExt.Text(ContextualText.info_overview, true)
+    ImGuiExt.SetTooltip(ContextualText.info_contextual)
+    ImGui.Text("")
     ImGuiExt.Text(ContextualText.info_select_context, true)
     ImGui.Text("")
     ImGuiExt.TextColor(GeneralText.info_important, 1, 0.85, 0.31, 1, true)
     ImGuiExt.Text(ContextualText.info_contextual_requirements, true)
+    ImGuiExt.SetTooltip(ContextualText.info_dynamic_frame_gen_forbidden)
     ImGui.Text("")
     ImGuiExt.Text(ContextualText.group_contexts)
     ImGui.Separator()
@@ -1074,6 +1092,8 @@ function Contextual.DrawUI()
           Contexts.FastPaced = false
         end
       end
+      SaveUserSettings()
+      ImGuiExt.SetStatusBar(SettingsText.status_settings_saved)
     end
     ImGuiExt.SetTooltip(ContextualText.tooltip_context_my_own)
 

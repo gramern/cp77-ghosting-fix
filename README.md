@@ -10,7 +10,6 @@ Limits ghosting behind some moving 3D objects caused by modded FSR3 frame genera
 
 Allows prioritizing image quality for [certain in-game events](docs/assets/images/contextual-menu.gif) by automatically turning frame generation on/off without lag or stutter.
 
-
 # Requirements
 **Base (Anti-Ghosting) requirements:**
 + Cyberpunk 2077 2.12+
@@ -31,6 +30,9 @@ Since 4.0.0-alpha, thanks to a major change in how masks are projected (using th
 **Contextual Frame Generation:** 
 
 While there are no framerate limits to use this feature, 55+ base FPS (without frame generation) is recommended due to the perceived smoothness difference between frame generation ON and OFF states.
+
+# Supported screens
+The mod supports 16:9, 16:10, 21:9, 32:9 and 4:3 screens.
 
 # Installation
 Extract the mod's zip archive to your Cyberpunk 2077 folder.

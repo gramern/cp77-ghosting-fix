@@ -24,7 +24,6 @@ local VehElementsDef = {
   BikeSpeedometer = {
     Offset = {x = 0.0, y = 0.8, z = 0.45},
     rotation = 180,
-    Scale = {x = 100, y = 100},
     Size = {x = 6120, y = 1600},
     visible = true,
   },
@@ -32,14 +31,12 @@ local VehElementsDef = {
     Left = {
       Offset = {x = -0.6, y = 0.7, z = 0.48},
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Size = {x = 3000, y = 1800},
       visible = true,
     },
     Right = {
       Offset = {x = 0.6, y = 0.7, z = 0.48},
       rotation = 0,
-      Scale = {x = 100, y = 100},
       Size = {x = 3000, y = 1800},
       visible = true,
     }
@@ -47,7 +44,6 @@ local VehElementsDef = {
   BikeWindshield = {
     Offset = {x = 0.0, y = 1, z = 0.54},
     rotation = 0,
-    Scale = {x = 100, y = 100},
     Size = {x = 3600, y = 1200},
     visible = true,
   },
@@ -55,14 +51,12 @@ local VehElementsDef = {
     Left = {
       Offset = {x = -1.2, y = 0.55, z = 0},
       rotation = 140,
-      Scale = {x = 100, y = 100},
       Size = {x = 3000, y = 2000},
       visible = true,
     },
     Right = {
       Offset = {x = 1.2, y = 0.55, z = 0},
       rotation = -160,
-      Scale = {x = 100, y = 100},
       Size = {x = 2250, y = 1500},
       visible = true,
     },
@@ -71,14 +65,12 @@ local VehElementsDef = {
     Left = {
       Offset = {x = -1, y = 0.45, z = 0.65},
       rotation = 40,
-      Scale = {x = 100, y = 100},
       Size = {x = 1400, y = 1200},
       visible = true,
     },
     Right = {
       Offset = {x = 1.05, y = 0.45, z = 0.65},
       rotation = 145,
-      Scale = {x = 100, y = 100},
       Size = {x = 800, y = 800},
       visible = true,
     },
