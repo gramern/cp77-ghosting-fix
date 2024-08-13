@@ -38,20 +38,29 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
     this.controller.FrameGenGhostingFixHasWeapon();
     // LogChannel(n"DEBUG", s"\(this.controller.m_upperBodyState)");
 
-    if Equals(this.controller.m_isWeaponDrawn, true) {
-      if Equals(this.controller.m_isMaskingOnFootActivated, false) {
-        this.controller.m_isMaskingOnFootActivated = true;
-        this.controller.FrameGenGhostingFixOnFootActivationEvent();
-      }
-      if Equals(this.controller.m_masksOnFootActivated, true) && this.controller.m_masksOnFootCurrentOpacity < this.controller.m_masksOnFootFinalOpacity {
-        this.controller.FrameGenGhostingFixMasksOnFootSetTransition();
+    this.controller.FrameGenGhostingFixVignetteOnFootToggle(false);
+    this.controller.FrameGenGhostingFixVignetteOnFootPermamentToggle(false);
+
+    if Equals(this.controller.m_vignetteOnFootPermamentEnabled, true) {
+      if Equals(this.controller.m_vignetteOnFootEnabled, true) && NotEquals(this.controller.m_vignetteOnFootActivated, true) {
+        this.controller.FrameGenGhostingFixVignetteOnFootActivationEvent();
       }
       if Equals(this.controller.m_vignetteOnFootActivated, true) && this.controller.m_vignetteOnFootCurrentOpacity < this.controller.m_vignetteOnFootFinalOpacity {
         this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
       }
+    }
 
+    if Equals(this.controller.m_isWeaponDrawn, true) {
+      this.controller.FrameGenGhostingFixCornersOnFootToggle(false);
       this.controller.FrameGenGhostingFixBlockerAimOnFootToggle(false);
       this.controller.FrameGenGhostingFixVignetteAimOnFootToggle(false);
+
+      if Equals(this.controller.m_cornersOnFootEnabled, true) && NotEquals(this.controller.m_cornersOnFootActivated, true) {
+        this.controller.FrameGenGhostingFixCornersOnFootActivationEvent();
+      }
+      if Equals(this.controller.m_cornersOnFootActivated, true) && this.controller.m_cornersOnFootCurrentOpacity < this.controller.m_cornersOnFootFinalOpacity {
+        this.controller.FrameGenGhostingFixMasksOnFootSetTransition();
+      }
 
       if Equals(this.controller.m_upperBodyState, IntEnum<gamePSMUpperBodyStates>(6)) {
         if Equals(this.controller.m_blockerAimOnFootEnabled, true) && NotEquals(this.controller.m_blockerAimOnFootActivated, true) {
@@ -60,9 +69,7 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
         if Equals(this.controller.m_vignetteAimOnFootEnabled, true) && NotEquals(this.controller.m_vignetteAimOnFootActivated, true) {
           this.controller.FrameGenGhostingFixVignetteAimOnFootActivationEvent();
         }
-      }
-      
-      if NotEquals(this.controller.m_upperBodyState, IntEnum<gamePSMUpperBodyStates>(6)) {
+      } else {
         if Equals(this.controller.m_blockerAimOnFootEnabled, true) && Equals(this.controller.m_blockerAimOnFootActivated, true) {
           this.controller.FrameGenGhostingFixBlockerAimOnFootDeActivationEvent();
         }
@@ -85,16 +92,29 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
         this.controller.FrameGenGhostingFixVignetteAimOnFootSetTransition();
       }
 
-    } else {
-      if Equals(this.controller.m_isMaskingOnFootActivated, true) {
-        this.controller.m_isMaskingOnFootActivated = false;
-        this.controller.FrameGenGhostingFixOnFootDeActivationEvent();
+      if NotEquals(this.controller.m_vignetteOnFootPermamentEnabled, true) {
+        if Equals(this.controller.m_vignetteOnFootEnabled, true) && NotEquals(this.controller.m_vignetteOnFootActivated, true) {
+          this.controller.FrameGenGhostingFixVignetteOnFootActivationEvent();
+        }
+        if Equals(this.controller.m_vignetteOnFootActivated, true) && this.controller.m_vignetteOnFootCurrentOpacity < this.controller.m_vignetteOnFootFinalOpacity {
+          this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
+        }
       }
-      if Equals(this.controller.m_masksOnFootActivated, false) && this.controller.m_masksOnFootCurrentOpacity > this.controller.m_masksOnFootFinalOpacity {
+    } else {
+      if Equals(this.controller.m_cornersOnFootEnabled, true) && Equals(this.controller.m_cornersOnFootActivated, true){
+        this.controller.FrameGenGhostingFixCornersOnFootDeActivationEvent();
+      }
+      if Equals(this.controller.m_cornersOnFootActivated, false) && this.controller.m_cornersOnFootCurrentOpacity > this.controller.m_cornersOnFootFinalOpacity {
         this.controller.FrameGenGhostingFixMasksOnFootSetTransition();
       }
-      if Equals(this.controller.m_vignetteOnFootActivated, false) && this.controller.m_vignetteOnFootCurrentOpacity > this.controller.m_vignetteOnFootFinalOpacity {
-        this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
+
+      if NotEquals(this.controller.m_vignetteOnFootPermamentEnabled, true) {
+        if Equals(this.controller.m_vignetteOnFootEnabled, true) && Equals(this.controller.m_vignetteOnFootActivated, true) {
+          this.controller.FrameGenGhostingFixVignetteOnFootDeActivationEvent();
+        }
+        if Equals(this.controller.m_vignetteOnFootActivated, false) && this.controller.m_vignetteOnFootCurrentOpacity > this.controller.m_vignetteOnFootFinalOpacity {
+          this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
+        }
       }
     }
   
@@ -219,10 +239,10 @@ protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
 
   this.FrameGenGhostingFixCallback();
   this.FrameGenGhostingFixMasksOnFootSetMarginsToggle();
-  this.FrameGenGhostingFixVignetteOnFootSetDimensions();
-  this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
   this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
   this.FrameGenGhostingFixAimOnFootSetDimensions();
+  this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
+  this.FrameGenGhostingFixVignetteOnFootSetDimensions();
 
   // LogChannel(n"DEBUG", s"Main Loop initialized...");
 }

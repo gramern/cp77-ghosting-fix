@@ -2,31 +2,32 @@
 
 // FrameGen Ghosting 'Fix' 5.0.0, 2024 gramern (scz_g), danyalzia (omniscient) 2024
 
-@addField(gameuiCrosshairContainerController) public let m_masksOnFootEnabled: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEnabled: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_cornersOnFootEnabled: Bool = false;
 @addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEnabled: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootPermamentEnabled: Bool = false;
 
 @addField(gameuiCrosshairContainerController) public let m_isWeaponDrawn: Bool;
 
-@addField(gameuiCrosshairContainerController) public let m_isMaskingOnFootActivated: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_masksOnFootActivated: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootActivated: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootActivated: Bool = false;
+// @addField(gameuiCrosshairContainerController) public let m_isMaskingOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_cornersOnFootActivated: Bool = false;
 @addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootActivated: Bool = false;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootActivated: Bool = false;
 
-@addField(gameuiCrosshairContainerController) public let m_masksOnFootChangeOpacityBy: Float;
-@addField(gameuiCrosshairContainerController) public let m_masksOnFootCurrentOpacity: Float;
-@addField(gameuiCrosshairContainerController) public let m_masksOnFootFinalOpacity: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootChangeOpacityBy: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootCurrentOpacity: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootFinalOpacity: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootChangeOpacityBy: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootCurrentOpacity: Float;
-@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_cornersOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_cornersOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_cornersOnFootFinalOpacity: Float;
 @addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootChangeOpacityBy: Float;
 @addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootCurrentOpacity: Float;
 @addField(gameuiCrosshairContainerController) public let m_blockerAimOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteAimOnFootFinalOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootChangeOpacityBy: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootCurrentOpacity: Float;
+@addField(gameuiCrosshairContainerController) public let m_vignetteOnFootFinalOpacity: Float;
 
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginLeft: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginTop: Float;
@@ -45,11 +46,11 @@ protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
   let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownLeftOnFoot") as inkWidget;
   let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownRightOnFoot") as inkWidget;
 
-  this.m_masksOnFootCurrentOpacity = this.m_masksOnFootCurrentOpacity + this.m_masksOnFootChangeOpacityBy;
-  cornerDownLeftOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
-  cornerDownRightOnFoot.SetOpacity(this.m_masksOnFootCurrentOpacity);
+  this.m_cornersOnFootCurrentOpacity = this.m_cornersOnFootCurrentOpacity + this.m_cornersOnFootChangeOpacityBy;
+  cornerDownLeftOnFoot.SetOpacity(this.m_cornersOnFootCurrentOpacity);
+  cornerDownRightOnFoot.SetOpacity(this.m_cornersOnFootCurrentOpacity);
 
-  // LogChannel(n"DEBUG", s"this.m_masksOnFootCurrentOpacity = \(this.m_masksOnFootCurrentOpacity)");
+  // LogChannel(n"DEBUG", s"this.m_cornersOnFootCurrentOpacity = \(this.m_cornersOnFootCurrentOpacity)");
   // LogChannel(n"DEBUG", s"cornerDownLeftOnFoot.GetOpacity() = \(cornerDownLeftOnFoot.GetOpacity())");
   // LogChannel(n"DEBUG", s"cornerDownRightOnFoot.GetOpacity() = \(cornerDownRightOnFoot.GetOpacity())");
 }
@@ -195,22 +196,10 @@ private cb func FrameGenGhostingFixVignetteOnFootEditorContext(vignetteOnFootEdi
   this.m_vignetteOnFootEditor = vignetteOnFootEditor;
 }
 
-// Activate masks on foot ---------------------------------------------------------------------------------------
+// Activate corner masks on foot ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
-protected final func FrameGenGhostingFixOnFootToggle(masksOnFoot: Bool) -> Void {
-  this.m_masksOnFootEnabled = masksOnFoot;
-}
-
-// Activate main vignette ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected final func FrameGenGhostingFixVignetteOnFootToggle(vignetteOnFoot: Bool) -> Void {
-  this.m_vignetteOnFootEnabled = vignetteOnFoot;
-}
-
-// Turn off deactivation of main vignette ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected final func FrameGenGhostingFixVignetteOnFootActivationToggle(vignetteOnFootActivation: Bool) -> Void {
-  this.m_vignetteOnFootActivated = vignetteOnFootActivation;
+protected final func FrameGenGhostingFixCornersOnFootToggle(cornersOnFoot: Bool) -> Void {
+  this.m_cornersOnFootEnabled = cornersOnFoot;
 }
 
 // Activate vignette for aiming ---------------------------------------------------------------------------------------
@@ -225,49 +214,66 @@ protected final func FrameGenGhostingFixBlockerAimOnFootToggle(blockerAimOnFoot:
   this.m_blockerAimOnFootEnabled = blockerAimOnFoot;
 }
 
+// Activate main vignette ---------------------------------------------------------------------------------------
+@addMethod(gameuiCrosshairContainerController)
+protected final func FrameGenGhostingFixVignetteOnFootToggle(vignetteOnFoot: Bool) -> Void {
+  this.m_vignetteOnFootEnabled = vignetteOnFoot;
+}
+
+// Turn off deactivation of main vignette without weapon---------------------------------------------------------------------------------------
+@addMethod(gameuiCrosshairContainerController)
+protected final func FrameGenGhostingFixVignetteOnFootPermamentToggle(vignetteOnFootPermament: Bool) -> Void {
+  this.m_vignetteOnFootPermamentEnabled = vignetteOnFootPermament;
+}
 
 @addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixOnFootActivationEvent() -> Bool {
+protected cb func FrameGenGhostingFixCornersOnFootActivationEvent() -> Bool {
+
+  if Equals(this.m_cornersOnFootEnabled, true) {
+    this.m_cornersOnFootActivated = true;
+    this.m_cornersOnFootCurrentOpacity = 0.0;
+    this.m_cornersOnFootFinalOpacity = 0.044;
+    this.m_cornersOnFootChangeOpacityBy = 0.009;
+  }
+}
+
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixCornersOnFootDeActivationEvent() -> Bool {
+
+  if Equals(this.m_cornersOnFootActivated, true) {
+    this.m_cornersOnFootCurrentOpacity = 0.045;
+    this.m_cornersOnFootFinalOpacity = 0.0;
+    this.m_cornersOnFootChangeOpacityBy = -0.009;
+  }
+
+  this.m_cornersOnFootActivated = false;
+}
+
+// Blocker onAim
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
+
+  if Equals(this.m_blockerAimOnFootEnabled, true) {
+    this.m_blockerAimOnFootActivated = true;
+    this.m_blockerAimOnFootCurrentOpacity = 0.0;
+    this.m_blockerAimOnFootFinalOpacity = 0.014;
+    this.m_blockerAimOnFootChangeOpacityBy = 0.004;
+  }
+}
+
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool {
   
-  this.FrameGenGhostingFixOnFootToggle(false);
-  this.FrameGenGhostingFixVignetteOnFootToggle(false);
-
-  if Equals(this.m_masksOnFootEnabled, true) {
-    this.m_masksOnFootActivated = true;
-    this.m_masksOnFootCurrentOpacity = 0.0;
-    this.m_masksOnFootFinalOpacity = 0.044;
-    this.m_masksOnFootChangeOpacityBy = 0.009;
+  if Equals(this.m_blockerAimOnFootEnabled, true) {
+    this.m_blockerAimOnFootCurrentOpacity = 0.016;
+    this.m_blockerAimOnFootFinalOpacity = 0.001;
+    this.m_blockerAimOnFootChangeOpacityBy = -0.004;
   }
 
-  if Equals(this.m_vignetteOnFootEnabled, true) {
-    this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
-    this.m_vignetteOnFootActivated = true;
-    this.m_vignetteOnFootCurrentOpacity = 0.0;
-    this.m_vignetteOnFootFinalOpacity = 0.018;
-    this.m_vignetteOnFootChangeOpacityBy = 0.005;
-  }
+  this.m_blockerAimOnFootActivated = false;
 }
 
-@addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixOnFootDeActivationEvent() -> Bool {
-
-  if Equals(this.m_masksOnFootActivated, true) {
-    this.m_masksOnFootCurrentOpacity = 0.045;
-    this.m_masksOnFootFinalOpacity = 0.0;
-    this.m_masksOnFootChangeOpacityBy = -0.009;
-  }
-
-  if Equals(this.m_vignetteOnFootEnabled, true) {
-    this.m_vignetteOnFootCurrentOpacity = 0.02;
-    this.m_vignetteOnFootFinalOpacity = 0.0;
-    this.m_vignetteOnFootChangeOpacityBy = -0.005;
-  }
-
-  this.m_masksOnFootActivated = false;
-  this.FrameGenGhostingFixVignetteOnFootActivationToggle(false);
-}
-
-// Vignette aiming
+// Vignette onAim
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootActivationEvent() -> Bool {
 
@@ -291,28 +297,28 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootDeActivationEvent() -> Boo
   this.m_vignetteAimOnFootActivated = false;
 }
 
-// Blocker aiming
+// Vignette onWeapon/permament
 @addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
+protected cb func FrameGenGhostingFixVignetteOnFootActivationEvent() -> Bool {
 
-  if Equals(this.m_blockerAimOnFootEnabled, true) {
-    this.m_blockerAimOnFootActivated = true;
-    this.m_blockerAimOnFootCurrentOpacity = 0.0;
-    this.m_blockerAimOnFootFinalOpacity = 0.014;
-    this.m_blockerAimOnFootChangeOpacityBy = 0.004;
+  if Equals(this.m_vignetteOnFootEnabled, true) {
+    this.m_vignetteOnFootActivated = true;
+    this.m_vignetteOnFootCurrentOpacity = 0.0;
+    this.m_vignetteOnFootFinalOpacity = 0.018;
+    this.m_vignetteOnFootChangeOpacityBy = 0.005;
   }
 }
 
 @addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool {
-  
-  if Equals(this.m_blockerAimOnFootEnabled, true) {
-    this.m_blockerAimOnFootCurrentOpacity = 0.016;
-    this.m_blockerAimOnFootFinalOpacity = 0.001;
-    this.m_blockerAimOnFootChangeOpacityBy = -0.004;
+protected cb func FrameGenGhostingFixVignetteOnFootDeActivationEvent() -> Bool {
+
+  if Equals(this.m_vignetteOnFootEnabled, true) {
+    this.m_vignetteOnFootCurrentOpacity = 0.02;
+    this.m_vignetteOnFootFinalOpacity = 0.0;
+    this.m_vignetteOnFootChangeOpacityBy = -0.005;
   }
 
-  this.m_blockerAimOnFootActivated = false;
+  this.m_vignetteOnFootActivated = false;
 }
 
 // Weapon checks ---------------------------------------------------------------------------------------

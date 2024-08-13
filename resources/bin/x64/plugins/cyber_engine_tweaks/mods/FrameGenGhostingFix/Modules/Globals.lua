@@ -654,6 +654,7 @@ function Globals.UpdateDelays(gameDeltaTime)
       end
     
       table.insert(delaysToRemove, key)
+      -- Globals.PrintDebug(Globals.__NAME, "Delay fired for:", key)
     end
   end
 

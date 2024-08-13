@@ -237,7 +237,7 @@ local function Benchmark()
 
     Tracker.SetGamePerfAverage(averageFps)
 
-    Globals.Print(LogText.benchmark_avg_fps_result, averageFps)
+    Globals.Print("Benchmark", LogText.benchmark_avg_fps_result, averageFps)
 
     Calculate.ApplySuggestedSettings(averageFps)
 

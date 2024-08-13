@@ -136,7 +136,7 @@ local function KeepOnHold(timeSeconds)
     isOnHold = false
 
     if not isDebug then return end
-    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [" .. Contextual.__NAME .. "] Previous context released."
+    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [Debug] [" .. Contextual.__NAME .. "] Previous context released."
     print(msg)
     spdlog.debug(msg)
   else
@@ -144,7 +144,7 @@ local function KeepOnHold(timeSeconds)
     timeOnHold = timeSeconds
 
     if not isDebug then return end
-    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [" .. Contextual.__NAME .. "] Keeping previous context on hold for: " .. timeSeconds .. " seconds."
+    local msg = "[" .. FrameGenGhostingFix.__NAME .. "] [Debug] [" .. Contextual.__NAME .. "] Keeping previous context on hold for: " .. timeSeconds .. " seconds."
     print(msg)
     spdlog.debug(msg)
   end

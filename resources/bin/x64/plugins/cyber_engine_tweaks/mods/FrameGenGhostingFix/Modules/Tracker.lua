@@ -10,9 +10,12 @@ local GameState = {
   isPreGame = nil,
 }
 
-local GameEvents = {
+local GameStateEvents = {
   gamePaused = false,
+  gameLoaded = false,
 }
+
+local GameStateEventsBoard = {}
 
 local GamePerf = {
   averageFps = nil,
@@ -177,9 +180,19 @@ end
 --
 -- @return boolean: `true` if game can be set to loaded (isPreGame = `false`)
 function Tracker.SetGameLoaded(isLoaded)
-  if GameState.isPreGame then return false end
+  if GameState.isPreGame then
+    GameState.isGameLoaded = false
+    GameStateEvents.gameLoaded = false
+
+    return false
+  end
   
   GameState.isGameLoaded = isLoaded
+
+  if not isLoaded then
+    GameStateEvents.gameLoaded = isLoaded
+  end
+
   return true
 end
 
@@ -327,8 +340,42 @@ local function TrackGameState()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
--- Game Events Local Functions
+-- Game State Events
 ----------------------------------------------------------------------------------------------------------------------
+
+-- @param `key`: string; A unique identifier for the event.
+-- @param `callback`: function; The function to be called when the event fires.
+-- @param `...`: any; Optional parameters to be passed to the callback function.
+--
+-- @return None
+function Tracker.SetOnGameLoadedEvent(key, callback, ...)
+  key = tostring(key)
+
+  if GameStateEventsBoard[key] then Globals.PrintError(Tracker.__NAME, "OnGameLoadedEvent exist for a key:", key) return end
+
+  local parameters = {...}
+
+  GameStateEventsBoard[key] = {
+    callback = callback,
+    parameters = parameters
+  }
+
+  -- Globals.PrintDebug(Tracker.__NAME, "Set OnGameLoadedEvent for:", key)
+end
+
+local function OnGameLoaded()
+  if not next(GameStateEventsBoard) then return end
+
+  for _, event in pairs(GameStateEventsBoard) do
+    if event.parameters then
+      event.callback(unpack(event.parameters))
+    else
+      event.callback()
+    end
+
+    -- Globals.PrintDebug(Tracker.__NAME, "OnGameLoadedEvent fired:", _)
+  end
+end
 
 local function OnGamePaused()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
@@ -344,18 +391,28 @@ local function OnGameUnpaused()
   Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
 end
 
-local function TrackGameEvents()
+local function TrackGameStateEvents()
   if GameState.isGamePaused then
-    if GameEvents.gamePaused then return end
+    if GameStateEvents.gamePaused then return end
 
     OnGamePaused()
-    GameEvents.gamePaused = true
+    GameStateEvents.gamePaused = true
   else
-    if not GameEvents.gamePaused then return end
+    --- deactivating for now, may turn out handy later
+    -- if GameState.isGameLoaded then
+    --   if not GameStateEvents.gameLoaded then
+    --     OnGameLoaded()
+    --     GameStateEvents.gameLoaded = true
+
+    --     -- Globals.PrintDebug(Tracker.__NAME, "Game Loaded.")
+    --   end
+    -- end
+
+    if not GameStateEvents.gamePaused then return end
 
     -- set to fire up with a delay to ensure accurate results
     Globals.SetDelay(1, 'TrackerOnGameUnpasued', OnGameUnpaused)
-    GameEvents.gamePaused = false
+    GameStateEvents.gamePaused = false
   end
 end
 
@@ -504,7 +561,7 @@ end
 function Tracker.OnUpdate()
   TrackGameState()
 
-  TrackGameEvents()
+  TrackGameStateEvents()
 
   if not Tracker.IsGameReady() then return end
 

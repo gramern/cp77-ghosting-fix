@@ -63,7 +63,7 @@ local MasksData = {
       Max = {x = 150, y = 145},
       Min = {x = 50, y = 55},
       x = 100,
-      y = 80,
+      y = 75,
     },
     ScreenSpace = {x = 1920, y = 1080},
     Size = {x = 4840, y = 2560},
@@ -391,13 +391,13 @@ function Calculate.ApplySuggestedSettings(averageFps)
     MasksData.Vignette.onWeapon = false
   end
 
-  if averageFps >= 65 then
+  if averageFps >= 60 then
     MasksData.Vignette.permament = true
   else
     MasksData.Vignette.permament = false
   end
 
-  Toggle()
+  Calculate.Toggle()
 
   SaveUserSettings()
 
@@ -420,13 +420,7 @@ function Calculate.OnInitialize()
   GetVignetteScreenSpace('y')
   GetVignetteSize('x')
   GetVignetteSize('y')
-  Toggle()
-
-  -- if not MaskingGlobal.masksController then return end
-
-  -- ObserveAfter(MaskingGlobal.masksController, 'OnPlayerAttach', function(self, playerGameObject)
-  --   ToggleOnAttach()
-  -- end)
+  Calculate.Toggle()
 end
 
 function Calculate.OnOverlayClose()
@@ -439,7 +433,7 @@ function Calculate.OnOverlayClose()
   GetVignetteScreenSpace('y')
   GetVignetteSize('x')
   GetVignetteSize('y')
-  Toggle()
+  Calculate.Toggle()
   TurnOffLiveView()
 end
 
@@ -447,7 +441,7 @@ end
 -- Toggle RedScript Methods
 ------------------
 
-function Toggle()
+function Calculate.Toggle()
   ToggleCornersOnWeapon()
   ToggleBlockerOnAim()
   ToggleVignetteOnAim()
@@ -461,11 +455,11 @@ function ToggleCornersOnWeapon()
   if masksController then
     local edge = Screen.Edge
 
-    Override(masksController, 'FrameGenGhostingFixOnFootToggle', function(self, masksOnFoot, wrappedMethod)
-      local originalOnFoot = wrappedMethod(masksOnFoot)
+    Override(masksController, 'FrameGenGhostingFixCornersOnFootToggle', function(self, cornersOnFoot, wrappedMethod)
+      local originalOnFoot = wrappedMethod(cornersOnFoot)
 
       if not MasksData.Corners.onWeapon then return originalOnFoot end
-      self.masksOnFootEnabled = true
+      self.cornersOnFootEnabled = true
     end)
 
     Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggle', function(self)
@@ -552,11 +546,11 @@ function ToggleVignettePermament()
   local masksController = MaskingGlobal.masksController
 
   if masksController then
-    Override(masksController, 'FrameGenGhostingFixVignetteOnFootActivationToggle', function(self, vignetteOnFootActivation, wrappedMethod)
-      local originalFunction = wrappedMethod(vignetteOnFootActivation)
+    Override(masksController, 'FrameGenGhostingFixVignetteOnFootPermamentToggle', function(self, vignetteOnFootPermament, wrappedMethod)
+      local originalFunction = wrappedMethod(vignetteOnFootPermament)
 
       if not MasksData.Vignette.permament then return originalFunction end
-      self.vignetteOnFootActivated = true
+      self.vignetteOnFootPermamentEnabled = true
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
