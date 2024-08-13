@@ -19,7 +19,7 @@ Allows prioritizing image quality for [certain in-game events](docs/assets/image
 + [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
 
 **Contextual Frame Generation additionally requires:**
-+ [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.01.000.0+
++ [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.00.000.0+
 + [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.3.4.0+ _(the dll file is included in this repo)_
 
 # Intended results
