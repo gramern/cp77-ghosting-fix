@@ -1,11 +1,11 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 0, 0 },
+  __VERSION = { 5, 0, 1 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
-  __DLSS_ENABLER_VERSION_MIN = { 3, 0, 0, 1},
+  __DLSS_ENABLER_VERSION_MIN = { 3, 0, 0, 1 },
   __DESCRIPTION = "Limits ghosting when using frame generation in Cyberpunk 2077",
   __LICENSE = [[
     MIT License
@@ -89,9 +89,6 @@ local benchmarkTime = 0
 local averageFps = 0
 local countFps = 0
 
--- user_settings not loading on SteamOS - problem mitigation attempt
--- local userSettingsLoaded = false
-
 --ui
 local windowTitle
 local openOverlay
@@ -133,13 +130,13 @@ end
 --
 -- @param asTable: boolean; Whether to return the version as a table.
 -- 
--- @return string | table | nil; Version information. If `dlss-enabler-bridge-2077.dll` is not present, returns `nil`
+-- @return string | table | nil; Version information. If `dlss-enabler-bridge-2077.dll` is not present or version is unknown, returns `nil`
 function FrameGenGhostingFix.GetDLSSEnablerVersion(asTable)
   local version = DLSSEnabler_GetVersionAsString() or nil
 
-  if not version then return nil end
+  if version == "Unknown" or not version then return nil end
 
-  if version ~= "Unknown" and asTable then
+  if asTable then
     version = Globals.VersionStringToTable(DLSSEnabler_GetVersionAsString())
   end
 
@@ -150,7 +147,7 @@ end
 --
 -- @param None
 -- 
--- @return boolean; `true` if compatible, `false` if otherwise or DLSS Enabler is missing
+-- @return boolean; `true` if compatible, `false` if otherwise or DLSS Enabler is missing or version is unknown
 function FrameGenGhostingFix.IsDLSSEnablerCompatible()
   local version = FrameGenGhostingFix.GetDLSSEnablerVersion(true)
 
@@ -158,6 +155,8 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
 
   local enablerVersion = FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN
   local minVersion = {major = enablerVersion[1], minor = enablerVersion[2], patch = enablerVersion[3], revision = enablerVersion[4]}
+
+  if type(version) ~= "table" or #version < 4 then return false end
 
   local isCompatible =
     version[1] > minVersion.major or
@@ -167,15 +166,6 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
 
   return isCompatible
 end
-
---- Sets internal info, that user settings file has been loaded. A mitigation for specific problems with normal file loading on Linux/SteamOs
---
--- @param `isLoaded`: boolean;
--- 
--- @return None
--- function FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(isExecuted)
---   userSettingsLoaded = isExecuted
--- end
 
 ------------------
 -- Benchmark
@@ -366,7 +356,13 @@ registerForEvent("onInit", function()
     if Contextual then 
       if not FrameGenGhostingFix.IsDLSSEnablerCompatible() then
         Globals.PrintError(Contextual.__NAME, LogText.bridge_bad_enabler_version)
-        Globals.PrintError(Contextual.__NAME, LogText.bridge_found_enabler_version, FrameGenGhostingFix.GetDLSSEnablerVersion())
+        
+        local version = FrameGenGhostingFix.GetDLSSEnablerVersion()
+
+        if version and type(version) == "string" then
+          Globals.PrintError(Contextual.__NAME, LogText.bridge_found_enabler_version, version)
+          return
+        end
       end
     else
       Globals.PrintError(LogText.contextual_missing)

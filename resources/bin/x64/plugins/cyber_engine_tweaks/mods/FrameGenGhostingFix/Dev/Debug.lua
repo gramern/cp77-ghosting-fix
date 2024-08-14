@@ -1,6 +1,6 @@
 local Debug = {
   __NAME = "Debug",
-  __VERSION = { 5, 0, 0 },
+  __VERSION = { 5, 0, 1 },
 }
 
 local Globals = require("Modules/Globals")

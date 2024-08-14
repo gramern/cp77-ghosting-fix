@@ -1,6 +1,6 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
-  __VERSION = { 5, 0, 0 },
+  __VERSION = { 5, 0, 1 },
 }
 
 local SortedPresetIds = {}

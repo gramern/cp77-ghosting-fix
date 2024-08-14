@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 0, 0 },
+  __VERSION = { 5, 0, 1 },
 }
 
 local GameState = {
@@ -343,6 +343,7 @@ end
 -- Game State Events
 ----------------------------------------------------------------------------------------------------------------------
 
+--- Callbacks OnGameLoaded for Override methods e.g., may turn out handy later (needs activation)
 -- @param `key`: string; A unique identifier for the event.
 -- @param `callback`: function; The function to be called when the event fires.
 -- @param `...`: any; Optional parameters to be passed to the callback function.
@@ -363,6 +364,7 @@ function Tracker.SetOnGameLoadedEvent(key, callback, ...)
   -- Globals.PrintDebug(Tracker.__NAME, "Set OnGameLoadedEvent for:", key)
 end
 
+--- Callbacks OnGameLoaded for Override methods e.g., may turn out handy later (needs activation)
 local function OnGameLoaded()
   if not next(GameStateEventsBoard) then return end
 
@@ -398,7 +400,7 @@ local function TrackGameStateEvents()
     OnGamePaused()
     GameStateEvents.gamePaused = true
   else
-    --- deactivating for now, may turn out handy later
+    --- deactivating for now, may turn out handy later (needs activation)
     -- if GameState.isGameLoaded then
     --   if not GameStateEvents.gameLoaded then
     --     OnGameLoaded()
@@ -410,7 +412,7 @@ local function TrackGameStateEvents()
 
     if not GameStateEvents.gamePaused then return end
 
-    -- set to fire up with a delay to ensure accurate results
+    -- set to fire with a delay to ensure accurate results
     Globals.SetDelay(1, 'TrackerOnGameUnpasued', OnGameUnpaused)
     GameStateEvents.gamePaused = false
   end
