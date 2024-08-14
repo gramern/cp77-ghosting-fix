@@ -29,18 +29,21 @@
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootCurrentOpacity: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootFinalOpacity: Float;
 
+@addField(gameuiCrosshairContainerController) public let m_cornerDownLeftMargin: Float;
+@addField(gameuiCrosshairContainerController) public let m_cornerDownRightMargin: Float;
+@addField(gameuiCrosshairContainerController) public let m_cornerDownMarginTop: Float;
+@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeX: Float;
+@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeY: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginLeft: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootMarginTop: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootSizeX: Float;
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootSizeY: Float;
-@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeX: Float;
-@addField(gameuiCrosshairContainerController) public let m_aimOnFootSizeY: Float;
 
 @addField(gameuiCrosshairContainerController) public let m_vignetteOnFootEditor: Bool = false;
 
 // Corner masks transition functions ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
+protected cb func FrameGenGhostingFixCornersOnFootSetTransition() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownLeftOnFoot") as inkWidget;
@@ -56,62 +59,28 @@ protected cb func FrameGenGhostingFixMasksOnFootSetTransition() -> Bool {
 }
 
 @addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixMasksOnFootSetMargins(cornerDownLeftMargin: Float, cornerDownRightMargin: Float, cornerDownMarginTop: Float) -> Bool {
+protected cb func FrameGenGhostingFixMasksOnFootSetMargins() -> Bool {
 
   let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
   let cornerDownLeftOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownLeftOnFoot") as inkWidget;
   let cornerDownRightOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/cornerDownRightOnFoot") as inkWidget;
 
   let cornerDownLeftOnFootMargin = cornerDownLeftOnFoot.GetMargin();
-  cornerDownLeftOnFoot.SetMargin(cornerDownLeftMargin, cornerDownMarginTop, cornerDownLeftOnFootMargin.right, cornerDownLeftOnFootMargin.bottom);
+  cornerDownLeftOnFoot.SetMargin(this.m_cornerDownLeftMargin, this.m_cornerDownMarginTop, cornerDownLeftOnFootMargin.right, cornerDownLeftOnFootMargin.bottom);
 
   let cornerDownRightOnFootMargin = cornerDownRightOnFoot.GetMargin();
-  cornerDownRightOnFoot.SetMargin(cornerDownRightMargin, cornerDownMarginTop, cornerDownRightOnFootMargin.right, cornerDownRightOnFootMargin.bottom);
+  cornerDownRightOnFoot.SetMargin(this.m_cornerDownRightMargin, this.m_cornerDownMarginTop, cornerDownRightOnFootMargin.right, cornerDownRightOnFootMargin.bottom);
 
   // LogChannel(n"DEBUG", s"Margins for corner masks set: \(cornerDownLeftMargin), \(cornerDownRightMargin), \(cornerDownMarginTop)");
 }
 
 @addMethod(gameuiCrosshairContainerController)
-private cb func FrameGenGhostingFixMasksOnFootSetMarginsToggle() -> Void {
-
-  this.FrameGenGhostingFixMasksOnFootSetMargins(0.0, 3840.0, 2160.0);
-}
-
-// Vignette dimensions transition functions ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixVignetteOnFootSetDimensions() -> Bool {
-
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
-
-  let vignetteOnFootMargin = vignetteOnFoot.GetMargin();
-  vignetteOnFoot.SetMargin(this.m_vignetteOnFootMarginLeft, this.m_vignetteOnFootMarginTop, vignetteOnFootMargin.right, vignetteOnFootMargin.bottom);
-
-  vignetteOnFoot.SetSize(this.m_vignetteOnFootSizeX, this.m_vignetteOnFootSizeY);
-  vignetteOnFoot.Reparent(root);
-}
-
-@addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(vignetteOnFootMarginLeft: Float, vignetteOnFootMarginTop: Float, vignetteOnFootSizeX: Float, vignetteOnFootSizeY: Float) -> Bool {
-
-  this.m_vignetteOnFootMarginLeft = vignetteOnFootMarginLeft;
-  this.m_vignetteOnFootMarginTop = vignetteOnFootMarginTop;
-  this.m_vignetteOnFootSizeX = vignetteOnFootSizeX;
-  this.m_vignetteOnFootSizeY = vignetteOnFootSizeY;
-}
-
-// Vignette opacity transition functions ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
-
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
-
-  this.m_vignetteOnFootCurrentOpacity = this.m_vignetteOnFootCurrentOpacity + this.m_vignetteOnFootChangeOpacityBy;
-  vignetteOnFoot.SetOpacity(this.m_vignetteOnFootCurrentOpacity);
-
-  // LogChannel(n"DEBUG", s"this.m_vignetteOnFootCurrentOpacity = \(this.m_vignetteOnFootCurrentOpacity)");
-  // LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteOnFoot.GetOpacity())");
+private cb func FrameGenGhostingFixMasksOnFootSetMarginsToggle(cornerDownLeftMargin: Float, cornerDownRightMargin: Float, cornerDownMarginTop: Float) -> Void {
+  
+  this.m_cornerDownLeftMargin = cornerDownLeftMargin;
+  this.m_cornerDownRightMargin = cornerDownRightMargin;
+  this.m_cornerDownMarginTop = cornerDownMarginTop;
+  this.FrameGenGhostingFixMasksOnFootSetMargins();
 }
 
 // Aiming on foot dimension transition functions ---------------------------------------------------------------------------------------
@@ -136,6 +105,7 @@ protected cb func FrameGenGhostingFixAimOnFootSetDimensionsToggle(aimOnFootSizeX
 
   this.m_aimOnFootSizeX = aimOnFootSizeX;
   this.m_aimOnFootSizeY = aimOnFootSizeY;
+  this.FrameGenGhostingFixAimOnFootSetDimensions();
 }
 
 // Aiming on foot transitions functions ---------------------------------------------------------------------------------------
@@ -165,6 +135,43 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootSetTransition() -> Bool {
   // LogChannel(n"DEBUG", s"blockerAimOnFoot.GetOpacity() = \(blockerAimOnFoot.GetOpacity())");
 }
 
+// Vignette dimensions transition functions ---------------------------------------------------------------------------------------
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixVignetteOnFootSetDimensions() -> Bool {
+
+  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
+
+  let vignetteOnFootMargin = vignetteOnFoot.GetMargin();
+  vignetteOnFoot.SetMargin(this.m_vignetteOnFootMarginLeft, this.m_vignetteOnFootMarginTop, vignetteOnFootMargin.right, vignetteOnFootMargin.bottom);
+
+  vignetteOnFoot.SetSize(this.m_vignetteOnFootSizeX, this.m_vignetteOnFootSizeY);
+  vignetteOnFoot.Reparent(root);
+}
+
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(vignetteOnFootMarginLeft: Float, vignetteOnFootMarginTop: Float, vignetteOnFootSizeX: Float, vignetteOnFootSizeY: Float) -> Bool {
+
+  this.m_vignetteOnFootMarginLeft = vignetteOnFootMarginLeft;
+  this.m_vignetteOnFootMarginTop = vignetteOnFootMarginTop;
+  this.m_vignetteOnFootSizeX = vignetteOnFootSizeX;
+  this.m_vignetteOnFootSizeY = vignetteOnFootSizeY;
+  this.FrameGenGhostingFixVignetteOnFootSetDimensions();
+}
+
+// Vignette opacity transition functions ---------------------------------------------------------------------------------------
+@addMethod(gameuiCrosshairContainerController)
+protected cb func FrameGenGhostingFixVignetteOnFootSetTransition() -> Bool {
+
+  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+  let vignetteOnFoot: ref<inkWidget> = root.GetWidgetByPathName(n"fgfix/vignetteOnFoot") as inkWidget;
+
+  this.m_vignetteOnFootCurrentOpacity = this.m_vignetteOnFootCurrentOpacity + this.m_vignetteOnFootChangeOpacityBy;
+  vignetteOnFoot.SetOpacity(this.m_vignetteOnFootCurrentOpacity);
+
+  // LogChannel(n"DEBUG", s"this.m_vignetteOnFootCurrentOpacity = \(this.m_vignetteOnFootCurrentOpacity)");
+  // LogChannel(n"DEBUG", s"vignetteOnFoot.GetOpacity() = \(vignetteOnFoot.GetOpacity())");
+}
 
 // Vignette editor context ---------------------------------------------------------------------------------------
 @addMethod(gameuiCrosshairContainerController)
@@ -240,12 +247,9 @@ protected cb func FrameGenGhostingFixCornersOnFootActivationEvent() -> Bool {
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixCornersOnFootDeActivationEvent() -> Bool {
 
-  if Equals(this.m_cornersOnFootActivated, true) {
-    this.m_cornersOnFootCurrentOpacity = 0.045;
-    this.m_cornersOnFootFinalOpacity = 0.0;
-    this.m_cornersOnFootChangeOpacityBy = -0.009;
-  }
-
+  this.m_cornersOnFootCurrentOpacity = 0.045;
+  this.m_cornersOnFootFinalOpacity = 0.0;
+  this.m_cornersOnFootChangeOpacityBy = -0.009;
   this.m_cornersOnFootActivated = false;
 }
 
@@ -264,12 +268,9 @@ protected cb func FrameGenGhostingFixBlockerAimOnFootActivationEvent() -> Bool {
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixBlockerAimOnFootDeActivationEvent() -> Bool {
   
-  if Equals(this.m_blockerAimOnFootEnabled, true) {
-    this.m_blockerAimOnFootCurrentOpacity = 0.016;
-    this.m_blockerAimOnFootFinalOpacity = 0.001;
-    this.m_blockerAimOnFootChangeOpacityBy = -0.004;
-  }
-
+  this.m_blockerAimOnFootCurrentOpacity = 0.016;
+  this.m_blockerAimOnFootFinalOpacity = 0.001;
+  this.m_blockerAimOnFootChangeOpacityBy = -0.004;
   this.m_blockerAimOnFootActivated = false;
 }
 
@@ -288,12 +289,9 @@ protected cb func FrameGenGhostingFixVignetteAimOnFootActivationEvent() -> Bool 
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteAimOnFootDeActivationEvent() -> Bool {
 
-  if Equals(this.m_vignetteAimOnFootEnabled, true) {
-    this.m_vignetteAimOnFootCurrentOpacity = 0.02;
-    this.m_vignetteAimOnFootFinalOpacity = 0.001;
-    this.m_vignetteAimOnFootChangeOpacityBy = -0.004;
-  }
-
+  this.m_vignetteAimOnFootCurrentOpacity = 0.02;
+  this.m_vignetteAimOnFootFinalOpacity = 0.001;
+  this.m_vignetteAimOnFootChangeOpacityBy = -0.004;
   this.m_vignetteAimOnFootActivated = false;
 }
 
@@ -312,12 +310,9 @@ protected cb func FrameGenGhostingFixVignetteOnFootActivationEvent() -> Bool {
 @addMethod(gameuiCrosshairContainerController)
 protected cb func FrameGenGhostingFixVignetteOnFootDeActivationEvent() -> Bool {
 
-  if Equals(this.m_vignetteOnFootEnabled, true) {
-    this.m_vignetteOnFootCurrentOpacity = 0.02;
-    this.m_vignetteOnFootFinalOpacity = 0.0;
-    this.m_vignetteOnFootChangeOpacityBy = -0.005;
-  }
-
+  this.m_vignetteOnFootCurrentOpacity = 0.02;
+  this.m_vignetteOnFootFinalOpacity = 0.0;
+  this.m_vignetteOnFootChangeOpacityBy = -0.005;
   this.m_vignetteOnFootActivated = false;
 }
 

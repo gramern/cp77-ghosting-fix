@@ -97,7 +97,6 @@ function Globals.GetAspectRatio()
 
   if Screen.aspectRatio ~= previousAspectRatio then
     Screen.isAspectRatioChange = true
-    Globals.SetModReady(false)
     Globals.Print(Globals.__NAME, "The aspect ratio of the screen has changed. Please restart the game to ensure the mod will work as intended.")
   end
 

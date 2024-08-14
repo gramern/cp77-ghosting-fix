@@ -9,6 +9,7 @@ local Diagnostics = {
 local Globals = require("Modules/Globals")
 local ImGuiExt = require("Modules/ImGuiExt")
 local Localization = require("Modules/Localization")
+local Tracker = require("Modules/Tracker")
 
 local DiagnosticsText = Localization.GetDiagnosticsText()
 
@@ -24,7 +25,7 @@ end
 function Diagnostics.OnInitialize()
   -- Diagnostics.CheckModsCompatibility()
   if Diagnostics.isModsCompatibility then return end
-  Globals.SetModReady(false)
+  Tracker.SetModReady(false)
 end
 
 --Local UI

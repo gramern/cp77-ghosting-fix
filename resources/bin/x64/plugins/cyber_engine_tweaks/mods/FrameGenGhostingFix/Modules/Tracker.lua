@@ -186,7 +186,7 @@ function Tracker.SetGameLoaded(isLoaded)
 
     return false
   end
-  
+
   GameState.isGameLoaded = isLoaded
 
   if not isLoaded then

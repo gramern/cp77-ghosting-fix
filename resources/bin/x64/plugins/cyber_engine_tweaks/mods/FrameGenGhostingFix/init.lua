@@ -530,6 +530,16 @@ registerForEvent("onDraw", function()
         end
         --debug interface ends------------------------------------------------------------------------------------------------------------------
         
+        if Globals.IsAspectRatioChange() then
+          if ImGui.BeginTabItem(InfoText.tab_name_info) then
+
+            ImGuiExt.Text(InfoText.info_aspect_ratio_change, true)
+
+            ImGui.EndTabItem()
+            return
+          end
+        end
+
         -- danyalzia: remove forced benchmarking upon new install dur ing development
         if Tracker.IsModNewInstall() then
           if ImGui.BeginTabItem(InfoText.tab_name_info) then
@@ -564,15 +574,6 @@ registerForEvent("onDraw", function()
                 Settings.SetKeepWindow(false)
               end
             end
-            ImGui.EndTabItem()
-          end
-        end
-
-        if Globals.IsAspectRatioChange() then
-          if ImGui.BeginTabItem(InfoText.tab_name_info) then
-
-            ImGuiExt.Text(InfoText.info_aspect_ratio_change, true)
-
             ImGui.EndTabItem()
           end
         end

@@ -397,7 +397,10 @@ function Calculate.ApplySuggestedSettings(averageFps)
     MasksData.Vignette.permament = false
   end
 
+  Calculate.SetVignetteDefault('x')
+  Calculate.SetVignetteDefault('y')
   Calculate.Toggle()
+
 
   SaveUserSettings()
 
@@ -462,8 +465,11 @@ function ToggleCornersOnWeapon()
       self.cornersOnFootEnabled = true
     end)
 
-    Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggle', function(self)
-      self:FrameGenGhostingFixMasksOnFootSetMargins(edge.left, edge.right, edge.down)
+    Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggle', function(self, cornerDownLeftMargin, cornerDownRightMargin, cornerDownMarginTop, wrappedMethod)
+      self.m_cornerDownLeftMargin = edge.left
+      self.m_cornerDownRightMargin = edge.right
+      self.m_cornerDownMarginTop = edge.down
+      self:FrameGenGhostingFixMasksOnFootSetMargins()
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -486,6 +492,7 @@ function ToggleBlockerOnAim()
     Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggle', function(self, aimOnFootSizeX, aimOnFootSizeY, wrappedMethod)
       self.aimOnFootSizeX = size.x
       self.aimOnFootSizeY = size.y
+      self:FrameGenGhostingFixAimOnFootSetDimensions()
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -508,6 +515,7 @@ function ToggleVignetteOnAim()
     Override(masksController, 'FrameGenGhostingFixAimOnFootSetDimensionsToggle', function(self, aimOnFootSizeX, aimOnFootSizeY, wrappedMethod)
       self.aimOnFootSizeX = size.x
       self.aimOnFootSizeY = size.y
+      self:FrameGenGhostingFixAimOnFootSetDimensions()
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -529,13 +537,11 @@ function ToggleVignetteOnWeapon()
     end)
 
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootSetDimensionsToggle', function(self, vignetteOnFootMarginLeft, vignetteOnFootMarginTop, vignetteOnFootSizeX, vignetteOnFootSizeY, wrappedMethod)
-      local originalVignetteDimensions = wrappedMethod(vignetteOnFootMarginLeft, vignetteOnFootMarginTop, vignetteOnFootSizeX, vignetteOnFootSizeY)
-
-      if not MasksData.Vignette.onWeapon then return originalVignetteDimensions end
       self.vignetteOnFootMarginLeft = space.x
       self.vignetteOnFootMarginTop = space.y
       self.vignetteOnFootSizeX = size.x
       self.vignetteOnFootSizeY = size.y
+      self:FrameGenGhostingFixVignetteOnFootSetDimensions();
     end)
   else
     Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
@@ -745,9 +751,7 @@ function Calculate.DrawUI()
         ImGuiExt.SetStatusBar(OnFootText.status_get_out)
       end
     else
-      if GetVignetteState('permament') then
-        SetVignetteState('permament', false)
-      end
+      SetVignetteState('permament', false)
     end
 
     ImGui.EndTabItem()

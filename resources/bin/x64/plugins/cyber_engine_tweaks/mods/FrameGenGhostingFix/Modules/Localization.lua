@@ -26,7 +26,7 @@ local UIText = {
   },
   Info = {
     tab_name_info = "Info",
-    info_aspect_ratio_change= "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod will work as intended.",
+    info_aspect_ratio_change= "[ ! ] The aspect ratio of your screen has changed.\n\nPlease restart the game to ensure the mod works as intended.",
     info_benchmark = "[ ! ] FrameGen Ghosting 'Fix' is benchmarking your game's performance. Please continue playing freely: once the benchmark is finished, the mod will apply optimal settings for your game's performance. You can change those settings later.\n\nThe benchmark is conducted during the first run of the mod.",
     info_benchmark_ask = "[ ! ] Do you want to run a benchmark to let the mod measure your game's performance and set optimal anti-ghosting settings?\n\nIt will happen in the background, please continue playing freely.",
     info_mod_not_ready = "The mod encountered a problem:",
