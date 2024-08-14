@@ -41,7 +41,7 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
     this.controller.FrameGenGhostingFixVignetteOnFootToggle(false);
     this.controller.FrameGenGhostingFixVignetteOnFootPermamentToggle(false);
 
-    if Equals(this.controller.m_vignetteOnFootPermamentEnabled, true) {
+    if Equals(this.controller.m_vignetteOnFootPermamentEnabled, true) && NotEquals(this.controller.m_isVehicleMountedFGGF, true) {
       if Equals(this.controller.m_vignetteOnFootEnabled, true) && NotEquals(this.controller.m_vignetteOnFootActivated, true) {
         this.controller.FrameGenGhostingFixVignetteOnFootActivationEvent();
       }
@@ -98,7 +98,7 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
         // LogChannel(n"DEBUG", s"\(this.controller.m_vignetteAimOnFootCurrentOpacity), \(this.controller.m_vignetteAimOnFootFinalOpacity), \(this.controller.m_vignetteAimOnFootChangeOpacityBy)");
       }
 
-      if NotEquals(this.controller.m_vignetteOnFootPermamentEnabled, true) {
+      if NotEquals(this.controller.m_vignetteOnFootPermamentEnabled, true) && NotEquals(this.controller.m_isVehicleMountedFGGF, true) {
         if Equals(this.controller.m_vignetteOnFootEnabled, true) && NotEquals(this.controller.m_vignetteOnFootActivated, true) {
           this.controller.FrameGenGhostingFixVignetteOnFootActivationEvent();
         }
@@ -127,6 +127,11 @@ public class FrameGenGhostingFixDelayCallback extends DelayCallback {
           // LogChannel(n"DEBUG", s"Vignette: Deactivation without gun.");
           // LogChannel(n"DEBUG", s"\(this.controller.m_vignetteOnFootCurrentOpacity), \(this.controller.m_vignetteOnFootFinalOpacity), \(this.controller.m_vignetteOnFootChangeOpacityBy)");
         }
+      }
+      if Equals(this.controller.m_isVehicleMountedFGGF, true) && this.controller.m_vignetteOnFootCurrentOpacity > this.controller.m_vignetteOnFootFinalOpacity {
+        this.controller.FrameGenGhostingFixVignetteOnFootSetTransition();
+        // LogChannel(n"DEBUG", s"Vignette: Deactivation on MountingEvent.");
+        // LogChannel(n"DEBUG", s"\(this.controller.m_vignetteOnFootCurrentOpacity), \(this.controller.m_vignetteOnFootFinalOpacity), \(this.controller.m_vignetteOnFootChangeOpacityBy)");
       }
     }
   

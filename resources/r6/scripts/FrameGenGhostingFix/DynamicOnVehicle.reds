@@ -32,6 +32,10 @@
 @addMethod(gameuiCrosshairContainerController)
 private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> Bool {
   this.m_isVehicleMountedFGGF = true;
+  
+  if Equals(this.m_vignetteOnFootActivated, true) {
+    this.FrameGenGhostingFixVignetteOnFootDeActivationEvent();
+  }
 }
 
 @addMethod(gameuiCrosshairContainerController)
@@ -311,7 +315,7 @@ protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<Sta
 
 // Setting context for car masks start here ---------------------------------------------------------------------------------------
 @addMethod(DriveEvents)
-public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
+public final func FrameGenGhostingFixCarCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
   let cameraFPPEvent: ref<FrameGenGhostingFixCameraFPPCarEvent>;
   let cameraTPPEvent: ref<FrameGenGhostingFixCameraTPPCarEvent>;
@@ -344,7 +348,7 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
 
 // Setting context for bike masks start here ---------------------------------------------------------------------------------------
 @addMethod(DriveEvents)
-public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
+public final func FrameGenGhostingFixBikeCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
   let cameraFPPBikeEvent: ref<FrameGenGhostingFixCameraFPPBikeEvent>;
   let cameraTPPBikeEvent: ref<FrameGenGhostingFixCameraTPPBikeEvent>;
@@ -384,10 +388,10 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      this.FrameGenGhostingFixBikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       break;
     case gamedataVehicleType.Car:
-      this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+      this.FrameGenGhostingFixCarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
       break;
     default:
       break;
@@ -439,7 +443,7 @@ protected func OnEnter(stateContext: ref<StateContext>, scriptInterface: ref<Sta
 
 // Setting context for car masks while in combat starts here ---------------------------------------------------------------------------------------
 @addMethod(DriverCombatEvents)
-public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
+public final func FrameGenGhostingFixCarCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
   let cameraFPPEvent: ref<FrameGenGhostingFixCameraFPPCarEvent>;
   let cameraTPPEvent: ref<FrameGenGhostingFixCameraTPPCarEvent>;
@@ -472,7 +476,7 @@ public final func CarCameraChange(scriptInterface: ref<StateGameScriptInterface>
 
 // Setting context for bike masks while in combat starts here ---------------------------------------------------------------------------------------
 @addMethod(DriverCombatEvents)
-public final func BikeCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
+public final func FrameGenGhostingFixBikeCameraChange(scriptInterface: ref<StateGameScriptInterface>, perspective: vehicleCameraPerspective) -> Void {
 
   let cameraFPPBikeEvent: ref<FrameGenGhostingFixCameraFPPBikeEvent>;
   let cameraTPPBikeEvent: ref<FrameGenGhostingFixCameraTPPBikeEvent>;
@@ -512,10 +516,10 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
 
   switch(this.m_vehicleCurrentTypeFGGF) {
     case gamedataVehicleType.Bike:
-      this.BikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
+      this.FrameGenGhostingFixBikeCameraChange(scriptInterface, this.m_bikeCameraContextFGGF);
       break;
     case gamedataVehicleType.Car:
-      this.CarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
+      this.FrameGenGhostingFixCarCameraChange(scriptInterface, this.m_carCameraContextFGGF);
       break;
     default:
       break;
