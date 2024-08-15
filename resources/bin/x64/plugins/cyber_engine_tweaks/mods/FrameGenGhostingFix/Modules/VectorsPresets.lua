@@ -1,6 +1,6 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
-  __VERSION = { 5, 0, 1 },
+  __VERSION = { 5, 0, 2 },
 }
 
 local SortedPresetIds = {}
@@ -162,6 +162,17 @@ function VectorsPresets.LoadPreset()
   end
 end
 
+function VectorsPresets.UpdateMaskingState()
+  if Tracker.IsGameFrameGeneration()  then
+    if selectedPreset == "a005" then return end
+    Vectors.SetMaskingState(true)
+  else
+    Vectors.SetMaskingState(false)
+  end
+
+  Globals.PrintDebug(VectorsPresets.__NAME, "Frame Generation in the game's settings is set to:", tostring(Tracker.IsGameFrameGeneration()), "Masking set to:", tostring(Vectors.GetMaskingState()))
+end
+
 ----------------------------------------------------------------------------------------------------------------------
 -- On... registers
 ----------------------------------------------------------------------------------------------------------------------
@@ -170,23 +181,13 @@ function VectorsPresets.OnInitialize()
   LoadUserSettings(Settings.GetUserSettings("VehiclesPreset"))
   GetPresets()
   VectorsPresets.LoadPreset()
-
-  if not Tracker.IsGameFrameGeneration() then
-    Vectors.SetMaskingState(false)
-  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not selectedPreset == "a005" then
-    Vectors.SetMaskingState(true)
-  end
+  VectorsPresets.UpdateMaskingState()
+  Tracker.SetCallbackOnGameStateChange('gameUnpaused', 'VectorsPresetsUpdateMaskingState', VectorsPresets.UpdateMaskingState)
 end
 
 function VectorsPresets.OnOverlayOpen()
   -- Translate and refresh presets info and list
   PresetsList = Localization.GetLocalization(PresetsList, "PresetsList")
-  
-  if not Tracker.IsGameFrameGeneration() then
-    Vectors.SetMaskingState(false)
-  elseif Tracker.IsGameFrameGeneration() and not Vectors.GetMaskingState() and not selectedPreset == "a005" then
-    Vectors.SetMaskingState(true)
-  end
 end
 
 ----------------------------------------------------------------------------------------------------------------------

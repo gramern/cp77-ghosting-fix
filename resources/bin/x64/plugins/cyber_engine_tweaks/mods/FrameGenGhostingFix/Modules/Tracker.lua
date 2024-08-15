@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 0, 1 },
+  __VERSION = { 5, 0, 2 },
 }
 
 local GameState = {
@@ -11,8 +11,9 @@ local GameState = {
 }
 
 local GameStateEvents = {
-  gamePaused = false,
   gameLoaded = false,
+  gamePaused = false,
+  gameUnpaused = false,
 }
 
 local GameStateEventsBoard = {}
@@ -343,39 +344,46 @@ end
 -- Game State Events
 ----------------------------------------------------------------------------------------------------------------------
 
---- Callbacks OnGameLoaded for Override methods e.g., may turn out handy later (needs activation)
+-- @paran `gameState`: string; Game state event's name to fire callback on. Available: `gamePaused`, `gameUnpaused`
 -- @param `key`: string; A unique identifier for the event.
 -- @param `callback`: function; The function to be called when the event fires.
 -- @param `...`: any; Optional parameters to be passed to the callback function.
 --
 -- @return None
-function Tracker.SetOnGameLoadedEvent(key, callback, ...)
+function Tracker.SetCallbackOnGameStateChange(gameState, key, callback, ...)
+  gameState = tostring(gameState)
   key = tostring(key)
 
-  if GameStateEventsBoard[key] then Globals.PrintError(Tracker.__NAME, "OnGameLoadedEvent exist for a key:", key) return end
+  if GameStateEventsBoard[gameState] and GameStateEventsBoard[gameState][key] then Globals.PrintError(Tracker.__NAME, key, "exists for OnGameStateChange:", gameState) return end
 
   local parameters = {...}
 
-  GameStateEventsBoard[key] = {
+  GameStateEventsBoard[gameState] = GameStateEventsBoard[gameState] or {}
+
+  GameStateEventsBoard[gameState][key] = {
     callback = callback,
     parameters = parameters
   }
 
-  -- Globals.PrintDebug(Tracker.__NAME, "Set OnGameLoadedEvent for:", key)
+  Globals.PrintDebug(Tracker.__NAME, "Set Callback", key, "for OnGameStateChange:", gameState)
 end
 
---- Callbacks OnGameLoaded for Override methods e.g., may turn out handy later (needs activation)
-local function OnGameLoaded()
-  if not next(GameStateEventsBoard) then return end
+-- @paran `gameState`: string; Game state event's name to fire set callbacks on. Available: `gamePaused`, `gameUnpaused`
+--
+-- @return None
+local function ExecuteCallbackOnGameStateChange(gameState)
+  gameState = tostring(gameState)
 
-  for _, event in pairs(GameStateEventsBoard) do
+  if not next(GameStateEventsBoard) or  GameStateEventsBoard[gameState] == nil then return end
+
+  for _, event in pairs(GameStateEventsBoard[gameState]) do
     if event.parameters then
       event.callback(unpack(event.parameters))
     else
       event.callback()
     end
 
-    -- Globals.PrintDebug(Tracker.__NAME, "OnGameLoadedEvent fired:", _)
+    Globals.PrintDebug(Tracker.__NAME, "Callback fired:", _, "OnGameStateChange:", gameState)
   end
 end
 
@@ -383,6 +391,8 @@ local function OnGamePaused()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 
   Tracker.SetModFrameGeneration(false)
+
+  ExecuteCallbackOnGameStateChange('gamePaused')
 end
 
 local function OnGameUnpaused()
@@ -391,6 +401,8 @@ local function OnGameUnpaused()
   Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
 
   Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+
+  ExecuteCallbackOnGameStateChange('gameUnpaused')
 end
 
 local function TrackGameStateEvents()
@@ -400,7 +412,7 @@ local function TrackGameStateEvents()
     OnGamePaused()
     GameStateEvents.gamePaused = true
   else
-    --- deactivating for now, may turn out handy later (needs activation)
+    --- deactivating for now, may turn out handy later (needs activation and OnGameLoaded func)
     -- if GameState.isGameLoaded then
     --   if not GameStateEvents.gameLoaded then
     --     OnGameLoaded()

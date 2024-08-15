@@ -1,6 +1,6 @@
 local Globals = {
   __NAME = "Globals",
-  __VERSION = { 5, 0, 1 },
+  __VERSION = { 5, 0, 2 },
 }
 
 local isDebug = nil

@@ -1,6 +1,6 @@
 local Settings = {
   __NAME = "Settings",
-  __VERSION = { 5, 0, 1 },
+  __VERSION = { 5, 0, 2 },
 }
 
 local ModSettings = {}
@@ -38,7 +38,7 @@ end
 ------------------
 
 local function CheckFileVersion(fileVersion)
-  if not fileVersion or not Globals.VersionCompare(FrameGenGhostingFix.__VERSION, Globals.VersionStringToTable(fileVersion)) then
+  if not fileVersion or Globals.VersionCompare(FrameGenGhostingFix.__VERSION, Globals.VersionStringToTable(fileVersion)) then
     Tracker.SetModNewInstall(true)
   end
 end
