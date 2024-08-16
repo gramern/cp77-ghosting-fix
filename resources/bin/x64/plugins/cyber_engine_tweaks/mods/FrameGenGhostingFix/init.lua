@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 0, 2 },
+  __VERSION = { 5, 1, 0 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -67,10 +67,11 @@ local floor = math.floor
 
 --game performance
 local gameDeltaTime = 0
+local calculationInterval = 0.5
 local currentFps = 0
 local currentFpsInt = 0
 local currentFrametimeInt = 0
-local currentCycle = 1 / 2
+local currentCycle = calculationInterval
 local currentCount = 0
 local currentFpsSum = 0
 local currentDeltaTimeSum = 0
@@ -165,6 +166,24 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
     (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] == minVersion.patch and version[4] >= minVersion.revision)
 
   return isCompatible
+end
+
+--- Returns the time interval for reported current FPS calculation.
+--
+-- @param None
+-- 
+-- @return number; Time in seconds
+function FrameGenGhostingFix.GetFpsCalculationInterval()
+  return calculationInterval
+end
+
+--- Sets the time interval for reported current FPS calculation.
+--
+-- @param timeSeconds number The duration in seconds for which FPS will be calculated.
+-- 
+-- @return None
+function FrameGenGhostingFix.SetFpsCalculationInterval(timeSeconds)
+  calculationInterval = timeSeconds
 end
 
 ------------------
@@ -264,7 +283,6 @@ function BenchmarkUI()
     ImGui.SameLine()
     ImGuiExt.Text(tostring(currentFrametimeInt))
   else
-    ImGui.Text("")
     ImGuiExt.Text(BenchmarkText.info_benchmark_pre_game, true)
   end
 
@@ -315,7 +333,7 @@ local function MonitorFps(deltaTime)
   if currentCycle <= 0 then
     currentFpsInt = floor(currentFpsSum / currentCount + 0.5)
     currentFrametimeInt = floor(currentDeltaTimeSum / currentCount + 0.5)
-    currentCycle = 0.5
+    currentCycle = calculationInterval
     currentCount = 0
     currentFpsSum = 0
     currentDeltaTimeSum = 0
@@ -487,7 +505,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
   if deltaTime == 0 then return end
   MonitorDelta(deltaTime)
-  Tracker.SetGamePerfCurrent(currentFps, deltaTime)
+  Tracker.SetGamePerfCurrent(currentFps, currentFpsInt, deltaTime)
 
   if Tracker.IsGamePaused() then return end
   Globals.UpdateDelays(deltaTime)
@@ -660,7 +678,10 @@ registerForEvent("onDraw", function()
               ImGuiExt.SetTooltip(SettingsText.tooltip_help)
 
               ImGui.Text("")
+
               ImGuiExt.Text(SettingsText.combobox_theme)
+              ImGui.SetNextItemWidth(370)
+
               if ImGui.BeginCombo("##Themes", ImGuiExt.GetTheme()) then
                 local themesList = ImGuiExt.GetThemesList()
             
@@ -730,17 +751,23 @@ registerForEvent("onDraw", function()
             ImGui.SameLine()
             
             if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
-              if Tracker. IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
+              if Tracker.IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
                 ImGuiExt.Text(GeneralText.info_enabled)
               else
                 ImGuiExt.Text(GeneralText.info_disabled)
               end
             else
-              if Tracker. IsGameFrameGeneration() then
+              if Tracker.IsGameFrameGeneration() then
                 ImGuiExt.Text(GeneralText.info_enabled)
               else
                 ImGuiExt.Text(GeneralText.info_disabled)
               end
+            end
+
+            if Contextual.GetBaseFpsContext() ~= 0 then
+              ImGui.Text("")
+              ImGuiExt.Text(SettingsText.info_context_base_fps, true)
+              ImGuiExt.Text(tostring(Contextual.GetBaseFpsContext()))
             end
 
             ImGui.Text("")

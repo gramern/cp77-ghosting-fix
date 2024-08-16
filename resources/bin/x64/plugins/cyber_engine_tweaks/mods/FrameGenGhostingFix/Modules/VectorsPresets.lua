@@ -1,6 +1,6 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
-  __VERSION = { 5, 0, 2 },
+  __VERSION = { 5, 1, 0 },
 }
 
 local SortedPresetIds = {}
@@ -212,6 +212,7 @@ function VectorsPresets.DrawUI()
 
     if not isPresetsEditor then
       ImGuiExt.Text(VehiclesText.info_presets)
+      ImGui.SetNextItemWidth(370)
 
       -- Displays list of presets' names and sets a preset
       if ImGui.BeginCombo("##Presets", selectedPresetName) then

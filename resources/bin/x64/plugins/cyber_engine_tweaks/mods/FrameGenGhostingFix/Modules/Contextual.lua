@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 0, 2 },
+  __VERSION = { 5, 1, 0 },
 }
 
 local isDebug = nil
@@ -20,6 +20,7 @@ local Contexts = {
   SlowPacedAndCinematics = false,
   FastPaced = false,
   MyOwn = false,
+  BaseFps = 0,
 }
 
 local CurrentStates = {
@@ -102,19 +103,17 @@ function SetDebugMode(isDebugMode)
 end
 
 ------------------
--- Main Logic Starts Here
+-- Getters
 ------------------
 
-local function TurnOnFrameGen()
-  if not Tracker.IsGameReady() then return end
-
-  -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
-  if FGEnabled == false then
-    DLSSEnabler_SetFrameGenerationState(true)
-    FGEnabled = true
-    Tracker.SetModFrameGeneration(true)
-  end
+-- @return number;
+function Contextual.GetBaseFpsContext()
+  return Contexts.BaseFps
 end
+
+------------------
+-- Main Logic Starts Here
+------------------
 
 local function TurnOffFrameGen()
   if not Tracker.IsGameReady() then return end
@@ -124,6 +123,42 @@ local function TurnOffFrameGen()
     DLSSEnabler_SetFrameGenerationState(false)
     FGEnabled = false
     Tracker.SetModFrameGeneration(false)
+  end
+end
+
+local function TurnOnFrameGen()
+  if not Tracker.IsGameReady() then return end
+
+  -- Community Request: adding global FG disable on Contexts.BaseFps ~= 0
+  if Tracker.GetCurrentFPSInteger() and Tracker.GetCurrentFPSInteger() < Contexts.BaseFps then return end
+
+  -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
+  if FGEnabled == false then
+    DLSSEnabler_SetFrameGenerationState(true)
+    FGEnabled = true
+    Tracker.SetModFrameGeneration(true)
+  end
+end
+
+local function InitializeFrameGenState()
+  FGEnabled = DLSSEnabler_GetFrameGenerationState()
+
+  if Contexts.BaseFps then
+    TurnOnFrameGen()
+  end
+
+  if Toggles.Standing then
+    TurnOffFrameGen()
+  end
+
+  Globals.PrintDebug(Contextual.__NAME, "Frame Generation set to initial state:", FGEnabled)
+end
+
+function ToggleFrameGenOnBaseFpsContext()
+  if Tracker.GetCurrentFPSInteger() and Tracker.GetCurrentFPSInteger() < Contexts.BaseFps then
+    TurnOffFrameGen()
+  else
+    TurnOnFrameGen()
   end
 end
 
@@ -563,11 +598,7 @@ function Contextual.OnInitialize()
     versionRequired = Globals.VersionTableToString(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN)
   end
 
-  -- this is redundant since the FG state can't be requested onInit; changed to 
-  -- Observe('PlayerPuppet', 'OnGameAttached', function()
-  --   TurnOnFrameGen()
-  --   Globals.PrintDebug(Contextual.__NAME, "Game started. FG Enabled (PlayerPuppet->OnGameAttached)")
-  -- end)
+  Tracker.SetCallbackOnGameStateChange('gameLoaded', 'ContextualInitalizeFrameGenState', Globals.SetDelay, FrameGenGhostingFix.GetFpsCalculationInterval() + 0.5, 'ContextualInitalizeFrameGenState', InitializeFrameGenState)
 
   -- This will prove useful in future to set contexts based on camera perspective
   -- Observe('VehicleTransition', 'RequestToggleVehicleCamera', function() end)
@@ -729,6 +760,12 @@ function Contextual.OnInitialize()
   -------------------------------------------------
   ---
   Observe('LocomotionEventsTransition', 'OnUpdate', function()
+
+    -- Community Request: adding global FG disable on Contexts.BaseFps ~= 0
+    if Contexts.BaseFps ~= 0 then
+      ToggleFrameGenOnBaseFpsContext()
+    end
+
     -- LocomotionEventsTransition OnUpdate fires up also when in a vehicle
     if Tracker.IsPlayerDriver() then OnPlayerDriverEvent() return end
 
@@ -948,7 +985,8 @@ end
 
 function Contextual.DrawUI()
 
-  local contextSightseeingToggle, contextSlowPacedAndCinematicsToggle, contextFastPacedToggle, contextMyOwnToggle
+  local baseFpsCalcInterval
+  local contextSightseeingToggle, contextSlowPacedAndCinematicsToggle, contextFastPacedToggle, contextMyOwnToggle, contextBaseFpsSliderToggle, baseFpsCalcIntervalToggle
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
@@ -1202,6 +1240,39 @@ function Contextual.DrawUI()
       end
     end
 
+    ImGui.Text("")
+    ImGuiExt.Text(ContextualText.group_base_fps)
+    ImGui.Separator()
+    ImGuiExt.Text(ContextualText.info_context_base_fps, true)
+    ImGui.Text("")
+
+    ImGuiExt.Text(ContextualText.info_context_base_fps_state)
+    ImGui.SameLine()
+    if Contexts.BaseFps == 0 then
+      ImGuiExt.Text(GeneralText.info_disabled)
+    else
+      ImGuiExt.Text(GeneralText.info_enabled)
+    end
+
+    ImGui.Text("")
+
+    ImGuiExt.Text(ContextualText.slider_context_base_fps_threshold)
+
+    Contexts.BaseFps, contextBaseFpsSliderToggle = ImGui.SliderFloat("##BaseFps", Contexts.BaseFps, 0, 200, "%.0f")
+    if contextBaseFpsSliderToggle then
+      SaveUserSettings()
+    end
+    ImGuiExt.SetTooltip(ContextualText.tooltip_context_base_fps)
+
+    ImGuiExt.Text(ContextualText.slider_base_fps_calc_interval)
+
+    baseFpsCalcInterval, baseFpsCalcIntervalToggle = ImGui.SliderFloat("##CalcInterval", FrameGenGhostingFix.GetFpsCalculationInterval(), 0.5, 2, "%.1f")
+    if baseFpsCalcIntervalToggle then
+      FrameGenGhostingFix.SetFpsCalculationInterval(baseFpsCalcInterval)
+      SaveUserSettings()
+    end
+    ImGuiExt.SetTooltip(ContextualText.tooltip_base_fps_calc_interval)
+
     if Settings.IsDebugMode() then
       ImGui.Text("")
       ImGui.Separator()
@@ -1220,19 +1291,19 @@ function Contextual.DrawUI()
 
       ImGui.Separator()
 
-      local fgStatus = "Enabled"
+      local fgStatus = GeneralText.info_enabled
 
       if FGEnabled == true then
-        fgStatus = "Enabled"
+        fgStatus = GeneralText.info_enabled
       else
-        fgStatus = "Disabled"
+        fgStatus = GeneralText.info_disabled
       end
 
       ImGuiExt.Text("Contextual Frame Gen State: " .. fgStatus)
 
       ImGui.Separator()
 
-      local realTimeState = "Disabled"
+      local realTimeState = GeneralText.info_disabled
 
       if Tracker.IsGameReady() then
         realTimeState = tostring(DLSSEnabler_GetFrameGenerationState())

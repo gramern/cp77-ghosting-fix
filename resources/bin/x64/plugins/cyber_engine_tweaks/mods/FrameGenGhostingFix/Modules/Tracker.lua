@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 0, 2 },
+  __VERSION = { 5, 1, 0 },
 }
 
 local GameState = {
@@ -161,8 +161,9 @@ end
 -- @param `gamedeltaTime`: number;
 --
 -- @return None
-function Tracker.SetGamePerfCurrent(currentFps, gameDeltaTime)
+function Tracker.SetGamePerfCurrent(currentFps, currentFpsInt, gameDeltaTime)
   GamePerf.currentFps = currentFps
+  GamePerf.currentFpsInt = currentFpsInt
   GamePerf.gameDeltaTime = gameDeltaTime
 end
 
@@ -271,6 +272,11 @@ function Tracker.GetCurrentFPS()
   return GamePerf.currentFps
 end
 
+-- @return number; Current FPS value caluculated for a sampling time set in the mod
+function Tracker.GetCurrentFPSInteger()
+  return GamePerf.currentFpsInt
+end
+
 -- @return number;
 function Tracker.GetGameDeltaTime()
   return GamePerf.gameDeltaTime
@@ -368,7 +374,7 @@ function Tracker.SetCallbackOnGameStateChange(gameState, key, callback, ...)
   Globals.PrintDebug(Tracker.__NAME, "Set Callback", key, "for OnGameStateChange:", gameState)
 end
 
--- @paran `gameState`: string; Game state event's name to fire set callbacks on. Available: `gamePaused`, `gameUnpaused`
+-- @paran `gameState`: string; Game state event's name to fire set callbacks on. Available: `gamePaused`, `gameUnpaused`, `gameLoaded`
 --
 -- @return None
 local function ExecuteCallbackOnGameStateChange(gameState)
@@ -385,6 +391,16 @@ local function ExecuteCallbackOnGameStateChange(gameState)
 
     Globals.PrintDebug(Tracker.__NAME, "Callback fired:", _, "OnGameStateChange:", gameState)
   end
+end
+
+local function OnGameLoaded()
+  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+
+  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+
+  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+
+  ExecuteCallbackOnGameStateChange('gameLoaded')
 end
 
 local function OnGamePaused()
@@ -412,15 +428,14 @@ local function TrackGameStateEvents()
     OnGamePaused()
     GameStateEvents.gamePaused = true
   else
-    --- deactivating for now, may turn out handy later (needs activation and OnGameLoaded func)
-    -- if GameState.isGameLoaded then
-    --   if not GameStateEvents.gameLoaded then
-    --     OnGameLoaded()
-    --     GameStateEvents.gameLoaded = true
+    if GameState.isGameLoaded then
+      if not GameStateEvents.gameLoaded then
+        OnGameLoaded()
+        GameStateEvents.gameLoaded = true
 
-    --     -- Globals.PrintDebug(Tracker.__NAME, "Game Loaded.")
-    --   end
-    -- end
+        Globals.PrintDebug(Tracker.__NAME, "Game Loaded.")
+      end
+    end
 
     if not GameStateEvents.gamePaused then return end
 

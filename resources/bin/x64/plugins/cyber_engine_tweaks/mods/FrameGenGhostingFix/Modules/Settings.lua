@@ -1,6 +1,6 @@
 local Settings = {
   __NAME = "Settings",
-  __VERSION = { 5, 0, 2 },
+  __VERSION = { 5, 1, 0 },
 }
 
 local ModSettings = {}
@@ -38,7 +38,7 @@ end
 ------------------
 
 local function CheckFileVersion(fileVersion)
-  if not fileVersion or Globals.VersionCompare(FrameGenGhostingFix.__VERSION, Globals.VersionStringToTable(fileVersion)) then
+  if not fileVersion or not Globals.VersionCompare(Globals.VersionStringToTable(fileVersion), FrameGenGhostingFix.__VERSION) then
     Tracker.SetModNewInstall(true)
   end
 end
@@ -51,6 +51,7 @@ local function LoadModSettings(modSettings)
   ModSettings.isDebugMode = modSettings and modSettings.DebugMode or false
   ModSettings.isDebugView = modSettings and modSettings.DebugView or false
   ModSettings.isFGEnabled = modSettings and modSettings.FrameGen or true
+  FrameGenGhostingFix.SetFpsCalculationInterval(modSettings and modSettings.FpsCalculationInterval or 0.5)
   ModSettings.isHelp = modSettings and modSettings.Help or true
   ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
   ModSettings.isMessage = modSettings and modSettings.Message or false
@@ -62,6 +63,7 @@ local function SaveModSettings()
     DebugMode = ModSettings.isDebugMode,
     DebugView = ModSettings.isDebugView,
     FrameGen = ModSettings.isDebugView,
+    FpsCalculationInterval = FrameGenGhostingFix.GetFpsCalculationInterval(),
     Help = ModSettings.isHelp,
     KeepWindow = ModSettings.isKeepWindow,
     Message = ModSettings.isMessage,
@@ -274,36 +276,31 @@ function Settings.OnOverlayClose()
 end
 
 -- leaving for later: another way to make th mod forcefully try to load user-settings.json if it didn't onInit
-function Settings.OnUpdate()
-  if not isLoadRequest and UserSettings == nil then
-    local result = LoadFile()
+-- function Settings.OnUpdate()
+--   if not isLoadRequest and UserSettings == nil then
+--     local result = LoadFile()
 
-    if result and UserSettings and UserSettings.ModSettings then
-      if UserSettings and UserSettings.ModSettings and UserSettings.ModSettings.DebugMode then
-        Globals.PrintTable(UserSettings)
-      end
+--     if result and UserSettings and UserSettings.ModSettings then
+--       if UserSettings and UserSettings.ModSettings and UserSettings.ModSettings.DebugMode then
+--         Globals.PrintTable(UserSettings)
+--       end
 
-      LoadModSettings(Settings.GetUserSettings("ModSettings"))
+--       LoadModSettings(Settings.GetUserSettings("ModSettings"))
+--       isLoadRequest = true
 
-      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
-      isLoadRequest = true
+--       Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
+--     else
+--       isLoadRequest = true
 
-      Globals.PrintDebug(Settings.__NAME, LogText.settings_loaded)
-    else
-      FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
-      isLoadRequest = true
+--       Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
+--     end 
+--   end
 
-      Globals.Print(Settings.__NAME, LogText.settings_file_not_found)
-    end 
-  end
+--   if UserSettings ~= nil then
+--     isLoadRequest = true
 
-  if UserSettings ~= nil then
-    FrameGenGhostingFix.SetLoadUserSettingsFileAttmept(true)
-
-    isLoadRequest = true
-
-    Globals.PrintDebug(Settings.__NAME, "UserSettings found, stopping the check.")
-  end
-end
+--     Globals.PrintDebug(Settings.__NAME, "UserSettings found, stopping the check.")
+--   end
+-- end
 
 return Settings
