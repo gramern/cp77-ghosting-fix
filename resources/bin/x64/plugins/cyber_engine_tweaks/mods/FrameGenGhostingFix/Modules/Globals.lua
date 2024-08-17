@@ -559,6 +559,8 @@ function Globals.SetFallback(owner, contents, key)
   else
     FallbackBoard[owner] = copiedContents
   end
+
+  Globals.PrintDebug(Globals.__NAME, "A fallback created for:", owner)
 end
 
 --- Retrieves a fallback value for a specified owner, optionally with a key.
