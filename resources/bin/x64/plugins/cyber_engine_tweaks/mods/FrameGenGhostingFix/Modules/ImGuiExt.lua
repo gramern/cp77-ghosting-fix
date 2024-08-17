@@ -1,6 +1,6 @@
 local ImGuiExt = {
   __NAME = "ImGuiExt",
-  __VERSION = { 5, 1, 0 },
+  __VERSION = { 5, 1, 2 },
 }
 
 local Themes = {

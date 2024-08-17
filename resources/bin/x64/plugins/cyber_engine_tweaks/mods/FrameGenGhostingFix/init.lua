@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 1, 0 },
+  __VERSION = { 5, 1, 2 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -166,6 +166,19 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
     (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] == minVersion.patch and version[4] >= minVersion.revision)
 
   return isCompatible
+end
+
+--- Returns current FPS: as a floating-point number for each tick or an integer calculated for a time interval.
+--
+-- @param `asInteger`: boolean; Optional: if `true`, returns current FPS as an integer calculated for a time interval
+-- 
+-- @return number; Frames Per Second
+function FrameGenGhostingFix.GetCurrentFps(asInteger)
+  if not asInteger then
+    return currentFps
+  else
+    return currentFpsInt
+  end
 end
 
 --- Returns the time interval for reported current FPS calculation.

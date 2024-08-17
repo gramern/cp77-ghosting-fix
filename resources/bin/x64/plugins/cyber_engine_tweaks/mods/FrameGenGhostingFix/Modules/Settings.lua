@@ -1,6 +1,6 @@
 local Settings = {
   __NAME = "Settings",
-  __VERSION = { 5, 1, 0 },
+  __VERSION = { 5, 1, 2 },
 }
 
 local ModSettings = {}

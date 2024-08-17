@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 1, 0 },
+  __VERSION = { 5, 1, 2 },
 }
 
 local GameState = {
@@ -273,7 +273,7 @@ function Tracker.GetCurrentFPS()
 end
 
 -- @return number; Current FPS value caluculated for a sampling time set in the mod
-function Tracker.GetCurrentFPSInteger()
+function Tracker.GetCurrentFpsInteger()
   return GamePerf.currentFpsInt
 end
 

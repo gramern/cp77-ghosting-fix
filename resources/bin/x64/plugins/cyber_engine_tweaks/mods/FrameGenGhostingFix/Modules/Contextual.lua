@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 1, 0 },
+  __VERSION = { 5, 1, 2 },
 }
 
 local isDebug = nil
@@ -130,7 +130,7 @@ local function TurnOnFrameGen()
   if not Tracker.IsGameReady() then return end
 
   -- Community Request: adding global FG disable on Contexts.BaseFps ~= 0
-  if Tracker.GetCurrentFPSInteger() and Tracker.GetCurrentFPSInteger() < Contexts.BaseFps then return end
+  if Tracker.GetCurrentFpsInteger() and Tracker.GetCurrentFpsInteger() < Contexts.BaseFps then return end
 
   -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
   if FGEnabled == false then
@@ -155,7 +155,7 @@ local function InitializeFrameGenState()
 end
 
 function ToggleFrameGenOnBaseFpsContext()
-  if Tracker.GetCurrentFPSInteger() and Tracker.GetCurrentFPSInteger() < Contexts.BaseFps then
+  if Tracker.GetCurrentFpsInteger() and Tracker.GetCurrentFpsInteger() < Contexts.BaseFps then
     TurnOffFrameGen()
   else
     TurnOnFrameGen()
@@ -804,7 +804,7 @@ function Contextual.OnInitialize()
           return -- early return to continue previous states on sliding, dodging and jumping
         end
     
-    -- gramern: locomotionState == 1 isn't working too well apparently
+
     if not Tracker.IsPlayerMoving() then
       CurrentStates.isStandingCrouching = true
       CurrentStates.isWalkingCrouchWalking = false
@@ -834,9 +834,16 @@ function Contextual.OnInitialize()
       end
     end
 
+    -- gramern: separating Player slow-paced contexts from Combat - since Combat should be considered a fast-paced activity seprately and those states should not impact it
     -- Only process standing logic when V is out of vehicle
     if Toggles.Standing == true then
       if CurrentStates.isStandingCrouching then
+        if IsInCombat() then
+          TurnOnFrameGen()
+          -- Globals.PrintDebug(Contextual.__NAME, "Player is in Combat. FG remains Enabled while on-foot.")
+          return
+        end
+        
         TurnOffFrameGen()
       else
         -- if not (Toggles.Standing and CurrentStates.isStandingCrouching)
@@ -850,6 +857,12 @@ function Contextual.OnInitialize()
     
     if Toggles.Walking == true then
       if CurrentStates.isWalkingCrouchWalking then
+        if IsInCombat() then
+          TurnOnFrameGen()
+          -- Globals.PrintDebug(Contextual.__NAME, "Player is in Combat. FG remains Enabled while on-foot.")
+          return
+        end
+
         TurnOffFrameGen()
       else
         if not (Toggles.Standing and CurrentStates.isStandingCrouching)
@@ -861,8 +874,14 @@ function Contextual.OnInitialize()
       end
     end
 
-    if Toggles.SlowWalking then
+    if Toggles.SlowWalking then 
       if CurrentStates.isSlowWalking == true then
+        if IsInCombat() then
+          TurnOnFrameGen()
+          -- Globals.PrintDebug(Contextual.__NAME, "Player is in Combat. FG remains Enabled while on-foot.")
+          return
+        end
+
         TurnOffFrameGen()
       else
         if not (Toggles.Standing and CurrentStates.isStandingCrouching)
@@ -876,6 +895,12 @@ function Contextual.OnInitialize()
 
     if Toggles.Sprinting then
       if CurrentStates.isSprintingCrouchSprinting == true then
+        if IsInCombat() then
+          TurnOnFrameGen()
+          -- Globals.PrintDebug(Contextual.__NAME, "Player is in Combat. FG remains Enabled while on-foot.")
+          return
+        end
+
         TurnOffFrameGen()
       else
         if not (Toggles.Standing and CurrentStates.isStandingCrouching)
@@ -894,6 +919,12 @@ function Contextual.OnInitialize()
   Observe('SwimmingEvents', 'OnEnter', function()
     CurrentStates.isSwimming = true
     if Toggles.Swimming == true then
+      if IsInCombat() then
+        TurnOnFrameGen()
+        Globals.PrintDebug(Contextual.__NAME, "Player is swimming while in Combat. FG Enabled (SwimmingEvents->OnEnter)")
+        return
+      end
+
       TurnOffFrameGen()
       Globals.PrintDebug(Contextual.__NAME, "Player is swimming. FG Disabled (SwimmingEvents->OnEnter)")
     end
