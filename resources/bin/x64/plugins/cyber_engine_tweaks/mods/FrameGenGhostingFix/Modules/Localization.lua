@@ -1,6 +1,6 @@
 Localization = {
   __NAME = "Localization",
-  __VERSION = { 5, 1, 2 },
+  __VERSION = { 5, 1, 4 },
 }
 
 local UIText = {

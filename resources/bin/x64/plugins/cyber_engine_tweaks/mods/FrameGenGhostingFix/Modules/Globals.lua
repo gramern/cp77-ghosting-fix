@@ -1,6 +1,6 @@
 local Globals = {
   __NAME = "Globals",
-  __VERSION = { 5, 1, 2 },
+  __VERSION = { 5, 1, 4 },
 }
 
 local isDebug = nil
@@ -482,22 +482,6 @@ function Globals.VersionStringToTable(versionString)
   end
 
   return versionTable
-end
-
--- @param `versionTable`: table; Input version table with 1 to 4 numbers
---
--- @return string: A formatted version string (e.g., "3.0.0.1")
-function Globals.VersionTableToString(versionTable)
-  local result = {}
-
-  for i = 1, math.min(4, #versionTable) do
-    if type(versionTable[i]) ~= "number" then
-      Globals.PrintError(Globals.__NAME, "All elements in the version table must be numbers")
-    end
-    table.insert(result, tostring(versionTable[i]))
-  end
-
-  return table.concat(result, ".")
 end
 
 --- Pads a version table to ensure it has 4 elements

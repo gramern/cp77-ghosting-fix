@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 1, 2 },
+  __VERSION = { 5, 1, 4 },
 }
 
 local isDebug = nil
@@ -588,13 +588,13 @@ end
 ---------------
 
 local function ResetToggles(togglesTable)
-    for state, v in pairs(togglesTable) do
-        if type(v) == "table" then
-          ResetToggles(v)
-        else
-          togglesTable[state] = false
-        end
+  for state, v in pairs(togglesTable) do
+    if type(v) == "table" then
+      ResetToggles(v)
+    else
+      togglesTable[state] = false
     end
+  end
 end
 
 local function ToggleSightseeing()
@@ -675,6 +675,7 @@ end
 --------------- 
 
 function Contextual.OnInitialize()
+  if not FrameGenGhostingFix.IsContextual() then return end
 
   LoadUserSettings(Settings.GetUserSettings("Contextual"))
 
@@ -682,7 +683,6 @@ function Contextual.OnInitialize()
 
   if not isDLSSEnabler then
     versionDLSSEnabler = FrameGenGhostingFix.GetDLSSEnablerVersion()
-    versionRequired = Globals.VersionTableToString(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN)
   end
 
   Tracker.SetCallbackOnGameStateChange('gameLoaded', 'ContextualInitalizeFrameGenState', Globals.SetDelay, FrameGenGhostingFix.GetFpsCalculationInterval() + 0.5, 'ContextualInitalizeFrameGenState', InitializeFrameGenState)
@@ -1102,6 +1102,7 @@ end
 --------------- 
 
 function Contextual.DrawUI()
+  if not FrameGenGhostingFix.IsContextual() then return end
 
   local baseFpsCalcInterval
   local contextSightseeingToggle, contextSlowPacedAndCinematicsToggle, contextFastPacedToggle, contextMyOwnToggle, contextBaseFpsSliderToggle, baseFpsCalcIntervalToggle
@@ -1110,6 +1111,11 @@ function Contextual.DrawUI()
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
 
     if not isDLSSEnabler then
+      if not versionRequired then
+        --moved it here, as it can't concat onInit for some reason
+        versionRequired = table.concat(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN, ".")
+      end
+
       ImGui.Text("")
       ImGuiExt.TextRed(ContextualText.info_bad_enabler_version, true)
       ImGui.Text("")

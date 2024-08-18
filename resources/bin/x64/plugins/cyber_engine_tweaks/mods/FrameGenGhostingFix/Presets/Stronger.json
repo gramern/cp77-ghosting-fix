@@ -1,5 +1,5 @@
 {
-  "__VERSION": "5.1.2",
+  "__VERSION": "5.1.4",
   "MaskingGlobal": {
     "vehicles": true,
     "isOpacityLock": false

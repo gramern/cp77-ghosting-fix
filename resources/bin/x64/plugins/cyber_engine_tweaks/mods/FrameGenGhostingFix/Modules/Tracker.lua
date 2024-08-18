@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 1, 2 },
+  __VERSION = { 5, 1, 4 },
 }
 
 local GameState = {
@@ -396,9 +396,11 @@ end
 local function OnGameLoaded()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 
-  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+  if FrameGenGhostingFix.IsContextual() then
+    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
 
-  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+  end
 
   ExecuteCallbackOnGameStateChange('gameLoaded')
 end
@@ -414,9 +416,11 @@ end
 local function OnGameUnpaused()
   SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 
-  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+  if FrameGenGhostingFix.IsContextual() then
+    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
 
-  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+  end
 
   ExecuteCallbackOnGameStateChange('gameUnpaused')
 end
@@ -554,9 +558,11 @@ function Tracker.OnInitialize()
 
     SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
 
-    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+    if FrameGenGhostingFix.IsContextual() then
+      Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
 
-    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+      Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+    end
   end)
 
   Observe('QuestTrackerGameController', 'OnUninitialize', function()
@@ -582,9 +588,11 @@ function Tracker.OnOverlayOpen()
 
   if not Tracker.IsGameReady() then return end
 
-  Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
+  if FrameGenGhostingFix.IsContextual() then
+    Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
 
-  Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+    Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
+  end
 end
 
 function Tracker.OnUpdate()

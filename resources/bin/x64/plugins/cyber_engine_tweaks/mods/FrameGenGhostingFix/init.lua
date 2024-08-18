@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 1, 2 },
+  __VERSION = { 5, 1, 4 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -46,7 +46,7 @@ local VectorsPresets = require("Modules/VectorsPresets")
 local Vectors = require("Modules/Vectors")
 
 --optional modules
-local Diagnostics = require("Modules/Diagnostics")
+-- local Diagnostics = require("Modules/Diagnostics")
 local VectorsEditor = require("Modules/VectorsEditor")
 
 --localization tables
@@ -133,7 +133,15 @@ end
 -- 
 -- @return string | table | nil; Version information. If `dlss-enabler-bridge-2077.dll` is not present or version is unknown, returns `nil`
 function FrameGenGhostingFix.GetDLSSEnablerVersion(asTable)
-  local version = DLSSEnabler_GetVersionAsString() or nil
+  local version
+
+  if type(DLSSEnabler_GetVersionAsString) == "function" then
+    version = DLSSEnabler_GetVersionAsString()
+  else
+    Globals.PrintError(LogText.bridge_missing)
+    Contextual = nil
+    return nil
+  end
 
   if version == "Unknown" or not version then return nil end
 
@@ -152,7 +160,7 @@ end
 function FrameGenGhostingFix.IsDLSSEnablerCompatible()
   local version = FrameGenGhostingFix.GetDLSSEnablerVersion(true)
 
-  if not version then Globals.PrintError(LogText.bridge_missing) return false end
+  if not version then return false end
 
   local enablerVersion = FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN
   local minVersion = {major = enablerVersion[1], minor = enablerVersion[2], patch = enablerVersion[3], revision = enablerVersion[4]}
@@ -166,6 +174,19 @@ function FrameGenGhostingFix.IsDLSSEnablerCompatible()
     (version[1] == minVersion.major and version[2] == minVersion.minor and version[3] == minVersion.patch and version[4] >= minVersion.revision)
 
   return isCompatible
+end
+
+--- Returns whether Contextual Frame Generation is available
+--
+-- @param None
+-- 
+-- @return boolean;
+function FrameGenGhostingFix.IsContextual()
+  if not Contextual then
+    return false
+  else
+    return FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc"
+  end
 end
 
 --- Returns current FPS: as a floating-point number for each tick or an integer calculated for a time interval.
@@ -383,15 +404,15 @@ registerForEvent("onInit", function()
   if not Vectors then Globals.PrintError(LogText.vectors_missing) end
 
   -- check for the right DLSS Enabler's version for the contextual edition of the mod
-  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+  if FrameGenGhostingFix.IsContextual() then
     if Contextual then 
       if not FrameGenGhostingFix.IsDLSSEnablerCompatible() then
-        Globals.PrintError(Contextual.__NAME, LogText.bridge_bad_enabler_version)
+        Globals.PrintError(LogText.bridge_bad_enabler_version)
         
         local version = FrameGenGhostingFix.GetDLSSEnablerVersion()
 
         if version and type(version) == "string" then
-          Globals.PrintError(Contextual.__NAME, LogText.bridge_found_enabler_version, version)
+          Globals.PrintError(LogText.bridge_found_enabler_version, version)
           return
         end
       end
@@ -420,7 +441,7 @@ registerForEvent("onInit", function()
   Calculate.OnInitialize()
 
   -- check for the non-contextual edition of the mod
-  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+  if FrameGenGhostingFix.IsContextual() then
     Contextual.OnInitialize()
   end
 
@@ -500,7 +521,7 @@ registerForEvent("onOverlayClose", function()
   Calculate.OnOverlayClose()
 
   -- check for the non-contextual edition of the mod
-  if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+  if FrameGenGhostingFix.IsContextual() then
     Contextual.OnOverlayClose()
   end
 
@@ -543,10 +564,11 @@ registerForEvent("onDraw", function()
 
       if ImGui.BeginTabBar('Tabs') then
         
+        --- commented out since the 'Diagnostics' module isn't shipped for now
         --diagnostics interface starts------------------------------------------------------------------------------------------------------------------
-        if Diagnostics and Diagnostics.IsUpdateRecommended() then
-            Diagnostics.DrawUI()
-        end
+        -- if Diagnostics and Diagnostics.IsUpdateRecommended() then
+        --     Diagnostics.DrawUI()
+        -- end
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
         
         --debug interface starts------------------------------------------------------------------------------------------------------------------
@@ -627,7 +649,7 @@ registerForEvent("onDraw", function()
           end
         end
 
-        if openOverlay and FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" or Contextual and Settings.IsDebugMode() then
+        if openOverlay and FrameGenGhostingFix.IsContextual() or Contextual and Settings.IsDebugMode() then
           Contextual.DrawUI()
         end
 
@@ -763,7 +785,7 @@ registerForEvent("onDraw", function()
             ImGuiExt.Text(SettingsText.info_frame_gen_status)
             ImGui.SameLine()
             
-            if FrameGenGhostingFix.__VERSION_SUFFIX ~= "nc" then
+            if FrameGenGhostingFix.IsContextual() then
               if Tracker.IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
                 ImGuiExt.Text(GeneralText.info_enabled)
               else
@@ -777,7 +799,7 @@ registerForEvent("onDraw", function()
               end
             end
 
-            if Contextual.GetBaseFpsContext() ~= 0 then
+            if FrameGenGhostingFix.IsContextual() and Contextual.GetBaseFpsContext() ~= 0 then
               ImGui.Text("")
               ImGuiExt.Text(SettingsText.info_context_base_fps, true)
               ImGuiExt.Text(tostring(Contextual.GetBaseFpsContext()))
