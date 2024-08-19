@@ -299,7 +299,7 @@ local translation = {
       info_potentially_mods = "Potentially conflicting mods:"
     },
   },
-  PresetsInfo = {
+  PresetsList = {
     --[=====[
     Presets are saved using IDs, to translate a preset you need the ID of it. The structure looks like following
     [PresetID] = {
