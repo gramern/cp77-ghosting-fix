@@ -1,6 +1,6 @@
 local VectorsEditor = {
   __NAME = "VectorsEditor",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local PresetsList = {}
@@ -49,35 +49,8 @@ local presetDescription = ""
 local presetAuthor = ""
 local presetFile = ""
 
-local bikeAllMasksFPPToggle
-local bikeAllMasksTPPToggle
-local bikeSideMasksScale = {}
-local bikeSideMasksScaleToggle = {}
-local bikeWindshieldScale = {}
-local bikeWindshieldScaleToggle = {}
-
-local carAllMasksFPPToggle
-local carFrontMaskToggle
-local carRearMaskToggle
-local carSideMasksToggle
-local carSideMasksScale = {}
-local carSideMasksScaleToggle = {}
-
-local hedCornersToggle
-local hedFillToggle
-local hedFillLockToggle
-local hedTrackerToggle
-local hedScale = {}
-local hedScaleToggle = {}
-local hedLockToggle
-
-local opacityHed
-local opacityHedToggle
 local maxOpacityHed = 6
-local opacityMasks
-local opacityMasksToggle
 local maxOpacityMasks = 12
-local opacityLockToggle
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Working Presets
@@ -138,20 +111,6 @@ local function ResetUI()
   presetDescription = ""
   presetAuthor = ""
   presetFile = ""
-
-  bikeSideMasksScale = {}
-  bikeSideMasksScaleToggle = {}
-  bikeWindshieldScale = {}
-  bikeWindshieldScaleToggle = {}
-
-  carSideMasksScale = {}
-  carSideMasksScaleToggle = {}
-
-  hedScale = {}
-  hedScaleToggle = {}
-
-  opacityHed = nil
-  opacityMasks = nil
 end
 
 -- @param `opacity`: number; In range 0 - 200
@@ -277,16 +236,17 @@ function VectorsEditor.SetInstance(presetsList)
     end
   end
 
+  SetPresetsList(presetsList)
+  LoadPreset()
+
   if Settings.IsDebugMode() then
     SetMaxOpacity(200)
     ImGuiExt.SetStatusBar("Presets Editor running in Debug Mode", 'PresetsEditorWindow')
   else
     SetMaxOpacity(12)
-    ImGuiExt.SetStatusBar(ImGuiExt.GetStatusBar(), 'PresetsEditorWindow')
+    local infoLoadedPreset = EditorText.status_preset_loaded .. " " .. PresetsList[selectedPreset].PresetInfo.name
+    ImGuiExt.SetStatusBar(infoLoadedPreset, 'PresetsEditorWindow')
   end
-
-  SetPresetsList(presetsList)
-  LoadPreset()
 end
 
 -- @return None
@@ -326,6 +286,36 @@ end
 
 local function FlagSettingChange()
   ImGuiExt.SetStatusBar(EditorText.status_close_overlay_preview, 'PresetsEditorWindow')
+end
+
+local function GameLoadingWindow()
+  ImGuiExt.PushStyle()
+  ImGui.SetNextWindowPos(600, 400, ImGuiCond.FirstUseEver)
+
+  if ImGui.Begin(EditorText.window_presets_editor, ImGuiWindowFlags.AlwaysAutoResize) then
+
+    ImGui.Text("")
+    ImGuiExt.TextRed(EditorText.info_game_loading_wait)
+    ImGui.Text("")
+  end
+
+  ImGui.End()
+  ImGuiExt.PopStyle()
+end
+
+local function EnterVehicleWindow()
+  ImGuiExt.PushStyle()
+  ImGui.SetNextWindowPos(600, 400, ImGuiCond.FirstUseEver)
+
+  if ImGui.Begin(EditorText.window_presets_editor, ImGuiWindowFlags.AlwaysAutoResize) then
+
+    ImGui.Text("")
+    ImGuiExt.TextRed(EditorText.info_enter_vehicle)
+    ImGui.Text("")
+  end
+
+  ImGui.End()
+  ImGuiExt.PopStyle()
 end
 
 local function LoadPresetWindow()
@@ -435,7 +425,7 @@ local function SavePresetWindow()
     if ImGui.Button(GeneralText.btn_save, 100 * ImGuiExt.GetScaleFactor(), 0) then
       if presetName == "" or presetAuthor == "" or presetFile == "" then
         ImGuiExt.SetStatusBar(EditorText.status_fill_all_save, 'SavePresetWindow')
-      elseif not Globals.AreLettersOnly(presetFile) then
+      elseif not Globals.ValidateFileName(presetFile) then
         ImGuiExt.SetStatusBar(EditorText.status_file_name_letters_only, 'SavePresetWindow')
       else
         local presetId = GeneratePresetID()
@@ -460,28 +450,45 @@ local function SavePresetWindow()
 end
 
 function VectorsEditor.DrawWindow()
+  if not Tracker.IsGameLoaded() then
+    GameLoadingWindow()
+
+    return
+  end
+
+  if not Tracker.IsVehicleMounted() and not Tracker.IsPlayerDriver() then
+    EnterVehicleWindow()
+
+    return
+  end
+
+  local bikeAllMasksFPPToggle, bikeAllMasksTPPToggle
+  local bikeSideMasksScale, bikeSideMasksScaleToggle = {}, {}
+  local bikeWindshieldScale, bikeWindshieldScaleToggle = {}, {}
+
+  local carAllMasksFPPToggle, carFrontMaskToggle, carRearMaskToggle, carSideMasksToggle
+  local carSideMasksScale, carSideMasksScaleToggle = {}, {}
+
+  local hedCornersToggle, hedFillToggle, hedFillLockToggle, hedTrackerToggle, hedLockToggle
+  local hedScale, hedScaleToggle = {}, {}
+
+  local opacityHed, opacityHedToggle
+  local opacityGain, opacityGainToggle
+  local opacityMasks, opacityMasksToggle
+  local opacityMaskDashboard, opacityMaskDashboardToggle
+  local opacityMaskEnd, opacityMaskEndToggle
+  local opacityMaskSidesBike, opacityMaskSidesBikeToggle
+  local opacityMaskFront, opacityMaskFrontToggle
+  local opacityMaskRear, opacityMaskRearToggle
+  local opacityMaskSides, opacityMaskSidesToggle
+  local opacityLockToggle
+  local opacityThreshold, opacityThresholdToggle
+  local opacityDelay, opacityDelayToggle
+
   ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(500, 300, ImGuiCond.FirstUseEver)
 
   if ImGui.Begin(EditorText.window_presets_editor, ImGuiWindowFlags.AlwaysAutoResize) then
-
-    if not Tracker.IsGameLoaded() then
-      ImGui.Text("")
-      ImGuiExt.TextRed(EditorText.info_game_loading_wait)
-      ImGui.Text("")
-
-      ImGui.End()
-      return
-    end
-
-    if not Tracker.IsVehicleMounted() and not Tracker.IsPlayerDriver() then
-      ImGui.Text("")
-      ImGuiExt.TextRed(EditorText.info_enter_vehicle)
-      ImGui.Text("")
-
-      ImGui.End()
-      return
-    end
 
     if ImGui.Button(EditorText.btn_load_preset, 180 * ImGuiExt.GetScaleFactor(), 0) then
       isLoadWindow = not isLoadWindow
@@ -513,12 +520,12 @@ function VectorsEditor.DrawWindow()
     ImGui.Separator()
 
     cameraOptionsTextWidth = ImGui.CalcTextSize(EditorText.group_camera_options)
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - cameraOptionsTextWidth / 2 - 450 * ImGuiExt.GetScaleFactor() - 3 * ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetStyle().ItemSpacing.x + 90 - cameraOptionsTextWidth / 2)
     ImGuiExt.Text(EditorText.group_camera_options)
 
     ImGui.SameLine()
 
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 360 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(2 * ImGui.GetStyle().ItemSpacing.x + 180)
 
     if ImGui.Button(EditorText.btn_toggle_perspective, 180 * ImGuiExt.GetScaleFactor(), 0) then
       local newPerspective
@@ -536,7 +543,7 @@ function VectorsEditor.DrawWindow()
   
     ImGui.SameLine()
 
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 180 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(3 * ImGui.GetStyle().ItemSpacing.x + 360)
 
     if ImGui.Button(EditorText.btn_center_view, 180 * ImGuiExt.GetScaleFactor(), 0) then
       CenterCamera()
@@ -870,6 +877,130 @@ function VectorsEditor.DrawWindow()
         end
         ImGuiExt.SetTooltip(EditorText.tooltip_strength_vehicle)
 
+        if camera.activePerspective ~= vehicleCameraPerspective.FPP and Tracker.GetVehicleBaseObject() == 0 then
+
+          ImGuiExt.Text(EditorText.slider_strength_bike_dashboard)
+
+          opacityMaskDashboard, opacityMaskDashboardToggle = ImGui.SliderFloat('##OpacityMaskDashboard', LoadedPreset.Vectors.Modifiers.Bike.DashboardMask.opacity, 0.1, 1, "%.1f")
+          if opacityMaskDashboardToggle then
+            LoadedPreset.Vectors.Modifiers.Bike.DashboardMask.opacity = opacityMaskDashboard
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskDashboard, 'Mask1')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_bike_dashboard)
+
+          ImGuiExt.Text(EditorText.slider_strength_bike_end)
+
+          opacityMaskEnd, opacityMaskEndToggle = ImGui.SliderFloat('##OpacityMaskEnd', LoadedPreset.Vectors.Modifiers.Bike.EndMask.opacity, 0.1, 1, "%.1f")
+          if opacityMaskEndToggle then
+            LoadedPreset.Vectors.Modifiers.Bike.EndMask.opacity = opacityMaskEnd
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskEnd, 'Mask4')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_bike_end)
+
+          ImGuiExt.Text(EditorText.slider_strength_sides)
+
+          opacityMaskSidesBike, opacityMaskSidesBikeToggle = ImGui.SliderFloat('##OpacityMaskSidesBike', LoadedPreset.Vectors.Modifiers.Bike.SideMasks.opacity, 0.1, 1, "%.1f")
+          if opacityMaskSidesBikeToggle then
+            LoadedPreset.Vectors.Modifiers.Bike.SideMasks.opacity = opacityMaskSidesBike
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskSidesBike, 'Mask2', 'Mask3')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_sides)
+        end
+
+        if camera.activePerspective ~= vehicleCameraPerspective.FPP and Tracker.GetVehicleBaseObject() == 1 then
+
+          ImGuiExt.Text(EditorText.slider_strength_car_front)
+
+          opacityMaskFront, opacityMaskFrontToggle = ImGui.SliderFloat('##OpacityMaskFront', LoadedPreset.Vectors.Modifiers.Car.FrontMask.opacity, 0.1, 1, "%.1f")
+          if opacityMaskFrontToggle then
+            LoadedPreset.Vectors.Modifiers.Car.FrontMask.opacity = opacityMaskFront
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskFront, 'Mask4')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_car_front)
+
+          ImGuiExt.Text(EditorText.slider_strength_car_rear)
+
+          opacityMaskRear, opacityMaskRearToggle = ImGui.SliderFloat('##OpacityMaskRear', LoadedPreset.Vectors.Modifiers.Car.RearMask.opacity, 0.1, 1, "%.1f")
+          if opacityMaskRearToggle then
+            LoadedPreset.Vectors.Modifiers.Car.RearMask.opacity = opacityMaskRear
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskRear, 'Mask1')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_car_rear)
+
+          ImGuiExt.Text(EditorText.slider_strength_sides)
+
+          opacityMaskSides, opacityMaskSidesToggle = ImGui.SliderFloat('##OpacityMaskSides', LoadedPreset.Vectors.Modifiers.Car.SideMasks.opacity, 0.1, 1, "%.1f")
+          if opacityMaskSidesToggle then
+            LoadedPreset.Vectors.Modifiers.Car.SideMasks.opacity = opacityMaskSides
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(4, previewOpacity * opacityMaskSides, 'Mask2', 'Mask3')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_sides)
+
+          ImGuiExt.Text(EditorText.slider_strength_gain)
+
+          opacityGain, opacityGainToggle = ImGui.SliderFloat('##OpacityGain', LoadedPreset.Vectors.VehMasks.Opacity.Def.gain, 1, 2, "%.1f")
+          if opacityGainToggle then
+            LoadedPreset.Vectors.VehMasks.Opacity.Def.gain = opacityGain
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(opacityGain, previewOpacity, 'Mask1', 'Mask2', 'Mask3', 'Mask4')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_gain)
+
+          ImGuiExt.Text(EditorText.slider_strength_threshold_car)
+
+          opacityThreshold, opacityThresholdToggle = ImGui.SliderFloat('##OpacityThreshold', LoadedPreset.Vectors.VehMasks.Opacity.Def.threshold, 0.5, 1, "%.2f")
+          if opacityThresholdToggle then
+            LoadedPreset.Vectors.VehMasks.Opacity.Def.threshold = opacityThreshold
+
+            local previewOpacity = opacityMasks / maxOpacityMasks
+            Vectors.SetPopAndOutMask(opacityThreshold, previewOpacity, 'Mask1', 'Mask4')
+
+            FlagSettingChange()
+          end
+          ImGuiExt.SetTooltip(EditorText.tooltip_strength_threshold_car)
+        end
+
+        ImGuiExt.Text(EditorText.slider_strength_state_change_delay)
+  
+        opacityDelay, opacityDelayToggle = ImGui.SliderFloat('##OpacityDelay', LoadedPreset.Vectors.VehMasks.Opacity.Def.delayDuration, 0.1, 5, "%.1f")
+        if opacityDelayToggle then
+          LoadedPreset.Vectors.VehMasks.Opacity.Def.delayDuration = opacityDelay
+
+          local previewOpacity = opacityMasks / maxOpacityMasks
+          Vectors.SetPopAndOutMask(opacityDelay, previewOpacity, 'Mask1', 'Mask2', 'Mask3', 'Mask4')
+
+          FlagSettingChange()
+        end
+        ImGuiExt.SetTooltip(EditorText.tooltip_strength_state_change_delay)
+
+        ImGui.Text("")
         ImGuiExt.Text(EditorText.slider_strength_bottom)
     
         opacityHed, opacityHedToggle = ImGui.SliderFloat('##OpacityHed', LoadedPreset.Vectors.VehMasks.HorizontalEdgeDown.Opacity.Def.max * 200, 0, maxOpacityHed, "%.0f")

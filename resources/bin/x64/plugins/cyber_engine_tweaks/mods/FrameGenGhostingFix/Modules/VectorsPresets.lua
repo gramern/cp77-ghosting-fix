@@ -1,6 +1,6 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local SortedPresetIds = {}
@@ -194,16 +194,24 @@ end
 -- Local UI
 ----------------------------------------------------------------------------------------------------------------------
 
-function VectorsPresets.DrawUI()
+local function GameFrameGenerationOffCaseUI()
   if ImGui.BeginTabItem(VehiclesText.tab_name_vehicle) then
-    if not Tracker.IsGameFrameGeneration() then
-      ImGui.Text("")
-      ImGuiExt.Text(SettingsText.info_frame_gen_off, true)
-      ImGui.Text("")
+    ImGui.Text("")
+    ImGuiExt.Text(SettingsText.info_frame_gen_off, true)
+    ImGui.Text("")
 
-      ImGui.EndTabItem()
-      return
-    end
+    ImGui.EndTabItem()
+  end
+end
+
+function VectorsPresets.DrawUI()
+  if not Tracker.IsGameFrameGeneration() then
+    GameFrameGenerationOffCaseUI()
+    
+    return
+  end
+
+  if ImGui.BeginTabItem(VehiclesText.tab_name_vehicle) then
 
     ImGuiExt.Text(GeneralText.group_general)
     ImGui.Separator()

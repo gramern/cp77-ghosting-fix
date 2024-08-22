@@ -1,6 +1,6 @@
 local Globals = {
   __NAME = "Globals",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local isDebug = nil
@@ -704,6 +704,29 @@ end
 -- @return boolean: `true` if the `text` string has only letters as characters
 function Globals.AreLettersOnly(text)
   return not string.match(text, "[^%a]")
+end
+
+-- @param `filename`: string; The filename to be validated.
+--
+-- @return boolean, string | nil; Returns `true` if the filename is valid, or `false` and the invalid character if not valid.
+function Globals.ValidateFileName(filename)
+  if #filename == 0 then
+    return false, ""
+  end
+
+  if not string.match(filename:sub(1,1), "^[a-zA-Z]$") then
+    return false, filename:sub(1,1)
+  end
+
+  for i = 2, #filename do
+    local char = filename:sub(i,i)
+
+    if not string.match(char, "^[a-zA-Z0-9_-]$") then
+      return false, char
+    end
+  end
+
+  return true
 end
 
 ------------------

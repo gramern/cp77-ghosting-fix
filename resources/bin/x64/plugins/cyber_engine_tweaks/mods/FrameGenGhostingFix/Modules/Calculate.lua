@@ -1,6 +1,6 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local MaskingGlobal = {
@@ -597,26 +597,34 @@ end
 -- Local UI
 ------------------
 
-local cornersOnWeaponBool, cornersOnWeaponToggle
-local blockerOnAimBool, blockerOnAimToggle
-local vignetteOnAimBool, vignetteOnAimToggle
-local vignetteOnWeaponBool, vignetteOnWeaponToggle
-local vignettePermamentBool, vignettePermamentToggle
-local vignetteScaleToggle = {}
-local vignettePositionToggle = {}
-local vignetteScale = {}
-local vignettePosition = {}
+local function GameFrameGenerationOffCaseUI()
+  if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
+    ImGui.Text("")
+    ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
+    ImGui.Text("")
+
+    ImGui.EndTabItem()
+  end
+end
 
 function Calculate.DrawUI()
-  if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
-    if not Tracker.IsGameFrameGeneration() then
-      ImGui.Text("")
-      ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
-      ImGui.Text("")
+  if not Tracker.IsGameFrameGeneration() then
+    GameFrameGenerationOffCaseUI()
+  
+    return
+  end
 
-      ImGui.EndTabItem()
-      return
-    end
+  local cornersOnWeaponBool, cornersOnWeaponToggle
+  local blockerOnAimBool, blockerOnAimToggle
+  local vignetteOnAimBool, vignetteOnAimToggle
+  local vignetteOnWeaponBool, vignetteOnWeaponToggle
+  local vignettePermamentBool, vignettePermamentToggle
+  local vignetteScaleToggle = {}
+  local vignettePositionToggle = {}
+  local vignetteScale = {}
+  local vignettePosition = {}
+
+  if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
 
     ImGuiExt.Text(GeneralText.group_general)
     ImGui.Separator()

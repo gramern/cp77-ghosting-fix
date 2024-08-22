@@ -1,5 +1,5 @@
 {
-  "__VERSION": "5.1.4",
+  "__VERSION": "5.1.8",
   "MaskingGlobal": {
     "vehicles": true,
     "isOpacityLock": true
@@ -155,17 +155,12 @@
           "gain": 1,
           "max": 1,
           "speedFactor": 1,
-          "stepFactor": 0.1
+          "stepFactor": 0.1,
+          "threshold": 0.75
         }
       }
     },
     "Modifiers": {
-      "HorizontalEdgeDown": {
-        "Scale": {
-          "y": 1,
-          "x": 1
-        }
-      },
       "Bike": {
         "Windshield": {
           "Scale": {
@@ -173,11 +168,18 @@
             "x": 1
           }
         },
+        "DashboardMask": {
+          "opacity": 1
+        },
+        "EndMask": {
+          "opacity": 1
+        },
         "SideMasks": {
           "Scale": {
             "y": 1,
             "x": 1
-          }
+          },
+          "opacity": 1
         },
         "AllMasks": {
           "TPP": {
@@ -199,13 +201,16 @@
             "y": 1,
             "x": 1
           },
-          "visible": true
+          "visible": true,
+          "opacity": 1
         },
         "FrontMask": {
-          "visible": true
+          "visible": true,
+          "opacity": 1
         },
         "RearMask": {
-          "visible": true
+          "visible": true,
+          "opacity": 1
         }
       }
     }

@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -93,11 +93,6 @@ local countFps = 0
 --ui
 local windowTitle
 local openOverlay
-local debugBool, debugToggle
-local debugViewBool, debugViewToggle
-local helpBool, helpToggle
-local keepWindowBool, keepWindowToggle
-local fgBool, fgToggle
 
 ------------------
 -- Global Methods
@@ -556,6 +551,12 @@ registerForEvent("onDraw", function()
   if not Tracker.IsModReady() then return end
   ImGuiExt.DrawNotification()
 
+  local debugBool, debugToggle
+  local debugViewBool, debugViewToggle
+  local helpBool, helpToggle
+  local keepWindowBool, keepWindowToggle
+  local fgBool, fgToggle
+
   if Tracker.IsModOpenWindow() then
     ImGuiExt.PushStyle()
     ImGui.SetNextWindowPos(400, 200, ImGuiCond.FirstUseEver)
@@ -570,14 +571,6 @@ registerForEvent("onDraw", function()
         --     Diagnostics.DrawUI()
         -- end
         --diagnostics interface ends------------------------------------------------------------------------------------------------------------------
-        
-        --debug interface starts------------------------------------------------------------------------------------------------------------------
-        if Debug and Settings.IsDebugMode() and Settings.IsDebugView() then
-            Debug.DrawUI()
-            TrackerDebug.DrawUI()
-            VectorsDebug.DrawUI()
-        end
-        --debug interface ends------------------------------------------------------------------------------------------------------------------
         
         if Globals.IsAspectRatioChange() then
           if ImGui.BeginTabItem(InfoText.tab_name_info) then
@@ -857,6 +850,45 @@ registerForEvent("onDraw", function()
     ImGui.End()
     ImGuiExt.PopStyle()
   end
+
+  --debug interface starts------------------------------------------------------------------------------------------------------------------
+  if Debug and Settings.IsDebugMode() and Settings.IsDebugView() then
+    ImGuiExt.PushStyle()
+    ImGui.SetNextWindowPos(450, 250, ImGuiCond.FirstUseEver)
+  
+    if ImGui.Begin("General Debug", ImGuiWindowFlags.AlwaysAutoResize) then
+
+      if ImGui.BeginTabBar('GeneralDebugTabs') then
+        Debug.DrawUI()
+        TrackerDebug.DrawUI()
+      end
+
+      ImGui.EndTabBar()
+    end
+
+
+    ImGui.End()
+    ImGuiExt.PopStyle()
+  end
+
+  if Debug and Settings.IsDebugMode() and Settings.IsDebugView() then
+    ImGuiExt.PushStyle()
+    ImGui.SetNextWindowPos(500, 300, ImGuiCond.FirstUseEver)
+  
+    if ImGui.Begin("Vectors Debug", ImGuiWindowFlags.AlwaysAutoResize) then
+
+      if ImGui.BeginTabBar('VectorsDebugTabs') then
+        VectorsDebug.DrawUI()
+      end
+
+      ImGui.EndTabBar()
+    end
+
+    ImGui.End()
+    ImGuiExt.PopStyle()
+  end
+  --debug interface ends------------------------------------------------------------------------------------------------------------------
+
 end)
 
 return FrameGenGhostingFix

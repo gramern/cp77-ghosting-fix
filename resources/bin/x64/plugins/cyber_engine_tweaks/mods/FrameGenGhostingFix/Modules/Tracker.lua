@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local GameState = {

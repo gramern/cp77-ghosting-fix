@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local MaskingGlobal = {
@@ -334,7 +334,8 @@ local VehMasksData = {
       gain = 1,
       max = 0.05,
       speedFactor = 0.01,
-      stepFactor = 0.1
+      stepFactor = 0.1,
+      threshold = 0.75
     },
     value = 0,
     delayedValue = 0,
@@ -352,8 +353,15 @@ local ModifiersData = {
       FPP = { visible = true },
       TPP = { visible = true }
     },
+    DashboardMask = {
+      opacity = 1,
+    },
+    EndMask = {
+      opacity = 1,
+    },
     SideMasks = {
       Scale = {x = 1, y = 1},
+      opacity = 1,
     },
     Windshield = {
       Scale = {x = 1, y = 1},
@@ -365,13 +373,16 @@ local ModifiersData = {
     },
     FrontMask = {
       visible = true,
+      opacity = 1,
     },
     RearMask = {
       visible = true,
+      opacity = 1,
     },
     SideMasks = {
       Scale = {x = 1, y = 1},
       visible = true,
+      opacity = 1,
     },
   }
 }
@@ -905,14 +916,18 @@ local function TransformByVehBaseObject(baseObject)
     return
   else
     if baseObject == 1 then
+      local carDoors = vehElements.CarDoors
+
       mask1.Def = vehElements.CarSideMirrors.Left
-      mask2.Def = vehElements.CarDoors.Left
-      mask3.Def = vehElements.CarDoors.Right
+      mask2.Def = carDoors.Left
+      mask3.Def = carDoors.Right
       mask4.Def = vehElements.CarSideMirrors.Right
     else
+      local handlebars = vehElements.BikeHandlebars
+
       mask1.Def = vehElements.BikeSpeedometer
-      mask2.Def = vehElements.BikeHandlebars.Left
-      mask3.Def = vehElements.BikeHandlebars.Right
+      mask2.Def = handlebars.Left
+      mask3.Def = handlebars.Right
       mask4.Def = vehElements.BikeWindshield
     end
   end
@@ -932,26 +947,32 @@ local function TransformByModifiers(baseObject)
       ModifiersDerivatives.scaleMaskingInWidth = modifiersBike.SideMasks.Scale.y * dotVeh.forwardAbs
 
       if MaskingGlobal.isOpacityLock then return end
-      mask1.Def.visible = modifiersBike.AllMasks.TPP.visible
-      mask2.Def.visible = modifiersBike.AllMasks.TPP.visible
-      mask3.Def.visible = modifiersBike.AllMasks.TPP.visible
-      mask4.Def.visible = modifiersBike.AllMasks.TPP.visible
+      local visible = modifiersBike.AllMasks.TPP.visible
+
+      mask1.Def.visible = visible
+      mask2.Def.visible = visible
+      mask3.Def.visible = visible
+      mask4.Def.visible = visible
     else
       ModifiersDerivatives.scaleMaskingInWidth = modifiersCar.SideMasks.Scale.y * dotVeh.forwardAbs
 
       if MaskingGlobal.isOpacityLock then return end
+      local sideMasksVisible = modifiersCar.SideMasks.visible
+
       mask1.Def.visible = modifiersCar.RearMask.visible
-      mask2.Def.visible = modifiersCar.SideMasks.visible
-      mask3.Def.visible = modifiersCar.SideMasks.visible
+      mask2.Def.visible = sideMasksVisible
+      mask3.Def.visible = sideMasksVisible
       mask4.Def.visible = modifiersCar.FrontMask.visible
     end
   else
     if baseObject == 0 then
       if MaskingGlobal.isOpacityLock then return end
-      mask1.Def.visible = modifiersBike.AllMasks.FPP.visible
-      mask2.Def.visible = modifiersBike.AllMasks.FPP.visible
-      mask3.Def.visible = modifiersBike.AllMasks.FPP.visible
-      mask4.Def.visible = modifiersBike.AllMasks.FPP.visible
+      local visible = modifiersBike.AllMasks.FPP.visible
+
+      mask1.Def.visible = visible
+      mask2.Def.visible = visible
+      mask3.Def.visible = visible
+      mask4.Def.visible = visible
     end
   end
 end
@@ -987,12 +1008,15 @@ local function TransformPositionBike()
   end
   mask4.Position = Universal.GetWorldPositionFromOffset(midpointPos.Left, mask4NewOffset)
 
+  local sideMasksCoordY = dotVeh.forward * wheelbase * -0.6
+  local sideMasksCoordZ = dotVeh.rightAbs * -0.5
+
   --Mask2
-  local mask2NewOffset = new4(dotVeh.rightAbs * -0.4, dotVeh.forward * wheelbase * -0.6, dotVeh.rightAbs * -0.5)
+  local mask2NewOffset = new4(dotVeh.rightAbs * -0.4, sideMasksCoordY, sideMasksCoordZ)
   mask2.Position = Universal.GetWorldPositionFromOffset(midpointPos.Left, mask2NewOffset)
 
   --Mask3
-  local mask3NewOffset = new4(dotVeh.rightAbs * 0.4, dotVeh.forward * wheelbase * -0.6, dotVeh.rightAbs * -0.5)
+  local mask3NewOffset = new4(dotVeh.rightAbs * 0.4, sideMasksCoordY, sideMasksCoordZ)
   mask3.Position = Universal.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
@@ -1007,16 +1031,20 @@ local function TransformPositionCar()
   local vehVehicle = VehicleData
   local bumper, midpointPos, wheelbase = vehVehicle.Bumper, vehVehicle.Midpoint.Position, vehVehicle.Wheel.wheelbase
 
+  local endMaskCoordY = dotVeh.rightAbs * bumper.offset
+
   --Mask1
-  local mask1NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * -0.5, 0)
+  local mask1NewOffset = new4(0, endMaskCoordY * -0.5, 0)
   --Mask4
-  local mask4NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * 0.5, 0)
+  local mask4NewOffset = new4(0, endMaskCoordY * 0.5, 0)
 
   if medianPlane >= 0 then
+    local endMaskCoordZ = dotVeh.upAbs * -0.5
+
     --Mask1
-    mask1NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * -0.5, dotVeh.upAbs * -0.5)
+    mask1NewOffset = new4(0, endMaskCoordY * -0.5, endMaskCoordZ)
     --Mask4
-    mask4NewOffset = new4(0, dotVeh.rightAbs * bumper.offset * 0.5, dotVeh.upAbs * -0.5)
+    mask4NewOffset = new4(0, endMaskCoordY * 0.5, endMaskCoordZ)
   end
 
   --Mask1
@@ -1033,14 +1061,16 @@ local function TransformPositionCar()
     wheelbaseFactor = 0.2
   end
 
+  local sideMasksCoordX = dotVeh.rightAbs * wheelbaseFactor
+  local sideMasksCoordY = dotVeh.forward * bumper.distance * -0.5
+  local sideMasksCoordZ = dotVeh.rightAbs * -0.5
+
   --Mask2
-  local mask2NewOffset = nil
-  mask2NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor * -1, dotVeh.forward * bumper.distance * -0.5, dotVeh.rightAbs * -0.5)
+  local mask2NewOffset = new4(sideMasksCoordX * -1, sideMasksCoordY, sideMasksCoordZ)
   mask2.Position = Universal.GetWorldPositionFromOffset(midpointPos.Left, mask2NewOffset)
 
   --Mask3
-  local mask3NewOffset = nil
-  mask3NewOffset = new4(dotVeh.rightAbs * wheelbaseFactor, dotVeh.forward * bumper.distance * -0.5, dotVeh.rightAbs * -0.5)
+  local mask3NewOffset = new4(sideMasksCoordX, sideMasksCoordY, sideMasksCoordZ)
   mask3.Position = Universal.GetWorldPositionFromOffset(midpointPos.Right, mask3NewOffset)
 end
 
@@ -1350,22 +1380,23 @@ local function TransformHeightBike()
     end
 
     
-    local mask23Size = max(wheelbaseScreen * 1.5, wheelbaseScreenPerp * 1.5)
-    mask23Size = max(mask23Size, mask23Size * ModifiersDerivatives.scaleMaskingInWidth)
-    local mask23SizeMax = max(wheelbaseScreen * 2.5, mask23Size)
+    local sideMaskHeight = max(wheelbaseScreen * 1.5, wheelbaseScreenPerp * 1.5)
+    sideMaskHeight = max(sideMaskHeight, sideMaskHeight * ModifiersDerivatives.scaleMaskingInWidth)
+
+    local sideMaskHeightMax = max(wheelbaseScreen * 2.5, sideMaskHeight)
 
     if dotVeh.right >= 0 then
       --Mask2
-      mask2.Size.y = mask23SizeMax
+      mask2.Size.y = sideMaskHeightMax
 
       --Mask3
-      mask3.Size.y = max(mask23Size, mask23SizeMax * dotVeh.upAbs)
+      mask3.Size.y = max(sideMaskHeight, sideMaskHeightMax * dotVeh.upAbs)
     else
       --Mask2
-      mask2.Size.y = max(mask23Size, mask23SizeMax * dotVeh.upAbs)
+      mask2.Size.y = max(sideMaskHeight, sideMaskHeightMax * dotVeh.upAbs)
 
       --Mask3
-      mask3.Size.y = mask23SizeMax
+      mask3.Size.y = sideMaskHeightMax
     end
 
     --Mask4
@@ -1426,22 +1457,24 @@ local function TransformHeightCar(currentSpeed)
       wheelbaseFactor = 0.8
     end
 
+    local innerSideMaskHeight = max(axisLength.back * 0.8, axisLength.front * 0.8)
+    innerSideMaskHeight = max(bumpersScreenDistance * wheelbaseFactor, innerSideMaskHeight)
+    innerSideMaskHeight = max(innerSideMaskHeight, innerSideMaskHeight * ModifiersDerivatives.scaleMaskingInWidth)
+
+    local outerSideMaskHeight = max(axisLength.back, axisLength.front)
+
     --Mask2
     if dotVeh.right > -0.2 then
-      local mask2Size = max(axisLength.back * 0.8, axisLength.front * 0.8)
-      mask2Size = max(bumpersScreenDistance * wheelbaseFactor, mask2Size)
-      mask2.Size.y = max(mask2Size, mask2Size * ModifiersDerivatives.scaleMaskingInWidth)
+      mask2.Size.y = innerSideMaskHeight
     else
-      mask2.Size.y = max(axisLength.back, axisLength.front)
+      mask2.Size.y = outerSideMaskHeight
     end
 
     --Mask3
     if dotVeh.right < 0.2 then
-      local mask3Size = max(axisLength.back * 0.8, axisLength.front * 0.8)
-      mask3Size = max(bumpersScreenDistance * wheelbaseFactor, mask3Size)
-      mask3.Size.y = max(mask3Size, mask3Size * ModifiersDerivatives.scaleMaskingInWidth)
+      mask3.Size.y = innerSideMaskHeight
     else
-      mask3.Size.y = max(axisLength.back, axisLength.front)
+      mask3.Size.y = outerSideMaskHeight
     end
   else
     --Mask1
@@ -1492,7 +1525,7 @@ local function TransformRotationBike()
     --Mask1
     mask1.rotation = 90 + axisRotation.right
 
-    if dotVeh.right < 0.05 and dotVeh.forward > 0.9 then
+    if dotVeh.rightAbs < 0.05 and dotVeh.forwardAbs > 0.9 then
       --Mask2
       mask2.rotation = horizontalAngle - 90
 
@@ -1630,26 +1663,29 @@ local function TransformOpacityBike()
   local vehMasks = VehMasksData
   local mask1, mask2, mask3, mask4 = vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
 
+  local modifiers = ModifiersData.Bike
+  local opacityMaxDashboard, opacityMaxEnd, opacityMaxSides = modifiers.DashboardMask.opacity, modifiers.EndMask.opacity, modifiers.SideMasks.opacity
+
   local opacityValue = vehMasks.Opacity.value
   local opacityForwardAbs, opacityUpAbs = opacityValue * dotForwardAbs, opacityValue * dotUpAbs
 
   if activePerspective ~= vehicleCameraPerspective.FPP then
     --Mask1
     if dotForward >= 0 then
-      mask1.opacity = opacityValue * 0.75
+      mask1.opacity = opacityValue * opacityMaxDashboard * 0.75
     else
       mask1.opacity = opacityValue
     end
 
     --Mask2
-    mask2.opacity = opacityValue
+    mask2.opacity = opacityValue * opacityMaxSides
 
     --Mask3
-    mask3.opacity = opacityValue
+    mask3.opacity = opacityValue * opacityMaxSides
 
     --Mask4
     local mask4Opacity = max(opacityUpAbs, opacityForwardAbs)
-    mask4.opacity = min(opacityValue, mask4Opacity) * 0.75
+    mask4.opacity = min(opacityValue, mask4Opacity) * opacityMaxEnd * 0.75
   else
     --Mask1
     mask1.opacity = opacityValue * 0.75
@@ -1671,43 +1707,52 @@ local function TransformOpacityCar()
   local vehMasks = VehMasksData
   local mask1, mask2, mask3, mask4 = vehMasks.Mask1, vehMasks.Mask2, vehMasks.Mask3, vehMasks.Mask4
 
+  local modifiers = ModifiersData.Car
+  local opacityMaxFront, opacityMaxSides, opacityMaxRear = modifiers.FrontMask.opacity, modifiers.SideMasks.opacity, modifiers.RearMask.opacity
+
   local opacity = vehMasks.Opacity
-  local opacityGain, opacityValue = opacity.Def.gain, opacity.value
-  local opacityRightAbs, opacityUpAbs = opacityValue * dotVeh.rightAbs, opacityValue * dotVeh.upAbs
+  local opacityGain, opacityValue, opacityThreshold = opacity.Def.gain, opacity.value, opacity.Def.threshold
+  local opacityRightAbs, opacityUpAbs = opacityValue * dotVeh.rightAbs * 1.5, opacityValue * dotVeh.upAbs * 2
 
   if CameraData.activePerspective ~= vehicleCameraPerspective.FPP then
+
+    local closerEndMaskOpacity = max(dotVeh.forwardAbs, opacityThreshold) * opacityValue
+
+    local furtherEndMaskOpacity = max(opacityUpAbs, opacityRightAbs) * opacityGain
+    furtherEndMaskOpacity = min(opacityValue * opacityThreshold, furtherEndMaskOpacity)
+
+    local innerSideMaskOpacity = max(opacityUpAbs, opacityRightAbs * 2) * opacityGain
+    innerSideMaskOpacity = min(opacityValue, innerSideMaskOpacity) * opacityMaxSides
+
+    local outerSideMaskOpacity = opacityUpAbs * opacityGain
+    outerSideMaskOpacity = min(opacityValue, outerSideMaskOpacity) * opacityMaxSides
+
     --Mask1
     if dotVeh.forward < 0 then
-      local mask1Opacity = max(opacityUpAbs * 2, opacityRightAbs * 1.5) * opacityGain
-      mask1.opacity = min(opacityValue, mask1Opacity)
+      mask1.opacity = furtherEndMaskOpacity * opacityMaxRear
     else
-      mask1.opacity = opacityValue
+      mask1.opacity = closerEndMaskOpacity * opacityMaxRear
     end
 
     --Mask2
     if dotVeh.right > -0.2 or dotVeh.forward < -0.6 then
-      local mask2Opacity = max(opacityUpAbs * 2, opacityRightAbs * 3) * opacityGain
-      mask2.opacity = min(opacityValue, mask2Opacity)
+      mask2.opacity = innerSideMaskOpacity
     else
-      local mask2Opacity = opacityUpAbs * 2 * opacityGain
-      mask2.opacity = min(opacityValue, mask2Opacity)
+      mask2.opacity = outerSideMaskOpacity
     end
 
     --Mask3
     if dotVeh.right < 0.2 or dotVeh.forward < -0.6 then
-      local mask3Opacity = max(opacityUpAbs * 2, opacityRightAbs * 3) * opacityGain
-      mask3.opacity = min(opacityValue, mask3Opacity)
+      mask3.opacity = innerSideMaskOpacity
     else
-      local mask3Opacity = opacityUpAbs * 2 * opacityGain
-      mask3.opacity = min(opacityValue, mask3Opacity)
+      mask3.opacity = outerSideMaskOpacity
     end
     
     --Mask4
     if dotVeh.forward > 0 then
-      local mask4Opacity = max(opacityUpAbs * 2, opacityRightAbs * 1.5) * opacityGain
-      mask4.opacity = min(opacityValue, mask4Opacity)
+      mask4.opacity = furtherEndMaskOpacity * opacityMaxFront
     else
-      mask4.opacity = opacityValue
+      mask4.opacity = closerEndMaskOpacity * opacityMaxFront
     end
   else
     --Mask1

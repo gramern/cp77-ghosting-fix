@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 1, 4 },
+  __VERSION = { 5, 1, 8 },
 }
 
 local isDebug = nil
@@ -1101,58 +1101,81 @@ end
 -- Local UI
 --------------- 
 
+local function DLSSEnablerMissingCaseUI()
+  if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
+    if not versionRequired then
+      --moved it here, as it can't concat onInit for some reason
+      versionRequired = table.concat(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN, ".")
+    end
+
+    ImGui.Text("")
+    ImGuiExt.TextRed(ContextualText.info_bad_enabler_version, true)
+    ImGui.Text("")
+    ImGuiExt.TextRed(ContextualText.info_found_enabler_version)
+    ImGui.SameLine()
+    ImGuiExt.TextRed((versionDLSSEnabler or "Unknown"))
+    ImGuiExt.TextRed(GeneralText.info_required)
+    ImGui.SameLine()
+    ImGuiExt.TextRed(versionRequired)
+    ImGui.Text("")
+    ImGuiExt.ResetStatusBar()
+
+    ImGui.EndTabItem()
+  end
+end
+
+local function GameFrameGenerationOffCaseUI()
+  if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
+
+    ImGui.Text("")
+    ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
+    ImGui.Text("")
+    ImGuiExt.ResetStatusBar()
+
+    ImGui.EndTabItem()
+  end
+end
+
+local function ModDynamicFrameGenerationOnCaseUI()
+  if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
+
+    ImGui.Text("")
+    ImGuiExt.TextRed(ContextualText.info_dynamic_frame_gen_forbidden, true)
+    ImGui.Text("")
+    ImGuiExt.TextRed(GeneralText.info_reopen_overlay, true)
+    ImGui.Text("")
+    ImGuiExt.ResetStatusBar()
+
+    ImGui.EndTabItem()
+  end
+end
+
 function Contextual.DrawUI()
   if not FrameGenGhostingFix.IsContextual() then return end
+
+  if not isDLSSEnabler then
+    DLSSEnablerMissingCaseUI()
+
+    return
+  end
+
+  if not Tracker.IsGameFrameGeneration() then
+    GameFrameGenerationOffCaseUI()
+
+    return
+  end
+
+  if Tracker.IsModDynamicFrameGeneration() then
+    ModDynamicFrameGenerationOnCaseUI()
+
+    return
+  end
 
   local baseFpsCalcInterval
   local contextSightseeingToggle, contextSlowPacedAndCinematicsToggle, contextFastPacedToggle, contextMyOwnToggle, contextBaseFpsSliderToggle, baseFpsCalcIntervalToggle
   local isVehicleStaticToggled, isVehicleDrivingToggled, isVehicleStaticCombatToggled, isVehicleDrivingCombatToggled, standingToggle, walkingToggle, slowWalkingToggle, sprintingToggle, swimmingToggle, combatToggle, braindanceToggle, cinematicToggle, photoModeToggle
 
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
-
-    if not isDLSSEnabler then
-      if not versionRequired then
-        --moved it here, as it can't concat onInit for some reason
-        versionRequired = table.concat(FrameGenGhostingFix.__DLSS_ENABLER_VERSION_MIN, ".")
-      end
-
-      ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_bad_enabler_version, true)
-      ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_found_enabler_version)
-      ImGui.SameLine()
-      ImGuiExt.TextRed((versionDLSSEnabler or "Unknown"))
-      ImGuiExt.TextRed(GeneralText.info_required)
-      ImGui.SameLine()
-      ImGuiExt.TextRed(versionRequired)
-      ImGui.Text("")
-      ImGuiExt.ResetStatusBar()
-
-      ImGui.EndTabItem()
-      return
-    end
-
-    if not Tracker.IsGameFrameGeneration() then
-      ImGui.Text("")
-      ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
-      ImGui.Text("")
-      ImGuiExt.ResetStatusBar()
-
-      ImGui.EndTabItem()
-      return
-    end
-
-    if Tracker.IsModDynamicFrameGeneration() then
-      ImGui.Text("")
-      ImGuiExt.TextRed(ContextualText.info_dynamic_frame_gen_forbidden, true)
-      ImGui.Text("")
-      ImGuiExt.TextRed(GeneralText.info_reopen_overlay, true)
-      ImGui.Text("")
-      ImGuiExt.ResetStatusBar()
-
-      ImGui.EndTabItem()
-      return
-    end
 
     ImGuiExt.Text(GeneralText.group_overview)
     ImGui.Separator()
