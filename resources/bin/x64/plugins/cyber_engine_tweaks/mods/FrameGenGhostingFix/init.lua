@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 1, 8 },
+  __VERSION = { 5, 1, 9 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -61,6 +61,7 @@ local SettingsText = Localization.GetSettingsText()
 local Debug = require("Dev/Debug")
 local TrackerDebug = require("Dev/TrackerDebug")
 local VectorsDebug = require("Dev/VectorsDebug")
+local debugFirstTimePrint
 
 --math
 local floor = math.floor
@@ -132,6 +133,9 @@ function FrameGenGhostingFix.GetDLSSEnablerVersion(asTable)
 
   if type(DLSSEnabler_GetVersionAsString) == "function" then
     version = DLSSEnabler_GetVersionAsString()
+
+    local printDLSSEnablerVersion = LogText.bridge_found_enabler_version .. " " .. version
+    Globals.PrintDebug(printDLSSEnablerVersion)
   else
     Globals.PrintError(LogText.bridge_missing)
     Contextual = nil
@@ -407,7 +411,9 @@ registerForEvent("onInit", function()
         local version = FrameGenGhostingFix.GetDLSSEnablerVersion()
 
         if version and type(version) == "string" then
-          Globals.PrintError(LogText.bridge_found_enabler_version, version)
+          local errorDLSSEnablerVersion = LogText.bridge_found_enabler_version .. " " .. version
+
+          Globals.PrintError(errorDLSSEnablerVersion)
           return
         end
       end
@@ -419,8 +425,6 @@ registerForEvent("onInit", function()
 
   -- the first early return on very first problems with the mod
   if not Tracker.IsModReady() then return end
-
-  FrameGenGhostingFix.GetVersion()
 
   windowTitle = FrameGenGhostingFix.__NAME .. " " .. FrameGenGhostingFix.__EDITION or FrameGenGhostingFix.__NAME
 
@@ -484,7 +488,14 @@ if Debug then
 end
 
 registerForEvent("onOverlayOpen", function()
-  if not Tracker.IsModReady() then return end
+  if Debug and not debugFirstTimePrint then
+    local modVersion = LogText.mod_version .. " " .. FrameGenGhostingFix.GetVersion(true)
+    Globals.PrintDebug(modVersion)
+
+    Globals.PrintTable(Globals.LoadJSON('user-settings'))
+  end
+
+  if not Tracker.IsModReady() then Globals.PrintError(LogText.mod_not_ready) return end
   openOverlay = true
   Tracker.SetModOpenWindow(true)
 
@@ -500,6 +511,9 @@ registerForEvent("onOverlayOpen", function()
 
   Vectors.OnOverlayOpen()
   VectorsPresets.OnOverlayOpen()
+
+  if not Debug then return end
+  debugFirstTimePrint = true
 end)
 
 registerForEvent("onOverlayClose", function()
@@ -682,6 +696,7 @@ registerForEvent("onDraw", function()
                 if ImGui.Button(SettingsText.btn_print_user_settings, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
                   Globals.PrintTable(Globals.LoadJSON('user-settings'))
                 end
+                ImGuiExt.SetTooltip(SettingsText.tooltip_print_user_settings)
 
                 ImGui.Text("")
               end

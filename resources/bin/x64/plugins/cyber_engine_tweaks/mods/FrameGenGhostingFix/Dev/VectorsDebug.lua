@@ -1,6 +1,6 @@
 local VectorsDebug = {
   __NAME = "VectorsDebug",
-  __VERSION = { 5, 1, 8 },
+  __VERSION = { 5, 1, 9 },
 }
 
 local ImGuiExt = require("Modules/ImGuiExt")
@@ -24,11 +24,6 @@ function VectorsDebug.DrawUI()
         ImGui.SameLine()
         ImGuiExt.Text(tostring(MaskingGlobalData.masksController))
       end
-      -- if VectorsCustomize then
-        -- ImGuiExt.Text("For VectorsCustomize Module")
-        -- ImGui.SameLine()
-        -- ImGuiExt.Text(tostring(VectorsCustomize.GetMasksController()))
-      -- end
 
       ImGui.Separator()
 

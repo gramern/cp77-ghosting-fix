@@ -42,7 +42,7 @@
 --]=====]
 
 local translation = {
-  __VERSION = { 5, 1, 8 },
+  __VERSION = { 5, 1, 9 },
   __AUTHOR = "", -- Mark your work. 
   UIText = {
     General = {
@@ -283,6 +283,7 @@ local translation = {
       tooltip_fg = "Turn ON/OFF Frame Generation on the mod level (the game's settings remain unchanged).",
       tooltip_help = "Enable tooltips on mouse hover for certain settings.",
       tooltip_theme = "Pick your colors for the mod's window.",
+      tooltip_print_user_settings = "Tries to load 'user-settings.json'. If the file is present, prints its contents. Reopen CET's overlay for this function to work properly.",
       tooltip_reload_mod = "Reload the mod after using 'Reload all mods' option in Cyber Engine Tweaks.",
       tooltip_window = "Keep this window opened after closing CET's overlay.",
     },
