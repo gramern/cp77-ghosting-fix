@@ -293,9 +293,7 @@ function ImGuiExt.ResetStatusBar(barName)
   if FrameGenGhostingFix.__VERSION_STRING then
     status = GeneralText.status_version .. " " .. FrameGenGhostingFix.__VERSION_STRING
   else
-    status = "The mod has encountered an error: check logs."
-    Globals.PrintError(ImGuiExt.__NAME, "The mod has encountered an error. Turn off the game and check logs.")
-    Tracker.SetModReady(false)
+    status = GeneralText.status_version .. " " .. FrameGenGhostingFix.GetVersion(true)
   end
 
   if not barName then

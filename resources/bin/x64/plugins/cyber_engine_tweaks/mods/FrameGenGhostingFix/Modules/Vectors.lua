@@ -2319,7 +2319,7 @@ function Vectors.LoadPreset(presetTable)
   MaskingGlobal.vehicles = presetTable.MaskingGlobal.vehicles
   MaskingGlobal.isOpacityLock = presetTable.MaskingGlobal.isOpacityLock
 
-  if not MaskingGlobal.vehicles then SetVisibility(false) return end
+  if not MaskingGlobal.vehicles then SetVisibility(false) end
 
   Globals.SafeMergeTables(VehElementsDef, presetTable.Vectors.VehElements)
   Globals.SafeMergeTables(VehMasksData, presetTable.Vectors.VehMasks)

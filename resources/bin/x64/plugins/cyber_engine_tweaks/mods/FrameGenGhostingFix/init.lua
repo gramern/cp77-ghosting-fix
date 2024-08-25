@@ -402,6 +402,8 @@ registerForEvent("onInit", function()
   if not VectorsPresets then Globals.PrintError(LogText.presets_missing) end
   if not Vectors then Globals.PrintError(LogText.vectors_missing) end
 
+  FrameGenGhostingFix.GetVersion()
+
   -- check for the right DLSS Enabler's version for the contextual edition of the mod
   if FrameGenGhostingFix.IsContextual() then
     if Contextual then 
