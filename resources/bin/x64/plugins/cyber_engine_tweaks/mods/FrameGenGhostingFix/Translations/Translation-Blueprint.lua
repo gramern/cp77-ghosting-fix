@@ -42,7 +42,7 @@
 --]=====]
 
 local translation = {
-  __VERSION = { 5, 1, 9 },
+  __VERSION = { 5, 1, 10 },
   __AUTHOR = "", -- Mark your work. 
   UIText = {
     General = {
@@ -200,6 +200,7 @@ local translation = {
       slider_vignette_pos_x = "Vignette's horizontal position:",
       slider_vignette_pos_y = "Vignette's vertical position:",
       slider_vignette_width = "Vignette's width:",
+      slider_masking_strength = "Masking strength:",
       status_aim = "[ ! ] You can enable one aiming/blocking feature at once.",
       status_get_out = "[ ! ] V must exit a vehicle to use this option.",
       status_reload_accept_changes = "[ ! ] Redraw your weapon to accept changes.",
@@ -280,6 +281,7 @@ local translation = {
       status_settings_loaded = "User settings loaded.",
       status_settings_restored = "Restored your previous settings.",
       status_settings_saved = "[ ! ] Your settings will be saved.",
+      status_settings_save_reminder = "[ ! ] Remember to save your new settings when you finish editing.",
       tooltip_fg = "Turn ON/OFF Frame Generation on the mod level (the game's settings remain unchanged).",
       tooltip_help = "Enable tooltips on mouse hover for certain settings.",
       tooltip_theme = "Pick your colors for the mod's window.",

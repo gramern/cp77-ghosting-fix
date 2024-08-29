@@ -1,6 +1,6 @@
 // Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-// FrameGen Ghosting 'Fix' 5.1.9, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
+// FrameGen Ghosting 'Fix' 5.1.10, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
 
 // RedScript Modules Presence Check --------------------------------------------------------------------------------
 public static func FrameGenGhostingFixIsRedScriptModule() -> Void {}
@@ -249,10 +249,30 @@ protected cb func OnPlayerAttach(playerGameObject: ref<GameObject>) -> Bool {
   };
 
   this.FrameGenGhostingFixCallback();
+  this.FrameGenGhostingFixOpacityOnFootToggle(0.02, 0.005);
   this.FrameGenGhostingFixMasksOnFootSetMarginsToggle(0.0, 3840.0, 2160.0);
   this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
   this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
 
+  // ------------
+  // OnPlayerAttach debug check
+  // ------------
+  // LogChannel(n"DEBUG", s"Opacity for on foot masks set: \(this.m_onFootMaxOpacity), \(this.m_onFootChangeOpacityBy)");
+  // LogChannel(n"DEBUG", s"Margins for on foot corner masks set: \(this.m_cornerDownLeftMargin), \(this.m_cornerDownRightMargin), \(this.m_cornerDownMarginTop)");
+  // LogChannel(n"DEBUG", s"Dimensions for on aim masks set: \(this.m_aimOnFootSizeX), \(this.m_aimOnFootSizeY)");
+  // LogChannel(n"DEBUG", s"Margins for on foot vignette set: \(this.m_vignetteOnFootMarginLeft), \(this.m_vignetteOnFootMarginTop)");
+  // LogChannel(n"DEBUG", s"Dimensions for on foot vignette set: \(this.m_vignetteOnFootSizeX), \(this.m_vignetteOnFootSizeY)");
+
+  // this.FrameGenGhostingFixCornersOnFootToggle(false);
+  // this.FrameGenGhostingFixBlockerAimOnFootToggle(false);
+  // this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
+  // this.FrameGenGhostingFixVignetteOnFootToggle(false);
+  // this.FrameGenGhostingFixVignetteOnFootPermamentToggle(false);
+  // LogChannel(n"DEBUG", s"Corner masks enabled: \(this.m_cornersOnFootEnabled)");
+  // LogChannel(n"DEBUG", s"Blocker on aim enabled: \(this.m_blockerAimOnFootEnabled)");
+  // LogChannel(n"DEBUG", s"Vignette on aim enabled: \(this.m_vignetteAimOnFootEnabled)");
+  // LogChannel(n"DEBUG", s"Vignette on weapon enabled: \(this.m_vignetteOnFootEnabled)");
+  // LogChannel(n"DEBUG", s"Vignette permament enabled: \(this.m_vignetteOnFootPermamentEnabled)");
   // LogChannel(n"DEBUG", s"Main Loop initialized...");
 }
 

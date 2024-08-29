@@ -1,6 +1,6 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION = { 5, 1, 9 },
+  __VERSION = { 5, 1, 10 },
 }
 
 local MaskingGlobal = {
@@ -67,6 +67,10 @@ local MasksData = {
     },
     ScreenSpace = {x = 1920, y = 1080},
     Size = {x = 4840, y = 2560},
+  },
+  Opacity = {
+    max = 0.02,
+    changeStep = 0.005
   }
 }
 
@@ -95,7 +99,8 @@ local function GetUserSettings()
       onWeapon = MasksData.Vignette.onWeapon,
       ScreenPosition = {x = MasksData.Vignette.ScreenPosition.x, y = MasksData.Vignette.ScreenPosition.y},
       Scale = {x = MasksData.Vignette.Scale.x, y = MasksData.Vignette.Scale.y},
-    }
+    },
+    Opacity = {max = MasksData.Opacity.max, changeStep = MasksData.Opacity.changeStep}
   }
 
   return userSettings
@@ -445,6 +450,7 @@ end
 ------------------
 
 function Calculate.Toggle()
+  ToggleOnFootOpacity()
   ToggleCornersOnWeapon()
   ToggleBlockerOnAim()
   ToggleVignetteOnAim()
@@ -466,9 +472,9 @@ function ToggleCornersOnWeapon()
     end)
 
     Override(masksController, 'FrameGenGhostingFixMasksOnFootSetMarginsToggle', function(self, cornerDownLeftMargin, cornerDownRightMargin, cornerDownMarginTop, wrappedMethod)
-      self.m_cornerDownLeftMargin = edge.left
-      self.m_cornerDownRightMargin = edge.right
-      self.m_cornerDownMarginTop = edge.down
+      self.cornerDownLeftMargin = edge.left
+      self.cornerDownRightMargin = edge.right
+      self.cornerDownMarginTop = edge.down
       self:FrameGenGhostingFixMasksOnFootSetMargins()
     end)
   else
@@ -563,15 +569,33 @@ function ToggleVignettePermament()
   end
 end
 
+function ToggleOnFootOpacity()
+  local masksController = MaskingGlobal.masksController
+
+  if masksController then
+    local opacity = MasksData.Opacity
+
+    Override(masksController, 'FrameGenGhostingFixOpacityOnFootToggle', function(self, maxOpacity, changeStep, wrappedMethod)
+      self.onFootMaxOpacity = opacity.max
+      self.onFootChangeOpacityBy = opacity.changeStep
+    end)
+  else
+    Globals.Print(Calculate.__NAME, LogText.globals_controller_missing)
+  end
+end
+
 function TurnOnLiveView()
   local masksController = MaskingGlobal.masksController
 
   if masksController then
+    local opacity = MasksData.Opacity
     local space = MasksData.Vignette.ScreenSpace
     local size = MasksData.Vignette.Size
 
     Override(masksController, 'FrameGenGhostingFixVignetteOnFootEditorContext', function(self, vignetteOnFootEditor, wrappedMethod)
       self.vignetteOnFootEditor = true
+      self.onFootMaxOpacity = opacity.max
+      self.onFootChangeOpacityBy = opacity.changeStep
       self:FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(space.x, space.y, size.x, size.y)
     end)
   else
@@ -623,6 +647,7 @@ function Calculate.DrawUI()
   local vignettePositionToggle = {}
   local vignetteScale = {}
   local vignettePosition = {}
+  local opacityMaxFloat, opacityMaxToggle
 
   if ImGui.BeginTabItem(OnFootText.tab_name_on_foot) then
 
@@ -709,6 +734,8 @@ function Calculate.DrawUI()
           SetVignetteScale('x', vignetteScale.x)
           Calculate.OnVignetteChange('x')
           TurnOnLiveView()
+
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_save_reminder)
         end
       
         ImGuiExt.Text(OnFootText.slider_vignette_height)
@@ -718,6 +745,8 @@ function Calculate.DrawUI()
           SetVignetteScale('y', vignetteScale.y)
           Calculate.OnVignetteChange('y')
           TurnOnLiveView()
+
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_save_reminder)
         end
       
         ImGuiExt.Text(OnFootText.slider_vignette_pos_x)
@@ -727,6 +756,8 @@ function Calculate.DrawUI()
           SetVignetteScreenPosition('x', vignettePosition.x)
           Calculate.OnVignetteChange('x')
           TurnOnLiveView()
+
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_save_reminder)
         end
       
         ImGuiExt.Text(OnFootText.slider_vignette_pos_y)
@@ -736,6 +767,19 @@ function Calculate.DrawUI()
           SetVignetteScreenPosition('y', vignettePosition.y)
           Calculate.OnVignetteChange('y')
           TurnOnLiveView()
+
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_save_reminder)
+        end
+
+        ImGuiExt.Text(OnFootText.slider_masking_strength)
+      
+        opacityMaxFloat, opacityMaxToggle = ImGui.SliderFloat("##Opacity", MasksData.Opacity.max * 50, 1, 2.5, "%.1f")
+        if opacityMaxToggle then
+          MasksData.Opacity.max = opacityMaxFloat * 0.02
+          MasksData.Opacity.changeStep = opacityMaxFloat * 0.005
+          TurnOnLiveView()
+
+          ImGuiExt.SetStatusBar(SettingsText.status_settings_save_reminder)
         end
       
         ImGui.Text("")

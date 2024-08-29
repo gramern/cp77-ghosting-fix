@@ -1,6 +1,6 @@
 local VectorsEditor = {
   __NAME = "VectorsEditor",
-  __VERSION = { 5, 1, 9 },
+  __VERSION = { 5, 1, 10 },
 }
 
 local PresetsList = {}
@@ -49,8 +49,8 @@ local presetDescription = ""
 local presetAuthor = ""
 local presetFile = ""
 
-local maxOpacityHed = 6
-local maxOpacityMasks = 12
+local maxOpacityHed = 10
+local maxOpacityMasks = 20
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Working Presets
@@ -243,7 +243,7 @@ function VectorsEditor.SetInstance(presetsList)
     SetMaxOpacity(200)
     ImGuiExt.SetStatusBar("Presets Editor running in Debug Mode", 'PresetsEditorWindow')
   else
-    SetMaxOpacity(12)
+    SetMaxOpacity(20)
     local infoLoadedPreset = EditorText.status_preset_loaded .. " " .. PresetsList[selectedPreset].PresetInfo.name
     ImGuiExt.SetStatusBar(infoLoadedPreset, 'PresetsEditorWindow')
   end
