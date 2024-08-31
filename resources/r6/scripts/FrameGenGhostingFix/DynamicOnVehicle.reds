@@ -1,16 +1,6 @@
 // Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-// FrameGen Ghosting 'Fix' 5.1.10, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
-
-@addField(gameuiCrosshairContainerController) public let m_isMaskingInVehiclesEnabledFGGF: Bool = true;
-@addField(gameuiCrosshairContainerController) public let m_isVehicleMountedFGGF: Bool = false;
-@addField(gameuiCrosshairContainerController) public let m_hedCornersPath: CName = n"fgfix/horizontaledgedowncorners";
-@addField(gameuiCrosshairContainerController) public let m_hedFillPath: CName = n"fgfix/horizontaledgedownfill";
-@addField(gameuiCrosshairContainerController) public let m_hedTrackerPath: CName = n"fgfix/horizontaledgedowntracker";
-@addField(gameuiCrosshairContainerController) public let m_mask1Path: CName = n"fgfix/mask1";
-@addField(gameuiCrosshairContainerController) public let m_mask2Path: CName = n"fgfix/mask2";
-@addField(gameuiCrosshairContainerController) public let m_mask3Path: CName = n"fgfix/mask3";
-@addField(gameuiCrosshairContainerController) public let m_mask4Path: CName = n"fgfix/mask4";
+// FrameGen Ghosting 'Fix' 5.1.12, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
 
 @addField(DriveEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;
@@ -23,256 +13,6 @@
 @addField(DriverCombatEvents) public let m_vehicleCurrentTypeFGGF: gamedataVehicleType;
 @addField(DriverCombatEvents) public let m_vehicleCurrentSpeedFGGF: Float;
 @addField(DriverCombatEvents) public let m_vehicleCurrentSpeedCallbackFGGF: ref<CallbackHandle>;
-
-// Mounting/unmounting events ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixMountingEvent(evt: ref<MountingEvent>) -> Bool {
-  this.m_isVehicleMountedFGGF = true;
-  
-  if Equals(this.m_vignetteOnFootActivated, true) {
-    this.FrameGenGhostingFixVignetteOnFootDeActivationEvent();
-  }
-}
-
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixUnmountingEvent(evt: ref<UnmountingEvent>) -> Bool {
-  
-  this.m_isVehicleMountedFGGF = false;
-
-  let hedDeactivationEvent: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
-  this.OnFrameGenGhostingFixDeactivationHEDVehicleEvent(hedDeactivationEvent);
-  
-  let masksDeactivationEvent: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
-  this.OnFrameGenGhostingFixDeactivationMasksVehicleEvent(masksDeactivationEvent);
-
-}
-
-// Global toggle for transtions, called in the main loop---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected final func FrameGenFrameGenGhostingFixVehicleToggleEvent() -> Void {
-  this.FrameGenGhostingFixVehicleToggle(true);
-}
-
-@addMethod(gameuiCrosshairContainerController)
-protected final func FrameGenGhostingFixVehicleToggle(maskingInVehicles: Bool) -> Void {
-  this.m_isMaskingInVehiclesEnabledFGGF = maskingInVehicles;
-}
-
-// Setting transformation for specific masks ---------------------------------------------------------------------------------------
-// Setting masks when changing cameras in a car ---------------------------------------------------------------------------------------
-// TPP Car ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraTPPCarEvent(evt: ref<FrameGenGhostingFixCameraTPPCarEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.03, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.07, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.07, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.07, true);
-
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
-// FPP Car ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraFPPCarEvent(evt: ref<FrameGenGhostingFixCameraFPPCarEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.0, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.0, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.0, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.0, true);
-  
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
-// Setting masks when changing cameras on a bike ---------------------------------------------------------------------------------------
-// TPP Bike ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraTPPBikeEvent(evt: ref<FrameGenGhostingFixCameraTPPBikeEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.03, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.07, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.07, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.07, true);
-  
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
-// FPP Bike ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-private cb func OnFrameGenGhostingFixCameraFPPBikeEvent(evt: ref<FrameGenGhostingFixCameraFPPBikeEvent>) -> Bool {
-
-  let hedMargin: Vector2 = new Vector2(1920.0, 2280.0);
-  let hedSize: Vector2 = new Vector2(4240.0, 1440.0);
-
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedCornersPath, hedMargin, hedSize, 0.03, true);
-  this.FrameGenGhostingFixSetSimpleTransformation(this.m_hedFillPath, hedMargin, hedSize, 0.03, true);
-
-  let hedTrackerMargin: Vector2 = new Vector2(1920.0, 1920.0);
-  let hedTrackerSize: Vector2 = new Vector2(2400.0, 1200.0);
-  let hedTrackerShear: Vector2 = new Vector2(0.0, 0.0);
-  let hedTrackerAnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_hedTrackerPath, hedTrackerMargin, hedTrackerSize, 0.0, hedTrackerShear, hedTrackerAnchorPoint, 0.0, false);
-
-  let mask1Margin: Vector2 = new Vector2(1920.0, 2000.0);
-  let mask1Size: Vector2 = new Vector2(7680.0, 1200.0);
-  let mask1Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask1AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask1Path, mask1Margin, mask1Size, 0.0, mask1Shear, mask1AnchorPoint, 0.07, true);
-  
-  let mask2Margin: Vector2 = new Vector2(1920.0, 1900.0);
-  let mask2Size: Vector2 = new Vector2(5120.0, 1200.0);
-  let mask2Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask2AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask2Path, mask2Margin, mask2Size, 0.0, mask2Shear, mask2AnchorPoint, 0.0, true);
-
-  let mask3Margin: Vector2 = new Vector2(1920.0, 1700.0);
-  let mask3Size: Vector2 = new Vector2(2800.0, 1200.0);
-  let mask3Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask3AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask3Path, mask3Margin, mask3Size, 0.0, mask3Shear, mask3AnchorPoint, 0.0, true);
-  
-  let mask4Margin: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Size: Vector2 = new Vector2(0.0, 0.0);
-  let mask4Shear: Vector2 = new Vector2(0.0, 0.0);
-  let mask4AnchorPoint: Vector2 = new Vector2(0.5, 0.5);
-
-  this.FrameGenGhostingFixSetTransformation(this.m_mask4Path, mask4Margin, mask4Size, 0.0, mask4Shear, mask4AnchorPoint, 0.0, false);
-}
-
-// Setting masks deactivation for vehicles ---------------------------------------------------------------------------------------
-@addMethod(gameuiCrosshairContainerController)
-protected cb func OnFrameGenGhostingFixDeactivationHEDVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>)  -> Bool {
-
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let hedCorners: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedCornersPath) as inkWidget;
-  let hedFill: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedFillPath) as inkWidget;
-  let hedTracker: ref<inkWidget> = root.GetWidgetByPathName(this.m_hedTrackerPath) as inkWidget;
-
-  hedCorners.SetOpacity(0.0);
-  hedFill.SetOpacity(0.0);
-  hedTracker.SetOpacity(0.0);
-}
-
-@addMethod(gameuiCrosshairContainerController)
-protected cb func OnFrameGenGhostingFixDeactivationMasksVehicleEvent(evt: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>)  -> Bool {
-
-  let root: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
-  let mask1: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask1Path) as inkWidget;
-  let mask2: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask2Path) as inkWidget;
-  let mask3: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask3Path) as inkWidget;
-  let mask4: ref<inkWidget> = root.GetWidgetByPathName(this.m_mask4Path) as inkWidget;
-
-  mask1.SetOpacity(0.0);
-  mask2.SetOpacity(0.0);
-  mask3.SetOpacity(0.0);
-  mask4.SetOpacity(0.0);
-}
 
 // Setting context for vehicles masks start here ---------------------------------------------------------------------------------------
 @addMethod(DriveEvents)
@@ -287,6 +27,24 @@ public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: r
   vehicleDeactivation = new FrameGenGhostingFixDeactivationMasksVehicleEvent();
 
   scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
+}
+
+@addMethod(DriveEvents)
+public final func FrameGenGhostingFixOnVehicleMounted(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleMounting: ref<FrameGenGhostingFixOnVehicleMountedEvent>;
+
+  vehicleMounting = new FrameGenGhostingFixOnVehicleMountedEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleMounting);
+}
+
+@addMethod(DriveEvents)
+public final func FrameGenGhostingFixOnVehicleUnmounted(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleMounting: ref<FrameGenGhostingFixOnVehicleUnmountedEvent>;
+
+  vehicleMounting = new FrameGenGhostingFixOnVehicleUnmountedEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleMounting);
 }
 
 @addMethod(DriveEvents)
@@ -392,12 +150,15 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
     default:
       break;
   }
+
+  this.FrameGenGhostingFixOnVehicleMounted(scriptInterface);
 }
 
 @wrapMethod(DriveEvents)
 public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
   wrappedMethod(stateContext, scriptInterface);
 
+  this.FrameGenGhostingFixOnVehicleUnmounted(scriptInterface);
   this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
   // LogChannel(n"DEBUG", "Deactivating masks...");
 }
@@ -415,6 +176,24 @@ public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: r
   vehicleDeactivation = new FrameGenGhostingFixDeactivationMasksVehicleEvent();
 
   scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
+}
+
+@addMethod(DriverCombatEvents)
+public final func FrameGenGhostingFixOnVehicleMounted(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleMounting: ref<FrameGenGhostingFixOnVehicleMountedEvent>;
+
+  vehicleMounting = new FrameGenGhostingFixOnVehicleMountedEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleMounting);
+}
+
+@addMethod(DriverCombatEvents)
+public final func FrameGenGhostingFixOnVehicleUnmounted(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleMounting: ref<FrameGenGhostingFixOnVehicleUnmountedEvent>;
+
+  vehicleMounting = new FrameGenGhostingFixOnVehicleUnmountedEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleMounting);
 }
 
 @addMethod(DriverCombatEvents)
@@ -520,12 +299,15 @@ public final func OnUpdate(timeDelta: Float, stateContext: ref<StateContext>, sc
     default:
       break;
   }
+
+  this.FrameGenGhostingFixOnVehicleMounted(scriptInterface);
 }
 
 @wrapMethod(DriverCombatEvents)
 public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
   wrappedMethod(stateContext, scriptInterface);
 
+  this.FrameGenGhostingFixOnVehicleUnmounted(scriptInterface);
   this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
   // LogChannel(n"DEBUG", "Deactivating masks...");
 }

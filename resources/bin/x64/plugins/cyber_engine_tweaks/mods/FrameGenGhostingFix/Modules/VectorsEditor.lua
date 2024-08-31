@@ -1,6 +1,6 @@
 local VectorsEditor = {
   __NAME = "VectorsEditor",
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
 }
 
 local PresetsList = {}
@@ -319,6 +319,8 @@ local function EnterVehicleWindow()
 end
 
 local function LoadPresetWindow()
+  local itemWidth = 100 * ImGuiExt.GetScaleFactor()
+
   ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(screenWidth / 2 - 210, screenHeight / 2 - 120)
 
@@ -326,7 +328,7 @@ local function LoadPresetWindow()
 
     selectedPresetName = PresetsList[selectedPreset].PresetInfo.name
 
-    ImGui.SetNextItemWidth(410)
+    ImGui.SetNextItemWidth(4.1 * itemWidth)
     if ImGui.BeginCombo("##Presets", selectedPresetName) then
       for _, presetId in ipairs(SortedPresets) do
         local name = PresetsList[presetId].PresetInfo.name
@@ -345,17 +347,17 @@ local function LoadPresetWindow()
     end
     ImGuiExt.SetTooltip(EditorText.tooltip_load_preset)
 
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 2 * itemWidth - 2 * ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button(GeneralText.btn_cancel, 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_cancel, itemWidth, 0) then
       isLoadWindow = false
     end
 
     ImGui.SameLine()
 
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 100 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - itemWidth - ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button(GeneralText.btn_load, 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_load, itemWidth, 0) then
       LoadPreset()
 
       local infoLoadedPreset = EditorText.status_preset_loaded .. " " .. selectedPresetName
@@ -370,6 +372,8 @@ local function LoadPresetWindow()
 end
 
 local function SavePresetWindow()
+  local itemWidth = 100 * ImGuiExt.GetScaleFactor()
+
   ImGuiExt.PushStyle()
   ImGui.SetNextWindowPos(screenWidth / 2 - 210, screenHeight / 2 - 120)
 
@@ -377,52 +381,52 @@ local function SavePresetWindow()
 
     ImGuiExt.Text(EditorText.input_name)
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
-    ImGui.SetNextItemWidth(300)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetNextItemWidth(3 * itemWidth)
 
     presetName = ImGui.InputText("##Name", presetName, 30)
     ImGuiExt.SetTooltip(EditorText.tooltip_input_name)
 
     ImGuiExt.Text(EditorText.input_author)
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
-    ImGui.SetNextItemWidth(300)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetNextItemWidth(3 * itemWidth)
 
     presetAuthor = ImGui.InputText("##Author", presetAuthor, 30)
     ImGuiExt.SetTooltip(EditorText.tooltip_input_author)
 
     ImGuiExt.Text(EditorText.input_description)
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
 
-    presetDescription = ImGui.InputTextMultiline("##Description", presetDescription, 100, 300, 60)
+    presetDescription = ImGui.InputTextMultiline("##Description", presetDescription, 100, 3 * itemWidth, 60)
     ImGuiExt.SetTooltip(EditorText.tooltip_input_description)
     
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
     ImGuiExt.Text(EditorText.info_chars_left)
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 30 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 0.3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
     ImGuiExt.Text(tostring(100 - #presetDescription))
 
     ImGuiExt.Text(EditorText.input_file_name)
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 300 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
-    ImGui.SetNextItemWidth(300)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 3 * itemWidth - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetNextItemWidth(3 * itemWidth)
 
     presetFile = ImGui.InputText("##FileName", presetFile, 30)
     ImGuiExt.SetTooltip(EditorText.tooltip_input_file_name)
 
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 200 * ImGuiExt.GetScaleFactor() - 2 * ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 2 * itemWidth - 2 * ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button(GeneralText.btn_cancel, 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_cancel, itemWidth, 0) then
       isSaveWindow = false
       presetName, presetAuthor, presetDescription, presetFile = "", "", "", ""
     end
 
     ImGui.SameLine()
-    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 100 * ImGuiExt.GetScaleFactor() - ImGui.GetStyle().ItemSpacing.x)
+    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - itemWidth - ImGui.GetStyle().ItemSpacing.x)
 
-    if ImGui.Button(GeneralText.btn_save, 100 * ImGuiExt.GetScaleFactor(), 0) then
+    if ImGui.Button(GeneralText.btn_save, itemWidth, 0) then
       if presetName == "" or presetAuthor == "" or presetFile == "" then
         ImGuiExt.SetStatusBar(EditorText.status_fill_all_save, 'SavePresetWindow')
       elseif not Globals.ValidateFileName(presetFile) then
@@ -520,12 +524,12 @@ function VectorsEditor.DrawWindow()
     ImGui.Separator()
 
     cameraOptionsTextWidth = ImGui.CalcTextSize(EditorText.group_camera_options)
-    ImGui.SetCursorPosX(ImGui.GetStyle().ItemSpacing.x + 90 - cameraOptionsTextWidth / 2)
+    ImGui.SetCursorPosX(ImGui.GetStyle().ItemSpacing.x + 90 * ImGuiExt.GetScaleFactor() - cameraOptionsTextWidth / 2)
     ImGuiExt.Text(EditorText.group_camera_options)
 
     ImGui.SameLine()
 
-    ImGui.SetCursorPosX(2 * ImGui.GetStyle().ItemSpacing.x + 180)
+    ImGui.SetCursorPosX(2 * ImGui.GetStyle().ItemSpacing.x + 180 * ImGuiExt.GetScaleFactor())
 
     if ImGui.Button(EditorText.btn_toggle_perspective, 180 * ImGuiExt.GetScaleFactor(), 0) then
       local newPerspective
@@ -543,7 +547,7 @@ function VectorsEditor.DrawWindow()
   
     ImGui.SameLine()
 
-    ImGui.SetCursorPosX(3 * ImGui.GetStyle().ItemSpacing.x + 360)
+    ImGui.SetCursorPosX(3 * ImGui.GetStyle().ItemSpacing.x + 360 * ImGuiExt.GetScaleFactor())
 
     if ImGui.Button(EditorText.btn_center_view, 180 * ImGuiExt.GetScaleFactor(), 0) then
       CenterCamera()

@@ -42,7 +42,7 @@
 --]=====]
 
 local translation = {
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
   __AUTHOR = "", -- Mark your work. 
   UIText = {
     General = {
@@ -365,6 +365,12 @@ local translation = {
       PresetInfo = {
         name = "Turn off anti-ghosting masking",
         description = "Turns off TPP and FPP anti-ghosting masks for all vehicles.",
+      }
+    },
+    a006 = {
+      PresetInfo = {
+        name = "Maximum Strength",
+        description = "Masks' anti-ghosting strength is much greater. Their state change delay on a sudden speed decrease is set to 3 seconds.",
       }
     }
   }

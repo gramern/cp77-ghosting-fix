@@ -1,6 +1,6 @@
 local ImGuiExt = {
   __NAME = "ImGuiExt",
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
 }
 
 local Themes = {
@@ -49,10 +49,16 @@ end
 local function ApplyScaleFactor()
   local screenWidthFactor = Globals.GetScreenWidthFactor()
 
-  if screenWidthFactor == 1 then
+  if screenWidthFactor == 2 then
+    scaleFactor = 1 / screenWidthFactor
+  elseif screenWidthFactor == 1.34 then
     scaleFactor = 1
   else
-    scaleFactor = 1 / screenWidthFactor
+    if screenWidth < 3840 then
+      scaleFactor = 1
+    else
+      scaleFactor = 1.5
+    end
   end
 end
 

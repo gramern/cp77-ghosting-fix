@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -725,7 +725,7 @@ registerForEvent("onDraw", function()
               ImGui.Text("")
 
               ImGuiExt.Text(SettingsText.combobox_theme)
-              ImGui.SetNextItemWidth(370)
+              ImGui.SetNextItemWidth(370 * ImGuiExt.GetScaleFactor())
 
               if ImGui.BeginCombo("##Themes", ImGuiExt.GetTheme()) then
                 local themesList = ImGuiExt.GetThemesList()

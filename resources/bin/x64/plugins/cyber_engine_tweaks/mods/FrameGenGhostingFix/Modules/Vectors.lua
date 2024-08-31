@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
 }
 
 local MaskingGlobal = {
@@ -209,9 +209,9 @@ local VehMasksData = {
   enabled = true,
   HorizontalEdgeDown = {
     AnchorPoint = {x = 0.5, y = 0.5},
-    hedCornersPath = "fgfix/horizontaledgedowncorners",
-    hedFillPath = "fgfix/horizontaledgedownfill",
-    hedTrackerPath = "fgfix/horizontaledgedowntracker",
+    hedCornersPath = "horizontaledgedowncorners",
+    hedFillPath = "horizontaledgedownfill",
+    hedTrackerPath = "horizontaledgedowntracker",
     ScreenSpace = {
       Def = {x = 1920, y = 2280},
       x = 1920,
@@ -260,7 +260,7 @@ local VehMasksData = {
       Size = {x = 0, y = 0},
       visible = true,
     },
-    maskPath = "fgfix/mask1",
+    maskPath = "mask1",
     Offset = {x = 0, y = 0, z = 0},
     opacity = 0,
     Position = nil,
@@ -278,7 +278,7 @@ local VehMasksData = {
       Size = {x = 0, y = 0},
       visible = true,
     },
-    maskPath = "fgfix/mask2",
+    maskPath = "mask2",
     Offset = {x = 0, y = 0, z = 0},
     opacity = 0,
     Position = nil,
@@ -296,7 +296,7 @@ local VehMasksData = {
       Size = {x = 0, y = 0},
       visible = true,
     },
-    maskPath = "fgfix/mask3",
+    maskPath = "mask3",
     Offset = {x = 0, y = 0, z = 0},
     opacity = 0,
     Position = nil,
@@ -317,7 +317,7 @@ local VehMasksData = {
       Size = {x = 0, y = 0},
       visible = true,
     },
-    maskPath = "fgfix/mask4",
+    maskPath = "mask4",
     Offset = {x = 0, y = 0, z = 0},
     opacity = 0,
     Position = nil,

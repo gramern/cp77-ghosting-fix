@@ -6,168 +6,162 @@
   },
   "Vectors": {
     "VehElements": {
-      "BikeSpeedometer": {
-        "Offset": {
-          "x": 0.0,
-          "y": 0.8,
-          "z": 0.45
-        },
-        "rotation": 180,
-        "Size": {
-          "x": 6120,
-          "y": 1600
-        },
-        "visible": true
-      },
       "BikeHandlebars": {
         "Left": {
           "Offset": {
-            "x": -0.6,
             "y": 0.7,
-            "z": 0.48
+            "z": 0.48,
+            "x": -0.6
           },
           "rotation": 0,
+          "visible": true,
           "Size": {
-            "x": 3000,
-            "y": 1800
-          },
-          "visible": true
+            "y": 1800,
+            "x": 3000
+          }
         },
         "Right": {
           "Offset": {
-            "x": 0.6,
             "y": 0.7,
-            "z": 0.48
+            "z": 0.48,
+            "x": 0.6
           },
           "rotation": 0,
+          "visible": true,
           "Size": {
-            "x": 3000,
-            "y": 1800
-          },
-          "visible": true
+            "y": 1800,
+            "x": 3000
+          }
         }
       },
       "BikeWindshield": {
         "Offset": {
-          "x": 0.0,
           "y": 1,
-          "z": 0.54
+          "z": 0.54,
+          "x": 0
         },
         "rotation": 0,
+        "visible": true,
         "Size": {
-          "x": 3600,
-          "y": 1200
-        },
-        "visible": true
+          "y": 1200,
+          "x": 3600
+        }
       },
       "CarDoors": {
         "Left": {
           "Offset": {
-            "x": -1.2,
             "y": 0.55,
-            "z": 0
+            "z": 0,
+            "x": -1.2
           },
           "rotation": 140,
+          "visible": true,
           "Size": {
-            "x": 3000,
-            "y": 2000
-          },
-          "visible": true
+            "y": 2000,
+            "x": 3000
+          }
         },
         "Right": {
           "Offset": {
-            "x": 1.2,
             "y": 0.55,
-            "z": 0
+            "z": 0,
+            "x": 1.2
           },
           "rotation": -160,
+          "visible": true,
           "Size": {
-            "x": 2250,
-            "y": 1500
-          },
-          "visible": true
+            "y": 1500,
+            "x": 2250
+          }
         }
       },
       "CarSideMirrors": {
         "Left": {
           "Offset": {
-            "x": -1,
             "y": 0.45,
-            "z": 0.65
+            "z": 0.65,
+            "x": -1
           },
           "rotation": 40,
+          "visible": true,
           "Size": {
-            "x": 1400,
-            "y": 1200
-          },
-          "visible": true
+            "y": 1200,
+            "x": 1400
+          }
         },
         "Right": {
           "Offset": {
-            "x": 1.05,
             "y": 0.45,
-            "z": 0.65
+            "z": 0.65,
+            "x": 1.05
           },
           "rotation": 145,
+          "visible": true,
           "Size": {
-            "x": 800,
-            "y": 800
-          },
-          "visible": true
+            "y": 800,
+            "x": 800
+          }
+        }
+      },
+      "BikeSpeedometer": {
+        "Offset": {
+          "y": 0.8,
+          "z": 0.45,
+          "x": 0
+        },
+        "rotation": 180,
+        "visible": true,
+        "Size": {
+          "y": 1600,
+          "x": 6120
         }
       }
     },
     "VehMasks": {
       "AnchorPoint": {
-        "x": 0.5,
-        "y": 0.5
+        "y": 0.5,
+        "x": 0.5
       },
       "HorizontalEdgeDown": {
-        "Opacity": {
+        "Size": {
           "Def": {
-            "max": 0.03
+            "lock": false,
+            "y": 1480,
+            "x": 4240
+          }
+        },
+        "Visible": {
+          "Def": {
+            "fillLock": true,
+            "tracker": true,
+            "corners": true,
+            "fill": true
           }
         },
         "Scale": {
           "y": 1,
           "x": 1
         },
-        "Size": {
+        "Opacity": {
           "Def": {
-            "lock": false,
-            "x": 4240,
-            "y": 1480
-          }
-        },
-        "Visible": {
-          "Def": {
-            "corners": true,
-            "fill": true,
-            "fillLock": false,
-            "tracker": true
+            "max": 0.03
           }
         }
       },
       "Opacity": {
         "Def": {
-          "delayDuration": 1.5,
-          "delayThreshold": 0.95,
-          "gain": 1,
-          "max": 0.05,
           "speedFactor": 0.01,
           "stepFactor": 0.1,
-          "threshold": 0.75
+          "max": 0.06,
+          "threshold": 0.8,
+          "delayDuration": 3,
+          "delayThreshold": 0.95,
+          "gain": 1.5
         }
       }
     },
     "Modifiers": {
       "Bike": {
-        "Windshield": {
-          "Scale": {
-            "x": 1,
-            "y": 1
-          }
-        },
         "AllMasks": {
           "FPP": {
             "visible": true
@@ -184,41 +178,47 @@
         },
         "SideMasks": {
           "Scale": {
-            "x": 1,
-            "y": 1.3
+            "y": 1.3,
+            "x": 1
           },
           "opacity": 1
+        },
+        "Windshield": {
+          "Scale": {
+            "y": 1,
+            "x": 1
+          }
         }
       },
       "Car": {
+        "FrontMask": {
+          "visible": true,
+          "opacity": 0.80000001192093
+        },
         "AllMasks": {
           "FPP": {
             "visible": true
           }
         },
-        "FrontMask": {
-          "visible": true,
-          "opacity": 1
+        "SideMasks": {
+          "opacity": 0.80000001192093,
+          "Scale": {
+            "y": 1,
+            "x": 1
+          },
+          "visible": true
         },
         "RearMask": {
           "visible": true,
           "opacity": 1
-        },
-        "SideMasks": {
-          "Scale": {
-            "x": 1,
-            "y": 1
-          },
-          "opacity": 1,
-          "visible": true
         }
       }
     }
   },
   "PresetInfo": {
-    "name": "Default",
-    "description": "Default preset.",
-    "author": null,
-    "id": "a001"
+    "id": "a006",
+    "description": "Masks' anti-ghosting strength is much greater. Their state change delay on a sudden speed decrease is set to 3 seconds.",
+    "name": "Maximum Strength",
+    "author": null
   }
 }

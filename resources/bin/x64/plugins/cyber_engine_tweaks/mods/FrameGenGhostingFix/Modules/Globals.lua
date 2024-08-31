@@ -1,12 +1,12 @@
 local Globals = {
   __NAME = "Globals",
-  __VERSION = { 5, 1, 10 },
+  __VERSION = { 5, 1, 12 },
 }
 
 local isDebug = nil
 
 local MaskingGlobal = {
-  masksController = "gameuiCrosshairContainerController",
+  masksController = "frameGenGhostingFixMasksController",
   Widgets = {
     hedCorners = "horizontaledgedowncorners",
     hedFill = "horizontaledgedownfill",
