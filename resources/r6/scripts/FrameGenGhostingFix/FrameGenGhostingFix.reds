@@ -124,23 +124,23 @@ public class frameGenGhostingFixMasksController extends inkGameController {
     // ------------
     // OnPlayerAttach debug check
     // ------------
-    LogChannel(n"DEBUG", s"Opacity for on foot masks set: \(this.m_onFootMaxOpacity), \(this.m_onFootChangeOpacityBy)");
-    LogChannel(n"DEBUG", s"Margins for on foot corner masks set: \(this.m_cornerDownLeftMargin), \(this.m_cornerDownRightMargin), \(this.m_cornerDownMarginTop)");
-    LogChannel(n"DEBUG", s"Dimensions for on aim masks set: \(this.m_aimOnFootSizeX), \(this.m_aimOnFootSizeY)");
-    LogChannel(n"DEBUG", s"Margins for on foot vignette set: \(this.m_vignetteOnFootMarginLeft), \(this.m_vignetteOnFootMarginTop)");
-    LogChannel(n"DEBUG", s"Dimensions for on foot vignette set: \(this.m_vignetteOnFootSizeX), \(this.m_vignetteOnFootSizeY)");
+    // LogChannel(n"DEBUG", s"Opacity for on foot masks set: \(this.m_onFootMaxOpacity), \(this.m_onFootChangeOpacityBy)");
+    // LogChannel(n"DEBUG", s"Margins for on foot corner masks set: \(this.m_cornerDownLeftMargin), \(this.m_cornerDownRightMargin), \(this.m_cornerDownMarginTop)");
+    // LogChannel(n"DEBUG", s"Dimensions for on aim masks set: \(this.m_aimOnFootSizeX), \(this.m_aimOnFootSizeY)");
+    // LogChannel(n"DEBUG", s"Margins for on foot vignette set: \(this.m_vignetteOnFootMarginLeft), \(this.m_vignetteOnFootMarginTop)");
+    // LogChannel(n"DEBUG", s"Dimensions for on foot vignette set: \(this.m_vignetteOnFootSizeX), \(this.m_vignetteOnFootSizeY)");
 
-    this.FrameGenGhostingFixCornersOnFootToggle(false);
-    this.FrameGenGhostingFixBlockerAimOnFootToggle(false);
-    this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
-    this.FrameGenGhostingFixVignetteOnFootToggle(false);
-    this.FrameGenGhostingFixVignetteOnFootPermamentToggle(false);
-    LogChannel(n"DEBUG", s"Corner masks enabled: \(this.m_cornersOnFootEnabled)");
-    LogChannel(n"DEBUG", s"Blocker on aim enabled: \(this.m_blockerAimOnFootEnabled)");
-    LogChannel(n"DEBUG", s"Vignette on aim enabled: \(this.m_vignetteAimOnFootEnabled)");
-    LogChannel(n"DEBUG", s"Vignette on weapon enabled: \(this.m_vignetteOnFootEnabled)");
-    LogChannel(n"DEBUG", s"Vignette permament enabled: \(this.m_vignetteOnFootPermamentEnabled)");
-    LogChannel(n"DEBUG", s"Main Loop initialized...");
+    // this.FrameGenGhostingFixCornersOnFootToggle(false);
+    // this.FrameGenGhostingFixBlockerAimOnFootToggle(false);
+    // this.FrameGenGhostingFixVignetteAimOnFootToggle(false);
+    // this.FrameGenGhostingFixVignetteOnFootToggle(false);
+    // this.FrameGenGhostingFixVignetteOnFootPermamentToggle(false);
+    // LogChannel(n"DEBUG", s"Corner masks enabled: \(this.m_cornersOnFootEnabled)");
+    // LogChannel(n"DEBUG", s"Blocker on aim enabled: \(this.m_blockerAimOnFootEnabled)");
+    // LogChannel(n"DEBUG", s"Vignette on aim enabled: \(this.m_vignetteAimOnFootEnabled)");
+    // LogChannel(n"DEBUG", s"Vignette on weapon enabled: \(this.m_vignetteOnFootEnabled)");
+    // LogChannel(n"DEBUG", s"Vignette permament enabled: \(this.m_vignetteOnFootPermamentEnabled)");
+    // LogChannel(n"DEBUG", s"Main Loop initialized...");
   }
 
   protected cb func OnPlayerDetach(playerPuppet: ref<GameObject>) -> Bool {
