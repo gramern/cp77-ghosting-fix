@@ -422,6 +422,14 @@ local function OnGameUnpaused()
     Tracker.SetModDynamicFrameGeneration(DLSSEnabler_GetDynamicFrameGenerationState())
   end
 
+  Globals.GetAspectRatio()
+  Globals.GetScreenType()
+  Globals.GetScreenTypeName()
+  Globals.GetScreenEdge()
+  Globals.GetScreenWidthFactor()
+  Globals.GetScreenSpace()
+  Globals.ScaleWidgets()
+
   ExecuteCallbackOnGameStateChange('gameUnpaused')
 end
 

@@ -4,6 +4,9 @@
 
 // RedScript Modules Presence Check --------------------------------------------------------------------------------
 public static func FrameGenGhostingFixIsRedScriptModule() -> Void {}
+// Spawn & scale widgets --------------------------------------------------------------------------------
+public class FrameGenGhostingFixSpawnWidgetsEvent extends Event {}
+public class FrameGenGhostingFixScaleWidgetsEvent extends Event {}
 // Car camera change ---------------------------------------------------------------------------------------
 public class FrameGenGhostingFixCameraTPPCarEvent extends Event {}
 public class FrameGenGhostingFixCameraTPPFarCarEvent extends Event {}
@@ -18,9 +21,6 @@ public class FrameGenGhostingFixDeactivationHEDVehicleEvent extends Event {}
 // Vehicles mounting events -----------------------------------------------------------------------------
 public class FrameGenGhostingFixOnVehicleMountedEvent extends Event {}
 public class FrameGenGhostingFixOnVehicleUnmountedEvent extends Event {}
-
-// Custom masks controller wref -------------------------------------------------------------------------------------------
-@addField(NewHudPhoneGameController) public let m_masksController: wref<frameGenGhostingFixMasksController>;
 
 //------------------------
 // Custom masks controller
@@ -121,9 +121,9 @@ public class frameGenGhostingFixMasksController extends inkGameController {
     this.FrameGenGhostingFixAimOnFootSetDimensionsToggle(3840.0, 2440.0);
     this.FrameGenGhostingFixVignetteOnFootSetDimensionsToggle(1920.0, 1080.0, 4840.0, 2560.0);
 
-    // ------------
+    // --------------------------
     // OnPlayerAttach debug check
-    // ------------
+    // --------------------------
     // LogChannel(n"DEBUG", s"Opacity for on foot masks set: \(this.m_onFootMaxOpacity), \(this.m_onFootChangeOpacityBy)");
     // LogChannel(n"DEBUG", s"Margins for on foot corner masks set: \(this.m_cornerDownLeftMargin), \(this.m_cornerDownRightMargin), \(this.m_cornerDownMarginTop)");
     // LogChannel(n"DEBUG", s"Dimensions for on aim masks set: \(this.m_aimOnFootSizeX), \(this.m_aimOnFootSizeY)");
@@ -149,7 +149,6 @@ public class frameGenGhostingFixMasksController extends inkGameController {
       this.m_playerStateMachineBB.UnregisterListenerInt(GetAllBlackboardDefs().PlayerStateMachine.UpperBody, this.m_playerStateMachineUpperBodyBBID);
     };
 
-    let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
     GameInstance.GetDelaySystem(playerPuppet.GetGame()).CancelCallback(this.m_delayID);
   }
 
@@ -754,66 +753,4 @@ public class frameGenGhostingFixMasksController extends inkGameController {
     mask3.SetOpacity(0.0);
     mask4.SetOpacity(0.0);
   }
-}
-
-// ------------
-// The kick off
-// ------------
-@wrapMethod(NewHudPhoneGameController)
-protected cb func OnPlayerAttach(playerPuppet: ref<GameObject>) -> Bool {
-  wrappedMethod(playerPuppet);
-
-  // In case the widgets have been spawned already, then do nothing
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_hedCornersPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_hedFillPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_hedTrackerPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_mask1Path)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_mask2Path)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_mask3Path)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_mask4Path)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_cornerDownLeftPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_cornerDownRightPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_blockerAimPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_vignetteAimPath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_vignettePath)) {
-    return false;
-  }
-  if IsDefined(this.m_masksController.GetChildWidgetByPath(this.m_masksController.m_vignetteEditorPath)) {
-    return false;
-  }
-
-  // Spawn widgets
-  let root = this.GetRootCompoundWidget();
-  this.SpawnFromExternal(root, r"base\\gameplay\\gui\\widgets\\fgfix\\fgfix.inkwidget", n"Root:frameGenGhostingFixMasksController");
-
-  this.m_masksController.OnPlayerAttach(playerPuppet);
-}
-
-@wrapMethod(NewHudPhoneGameController)
-protected cb func OnPlayerDetach(playerPuppet: ref<GameObject>) -> Bool {
-  wrappedMethod(playerPuppet);
-
-  this.m_masksController.OnPlayerDetach(playerPuppet);
 }

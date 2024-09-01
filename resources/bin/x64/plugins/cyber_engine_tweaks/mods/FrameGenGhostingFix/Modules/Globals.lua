@@ -231,6 +231,15 @@ function Globals.GetScreenEdge()
   return screenEdge
 end
 
+--- Scale the mod's widget/masks accordingly to the screen configuration
+--
+-- @param None
+--
+-- @return None
+function Globals.ScaleWidgets()
+  Game.GetPlayer():QueueEvent(FrameGenGhostingFixScaleWidgetsEvent.new())
+end
+
 ------------------
 -- Unviersal methods
 ------------------
@@ -758,6 +767,7 @@ function Globals.OnOverlayClose()
   Globals.GetScreenEdge()
   Globals.GetScreenWidthFactor()
   Globals.GetScreenSpace()
+  Globals.ScaleWidgets()
 end
 
 return Globals

@@ -21,6 +21,15 @@ protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Vo
 }
 
 @addMethod(DriveEvents)
+public final func FrameGenGhostingFixDeactivationHedVehicle(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleDeactivation: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+
+  vehicleDeactivation = new FrameGenGhostingFixDeactivationHEDVehicleEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
+}
+
+@addMethod(DriveEvents)
 public final func FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface: ref<StateGameScriptInterface>) -> Void {
   let vehicleDeactivation: ref<FrameGenGhostingFixDeactivationMasksVehicleEvent>;
 
@@ -163,10 +172,29 @@ public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<S
   // LogChannel(n"DEBUG", "Deactivating masks...");
 }
 
+@wrapMethod(DriveEvents)
+public final func OnForcedExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  wrappedMethod(stateContext, scriptInterface);
+
+  this.FrameGenGhostingFixOnVehicleUnmounted(scriptInterface);
+  this.FrameGenGhostingFixDeactivationHedVehicle(scriptInterface);
+  this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
+  // LogChannel(n"DEBUG", "Deactivating masks...");
+}
+
 // Setting context for vehicles masks while in combat starts here ---------------------------------------------------------------------------------------
 @addMethod(DriverCombatEvents)
 protected final func OnFrameGenGhostingFixVehicleSpeedChange(speed: Float) -> Void {
   this.m_vehicleCurrentSpeedFGGF = speed;
+}
+
+@addMethod(DriverCombatEvents)
+public final func FrameGenGhostingFixDeactivationHedVehicle(scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  let vehicleDeactivation: ref<FrameGenGhostingFixDeactivationHEDVehicleEvent>;
+
+  vehicleDeactivation = new FrameGenGhostingFixDeactivationHEDVehicleEvent();
+
+  scriptInterface.executionOwner.QueueEvent(vehicleDeactivation);
 }
 
 @addMethod(DriverCombatEvents)
@@ -308,6 +336,16 @@ public final func OnExit(stateContext: ref<StateContext>, scriptInterface: ref<S
   wrappedMethod(stateContext, scriptInterface);
 
   this.FrameGenGhostingFixOnVehicleUnmounted(scriptInterface);
+  this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
+  // LogChannel(n"DEBUG", "Deactivating masks...");
+}
+
+@wrapMethod(DriverCombatEvents)
+public final func OnForcedExit(stateContext: ref<StateContext>, scriptInterface: ref<StateGameScriptInterface>) -> Void {
+  wrappedMethod(stateContext, scriptInterface);
+
+  this.FrameGenGhostingFixOnVehicleUnmounted(scriptInterface);
+  this.FrameGenGhostingFixDeactivationHedVehicle(scriptInterface);
   this.FrameGenGhostingFixDeactivationMasksVehicle(scriptInterface);
   // LogChannel(n"DEBUG", "Deactivating masks...");
 }
