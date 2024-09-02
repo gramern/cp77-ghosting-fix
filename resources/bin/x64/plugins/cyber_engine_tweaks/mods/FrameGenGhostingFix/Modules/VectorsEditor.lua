@@ -1,6 +1,6 @@
 local VectorsEditor = {
   __NAME = "VectorsEditor",
-  __VERSION = { 5, 1, 12 },
+  __VERSION = { 5, 2, 0 },
 }
 
 local PresetsList = {}

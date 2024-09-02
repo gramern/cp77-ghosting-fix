@@ -1,6 +1,6 @@
 local Debug = {
   __NAME = "Debug",
-  __VERSION = { 5, 1, 12 },
+  __VERSION = { 5, 2, 0 },
 }
 
 local Globals = require("Modules/Globals")
@@ -9,7 +9,6 @@ local ImGuiExt = require("Modules/ImGuiExt")
 local Calculate = require("Modules/Calculate")
 local Diagnostics = require("Modules/Diagnostics")
 local Vectors = require("Modules/Vectors")
-local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local Screen = Globals.GetScreenTable()
 local CalculateMaskingGlobal = Calculate.GetMaskingGlobalData()
@@ -64,11 +63,7 @@ function Debug.DrawUI()
       ImGui.SameLine()
       ImGuiExt.Text(tostring(VectorsMaskingGlobal.masksController))
     end
-    -- if VectorsCustomize then
-      -- ImGuiExt.Text("For VectorsCustomize Module")
-      -- ImGui.SameLine()
-      -- ImGuiExt.Text(tostring(VectorsCustomize.MaskingGlobal.masksController))
-    -- end
+    
     if Calculate then
       ImGuiExt.Text("For Calculate Module")
       ImGui.SameLine()

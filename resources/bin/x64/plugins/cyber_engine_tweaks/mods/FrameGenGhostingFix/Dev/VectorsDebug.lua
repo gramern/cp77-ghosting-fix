@@ -1,12 +1,11 @@
 local VectorsDebug = {
   __NAME = "VectorsDebug",
-  __VERSION = { 5, 1, 12 },
+  __VERSION = { 5, 2, 0 },
 }
 
 local ImGuiExt = require("Modules/ImGuiExt")
 local Tracker = require("Modules/Tracker")
 local Vectors = require("Modules/Vectors")
-local VectorsCustomize = require("Modules/VectorsCustomize")
 
 local MaskingGlobalData = Vectors.GetMaskingGlobalData()
 local CameraData = Vectors.GetCameraData()
@@ -14,7 +13,7 @@ local VehicleData = Vectors.GetVehicleData()
 local VehMasksData = Vectors.GetVehMasksData()
 
 function VectorsDebug.DrawUI()
-  if Vectors or VectorsCustomize then
+  if Vectors then
     if ImGui.BeginTabItem("Vectors General") then
 
       ImGuiExt.Text("Masks Controller:")

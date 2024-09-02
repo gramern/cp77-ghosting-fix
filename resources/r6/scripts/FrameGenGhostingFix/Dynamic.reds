@@ -1,6 +1,8 @@
 // Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-// FrameGen Ghosting 'Fix' 5.1.12, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
+// FrameGen Ghosting 'Fix' 5.2.0, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
+
+import Codeware.UI.*
 
 // -----------------
 // Get widgets scale
@@ -11,10 +13,7 @@ protected cb func FrameGenFrameGenGhostingFixGetWidgetsScale() -> Vector2 {
   let scale: Vector2;
 
   let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
-  let settings = GameInstance.GetSettingsSystem(playerPuppet.GetGame());
-  let screenResolutionConfigVar = settings.GetVar(n"/video/display", n"Resolution") as ConfigVarListString;
-  let screenDimensions = StrSplit(screenResolutionConfigVar.GetValue(), "x");
-  let screenResolution = new Vector2(StringToFloat(screenDimensions[0]), StringToFloat(screenDimensions[1]));
+  let screenResolution = ScreenHelper.GetScreenSize(playerPuppet.GetGame());
   let screenAspectRatio = screenResolution.X / screenResolution.Y;
 
   if screenAspectRatio < 2.2 {
@@ -36,8 +35,8 @@ protected cb func FrameGenFrameGenGhostingFixGetWidgetsScale() -> Vector2 {
 protected cb func OnFrameGenGhostingFixScaleWidgetsEvent(evt: ref<FrameGenGhostingFixScaleWidgetsEvent>) -> Void {
   
   if this.IsA(n"gameuiRootHudGameController") {
-    
-    let hudRoot: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+    let inkSystem = GameInstance.GetInkSystem();
+    let hudRoot = inkSystem.GetLayer(n"inkHUDLayer").GetVirtualWindow();
     let fgfix: ref<inkWidget> = hudRoot.GetWidget(n"FrameGenGhostingFixMasks") as inkWidget;
 
     if IsDefined(fgfix) {
@@ -57,7 +56,8 @@ protected cb func OnFrameGenGhostingFixSpawnWidgets(evt: ref<FrameGenGhostingFix
 
   if this.IsA(n"gameuiRootHudGameController") {
 
-    let hudRoot: ref<inkCompoundWidget> = this.GetRootCompoundWidget();
+    let inkSystem = GameInstance.GetInkSystem();
+    let hudRoot = inkSystem.GetLayer(n"inkHUDLayer").GetVirtualWindow();
 
     if !IsDefined(hudRoot.GetWidget(n"FrameGenGhostingFixMasks")) {
 
