@@ -9,7 +9,6 @@
 protected cb func FrameGenFrameGenGhostingFixGetWidgetsScale() -> Vector2 {
 
   let scale: Vector2;
-  let screenResolution: Vector2;
 
   let playerPuppet: ref<GameObject> = this.GetPlayerControlledObject();
   let settings = GameInstance.GetSettingsSystem(playerPuppet.GetGame());
