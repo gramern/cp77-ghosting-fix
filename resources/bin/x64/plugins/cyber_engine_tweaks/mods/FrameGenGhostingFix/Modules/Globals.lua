@@ -283,13 +283,13 @@ function Globals.SafeMergeTables(mergeTo, mergeA)
   if mergeA == nil then return mergeTo end
 
   for key, value in pairs(mergeA) do
-      if mergeTo[key] ~= nil then  -- Only proceed if the key exists in mergeTo
-          if type(value) == "table" and type(mergeTo[key]) == "table" then
-              mergeTo[key] = Globals.SafeMergeTables(mergeTo[key], value)
-          else
-              mergeTo[key] = value
-          end
+    if mergeTo[key] ~= nil then  -- Only proceed if the key exists in mergeTo
+      if type(value) == "table" and type(mergeTo[key]) == "table" then
+        mergeTo[key] = Globals.SafeMergeTables(mergeTo[key], value)
+      else
+        mergeTo[key] = value
       end
+    end
   end
 
   return mergeTo
@@ -305,15 +305,15 @@ function Globals.MergeTables(mergeTo, mergeA)
   if mergeA == nil then return mergeTo end
 
   for key, value in pairs(mergeA) do
-      if type(value) == "table" then
-          if type(mergeTo[key]) == "table" then
-              mergeTo[key] = Globals.MergeTables(mergeTo[key], value)
-          else
-              mergeTo[key] = Globals.MergeTables({}, value)
-          end
+    if type(value) == "table" then
+      if type(mergeTo[key]) == "table" then
+        mergeTo[key] = Globals.MergeTables(mergeTo[key], value)
       else
-          mergeTo[key] = value
+        mergeTo[key] = Globals.MergeTables({}, value)
       end
+    else
+      mergeTo[key] = value
+    end
   end
 
   return mergeTo
