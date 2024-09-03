@@ -266,7 +266,6 @@ local function RestartBenchmark()
 end
 
 local function Benchmark()
-  if not isBenchmark then return end
   if not Tracker.IsGameLoaded() then return end
 
   benchmarkTime = benchmarkTime + gameDeltaTime
@@ -377,10 +376,11 @@ local function MonitorDelta(deltaTime)
   gameDeltaTime = deltaTime
   currentFps = 1 / deltaTime
 
-  if Tracker.IsModOpenWindow() then
+  if Tracker.IsModOpenWindow() or Contextual.GetBaseFpsContext() ~= 0 then
     MonitorFps(deltaTime)
   end
 
+  if not isBenchmark then return end
   if openOverlay or Tracker.IsGamePaused() then RestartBenchmark() return end
   if benchmarkRestart then RestartBenchmark() return end
   Benchmark()
