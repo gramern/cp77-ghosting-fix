@@ -376,7 +376,7 @@ local translation = {
     a007 = {
       PresetInfo = {
         name = "Extreme - DBK Edition",
-        description = "For lovers of fast cars and wide spoilers. 60+ base FPS (120+ with FG ON) is recommended.",
+        description = "For enthusiasts of extremely fast cars and bold, wide spoilers.",
       }
     }
   }
