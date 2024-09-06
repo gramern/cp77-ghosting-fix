@@ -193,7 +193,7 @@
       "Car": {
         "FrontMask": {
           "visible": true,
-          "opacity": 0.80000001192093
+          "opacity": 0.8
         },
         "AllMasks": {
           "FPP": {
@@ -201,7 +201,7 @@
           }
         },
         "SideMasks": {
-          "opacity": 0.80000001192093,
+          "opacity": 0.8,
           "Scale": {
             "y": 1,
             "x": 1

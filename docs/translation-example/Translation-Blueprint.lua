@@ -372,6 +372,12 @@ local translation = {
         name = "Maximum Strength",
         description = "Masks' anti-ghosting strength is much greater. Their state change delay on a sudden speed decrease is set to 3 seconds.",
       }
+    },
+    a007 = {
+      PresetInfo = {
+        name = "Extreme - DBK Edition",
+        description = "For lovers of fast cars and wide spoilers. 60+ base FPS (120+ with FG ON) is recommended.",
+      }
     }
   }
 }
