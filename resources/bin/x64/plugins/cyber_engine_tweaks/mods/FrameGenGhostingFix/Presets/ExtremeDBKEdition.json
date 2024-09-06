@@ -1,0 +1,224 @@
+{
+  "__VERSION": "5.2.0",
+  "MaskingGlobal": {
+    "isOpacityLock": false,
+    "vehicles": true
+  },
+  "Vectors": {
+    "Modifiers": {
+      "Car": {
+        "RearMask": {
+          "visible": true,
+          "opacity": 1
+        },
+        "FrontMask": {
+          "visible": true,
+          "opacity": 0.8
+        },
+        "AllMasks": {
+          "FPP": {
+            "visible": true
+          }
+        },
+        "SideMasks": {
+          "visible": true,
+          "Scale": {
+            "x": 1,
+            "y": 2
+          },
+          "opacity": 0.8
+        }
+      },
+      "Bike": {
+        "DashboardMask": {
+          "opacity": 0.4
+        },
+        "EndMask": {
+          "opacity": 0.4
+        },
+        "SideMasks": {
+          "opacity": 1,
+          "Scale": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        "Windshield": {
+          "Scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "AllMasks": {
+          "TPP": {
+            "visible": true
+          },
+          "FPP": {
+            "visible": true
+          }
+        }
+      }
+    },
+    "VehElements": {
+      "CarDoors": {
+        "Left": {
+          "rotation": 140,
+          "visible": true,
+          "Size": {
+            "x": 3000,
+            "y": 2000
+          },
+          "Offset": {
+            "x": -1.2,
+            "y": 0.55,
+            "z": 0
+          }
+        },
+        "Right": {
+          "rotation": -160,
+          "visible": true,
+          "Size": {
+            "x": 2250,
+            "y": 1500
+          },
+          "Offset": {
+            "x": 1.2,
+            "y": 0.55,
+            "z": 0
+          }
+        }
+      },
+      "CarSideMirrors": {
+        "Left": {
+          "rotation": 40,
+          "visible": true,
+          "Size": {
+            "x": 1400,
+            "y": 1200
+          },
+          "Offset": {
+            "x": -1,
+            "y": 0.45,
+            "z": 0.65
+          }
+        },
+        "Right": {
+          "rotation": 145,
+          "visible": true,
+          "Size": {
+            "x": 800,
+            "y": 800
+          },
+          "Offset": {
+            "x": 1.05,
+            "y": 0.45,
+            "z": 0.65
+          }
+        }
+      },
+      "BikeSpeedometer": {
+        "rotation": 180,
+        "visible": true,
+        "Size": {
+          "x": 6120,
+          "y": 1600
+        },
+        "Offset": {
+          "x": 0,
+          "y": 0.8,
+          "z": 0.45
+        }
+      },
+      "BikeHandlebars": {
+        "Left": {
+          "rotation": 0,
+          "visible": true,
+          "Size": {
+            "x": 3000,
+            "y": 1800
+          },
+          "Offset": {
+            "x": -0.6,
+            "y": 0.7,
+            "z": 0.48
+          }
+        },
+        "Right": {
+          "rotation": 0,
+          "visible": true,
+          "Size": {
+            "x": 3000,
+            "y": 1800
+          },
+          "Offset": {
+            "x": 0.6,
+            "y": 0.7,
+            "z": 0.48
+          }
+        }
+      },
+      "BikeWindshield": {
+        "rotation": 0,
+        "visible": true,
+        "Size": {
+          "x": 3600,
+          "y": 1200
+        },
+        "Offset": {
+          "x": 0,
+          "y": 1,
+          "z": 0.54
+        }
+      }
+    },
+    "VehMasks": {
+      "HorizontalEdgeDown": {
+        "Size": {
+          "Def": {
+            "x": 4240,
+            "lock": true,
+            "y": 1480
+          }
+        },
+        "Opacity": {
+          "Def": {
+            "max": 0.03
+          }
+        },
+        "Visible": {
+          "Def": {
+            "fill": true,
+            "fillLock": true,
+            "tracker": true,
+            "corners": true
+          }
+        },
+        "Scale": {
+          "x": 0.92,
+          "y": 1
+        }
+      },
+      "Opacity": {
+        "Def": {
+          "max": 0.06,
+          "delayDuration": 3,
+          "delayThreshold": 0.95,
+          "gain": 3,
+          "speedFactor": 0.01,
+          "stepFactor": 0.1,
+          "threshold": 0.8
+        }
+      },
+      "AnchorPoint": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "PresetInfo": {
+    "id": "a007",
+    "name": "Extreme - DBK Edition",
+    "description": "For lovers of fast cars and wide spoilers. 60+ base FPS (120+ with FG ON) is recommended.",
+    "author": null
+  }
+}

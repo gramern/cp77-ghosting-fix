@@ -15,6 +15,17 @@ local FGEnabled = false
 local isOnHold = false
 local timeOnHold = 0
 
+local locomotionStatesOnHold = {
+  [5] = true,  -- Slide
+  [6] = true,  -- SlideFall
+  [7] = true,  -- Dodge
+  [18] = true, -- Jump
+  [19] = true, -- DoubleJump
+  [20] = true, -- ChargeJump
+  [21] = true, -- HoverJump
+  [22] = true  -- DodgeAir
+}
+
 local Contexts = {
   Sightseeing = false,
   SlowPacedAndCinematics = false,
@@ -869,29 +880,12 @@ function Contextual.OnInitialize()
 
     local locomotionState = LocomotionState()
     
-    -- Slide = 5
-    -- SlideFall = 6
-    -- Dodge = 7
-    -- Jump = 18
-    -- DoubleJump = 19
-    -- ChargeJump = 20
-    -- HoverJump = 21
-    -- DodgeAir = 22
-    if locomotionState == 5 or
-        locomotionState == 6 or
-        locomotionState == 7 or
-        locomotionState == 18 or
-        locomotionState == 19 or
-        locomotionState == 20 or
-        locomotionState == 21 or
-        locomotionState == 22 or
-        isOnHold
-        then
-          KeepOnHold(2)
-          return -- early return to continue previous states on sliding, dodging and jumping
-        end
+    -- locomotionStates to keep previous states on sliding, dodging and jumping
+    if locomotionStatesOnHold[locomotionState] or isOnHold then
+      KeepOnHold(2)
+      return -- early return to continue previous states on sliding, dodging and jumping
+    end
     
-
     if not Tracker.IsPlayerMoving() then
       CurrentStates.isStandingCrouching = true
       CurrentStates.isWalkingCrouchWalking = false
