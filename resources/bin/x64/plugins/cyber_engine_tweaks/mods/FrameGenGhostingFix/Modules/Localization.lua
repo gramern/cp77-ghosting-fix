@@ -289,6 +289,7 @@ local LogText = {
   calculate_apply_settings = "Applying settings accordingly...",
   calculate_missing = "Can't find the 'Calculate' module. The mod's anti-ghosting feature for on-foot gameplay won't work. Make sure the file and the mod's requried dependencies are installed and up-to-date. Check for conflicts with other mods.",
   contextual_missing = "Can't find the 'Contextual' module. The mod's Contextual Frame Generation feature won't work. Make sure the file and the mod's requried dependencies are installed and up-to-date. Check for conflicts with other mods.",
+  game_version = "Cyberpunk 2077 version:",
   globals_controller_missing = "Masks controller not set.  The mod won't work... Make sure the mod's requried dependencies are installed and up-to-date. Check for conflicts with other mods.",
   globals_first_run = "Initial launch of the mod detected.",
   globals_missing = "Can't find the 'Globals' module. The mod won't work... Make sure the file and the mod's requried dependencies are installed and up-to-date. Check for conflicts with other mods.",

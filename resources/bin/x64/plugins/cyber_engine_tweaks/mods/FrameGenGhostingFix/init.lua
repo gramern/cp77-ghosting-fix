@@ -494,6 +494,9 @@ registerForEvent("onOverlayOpen", function()
     local modVersion = LogText.mod_version .. " " .. FrameGenGhostingFix.GetVersion(true)
     Globals.PrintDebug(modVersion)
 
+    local gameVersion = LogText.game_version .. " " .. Game.GetSystemRequestsHandler():GetGameVersion()
+    Globals.PrintDebug(gameVersion)
+
     Globals.PrintTable(Globals.LoadJSON('user-settings'))
   end
 

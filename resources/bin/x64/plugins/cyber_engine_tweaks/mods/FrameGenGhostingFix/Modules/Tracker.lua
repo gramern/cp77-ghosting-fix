@@ -337,6 +337,22 @@ end
 -- Game State Local Functions
 ----------------------------------------------------------------------------------------------------------------------
 
+local function GetGameFrameGenerationState()
+  local fsr3SupportedGameVersion = {
+    ["2.13"] = true
+  }
+
+  local gameVersion = Game.GetSystemRequestsHandler():GetGameVersion()
+
+  if fsr3SupportedGameVersion[gameVersion] then
+    local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
+
+    return frameGeneration == "DLSS" or frameGeneration == "FSR3"
+  else
+    return GameOptions.GetBool("DLSSFrameGen", "Enable")
+  end
+end
+
 local function SetGameFrameGeneration(isEnabled)
   GameState.isFrameGen = isEnabled
 end
@@ -394,7 +410,7 @@ local function ExecuteCallbackOnGameStateChange(gameState)
 end
 
 local function OnGameLoaded()
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  SetGameFrameGeneration(GetGameFrameGenerationState())
 
   if FrameGenGhostingFix.IsContextual() then
     Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
@@ -406,7 +422,7 @@ local function OnGameLoaded()
 end
 
 local function OnGamePaused()
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  SetGameFrameGeneration(GetGameFrameGenerationState())
 
   Tracker.SetModFrameGeneration(false)
 
@@ -414,7 +430,7 @@ local function OnGamePaused()
 end
 
 local function OnGameUnpaused()
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  SetGameFrameGeneration(GetGameFrameGenerationState())
 
   if FrameGenGhostingFix.IsContextual() then
     Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
@@ -558,13 +574,13 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 function Tracker.OnInitialize()
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  SetGameFrameGeneration(GetGameFrameGenerationState())
 
   --Game / Mod State
   Observe('QuestTrackerGameController', 'OnInitialize', function()
     Tracker.SetGameLoaded(true)
 
-    SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+    SetGameFrameGeneration(GetGameFrameGenerationState())
 
     if FrameGenGhostingFix.IsContextual() then
       Tracker.SetModFrameGeneration(DLSSEnabler_GetFrameGenerationState())
@@ -576,7 +592,7 @@ function Tracker.OnInitialize()
   Observe('QuestTrackerGameController', 'OnUninitialize', function()
     Tracker.SetGameLoaded(false)
 
-    SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+    SetGameFrameGeneration(GetGameFrameGenerationState())
 
     Tracker.SetModFrameGeneration(false)
   end)
@@ -592,7 +608,7 @@ function Tracker.OnInitialize()
 end
 
 function Tracker.OnOverlayOpen()
-  SetGameFrameGeneration(GameOptions.GetBool("DLSSFrameGen", "Enable"))
+  SetGameFrameGeneration(GetGameFrameGenerationState())
 
   if not Tracker.IsGameReady() then return end
 
