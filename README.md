@@ -11,16 +11,28 @@ Limits ghosting behind some moving 3D objects caused by modded FSR3 frame genera
 Allows prioritizing image quality for [certain in-game events](docs/assets/images/contextual-menu.gif) by automatically turning frame generation on/off without lag or stutter.
 
 # Requirements
-**Base (Anti-Ghosting) requirements:**
-+ Cyberpunk 2077 2.12+
+### Base (Anti-Ghosting) requirements:
+
+For Cyberpunk 2077 2.13:
++ [redscript](https://github.com/jac3km4/redscript) 0.5.27+
++ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.33.0+
++ [RED4ext](https://github.com/WopsS/RED4ext) 1.25.1+
++ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.16.9+
+
+For Cyberpunk 2077 2.12/2.12a:
 + [redscript](https://github.com/jac3km4/redscript) 0.5.17+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.32.0+
 + [RED4ext](https://github.com/WopsS/RED4ext) 1.25.0+
 + [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
 
-**Contextual Frame Generation additionally requires:**
+### Contextual Frame Generation additionally requires:
 + [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.00.000.0+
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.3.4.0+ _(the dll file is included in this repo)_
+
+For Cyberpunk 2077 2.13:
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.3.0+ _(the dll file is included in this repo)_
+
+For Cyberpunk 2077 2.12/2.12a:
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.1.0+ _(the dll file is included in this repo)_
 
 # Intended results
 **Anti-ghosting:**
