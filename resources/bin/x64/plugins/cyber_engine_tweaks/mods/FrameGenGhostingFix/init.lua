@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 2, 0 },
+  __VERSION = { 5, 2, 1 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -356,6 +356,12 @@ end
 -- Performance
 ------------------
 
+local function IsBaseFpsContext()
+  if not Contextual then return end
+
+  return Contextual.GetBaseFpsContext() ~= 0
+end
+
 local function MonitorFps(deltaTime)
   currentCycle = currentCycle - deltaTime
   currentCount = currentCount + 1
@@ -376,7 +382,7 @@ local function MonitorDelta(deltaTime)
   gameDeltaTime = deltaTime
   currentFps = 1 / deltaTime
 
-  if Tracker.IsModOpenWindow() or Contextual.GetBaseFpsContext() ~= 0 then
+  if Tracker.IsModOpenWindow() or IsBaseFpsContext() then
     MonitorFps(deltaTime)
   end
 
@@ -812,10 +818,15 @@ registerForEvent("onDraw", function()
               end
             end
 
-            if FrameGenGhostingFix.IsContextual() and Contextual.GetBaseFpsContext() ~= 0 then
+            if FrameGenGhostingFix.IsContextual() and IsBaseFpsContext() then
               ImGui.Text("")
-              ImGuiExt.Text(SettingsText.info_context_base_fps, true)
-              ImGuiExt.Text(tostring(Contextual.GetBaseFpsContext()))
+              
+              if Contextual.IsSupported() then
+                ImGuiExt.Text(SettingsText.info_context_base_fps, true)
+                ImGuiExt.Text(tostring(Contextual.GetBaseFpsContext()))
+              else
+                ImGuiExt.Text(SettingsText.info_game_modded_frame_gen_required, true)
+              end
             end
 
             ImGui.Text("")

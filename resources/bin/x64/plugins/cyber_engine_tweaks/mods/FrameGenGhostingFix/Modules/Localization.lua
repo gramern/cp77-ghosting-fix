@@ -1,6 +1,6 @@
 Localization = {
   __NAME = "Localization",
-  __VERSION = { 5, 2, 0 },
+  __VERSION = { 5, 2, 1 },
 }
 
 local UIText = {
@@ -233,6 +233,7 @@ local UIText = {
     info_game_not_ready_warning = "[ ! ] You need to start or unpause the game to change these settings.",
     info_game_settings_fg = "[ ! ] Please make sure frame generation is always enabled in game menu for this to work correctly.",
     info_game_frame_gen_required = "[ ! ] Please enable FSR 3 Frame Generation in the game's settings to use these features.",
+    info_game_modded_frame_gen_required = "[ ! ] Please enable the MODDED FSR 3 Frame Generation in the game's settings to use these features.",
     info_mod_frame_gen_required = "[ ! ] Please check 'Enable Frame Generation' in the 'Settings' tab to use these features.",
     status_mod_reloaded = "The mod has been reloaded.",
     status_game_loaded_fail = "The game is in the main menu, can't be set to loaded.",

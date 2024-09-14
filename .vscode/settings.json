@@ -23,6 +23,7 @@
     "ImGuiStyleVar",
     "ImGuiWindowFlags",
     "FrameGenGhostingFixIsRedScriptModule",
+    "FrameGenGhostingFixScaleWidgetsEvent",
     "DLSSEnabler_GetVersionAsString",
     "DLSSEnabler_SetFrameGenerationMode",
     "DLSSEnabler_GetFrameGenerationMode",

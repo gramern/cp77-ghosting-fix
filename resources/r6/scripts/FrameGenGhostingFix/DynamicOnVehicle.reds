@@ -1,6 +1,6 @@
 // Thanks to djkovrik and psiberx for help and redscript snippets, Snaxgamer for his AutoVehicleCamera Switch mod from which a method of wrapping certain events has been inspired. JackHumbert for the Let There Be Flight mod I took bike parts names from. The code is also inspired by danyalzia's contribution to the Ghosting Fix mod (the first functioning script, thank you!)
 
-// FrameGen Ghosting 'Fix' 5.2.0, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
+// FrameGen Ghosting 'Fix' 5.2.1, 2024 gramern (scz_g), 2024 danyalzia (omniscient)
 
 @addField(DriveEvents) public let m_carCameraContextFGGF: vehicleCameraPerspective;
 @addField(DriveEvents) public let m_bikeCameraContextFGGF: vehicleCameraPerspective;

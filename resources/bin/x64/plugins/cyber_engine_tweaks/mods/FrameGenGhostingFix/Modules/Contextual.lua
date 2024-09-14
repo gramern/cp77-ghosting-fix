@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 2, 0 },
+  __VERSION = { 5, 2, 1 },
 }
 
 local isDebug = nil
@@ -122,6 +122,23 @@ function Contextual.GetBaseFpsContext()
   return Contexts.BaseFps
 end
 
+-- @return boolean;
+function Contextual.IsSupported()
+  local fsr3SupportedGameVersion = {
+    ["2.13"] = true
+  }
+
+  local gameVersion = Game.GetSystemRequestsHandler():GetGameVersion()
+
+  if fsr3SupportedGameVersion[gameVersion] then
+    local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
+
+    return frameGeneration == "DLSS"
+  else
+    return GameOptions.GetBool("DLSSFrameGen", "Enable")
+  end
+end
+
 ------------------
 -- Main Logic Starts Here
 ------------------
@@ -130,7 +147,7 @@ local function TurnOffFrameGen()
   if not Tracker.IsGameReady() then return end
 
   -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
-  if FGEnabled == true then
+  if FGEnabled then
     DLSSEnabler_SetFrameGenerationState(false)
     FGEnabled = false
     Tracker.SetModFrameGeneration(false)
@@ -144,7 +161,7 @@ local function TurnOnFrameGen()
   if Tracker.GetCurrentFpsInteger() and Tracker.GetCurrentFpsInteger() < Contexts.BaseFps then return end
 
   -- Only call external DLSSEnabler_SetFrameGeneration method once to avoid overhead
-  if FGEnabled == false then
+  if not FGEnabled then
     DLSSEnabler_SetFrameGenerationState(true)
     FGEnabled = true
     Tracker.SetModFrameGeneration(true)
@@ -1130,6 +1147,18 @@ local function GameFrameGenerationOffCaseUI()
   end
 end
 
+local function GameFrameGenerationNotCompatibleCaseUI()
+  if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
+
+    ImGui.Text("")
+    ImGuiExt.Text(SettingsText.info_game_modded_frame_gen_required, true)
+    ImGui.Text("")
+    ImGuiExt.ResetStatusBar()
+
+    ImGui.EndTabItem()
+  end
+end
+
 local function ModDynamicFrameGenerationOnCaseUI()
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
 
@@ -1155,6 +1184,12 @@ function Contextual.DrawUI()
 
   if not Tracker.IsGameFrameGeneration() then
     GameFrameGenerationOffCaseUI()
+
+    return
+  end
+
+  if not Contextual.IsSupported() then
+    GameFrameGenerationNotCompatibleCaseUI()
 
     return
   end
