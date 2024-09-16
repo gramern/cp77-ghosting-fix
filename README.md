@@ -32,9 +32,9 @@ For Cyberpunk 2077 2.13:
 + [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.3.0+ _(the dll file is included in this repo)_
 
 For Cyberpunk 2077 2.12/2.12a:
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.1.0+ _(the dll file is included in this repo)_
-
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.1.0+
 # Intended results
+
 **Anti-ghosting:**
 
 Since 4.0.0-alpha, thanks to a major change in how masks are projected (using the game's world space-to-screen space method, vehicle's position, and camera data to project and transform masks in real-time), the mod is usable with FSR3 FG ON at lower framerates (30+ fps interpolated to 60+ fps, e.g.). The new mask mapping algorithm for vehicles introduced in 4.8.0xl-alpha2 brought further improvements in smoothness at lower framerates.
