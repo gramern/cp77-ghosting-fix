@@ -1,6 +1,6 @@
 local VectorsDebug = {
   __NAME = "VectorsDebug",
-  __VERSION = { 5, 2, 1 },
+  __VERSION = { 5, 2, 2 },
 }
 
 local ImGuiExt = require("Modules/ImGuiExt")
