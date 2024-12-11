@@ -13,6 +13,12 @@ Allows prioritizing image quality for [certain in-game events](docs/assets/image
 # Requirements
 ### Base (Anti-Ghosting) requirements:
 
+For Cyberpunk 2077 2.2:
++ [redscript](https://github.com/jac3km4/redscript) 0.5.27+
++ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.34.0+
++ [RED4ext](https://github.com/WopsS/RED4ext) 1.26.1+
++ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.18.0+
+
 For Cyberpunk 2077 2.13:
 + [redscript](https://github.com/jac3km4/redscript) 0.5.27+
 + [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.33.0+
@@ -28,8 +34,11 @@ For Cyberpunk 2077 2.12/2.12a:
 ### Contextual Frame Generation additionally requires:
 + [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.00.000.0+
 
+For Cyberpunk 2077 2.2:
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.4.0+ _(the dll file is included in this repo)_
+
 For Cyberpunk 2077 2.13:
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.3.0+ _(the dll file is included in this repo)_
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.3.0
 
 For Cyberpunk 2077 2.12/2.12a:
 + [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.1.0+
