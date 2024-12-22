@@ -124,16 +124,7 @@ end
 
 -- @return boolean;
 function Contextual.IsSupported()
-  local gameVersion = Globals.VersionStringToTable(Game.GetSystemRequestsHandler():GetGameVersion())
-  local minorFirstDigit = tonumber(tostring(gameVersion[2]):sub(1,1))
-
-  if gameVersion[2] == 13 or minorFirstDigit >= 2 then
-    local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
-
-    return frameGeneration == "DLSS"
-  else
-    return GameOptions.GetBool("DLSSFrameGen", "Enable")
-  end
+  return Tracker.GetGameFrameGenerationTech() == "DLSS" and isDLSSEnabler
 end
 
 ------------------
@@ -1132,23 +1123,13 @@ local function DLSSEnablerMissingCaseUI()
   end
 end
 
-local function GameFrameGenerationOffCaseUI()
-  if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
-
-    ImGui.Text("")
-    ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
-    ImGui.Text("")
-    ImGuiExt.ResetStatusBar()
-
-    ImGui.EndTabItem()
-  end
-end
-
 local function GameFrameGenerationNotCompatibleCaseUI()
   if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
 
     ImGui.Text("")
     ImGuiExt.Text(SettingsText.info_game_modded_frame_gen_required, true)
+    ImGui.Text("")
+    ImGuiExt.Text(ContextualText.info_contextual_dependencies, true)
     ImGui.Text("")
     ImGuiExt.ResetStatusBar()
 
@@ -1175,12 +1156,6 @@ function Contextual.DrawUI()
 
   if not isDLSSEnabler then
     DLSSEnablerMissingCaseUI()
-
-    return
-  end
-
-  if not Tracker.IsGameFrameGeneration() then
-    GameFrameGenerationOffCaseUI()
 
     return
   end
