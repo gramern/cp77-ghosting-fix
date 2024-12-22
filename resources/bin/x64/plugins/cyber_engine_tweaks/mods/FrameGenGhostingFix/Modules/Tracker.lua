@@ -1,6 +1,6 @@
 local Tracker = {
   __NAME = "Tracker",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
 }
 
 local GameState = {
@@ -338,13 +338,10 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 local function GetGameFrameGenerationState()
-  local fsr3SupportedGameVersion = {
-    ["2.13"] = true
-  }
+  local gameVersion = Globals.VersionStringToTable(Game.GetSystemRequestsHandler():GetGameVersion())
+  local minorFirstDigit = tonumber(tostring(gameVersion[2]):sub(1,1))
 
-  local gameVersion = Game.GetSystemRequestsHandler():GetGameVersion()
-
-  if fsr3SupportedGameVersion[gameVersion] then
+  if gameVersion[2] == 13 or minorFirstDigit >= 2 then
     local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
 
     return frameGeneration == "DLSS" or frameGeneration == "FSR3"

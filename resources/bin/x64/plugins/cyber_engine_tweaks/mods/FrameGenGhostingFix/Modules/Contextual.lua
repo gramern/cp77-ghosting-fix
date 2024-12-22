@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
 }
 
 local isDebug = nil
@@ -124,19 +124,7 @@ end
 
 -- @return boolean;
 function Contextual.IsSupported()
-  local fsr3SupportedGameVersion = {
-    ["2.13"] = true
-  }
-
-  local gameVersion = Game.GetSystemRequestsHandler():GetGameVersion()
-
-  if fsr3SupportedGameVersion[gameVersion] then
-    local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
-
-    return frameGeneration == "DLSS"
-  else
-    return GameOptions.GetBool("DLSSFrameGen", "Enable")
-  end
+  return Tracker.IsGameFrameGeneration()
 end
 
 ------------------
