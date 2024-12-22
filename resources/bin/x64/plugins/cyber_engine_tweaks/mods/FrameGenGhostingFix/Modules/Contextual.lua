@@ -124,7 +124,16 @@ end
 
 -- @return boolean;
 function Contextual.IsSupported()
-  return Tracker.IsGameFrameGeneration()
+  local gameVersion = Globals.VersionStringToTable(Game.GetSystemRequestsHandler():GetGameVersion())
+  local minorFirstDigit = tonumber(tostring(gameVersion[2]):sub(1,1))
+
+  if gameVersion[2] == 13 or minorFirstDigit >= 2 then
+    local frameGeneration = Game.GetSettingsSystem():GetVar("/graphics/presets", "FrameGeneration"):GetValue()
+
+    return frameGeneration == "DLSS"
+  else
+    return GameOptions.GetBool("DLSSFrameGen", "Enable")
+  end
 end
 
 ------------------
