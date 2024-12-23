@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
@@ -535,6 +535,7 @@ registerForEvent("onOverlayClose", function()
   end
 
   Globals.OnOverlayClose()
+  Tracker.OnOverlayClose()
 
   if not Tracker.IsModReady() then return end
 
@@ -805,7 +806,7 @@ registerForEvent("onDraw", function()
             ImGui.SameLine()
             
             if FrameGenGhostingFix.IsContextual() then
-              if Tracker.IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
+              if Contextual.IsSupported() and Tracker.IsGameFrameGeneration() and Tracker.IsModFrameGeneration() then
                 ImGuiExt.Text(GeneralText.info_enabled)
               else
                 ImGuiExt.Text(GeneralText.info_disabled)

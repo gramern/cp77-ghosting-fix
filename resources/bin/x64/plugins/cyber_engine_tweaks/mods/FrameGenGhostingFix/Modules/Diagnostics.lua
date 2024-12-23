@@ -1,6 +1,6 @@
 local Diagnostics = {
   __NAME = "Diagnostics",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
   isModsCompatibility = true,
   modfiles = {},
   isUpdateRecommended = false

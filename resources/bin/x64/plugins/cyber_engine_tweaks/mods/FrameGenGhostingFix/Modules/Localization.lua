@@ -1,6 +1,6 @@
 Localization = {
   __NAME = "Localization",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
 }
 
 local UIText = {
@@ -177,7 +177,7 @@ local UIText = {
     info_bad_enabler_version = "[ ! ] DLSS Enabler is incompatible or missing. The mod's Contextual Frame Generation feature won't work.",
     info_found_enabler_version = "DLSS Enabler version:",
     info_contextual = "Contextual Frame Generation is a new feature that smoothly toggles frame generation ON/OFF based on the game's events. The feature allows you to prioritize image quality and get rid of frame generation artifacts for selected contexts, like city sightseeing, slow-paced scenes or cinematics.",
-    info_contextual_dependencies = "To use the new feature, you need 'FSR3 Frame Gen for Cyberpunk 2077 (DLSS Enabler 2077 Edition)' 3.00.000.0+ and FrameGen Ghosting 'Fix' 5.0.0+.",
+    info_contextual_dependencies = "To use this feature, you need 'FSR3 Frame Gen for Cyberpunk 2077 (DLSS Enabler 2077 Edition)' 3.00.000.0+ and FrameGen Ghosting 'Fix' 5.0.0+.",
     info_contextual_requirements = "This feature needs 55+ base FPS (without frame generation) to work in the intended way.",
     info_context_base_fps = "Set a base FPS value, below which frame generation will be turned off globally.\n\nValue set to '0' disables this feature.",
     info_context_base_fps_state = "Base FPS Context is:",

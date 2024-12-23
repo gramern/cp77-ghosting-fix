@@ -1,6 +1,6 @@
 local VectorsPresets = {
   __NAME = "VectorsPresets",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
 }
 
 local SortedPresetIds = {}
@@ -197,7 +197,7 @@ end
 local function GameFrameGenerationOffCaseUI()
   if ImGui.BeginTabItem(VehiclesText.tab_name_vehicle) then
     ImGui.Text("")
-    ImGuiExt.Text(SettingsText.info_frame_gen_off, true)
+    ImGuiExt.Text(SettingsText.info_game_frame_gen_required, true)
     ImGui.Text("")
 
     ImGui.EndTabItem()

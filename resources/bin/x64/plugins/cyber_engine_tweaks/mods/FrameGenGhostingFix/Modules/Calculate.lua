@@ -1,6 +1,6 @@
 local Calculate = {
   __NAME = "Calculate",
-  __VERSION = { 5, 2, 2 },
+  __VERSION = { 5, 2, 3 },
 }
 
 local MaskingGlobal = {
