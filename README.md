@@ -13,35 +13,17 @@ Allows prioritizing image quality for [certain in-game events](docs/assets/image
 # Requirements
 ### Base (Anti-Ghosting) requirements:
 
-For Cyberpunk 2077 2.2:
-+ [redscript](https://github.com/jac3km4/redscript) 0.5.27+
-+ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.34.0+
-+ [RED4ext](https://github.com/WopsS/RED4ext) 1.26.1+
-+ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.18.0+
-
-For Cyberpunk 2077 2.13:
-+ [redscript](https://github.com/jac3km4/redscript) 0.5.27+
-+ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.33.0+
-+ [RED4ext](https://github.com/WopsS/RED4ext) 1.25.1+
-+ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.16.9+
-
-For Cyberpunk 2077 2.12/2.12a:
-+ [redscript](https://github.com/jac3km4/redscript) 0.5.17+
-+ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.32.0+
-+ [RED4ext](https://github.com/WopsS/RED4ext) 1.25.0+
-+ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.14.3+
+For Cyberpunk 2077 2.3:
++ [redscript](https://github.com/jac3km4/redscript) 0.5.28+
++ [Cyber Engine Tweaks](https://github.com/maximegmd/CyberEngineTweaks) 1.36.0+
++ [RED4ext](https://github.com/WopsS/RED4ext) 1.28.0+
++ [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) 1.24.0+
++ [Codeware](https://github.com/psiberx/cp2077-codeware) 1.17.0+
 
 ### Contextual Frame Generation additionally requires:
 + [DLSS Enabler](https://github.com/artur-graniszewski/DLSS-Enabler) 3.00.000.0+
++ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.7.0 _(the dll file is included in this repo and the mod's releases)_
 
-For Cyberpunk 2077 2.2:
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.4.0+ _(the dll file is included in this repo)_
-
-For Cyberpunk 2077 2.13:
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.3.0
-
-For Cyberpunk 2077 2.12/2.12a:
-+ [DLSS Enabler Bridge 2077](https://github.com/gramern/cp77-dlss-enabler-bridge) 0.4.1.0+
 # Intended results
 
 **Anti-ghosting:**
