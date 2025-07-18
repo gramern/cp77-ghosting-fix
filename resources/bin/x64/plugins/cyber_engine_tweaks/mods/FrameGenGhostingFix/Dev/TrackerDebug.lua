@@ -1,6 +1,6 @@
 local TrackerDebug = {
   __NAME = "TrackerDebug",
-  __VERSION = { 5, 2, 4 },
+  __VERSION = { 5, 2, 5 },
 }
 
 local ImGuiExt = require("Modules/ImGuiExt")

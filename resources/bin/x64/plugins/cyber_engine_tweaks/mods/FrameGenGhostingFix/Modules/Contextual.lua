@@ -1,6 +1,6 @@
 local Contextual = {
   __NAME = "Contextual",
-  __VERSION = { 5, 2, 4 },
+  __VERSION = { 5, 2, 5 },
 }
 
 local isDebug = nil

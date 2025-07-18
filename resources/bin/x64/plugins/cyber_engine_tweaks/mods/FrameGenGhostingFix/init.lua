@@ -1,7 +1,7 @@
 FrameGenGhostingFix = {
   __NAME = "FrameGen Ghosting 'Fix'",
   __EDITION = "V",
-  __VERSION = { 5, 2, 4 },
+  __VERSION = { 5, 2, 5 },
   __VERSION_SUFFIX = nil,
   __VERSION_STATUS = nil,
   __VERSION_STRING = nil,
