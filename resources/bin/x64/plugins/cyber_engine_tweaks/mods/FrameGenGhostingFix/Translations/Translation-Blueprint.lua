@@ -42,7 +42,7 @@
 --]=====]
 
 local translation = {
-  __VERSION = { 5, 2, 5 },
+  __VERSION = { 5, 2, 6 },
   __AUTHOR = "", -- Mark your work. 
   UIText = {
     General = {
