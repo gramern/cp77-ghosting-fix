@@ -170,13 +170,13 @@ end
 --
 -- @return None
 function Settings.SetXeFGMsg(isDelivered)
-  ModSettings.isXeFGMSG = isDelivered
+  ModSettings.isXeFGMsg = isDelivered
   SaveRequest()
 end
 
 -- @return boolean: `true` if a message has been delivered to user.
 function Settings.IsXeFGMsg()
-  return ModSettings.isXeFGMSG
+  return ModSettings.isXeFGMsg
 end
 
 -- @return string; Selected Theme name

@@ -661,7 +661,7 @@ registerForEvent("onDraw", function()
             ImGui.Text("")
 
             if ImGui.Button(GeneralText.btn_apply, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
-              Settings.SetMessage(true)
+              Settings.SetXeFGMsg(true)
             end
 
             ImGui.EndTabItem()
