@@ -55,6 +55,7 @@ local function LoadModSettings(modSettings)
   ModSettings.isHelp = modSettings and modSettings.Help or true
   ModSettings.isKeepWindow = modSettings and modSettings.KeepWindow or false
   ModSettings.isMessage = modSettings and modSettings.Message or false
+  ModSettings.isXeFGMsg = modSettings and modSettings.XeFGMsg or false
   ModSettings.windowTheme = modSettings and modSettings.WindowTheme or "Crimson"
 end
 
@@ -67,6 +68,7 @@ local function SaveModSettings()
     Help = ModSettings.isHelp,
     KeepWindow = ModSettings.isKeepWindow,
     Message = ModSettings.isMessage,
+    XeFGMsg = ModSettings.isXeFGMsg,
     WindowTheme = ModSettings.windowTheme
   }
 
@@ -162,6 +164,19 @@ end
 -- @return boolean: `true` if a message has been delivered to user.
 function Settings.IsMessage()
   return ModSettings.isMessage
+end
+
+-- @param `isDelivered`: boolean; Whether a message has been delivered to user.
+--
+-- @return None
+function Settings.SetXeFGMsg(isDelivered)
+  ModSettings.isXeFGMSG = isDelivered
+  SaveRequest()
+end
+
+-- @return boolean: `true` if a message has been delivered to user.
+function Settings.IsXeFGMsg()
+  return ModSettings.isXeFGMSG
 end
 
 -- @return string; Selected Theme name

@@ -30,6 +30,11 @@ local UIText = {
     info_benchmark = "[ ! ] FrameGen Ghosting 'Fix' is benchmarking your game's performance. Please continue playing freely: once the benchmark is finished, the mod will apply optimal settings for your game's performance. You can change those settings later.\n\nThe benchmark is conducted during the first run of the mod.",
     info_benchmark_ask = "[ ! ] Do you want to run a benchmark to let the mod measure your game's performance and set optimal anti-ghosting settings?\n\nIt will happen in the background, please continue playing freely.",
     info_mod_not_ready = "The mod encountered a problem:",
+    info_XeFG = "Since update 2.3, Cyberpunk 2077 supports XeSS Frame Generation, offering superior image quality, lower latency and reduced artifacts compared to FSR 3.1 FG.",
+    info_XeFG_compatbility = "Verify your graphics card supports DP4a instructions (required for XeSS compatibility) and enable XeSS FG in the game's graphics settings.",
+    info_XeFG_mod_redundancy = "If you're switching to XeSS FG, Ghosting 'Fix' isn't required. We hope the mod served you well and made your gaming experience better.",
+    info_XeFG_thank_you = "Thanks for downloading and using Ghosting 'Fix'! See you in Night City,",
+    info_XeFG_authors = "Gramern, Danyalzia and creators of translation packs"
   },
   Vehicles = {
     tab_name_vehicle = "Vehicles",

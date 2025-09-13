@@ -646,6 +646,28 @@ registerForEvent("onDraw", function()
           end
         end
 
+        if not Settings.IsXeFGMsg() then
+          if ImGui.BeginTabItem(InfoText.tab_name_info) then
+
+            ImGuiExt.Text(InfoText.info_XeFG, true)
+            ImGui.Text("")
+            ImGuiExt.Text(InfoText.info_XeFG_compatbility, true)
+            ImGui.Text("")
+            ImGuiExt.Text(InfoText.info_XeFG_mod_redundancy, true)
+            ImGui.Text("")
+            ImGuiExt.Text(InfoText.info_XeFG_thank_you, true)
+            ImGui.Text("")
+            ImGuiExt.Text(InfoText.info_XeFG_authors, true)
+            ImGui.Text("")
+
+            if ImGui.Button(GeneralText.btn_apply, 478 * ImGuiExt.GetScaleFactor(), 40 * ImGuiExt.GetScaleFactor()) then
+              Settings.SetMessage(true)
+            end
+
+            ImGui.EndTabItem()
+          end
+        end
+
         if FrameGenGhostingFix.__VERSION_SUFFIX and not Settings.IsMessage() then
           if ImGui.BeginTabItem(ContextualText.tab_name_contextual) then
 
