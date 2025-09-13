@@ -1,5 +1,5 @@
 local translation = {
-  __VERSION = { 5, 2, 6 },
+  __VERSION = { 5, 2, 7 },
   __AUTHOR = "Testing Translation System",
   UIText = {
     General = {

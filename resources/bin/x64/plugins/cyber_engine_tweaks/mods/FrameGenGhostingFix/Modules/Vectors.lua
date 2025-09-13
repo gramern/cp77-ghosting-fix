@@ -1,6 +1,6 @@
 local Vectors = {
   __NAME = "Vectors",
-  __VERSION = { 5, 2, 6 },
+  __VERSION = { 5, 2, 7 },
 }
 
 local MaskingGlobal = {
